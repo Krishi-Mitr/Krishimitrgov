@@ -94,11 +94,6 @@ button {
 </div>
 
 <script>
-const supabase = supabase.createClient(
-  'https://xhzpvgiyvxcfwgnupkqv.supabase.co',
-  'sb_publishable_YviwlBy7i3PmxZ88mwsDeQ_P4Bg0naI'
-);
-
 const form = document.getElementById('registerForm');
 const msg = document.getElementById('message');
 const success = document.getElementById('success');
@@ -113,47 +108,66 @@ form.addEventListener('submit', async (e) => {
   const password = document.getElementById('password').value.trim();
   const name = document.getElementById('name').value.trim();
 
-  const { data: existing } = await supabase
-    .from('logindata')
-    .select('username')
-    .eq('username', username)
-    .single();
+  try {
+    /* 1️⃣ CHECK USERNAME */
+    const { data: existing, error: e1 } = await supabase
+      .from('logindata')
+      .select('username')
+      .eq('username', username);
 
-  if (existing) {
-    msg.innerText = "Username already exists!";
-    msg.style.display = "block";
-    return;
-  }
-  const { data, error } = await supabase.auth.signUp({
-    email: username + "@citizen.local",
-    password,
-    options: {
-      data: {
-        username,
-        name,
-        usertype: "Citizen"
-      }
+    if (e1) throw e1;
+
+    if (existing.length > 0) {
+      msg.innerText = "Username already exists!";
+      msg.style.display = "block";
+      return;
     }
-  });
 
-  if (error) {
-    msg.innerText = error.message;
+    /* 2️⃣ GENERATE citizenid */
+    const { data: last, error: e2 } = await supabase
+      .from('citizeninfo')
+      .select('citizenid')
+      .order('citizenid', { ascending: false })
+      .limit(1);
+
+    if (e2) throw e2;
+
+    const citizenid = last.length > 0 ? last[0].citizenid + 1 : 1000;
+
+    /* 3️⃣ INSERT citizeninfo */
+    const { error: e3 } = await supabase
+      .from('citizeninfo')
+      .insert({
+        citizenid: citizenid,
+        name: name
+      });
+
+    if (e3) throw e3;
+
+    /* 4️⃣ INSERT logindata */
+    const { error: e4 } = await supabase
+      .from('logindata')
+      .insert({
+        loginid: citizenid,
+        username: username,
+        password: password,
+        usertype: "Citizen"
+      });
+
+    if (e4) throw e4;
+
+    success.innerHTML =
+      `Registration successful! You can now <a href="login.html" style="color:#FF9933;">login</a>.`;
+    success.style.display = "block";
+    form.style.display = "none";
+
+  } catch (err) {
+    console.error(err);
+    msg.innerText = "Registration failed";
     msg.style.display = "block";
-    return;
   }
-  await supabase.from('logindata').insert({
-    id: data.user.id,
-    username,
-    name,
-    usertype: "Citizen"
-  });
-
-  success.innerHTML =
-    `Registration successful! You can now <a href="login.html" style="color:#FF9933;">login</a>.`;
-
-  success.style.display = "block";
-  form.style.display = "none";
 });
 </script>
+
 </body>
 </html>
