@@ -1,88 +1,90 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
+<meta charset="UTF-8" />
 <title>Dashboard - Krishi Mitr</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase.js"></script>
 
 <style>
-* { box-sizing: border-box; }
-
 body {
-    margin: 0;
-    font-family: 'Poppins', sans-serif;
-    min-height: 100vh;
-    background: linear-gradient(180deg,#FF9933 0%,#FFFFFF 50%,#138808 100%);
-    background-attachment: fixed;
+  margin: 0;
+  font-family: "Poppins", Arial, sans-serif;
+  min-height: 100vh;
+  background: linear-gradient(180deg, #FF9933 0%, #FFFFFF 50%, #138808 100%);
 }
 
-/* NAVBAR */
+/* TOP NAV */
 .top-nav {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 14px 24px;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    background: rgba(255,255,255,0.65);
-    backdrop-filter: blur(8px);
-    border-bottom: 3px solid #000080;
-    z-index: 1000;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 70px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 25px;
+  background: rgba(255,255,255,0.7);
+  backdrop-filter: blur(6px);
+  border-bottom: 3px solid #000080;
+  box-sizing: border-box;
 }
 
 .nav-left {
-    display: flex;
-    gap: 16px;
-    flex-wrap: wrap;
+  display: flex;
+  gap: 15px;
 }
 
 .nav-box {
-    background: #000080;
-    color: white;
-    padding: 10px 18px;
-    border-radius: 10px;
-    text-decoration: none;
-    font-weight: 600;
-    font-size: 14px;
-    transition: 0.25s ease;
+  background: #000080;
+  color: white;
+  padding: 10px 18px;
+  border-radius: 10px;
+  text-decoration: none;
+  font-weight: 600;
+  transition: 0.25s;
 }
 
 .nav-box:hover {
-    background: #FF9933;
-    color: #000;
+  background: #FF9933;
+  color: #000;
 }
 
 .logout-btn {
-    background: #FF9933;
-    color: white;
-    padding: 9px 18px;
-    border-radius: 10px;
-    font-weight: 600;
-    border: 2px solid #000080;
-    cursor: pointer;
+  background: #FF9933;
+  color: #000;
+  border: 2px solid #000080;
+  padding: 8px 16px;
+  border-radius: 10px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.logout-btn:hover {
+  background: #138808;
+  color: #fff;
 }
 
 /* CONTENT */
 .container {
-    max-width: 900px;
-    margin: 140px auto 50px;
-    background: rgba(255,255,255,0.95);
-    padding: 40px;
-    border-radius: 20px;
-    text-align: center;
-    border-left: 6px solid #FF9933;
-    border-right: 6px solid #138808;
+  max-width: 900px;
+  margin: 130px auto 40px;
+  background: rgba(255,255,255,0.95);
+  padding: 40px;
+  border-radius: 20px;
+  text-align: center;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.25);
 }
 
 h1 {
-    color: #000080;
-    font-size: 2.5em;
+  color: #000080;
+  font-size: 2.5em;
 }
 
 p {
-    font-size: 1.2em;
+  font-size: 1.2em;
 }
 </style>
 </head>
@@ -91,63 +93,65 @@ p {
 
 <!-- NAVBAR -->
 <div class="top-nav">
-    <div class="nav-left" id="navMenu"></div>
-    <button class="logout-btn" id="logoutBtn">Logout</button>
+  <div class="nav-left" id="navMenu"></div>
+  <button class="logout-btn" id="logoutBtn">Logout</button>
 </div>
 
-<!-- CONTENT -->
+<!-- MAIN -->
 <div class="container">
-    <h1 id="welcomeText">Loading...</h1>
-    <p>Your Krishi Mitr Dashboard.</p>
-    <p id="roleText"></p>
+  <h1 id="welcomeText">Loading...</h1>
+  <p>Your Krishi Mitr Dashboard</p>
+  <p id="roleText"></p>
 </div>
 
 <script>
 const db = window.db;
 
 async function initDashboard() {
-    const loginid = sessionStorage.getItem("loginid");
-    const usertype = sessionStorage.getItem("usertype");
+  const loginid = sessionStorage.getItem("loginid");
+  const usertype = sessionStorage.getItem("usertype");
 
-    if (!loginid || !usertype) {
-        window.location.href = "login.html";
-        return;
-    }
+  if (!loginid || !usertype) {
+    window.location.href = "login.html";
+    return;
+  }
 
-    // ✅ Fetch REAL NAME from database
-    const { data, error } = await db
-        .from("logindata")
-        .select("name")
-        .eq("loginid", loginid)
-        .single();
+  // 🔥 FETCH NAME (THIS WAS THE MISSING PART)
+  const { data, error } = await db
+    .from("logindata")
+    .select("name")
+    .eq("loginid", loginid)
+    .maybeSingle();
 
-    if (error || !data) {
-        sessionStorage.clear();
-        window.location.href = "login.html";
-        return;
-    }
-
-    // Welcome text
-    document.getElementById("welcomeText").innerText =
-        `Welcome, ${data.name}`;
-
-    document.getElementById("roleText").innerText =
-        usertype === "Farmer"
-        ? "Explore crop prices, sell harvests, and access AI insights."
-        : "Explore crop prices and buy fresh local produce.";
-
-    // Navbar
-    document.getElementById("navMenu").innerHTML = `
-        <a class="nav-box" href="krishimitr.html">Crop Predictor</a>
-        ${usertype === "Farmer" ? `<a class="nav-box" href="Sell.html">Sell Crops</a>` : ""}
-        <a class="nav-box" href="Buy.html">Buy Crops</a>
-        ${usertype === "Farmer" ? `<a class="nav-box" href="Notification.html">Notification</a>` : ""}
-    `;
-}
-
-document.getElementById("logoutBtn").onclick = () => {
+  if (error || !data) {
     sessionStorage.clear();
     window.location.href = "login.html";
+    return;
+  }
+
+  // Show NAME (not username)
+  document.getElementById("welcomeText").innerText =
+    `Welcome, ${data.name}`;
+
+  document.getElementById("roleText").innerText =
+    usertype === "Farmer"
+      ? "Explore crop prices, sell harvests, and access AI insights."
+      : "Explore crop prices and buy fresh local produce.";
+
+  // Navbar
+  const nav = document.getElementById("navMenu");
+  nav.innerHTML = `
+    <a class="nav-box" href="krishimitr.html">Crop Advisor</a>
+    ${usertype === "Farmer" ? `<a class="nav-box" href="Sell.html">Sell Crops</a>` : ""}
+    <a class="nav-box" href="Buy.html">Buy Crops</a>
+    ${usertype === "Farmer" ? `<a class="nav-box" href="Notification.html">Notifications</a>` : ""}
+  `;
+}
+
+// Logout
+document.getElementById("logoutBtn").onclick = () => {
+  sessionStorage.clear();
+  window.location.href = "login.html";
 };
 
 initDashboard();
