@@ -63,21 +63,52 @@ button:hover {
   font-weight: bold;
   color: #FF3333;
 }
+
+.small-link {
+  display: block;
+  margin-top: 15px;
+  font-size: 13px;
+  color: #FF9933;
+  cursor: pointer;
+  user-select: none;
+}
 </style>
 </head>
 
 <body>
 
 <div class="container">
-  <h2>Login</h2>
 
-  <form id="loginForm">
-    <input type="text" id="username" placeholder="Username" required />
-    <input type="password" id="password" placeholder="Password" required />
-    <button type="submit">Login</button>
-  </form>
+  <!-- Login Screen -->
+  <div id="loginScreen">
+    <h2>Login</h2>
 
-  <div class="message" id="message"></div>
+    <form id="loginForm">
+      <input type="text" id="username" placeholder="Username" required />
+      <input type="password" id="password" placeholder="Password" required />
+      <button type="submit">Login</button>
+    </form>
+
+    <div class="message" id="message"></div>
+
+    <span class="small-link" onclick="showRegister()">Don't have an account? Sign Up</span>
+  </div>
+
+  <!-- Register Screen -->
+  <div id="registerScreen" style="display:none;">
+    <h2>Select Registration</h2>
+
+    <button onclick="location.href='Farmerresgister.html'">
+      Farmer Registration
+    </button>
+
+    <button onclick="location.href='Citizenregister.html'">
+      Citizen Registration
+    </button>
+
+    <span class="small-link" onclick="showLogin()">Already have an account? Go Back</span>
+  </div>
+
 </div>
 
 <!-- Supabase scripts -->
@@ -85,11 +116,26 @@ button:hover {
 <script src="supabase.js"></script>
 
 <script>
+  const loginScreen = document.getElementById("loginScreen");
+  const registerScreen = document.getElementById("registerScreen");
   const form = document.getElementById("loginForm");
   const msg = document.getElementById("message");
 
+  function showRegister() {
+    loginScreen.style.display = "none";
+    registerScreen.style.display = "block";
+    msg.textContent = "";
+  }
+
+  function showLogin() {
+    registerScreen.style.display = "none";
+    loginScreen.style.display = "block";
+    msg.textContent = "";
+  }
+
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
+    msg.style.color = "#FF3333";  // Default error color
     msg.textContent = "Checking credentials...";
 
     const username = document.getElementById("username").value.trim();
@@ -112,7 +158,7 @@ button:hover {
         return;
       }
 
-      // Clear any previous session
+      // Successful login: save to sessionStorage
       sessionStorage.clear();
       sessionStorage.setItem("loginid", data.loginid);
       sessionStorage.setItem("usertype", data.usertype);
@@ -121,7 +167,7 @@ button:hover {
       msg.textContent = "Login successful! Redirecting...";
 
       setTimeout(() => {
-        window.location.href = "Dashboard.html";
+        window.location.href = "Dashboard.html";  // Redirect everyone here
       }, 800);
 
     } catch (err) {
