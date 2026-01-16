@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
+<meta charset="UTF-8" />
 <title>Login</title>
 
 <style>
@@ -51,6 +51,7 @@ button {
   font-weight: bold;
   background: #FF9933;
   cursor: pointer;
+  color: #000;
 }
 
 button:hover {
@@ -69,6 +70,7 @@ button:hover {
 .message {
   margin-top: 12px;
   font-weight: bold;
+  color: #FF3333;
 }
 </style>
 </head>
@@ -77,38 +79,35 @@ button:hover {
 
 <div class="container">
 
-<div id="loginScreen">
-  <h2>Login</h2>
+  <div id="loginScreen">
+    <h2>Login</h2>
 
-  <form id="loginForm">
-    <input type="text" id="username" placeholder="Username" required>
-    <input type="password" id="password" placeholder="Password" required>
-    <button type="submit">Login</button>
-  </form>
+    <form id="loginForm">
+      <input type="text" id="username" placeholder="Username" required />
+      <input type="password" id="password" placeholder="Password" required />
+      <button type="submit">Login</button>
+    </form>
 
-  <div class="message" id="message"></div>
+    <div class="message" id="message"></div>
 
-  <span class="small-link" onclick="showRegister()">Don't have an account? Sign Up</span>
-</div>
+    <span class="small-link" onclick="showRegister()">Don't have an account? Sign Up</span>
+  </div>
 
-<div id="registerScreen" style="display:none;">
-  <h2>Select Registration</h2>
+  <div id="registerScreen" style="display:none;">
+    <h2>Select Registration</h2>
 
-  <button onclick="location.href='Farmerresgister'">
-    Farmer Registration
-  </button>
+    <button onclick="location.href='Farmerregister'">Farmer Registration</button>
+    <button onclick="location.href='Citizenregister'">Citizen Registration</button>
 
-  <button onclick="location.href='Citizenregister'">
-    Citizen Registration
-  </button>
-
-  <span class="small-link" onclick="showLogin()">Already have an account? Go Back</span>
-</div>
+    <span class="small-link" onclick="showLogin()">Already have an account? Go Back</span>
+  </div>
 
 </div>
 
+<!-- Supabase JS -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="/supabase.js"></script>
+<!-- Your supabase.js that sets window.db -->
+<script src="supabase.js"></script>
 
 <script>
 const loginScreen = document.getElementById("loginScreen");
@@ -136,43 +135,53 @@ form.addEventListener("submit", async (e) => {
   const u = usernameInput.value.trim();
   const p = passwordInput.value.trim();
 
-  const { data, error } = await window.db
-    .from("logindata")
-    .select("loginid, username, password, usertype")
-    .eq("username", u)
-    .maybeSingle();   // 👈 IMPORTANT
+  try {
+    // Query for user by username
+    const { data, error } = await window.db
+      .from("logindata")
+      .select("loginid, username, password, usertype")
+      .eq("username", u)
+      .maybeSingle();
 
-  if (error || !data) {
-    msg.textContent = "Invalid username";
-    return;
+    if (error) throw error;
+
+    if (!data) {
+      msg.textContent = "Invalid username";
+      return;
+    }
+
+    if (p !== data.password) {
+      msg.textContent = "Invalid password";
+      return;
+    }
+
+    // Clear previous sessionStorage just in case
+    sessionStorage.clear();
+
+    // Store relevant info
+    sessionStorage.setItem("loginid", data.loginid);
+    sessionStorage.setItem("usertype", data.usertype);
+
+    // Set IDs based on usertype
+    if (data.usertype === "Farmer") {
+      sessionStorage.setItem("fid", data.loginid);
+    } else {
+      sessionStorage.setItem("cid", data.loginid);
+    }
+
+    msg.style.color = "green";
+    msg.textContent = "Login successful! Redirecting...";
+
+    setTimeout(() => {
+      location.replace(data.usertype === "Citizen" ? "/Citizen" : "/Farmer");
+    }, 800);
+
+  } catch (err) {
+    console.error(err);
+    msg.textContent = "Something went wrong. Please try again.";
   }
-
-  if (p !== data.password) {
-    msg.textContent = "Invalid password";
-    return;
-  }
-  sessionStorage.clear();
-  sessionStorage.setItem("loginid", data.loginid);
-  sessionStorage.setItem("usertype", data.usertype);
-
-  if (data.usertype === "Farmer") {
-    sessionStorage.setItem("fid", data.loginid);
-  } else {
-    sessionStorage.setItem("cid", data.loginid);
-  }
-
-  msg.textContent = "Login successful";
-
-  setTimeout(() => {
-    location.replace(
-      data.usertype === "Citizen"
-        ? "/Citizen"
-        : "/Farmer"
-    );
-  }, 500);
 });
 </script>
-
 
 </body>
 </html>
