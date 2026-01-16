@@ -110,7 +110,7 @@ async function initDashboard() {
     const usertype = sessionStorage.getItem("usertype");
 
     if (!loginid || !usertype) {
-        window.location.href = "login";
+        window.location.href = "login.html";
         return;
     }
 
@@ -123,7 +123,7 @@ async function initDashboard() {
 
     if (error || !data) {
         sessionStorage.clear();
-        window.location.href = "login";
+        window.location.href = "login.html";
         return;
     }
 
@@ -138,16 +138,16 @@ async function initDashboard() {
 
     // Navbar
     document.getElementById("navMenu").innerHTML = `
-        <a class="nav-box" href="krishimitr">Crop Predictor</a>
-        ${usertype === "Farmer" ? `<a class="nav-box" href="Sell">Sell Crops</a>` : ""}
-        <a class="nav-box" href="Buy">Buy Crops</a>
-        ${usertype === "Farmer" ? `<a class="nav-box" href="Notification">Notification</a>` : ""}
+        <a class="nav-box" href="krishimitr.html">Crop Predictor</a>
+        ${usertype === "Farmer" ? `<a class="nav-box" href="Sell.html">Sell Crops</a>` : ""}
+        <a class="nav-box" href="Buy.html">Buy Crops</a>
+        ${usertype === "Farmer" ? `<a class="nav-box" href="Notification.html">Notification</a>` : ""}
     `;
 }
 
 document.getElementById("logoutBtn").onclick = () => {
     sessionStorage.clear();
-    window.location.href = "login";
+    window.location.href = "login.html";
 };
 
 initDashboard();
@@ -155,4 +155,3 @@ initDashboard();
 
 </body>
 </html>
-
