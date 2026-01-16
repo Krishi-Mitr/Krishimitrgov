@@ -396,26 +396,49 @@ body.dark h2, body.dark h4 {
 </div>
 
 <script>
-// Check authentication FIRST, synchronously (like Dashboard.html and Sell.html)
+// Check authentication FIRST, synchronously (exactly like Dashboard.html)
 const loginid = sessionStorage.getItem("loginid");
 const usertype = sessionStorage.getItem("usertype");
 
 // Kick out if not logged in
 if (!loginid || !usertype) {
     window.location.href = "login.html";
+    // Prevent further execution
+    throw new Error("Redirecting to login");
 }
 
-// Hide farmer-only links if user is not a farmer
-if (usertype !== "Farmer") {
-    document.querySelectorAll('.farmer-only').forEach(el => el.remove());
+// Wait for DOM to be ready before manipulating elements
+function setupPage() {
+    // Hide farmer-only links if user is not a farmer
+    if (usertype !== "Farmer") {
+        try {
+            document.querySelectorAll('.farmer-only').forEach(el => el.remove());
+        } catch (e) {
+            // Elements might not exist yet, try again later
+            setTimeout(() => {
+                document.querySelectorAll('.farmer-only').forEach(el => el.remove());
+            }, 100);
+        }
+    }
+
+    // Setup logout button
+    const logoutBtn = document.getElementById('logoutBtn');
+    if (logoutBtn) {
+        logoutBtn.onclick = () => {
+            sessionStorage.clear();
+            location.href = "login.html";
+        };
+    } else {
+        // Retry if button doesn't exist yet
+        setTimeout(setupPage, 50);
+    }
 }
 
-const logoutBtn = document.getElementById('logoutBtn');
-if (logoutBtn) {
-  logoutBtn.onclick = () => {
-    sessionStorage.clear();
-    location.href = "login.html";
-  };
+// Run setup when DOM is ready
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', setupPage);
+} else {
+    setupPage();
 }
 </script>
 
