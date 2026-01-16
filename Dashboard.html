@@ -1,12 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
+<meta charset="UTF-8" />
 <title>Dashboard - Krishi Mitr</title>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
+/* Your existing styles here... */
 body {
     margin: 0;
     padding: 0;
@@ -16,7 +17,6 @@ body {
     background-attachment: fixed;
     overflow-x: hidden;
 }
-
 .top-nav {
     display: flex;
     justify-content: space-between;
@@ -30,12 +30,10 @@ body {
     z-index: 1000;
     border-bottom: 3px solid #000080;
 }
-
 .nav-left {
     display: flex;
     gap: 25px;
 }
-
 .nav-box {
     background: #000080;
     color: #fff;
@@ -47,13 +45,11 @@ body {
     box-shadow: 0 3px 10px rgba(0,0,40,0.25);
     transition: 0.25s ease;
 }
-
 .nav-box:hover {
     background: #FF9933;
     color: #000;
     transform: translateY(-3px);
 }
-
 .logout-btn {
     background: #FF9933;
     padding: 10px 20px;
@@ -64,13 +60,12 @@ body {
     font-weight: bold;
     border: 2px solid #000080;
     transition: 0.25s;
+    cursor: pointer;
 }
-
 .logout-btn:hover {
     background: #138808;
     transform: translateY(-2px);
 }
-
 .container {
     max-width: 900px;
     margin: 150px auto 50px;
@@ -82,16 +77,13 @@ body {
     border-left: 6px solid #FF9933;
     border-right: 6px solid #138808;
 }
-
 h1 {
     font-size: 2.6em;
     color: #000080;
 }
-
 p {
     font-size: 1.2em;
 }
-
 @media (max-width: 768px) {
     .top-nav {
         flex-direction: column;
@@ -111,57 +103,67 @@ p {
 <!-- NAVBAR -->
 <div class="top-nav">
     <div class="nav-left" id="navMenu"></div>
-    <a href="#" class="logout-btn" id="logoutBtn">Logout</a>
+    <button class="logout-btn" id="logoutBtn">Logout</button>
 </div>
 
 <!-- MAIN CONTENT -->
 <div class="container">
-    <h1 id="welcomeText"></h1>
+    <h1 id="welcomeText">Loading...</h1>
     <p>Your Krishi Mitr Dashboard.</p>
     <p id="roleText"></p>
 </div>
 
 <script>
+  // Make sure supabase.js sets window.db properly
+  const db = window.db;
 
-let user, username, usertype;
-async function initDashboard() {
-  const { data } = await supabase.auth.getUser();
+  async function initDashboard() {
+    const loginid = sessionStorage.getItem("loginid");
+    const usertype = sessionStorage.getItem("usertype");
 
-  if (!data.user) {
-    window.location.href = "login.html";
-    return;
-  }
+    if (!loginid || !usertype) {
+      // No login info — redirect to login
+      window.location.href = "login.html";
+      return;
+    }
 
-  user = data.user;
-  username = user.user_metadata.username;
-  usertype = user.user_metadata.usertype;
+    // Fetch username using loginid
+    const { data, error } = await db
+      .from("logindata")
+      .select("username")
+      .eq("loginid", loginid)
+      .maybeSingle();
 
-  renderDashboard();
-}
-function renderDashboard() {
-  document.getElementById('welcomeText').innerText =
-    `Welcome, ${username}`;
+    if (error || !data) {
+      // If user not found, force logout
+      alert("User data not found. Please login again.");
+      sessionStorage.clear();
+      window.location.href = "login.html";
+      return;
+    }
 
-  document.getElementById('roleText').innerText =
-    usertype === "Farmer"
+    // Render welcome and role info
+    document.getElementById("welcomeText").innerText = `Welcome, ${data.username}`;
+    document.getElementById("roleText").innerText = usertype === "Farmer"
       ? "Explore crop prices, sell harvests, and access AI insights."
       : "Explore crop prices and buy fresh local produce.";
 
-  const nav = document.getElementById('navMenu');
+    // Setup nav menu based on usertype
+    const nav = document.getElementById("navMenu");
+    nav.innerHTML = `
+      <a class="nav-box" href="krishimitr.html">Crop Predictor and Advisor</a>
+      ${usertype === "Farmer" ? `<a class="nav-box" href="Sell.html">Sell Your Crops</a>` : ""}
+      <a class="nav-box" href="Buy.html">Buy Crops</a>
+      ${usertype === "Farmer" ? `<a class="nav-box" href="Notification.html">Notification</a>` : ""}
+    `;
+  }
 
-  nav.innerHTML = `
-    <a class="nav-box" href="krishimitr.html">Crop Predictor and Advisor</a>
-    ${usertype === "Farmer" ? `<a class="nav-box" href="Sell.html">Sell Your Crops</a>` : ""}
-    <a class="nav-box" href="Buy.html">Buy Crops</a>
-    ${usertype === "Farmer" ? `<a class="nav-box" href="Notification.html">Notification</a>` : ""}
-  `;
-}
-document.getElementById('logoutBtn').onclick = async () => {
-  await supabase.auth.signOut();
-  window.location.href = "login.html";
-};
+  document.getElementById("logoutBtn").addEventListener("click", () => {
+    sessionStorage.clear();
+    window.location.href = "login.html";
+  });
 
-initDashboard();
+  initDashboard();
 </script>
 
 </body>
