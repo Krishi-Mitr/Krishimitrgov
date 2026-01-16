@@ -4,9 +4,9 @@
 <meta charset="UTF-8">
 <title>Citizen Registration - Vikasit Bharat</title>
 
-<!-- SUPABASE LIBRARY -->
+<!-- Supabase library -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<!-- YOUR SUPABASE CLIENT -->
+<!-- Your Supabase client -->
 <script src="supabase.js"></script>
 
 <style>
@@ -29,7 +29,6 @@ body {
     max-width: 90%;
     text-align: center;
     box-shadow: 0 12px 40px rgba(0,0,0,0.4);
-    border: 1px solid rgba(255,255,255,0.1);
 }
 
 h2 {
@@ -44,13 +43,6 @@ input {
     margin: 12px 0;
     border-radius: 12px;
     border: none;
-    font-size: 16px;
-    background: rgba(255,255,255,0.15);
-}
-
-input:focus {
-    outline: none;
-    box-shadow: 0 0 12px #FF9933;
 }
 
 button {
@@ -65,17 +57,8 @@ button {
     cursor: pointer;
 }
 
-.message {
-    color: #FF3333;
-    font-weight: bold;
-    margin-bottom: 15px;
-}
-
-.success {
-    color: #0a7a25;
-    font-weight: bold;
-    margin-bottom: 15px;
-}
+.message { color: #FF3333; font-weight: bold; }
+.success { color: #0a7a25; font-weight: bold; }
 </style>
 </head>
 
@@ -83,8 +66,8 @@ button {
 <div class="container">
 <h2>Citizen Registration</h2>
 
-<div id="message" class="message" style="display:none;"></div>
-<div id="success" class="success" style="display:none;"></div>
+<div id="message" class="message"></div>
+<div id="success" class="success"></div>
 
 <form id="registerForm">
     <input type="text" id="username" placeholder="Username" required>
@@ -103,71 +86,61 @@ const success = document.getElementById("success");
 
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
-
-  msg.style.display = "none";
-  success.style.display = "none";
+  msg.textContent = "";
+  success.textContent = "";
 
   const username = document.getElementById("username").value.trim();
   const password = document.getElementById("password").value.trim();
   const name = document.getElementById("name").value.trim();
+  const usertype = "Citizen";
 
   try {
-    /* 1️⃣ CHECK USERNAME */
-    const { data: existing, error: e1 } = await window.db
+    /* 1️⃣ CHECK USERNAME (same as PHP SELECT) */
+    const { data: exists, error: e1 } = await window.db
       .from("logindata")
-      .select("username")
+      .select("loginid")
       .eq("username", username);
 
     if (e1) throw e1;
 
-    if (existing.length > 0) {
-      msg.innerText = "Username already exists!";
-      msg.style.display = "block";
+    if (exists.length > 0) {
+      msg.textContent = "Username already exists!";
       return;
     }
 
-    /* 2️⃣ GENERATE citizenid */
-    const { data: last, error: e2 } = await window.db
-      .from("citizeninfo")
-      .select("citizenid")
-      .order("citizenid", { ascending: false })
+    /* 2️⃣ GET MAX(loginid) */
+    const { data: maxRow, error: e2 } = await window.db
+      .from("logindata")
+      .select("loginid")
+      .order("loginid", { ascending: false })
       .limit(1);
 
     if (e2) throw e2;
 
-    const citizenid = last.length > 0 ? last[0].citizenid + 1 : 1000;
+    const newLoginId = maxRow.length > 0
+      ? parseInt(maxRow[0].loginid) + 1
+      : 1;
 
-    /* 3️⃣ INSERT citizeninfo */
+    /* 3️⃣ INSERT INTO logindata */
     const { error: e3 } = await window.db
-      .from("citizeninfo")
+      .from("logindata")
       .insert({
-        citizenid: citizenid,
-        name: name
+        username: username,
+        password: password,
+        name: name,
+        usertype: usertype,
+        loginid: newLoginId.toString()
       });
 
     if (e3) throw e3;
 
-    /* 4️⃣ INSERT logindata */
-    const { error: e4 } = await window.db
-      .from("logindata")
-      .insert({
-        loginid: citizenid,
-        username: username,
-        password: password,
-        usertype: "Citizen"
-      });
-
-    if (e4) throw e4;
-
     success.innerHTML =
       `Registration successful! You can now <a href="login.html" style="color:#FF9933;">login</a>.`;
-    success.style.display = "block";
     form.style.display = "none";
 
   } catch (err) {
     console.error(err);
-    msg.innerText = "Registration failed";
-    msg.style.display = "block";
+    msg.textContent = "Registration failed. Please try again.";
   }
 });
 </script>
