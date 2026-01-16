@@ -51,6 +51,7 @@ button {
   font-weight: bold;
   background: #FF9933;
   cursor: pointer;
+  transition: background-color 0.3s ease;
 }
 
 button:hover {
@@ -135,7 +136,8 @@ button:hover {
 
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
-    msg.style.color = "#FF3333";  // Default error color
+
+    msg.style.color = "#FF3333";  // error color
     msg.textContent = "Checking credentials...";
 
     const username = document.getElementById("username").value.trim();
@@ -158,7 +160,7 @@ button:hover {
         return;
       }
 
-      // Successful login: save to sessionStorage
+      // Login success - store session info
       sessionStorage.clear();
       sessionStorage.setItem("loginid", data.loginid);
       sessionStorage.setItem("usertype", data.usertype);
@@ -167,7 +169,7 @@ button:hover {
       msg.textContent = "Login successful! Redirecting...";
 
       setTimeout(() => {
-        window.location.href = "Dashboard.html";  // Redirect everyone here
+        window.location.href = "Dashboard.html";
       }, 800);
 
     } catch (err) {
