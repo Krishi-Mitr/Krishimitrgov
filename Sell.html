@@ -137,11 +137,11 @@ body {
 </div>
 
 <script>
-const supabase = window.db;
+const db = window.db;
 
 let formToken = crypto.randomUUID();
 async function init() {
-  const { data } = await supabase.auth.getUser();
+  const { data } = await db.auth.getUser();
 
   if (!data.user) {
     location.href = "login.html";
@@ -171,14 +171,14 @@ document.getElementById('sellForm').addEventListener('submit', async e => {
 
   if (!formToken) return;
 
-  const user = (await supabase.auth.getUser()).data.user;
+  const user = (await db.auth.getUser()).data.user;
   if (!user) {
     alert("Please login again");
     location.href = "login.html";
     return;
   }
 
-  const { count, error: countError } = await supabase
+  const { count, error: countError } = await db
     .from('crop_sales')
     .select('*', { count: 'exact', head: true })
     .eq('ID', user.id);
@@ -196,7 +196,7 @@ document.getElementById('sellForm').addEventListener('submit', async e => {
   const price = document.getElementById('price').value;
   const location = document.getElementById('location').value;
 
-  const { data, error } = await supabase.from('crop_sales').insert({
+  const { data, error } = await db.from('crop_sales').insert({
     ID: user.id,
     JID: jid,
     farmer_name: user.user_metadata.username,
@@ -218,7 +218,7 @@ document.getElementById('sellForm').addEventListener('submit', async e => {
   location.search = "?success=1";
 });
 async function loadListings(uid) {
-  const { data, error } = await supabase
+  const { data, error } = await db
     .from('crop_sales')
     .select('*')
     .eq('ID', uid)
@@ -258,14 +258,14 @@ async function loadListings(uid) {
 async function deleteListing(created_at) {
   if (!confirm("Delete this listing?")) return;
 
-  const user = (await supabase.auth.getUser()).data.user;
+  const user = (await db.auth.getUser()).data.user;
   if (!user) {
     alert("Please login again");
     location.href = "login.html";
     return;
   }
 
-  const { error } = await supabase
+  const { error } = await db
     .from('crop_sales')
     .delete()
     .eq('ID', user.id)
@@ -280,7 +280,7 @@ async function deleteListing(created_at) {
   loadListings(user.id);
 }
 logoutBtn.onclick = async () => {
-  await supabase.auth.signOut();
+  await db.auth.signOut();
   location.href = "login.html";
 };
 
