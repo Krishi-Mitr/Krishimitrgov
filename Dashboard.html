@@ -6,24 +6,17 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
-* {
-    box-sizing: border-box;
-}
+* { box-sizing: border-box; }
 
 body {
     margin: 0;
     font-family: 'Poppins', sans-serif;
     min-height: 100vh;
-    background: linear-gradient(
-        180deg,
-        #FF9933 0%,
-        #FFFFFF 50%,
-        #138808 100%
-    );
+    background: linear-gradient(180deg,#FF9933 0%,#FFFFFF 50%,#138808 100%);
     background-attachment: fixed;
 }
 
-/* ===== NAVBAR ===== */
+/* NAVBAR */
 .top-nav {
     display: flex;
     justify-content: space-between;
@@ -33,7 +26,7 @@ body {
     top: 0;
     left: 0;
     width: 100%;
-    background: rgba(255, 255, 255, 0.65);
+    background: rgba(255,255,255,0.65);
     backdrop-filter: blur(8px);
     border-bottom: 3px solid #000080;
     z-index: 1000;
@@ -54,13 +47,11 @@ body {
     font-weight: 600;
     font-size: 14px;
     transition: 0.25s ease;
-    box-shadow: 0 3px 8px rgba(0,0,40,0.25);
 }
 
 .nav-box:hover {
     background: #FF9933;
     color: #000;
-    transform: translateY(-2px);
 }
 
 .logout-btn {
@@ -68,26 +59,18 @@ body {
     color: white;
     padding: 9px 18px;
     border-radius: 10px;
-    text-decoration: none;
     font-weight: 600;
     border: 2px solid #000080;
-    transition: 0.25s ease;
-    white-space: nowrap;
+    cursor: pointer;
 }
 
-.logout-btn:hover {
-    background: #138808;
-    transform: translateY(-2px);
-}
-
-/* ===== CONTENT ===== */
+/* CONTENT */
 .container {
     max-width: 900px;
     margin: 140px auto 50px;
     background: rgba(255,255,255,0.95);
     padding: 40px;
     border-radius: 20px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.25);
     text-align: center;
     border-left: 6px solid #FF9933;
     border-right: 6px solid #138808;
@@ -97,74 +80,4 @@ h1 {
     color: #000080;
     font-size: 2.5em;
 }
-
-p {
-    font-size: 1.15em;
-}
-
-/* ===== MOBILE ===== */
-@media (max-width: 768px) {
-    .top-nav {
-        flex-direction: column;
-        gap: 10px;
-        padding: 12px;
-    }
-
-    .nav-left {
-        justify-content: center;
-    }
-}
-</style>
-</head>
-
-<body>
-
-<!-- NAVBAR -->
-<div class="top-nav">
-    <div class="nav-left" id="navMenu"></div>
-    <a href="#" class="logout-btn" id="logoutBtn">Logout</a>
-</div>
-
-<!-- MAIN -->
-<div class="container">
-    <h1 id="welcomeText"></h1>
-    <p>Your Krishi Mitr Dashboard</p>
-    <p id="roleText"></p>
-</div>
-
-<script>
-/* SAME LOGIC – NOT TOUCHED */
-
-const loginid = sessionStorage.getItem("loginid");
-const usertype = sessionStorage.getItem("usertype");
-
-if (!loginid || !usertype) {
-    window.location.href = "login.html";
-}
-
-document.getElementById("welcomeText").innerText =
-    `Welcome, ${usertype}`;
-
-document.getElementById("roleText").innerText =
-    usertype === "Farmer"
-        ? "Manage crops, sell harvests, and get smart insights."
-        : "Explore and buy fresh produce directly from farmers.";
-
-const nav = document.getElementById("navMenu");
-
-nav.innerHTML = `
-    <a class="nav-box" href="krishimitr.html">Crop Advisor</a>
-    ${usertype === "Farmer" ? `<a class="nav-box" href="Sell.html">Sell Crops</a>` : ""}
-    <a class="nav-box" href="Buy.html">Buy Crops</a>
-    ${usertype === "Farmer" ? `<a class="nav-box" href="Notification.html">Notifications</a>` : ""}
-`;
-
-document.getElementById("logoutBtn").onclick = () => {
-    sessionStorage.clear();
-    window.location.href = "login.html";
-};
-</script>
-
-</body>
-</html>
-
+</style
