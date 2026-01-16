@@ -207,16 +207,21 @@ async function toggleBuy(fid, fname, btn) {
 
   if (existing) {
     const newVal = existing.yn === "yes" ? "no" : "yes";
+    // Update with timestamp when showing interest (yes), keep existing timestamp when removing interest
+    const updateData = { yn: newVal };
+    if (newVal === "yes") {
+      updateData.created_at = new Date().toISOString();
+    }
     await window.db
       .from("buy_table")
-      .update({ yn: newVal })
+      .update(updateData)
       .eq("fid", fid)
       .eq("cid", currentLoginId);
     btn.innerText = newVal === "yes" ? "Interested ✓" : "Show Interest";
   } else {
     const { data: crop } = await window.db
       .from("crop_sales")
-      .select("lid")
+      .select("lid, crop_name")
       .eq("jid", fid)
       .maybeSingle();
 
@@ -238,7 +243,8 @@ async function toggleBuy(fid, fname, btn) {
       lid: crop.lid,
       fname: fname,
       cname: userData?.username || currentLoginId,
-      yn: "yes"
+      yn: "yes",
+      created_at: new Date().toISOString()
     });
 
     btn.innerText = "Interested ✓";
