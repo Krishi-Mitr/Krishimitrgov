@@ -139,43 +139,63 @@ body {
 <script>
 // Use window.db directly to avoid any naming conflicts
 let formToken = crypto.randomUUID();
-async function init() {
-  if (!window.db) {
-    console.error("Database client not available");
-    return;
-  }
-  const { data } = await window.db.auth.getUser();
+let currentLoginId = null;
+let currentUsername = null;
 
-  if (!data.user) {
+async function init() {
+  // Check sessionStorage for authentication (like Dashboard.html)
+  const loginid = sessionStorage.getItem("loginid");
+  const usertype = sessionStorage.getItem("usertype");
+
+  if (!loginid || !usertype) {
     location.href = "login.html";
     return;
   }
 
-  const user = data.user;
-
-  if (user.user_metadata.usertype !== "Farmer") {
-    alert("Access denied");
+  if (usertype !== "Farmer") {
+    alert("Access denied. Only farmers can sell crops.");
     location.href = "Dashboard.html";
     return;
   }
 
-  document.getElementById('farmerName').value =
-    user.user_metadata.username;
+  currentLoginId = loginid;
+
+  // Get username from database
+  if (!window.db) {
+    console.error("Database client not available");
+    return;
+  }
+
+  const { data: userData, error: userError } = await window.db
+    .from("logindata")
+    .select("username")
+    .eq("loginid", loginid)
+    .maybeSingle();
+
+  if (userError || !userData) {
+    console.error("Error fetching user data:", userError);
+    alert("Error loading user data. Please login again.");
+    location.href = "login.html";
+    return;
+  }
+
+  currentUsername = userData.username;
+  document.getElementById('farmerName').value = currentUsername;
 
   if (new URLSearchParams(location.search).has("success")) {
     document.getElementById('messageBox').innerHTML =
       "<div class='success'>🌾 Crop listed successfully!</div>";
   }
 
-  loadListings(user.id);
+  loadListings(loginid);
 }
 document.getElementById('sellForm').addEventListener('submit', async e => {
   e.preventDefault();
 
   if (!formToken) return;
 
-  const user = (await window.db.auth.getUser()).data.user;
-  if (!user) {
+  const loginid = sessionStorage.getItem("loginid");
+  if (!loginid) {
     alert("Please login again");
     location.href = "login.html";
     return;
@@ -184,7 +204,7 @@ document.getElementById('sellForm').addEventListener('submit', async e => {
   const { count, error: countError } = await window.db
     .from('crop_sales')
     .select('*', { count: 'exact', head: true })
-    .eq('ID', user.id);
+    .eq('ID', loginid);
 
   if (countError) {
     console.error("Error counting listings:", countError);
@@ -192,7 +212,7 @@ document.getElementById('sellForm').addEventListener('submit', async e => {
     return;
   }
 
-  const jid = `${user.id}-${(count || 0) + 1}`;
+  const jid = `${loginid}-${(count || 0) + 1}`;
 
   const cropName = document.getElementById('crop_name').value;
   const quantity = document.getElementById('quantity').value;
@@ -200,15 +220,15 @@ document.getElementById('sellForm').addEventListener('submit', async e => {
   const location = document.getElementById('location').value;
 
   const { data, error } = await window.db.from('crop_sales').insert({
-    ID: user.id,
+    ID: loginid,
     JID: jid,
-    farmer_name: user.user_metadata.username,
+    farmer_name: currentUsername,
     crop_name: cropName,
     quantity: quantity,
     price: price,
     location: location,
     created_at: new Date().toISOString(),
-    LID: user.id
+    LID: loginid
   });
 
   if (error) {
@@ -261,8 +281,8 @@ async function loadListings(uid) {
 async function deleteListing(created_at) {
   if (!confirm("Delete this listing?")) return;
 
-  const user = (await window.db.auth.getUser()).data.user;
-  if (!user) {
+  const loginid = sessionStorage.getItem("loginid");
+  if (!loginid) {
     alert("Please login again");
     location.href = "login.html";
     return;
@@ -271,7 +291,7 @@ async function deleteListing(created_at) {
   const { error } = await window.db
     .from('crop_sales')
     .delete()
-    .eq('ID', user.id)
+    .eq('ID', loginid)
     .eq('created_at', created_at);
 
   if (error) {
@@ -280,10 +300,10 @@ async function deleteListing(created_at) {
     return;
   }
 
-  loadListings(user.id);
+  loadListings(loginid);
 }
-logoutBtn.onclick = async () => {
-  await window.db.auth.signOut();
+logoutBtn.onclick = () => {
+  sessionStorage.clear();
   location.href = "login.html";
 };
 
