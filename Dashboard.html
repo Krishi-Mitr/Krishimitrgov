@@ -80,4 +80,79 @@ h1 {
     color: #000080;
     font-size: 2.5em;
 }
-</style
+
+p {
+    font-size: 1.2em;
+}
+</style>
+</head>
+
+<body>
+
+<!-- NAVBAR -->
+<div class="top-nav">
+    <div class="nav-left" id="navMenu"></div>
+    <button class="logout-btn" id="logoutBtn">Logout</button>
+</div>
+
+<!-- CONTENT -->
+<div class="container">
+    <h1 id="welcomeText">Loading...</h1>
+    <p>Your Krishi Mitr Dashboard.</p>
+    <p id="roleText"></p>
+</div>
+
+<script>
+const db = window.db;
+
+async function initDashboard() {
+    const loginid = sessionStorage.getItem("loginid");
+    const usertype = sessionStorage.getItem("usertype");
+
+    if (!loginid || !usertype) {
+        window.location.href = "login.html";
+        return;
+    }
+
+    // ✅ Fetch REAL NAME from database
+    const { data, error } = await db
+        .from("logindata")
+        .select("name")
+        .eq("loginid", loginid)
+        .single();
+
+    if (error || !data) {
+        sessionStorage.clear();
+        window.location.href = "login.html";
+        return;
+    }
+
+    // Welcome text
+    document.getElementById("welcomeText").innerText =
+        `Welcome, ${data.name}`;
+
+    document.getElementById("roleText").innerText =
+        usertype === "Farmer"
+        ? "Explore crop prices, sell harvests, and access AI insights."
+        : "Explore crop prices and buy fresh local produce.";
+
+    // Navbar
+    document.getElementById("navMenu").innerHTML = `
+        <a class="nav-box" href="krishimitr.html">Crop Predictor</a>
+        ${usertype === "Farmer" ? `<a class="nav-box" href="Sell.html">Sell Crops</a>` : ""}
+        <a class="nav-box" href="Buy.html">Buy Crops</a>
+        ${usertype === "Farmer" ? `<a class="nav-box" href="Notification.html">Notification</a>` : ""}
+    `;
+}
+
+document.getElementById("logoutBtn").onclick = () => {
+    sessionStorage.clear();
+    window.location.href = "login.html";
+};
+
+initDashboard();
+</script>
+
+</body>
+</html>
+
