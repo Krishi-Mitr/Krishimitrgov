@@ -3,92 +3,95 @@
 <head>
 <meta charset="UTF-8" />
 <title>Farmer Registration - Vikasit Bharat</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1" />
 
 <style>
-body {
-    margin: 0;
-    font-family: 'Poppins', Arial, sans-serif;
-    height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background: linear-gradient(180deg, #FF9933 0%, #FFFFFF 50%, #138808 100%);
-}
+  body {
+      margin: 0;
+      font-family: 'Poppins', Arial, sans-serif;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: linear-gradient(180deg, #FF9933 0%, #FFFFFF 50%, #138808 100%);
+  }
 
-.container {
-    background: rgba(0,0,0,0.2);
-    backdrop-filter: blur(12px);
-    padding: 50px;
-    border-radius: 25px;
-    width: 400px;
-    max-width: 90%;
-    text-align: center;
-    box-shadow: 0 12px 40px rgba(0,0,0,0.4);
-}
+  .container {
+      background: rgba(0,0,0,0.2);
+      backdrop-filter: blur(12px);
+      padding: 50px;
+      border-radius: 25px;
+      width: 400px;
+      max-width: 90%;
+      text-align: center;
+      box-shadow: 0 12px 40px rgba(0,0,0,0.4);
+  }
 
-h2 {
-    color: #0a3d62;
-    margin-bottom: 25px;
-}
+  h2 {
+      color: #0a3d62;
+      margin-bottom: 25px;
+  }
 
-input {
-    width: 100%;
-    padding: 14px;
-    margin: 12px 0;
-    border-radius: 12px;
-    border: none;
-    font-size: 16px;
-}
+  input {
+      width: 100%;
+      padding: 14px;
+      margin: 12px 0;
+      border-radius: 12px;
+      border: none;
+      font-size: 16px;
+  }
 
-button {
-    width: 100%;
-    padding: 16px;
-    margin-top: 15px;
-    border-radius: 12px;
-    border: none;
-    font-weight: bold;
-    color: #fff;
-    background: linear-gradient(135deg, #FF9933, #138808);
-    cursor: pointer;
-}
+  button {
+      width: 100%;
+      padding: 16px;
+      margin-top: 15px;
+      border-radius: 12px;
+      border: none;
+      font-weight: bold;
+      color: #fff;
+      background: linear-gradient(135deg, #FF9933, #138808);
+      cursor: pointer;
+  }
 
-.message {
-    color: red;
-    font-weight: bold;
-    margin-bottom: 10px;
-}
+  .message {
+      color: red;
+      font-weight: bold;
+      margin-bottom: 10px;
+  }
 
-.success {
-    color: green;
-    font-weight: bold;
-    margin-bottom: 10px;
-}
+  .success {
+      color: green;
+      font-weight: bold;
+      margin-bottom: 10px;
+  }
 </style>
 </head>
 
 <body>
 
 <div class="container">
-<h2>Farmer Registration</h2>
+  <h2>Farmer Registration</h2>
 
-<div id="message" class="message"></div>
-<div id="success" class="success"></div>
+  <div id="message" class="message"></div>
+  <div id="success" class="success"></div>
 
-<form id="registerForm">
-    <input type="text" id="username" placeholder="Username" required>
-    <input type="password" id="password" placeholder="Password" required>
-    <input type="text" id="name" placeholder="Full Name" required>
-    <button type="submit">Register</button>
-</form>
+  <form id="registerForm">
+      <input type="text" id="username" placeholder="Username" required />
+      <input type="password" id="password" placeholder="Password" required />
+      <input type="text" id="name" placeholder="Full Name" required />
+      <button type="submit">Register</button>
+  </form>
 
-<a href="login" style="color:#FF9933;">Back to Login</a>
+  <a href="login" style="color:#FF9933;">Back to Login</a>
 </div>
 
-<!-- Load supabase.js that defines window.db -->
+<!-- 1. Load Supabase official JS library FIRST -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<!-- 2. Load your supabase.js that creates window.db -->
 <script src="supabase.js"></script>
 
+<!-- 3. Your Farmer Registration script -->
 <script>
 document.getElementById("registerForm").addEventListener("submit", async function (e) {
     e.preventDefault();
