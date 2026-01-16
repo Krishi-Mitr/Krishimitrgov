@@ -5,6 +5,7 @@
 
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase.js"></script>
 
 <style>
 body {
@@ -136,10 +137,7 @@ body {
 </div>
 
 <script>
-const supabase = supabase.createClient(
-  'https://xhzpvgiyvxcfwgnupkqv.supabase.co',
-  'sb_publishable_YviwlBy7i3PmxZ88mwsDeQ_P4Bg0naI'
-);
+const supabase = window.db;
 
 let formToken = crypto.randomUUID();
 async function init() {
@@ -174,38 +172,72 @@ document.getElementById('sellForm').addEventListener('submit', async e => {
   if (!formToken) return;
 
   const user = (await supabase.auth.getUser()).data.user;
+  if (!user) {
+    alert("Please login again");
+    location.href = "login.html";
+    return;
+  }
 
-  const { count } = await supabase
+  const { count, error: countError } = await supabase
     .from('crop_sales')
     .select('*', { count: 'exact', head: true })
     .eq('ID', user.id);
 
-  const jid = `${user.id}-${count + 1}`;
+  if (countError) {
+    console.error("Error counting listings:", countError);
+    alert("Error: " + countError.message);
+    return;
+  }
 
-  await supabase.from('crop_sales').insert({
+  const jid = `${user.id}-${(count || 0) + 1}`;
+
+  const cropName = document.getElementById('crop_name').value;
+  const quantity = document.getElementById('quantity').value;
+  const price = document.getElementById('price').value;
+  const location = document.getElementById('location').value;
+
+  const { data, error } = await supabase.from('crop_sales').insert({
     ID: user.id,
     JID: jid,
     farmer_name: user.user_metadata.username,
-    crop_name: crop_name.value,
-    quantity: quantity.value,
-    price: price.value,
-    location: location.value,
+    crop_name: cropName,
+    quantity: quantity,
+    price: price,
+    location: location,
     created_at: new Date().toISOString(),
     LID: user.id
   });
+
+  if (error) {
+    console.error("Error inserting crop:", error);
+    alert("Error saving crop: " + error.message);
+    return;
+  }
 
   formToken = null;
   location.search = "?success=1";
 });
 async function loadListings(uid) {
-  const { data } = await supabase
+  const { data, error } = await supabase
     .from('crop_sales')
     .select('*')
     .eq('ID', uid)
     .order('created_at', { ascending: false });
 
+  if (error) {
+    console.error("Error loading listings:", error);
+    document.getElementById('listingContainer').innerHTML = 
+      "<p class='text-danger'>Error loading listings: " + error.message + "</p>";
+    return;
+  }
+
   const box = document.getElementById('listingContainer');
   box.innerHTML = '';
+
+  if (!data || data.length === 0) {
+    box.innerHTML = "<p class='text-muted'>No listings yet.</p>";
+    return;
+  }
 
   data.forEach(row => {
     box.innerHTML += `
@@ -227,12 +259,23 @@ async function deleteListing(created_at) {
   if (!confirm("Delete this listing?")) return;
 
   const user = (await supabase.auth.getUser()).data.user;
+  if (!user) {
+    alert("Please login again");
+    location.href = "login.html";
+    return;
+  }
 
-  await supabase
+  const { error } = await supabase
     .from('crop_sales')
     .delete()
     .eq('ID', user.id)
     .eq('created_at', created_at);
+
+  if (error) {
+    console.error("Error deleting listing:", error);
+    alert("Error deleting listing: " + error.message);
+    return;
+  }
 
   loadListings(user.id);
 }
