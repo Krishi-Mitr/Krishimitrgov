@@ -2,8 +2,8 @@
 <html>
 <head>
 <title>Buy Crops - KrishiMitra</title>
-
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
 body {
@@ -12,7 +12,6 @@ body {
   font-family: Arial;
   padding-top: 90px;
 }
-
 .topbar {
     position: fixed;
     top: 0;
@@ -27,19 +26,16 @@ body {
     box-shadow: 0 4px 12px rgba(0,0,0,0.25);
     z-index: 9000;
 }
-
 .topbar-logo {
     font-size: 26px;
     font-weight: 900;
     color: #000080;
     margin-right: 25px;
 }
-
 .topbar-menu {
     display: flex;
     gap: 14px;
 }
-
 .topbar-menu a {
     text-decoration: none;
     padding: 10px 16px;
@@ -47,11 +43,9 @@ body {
     font-weight: 700;
     color: #000080;
 }
-
 .topbar-right {
     margin-left: auto;
 }
-
 .topbar-right a {
     padding: 8px 16px;
     background: #000080;
@@ -60,7 +54,6 @@ body {
     border-radius: 8px;
     font-weight: 700;
 }
-
 .card-custom {
     border: 3px solid #000080;
     border-radius: 15px;
@@ -68,27 +61,28 @@ body {
     padding: 18px;
     box-shadow: 0 4px 18px rgba(0,0,0,0.22);
 }
-
 .buy-btn {
-    padding: 8px 16px;
+    width: 100%;
+    padding: 10px;
+    font-weight: 700;
+    border-radius: 8px;
     border: none;
     background: #000080;
     color: white;
-    border-radius: 8px;
-    font-weight: 700;
 }
 </style>
-
-<!-- Supabase -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 
 <body>
 
 <div class="topbar">
     <div class="topbar-logo">🌾 KrishiMitra</div>
-    <div class="topbar-menu" id="menu"></div>
-    <div class="topbar-right"><a href="#" id="logoutBtn">Logout</a></div>
+    <div class="topbar-menu">
+        <a href="Dashboard.html">Main Page</a>
+        <a href="krishimitr.html">Crop Predictor</a>
+        <a href="Sell.html">Sell Crops</a>
+    </div>
+    <div class="topbar-right"><a href="#" id="logout">Logout</a></div>
 </div>
 
 <div class="container">
@@ -98,56 +92,41 @@ body {
 
 <script>
 const supabase = supabase.createClient(
-  'https://xhzpvgiyvxcfwgnupkqv.supabase.co',
-  'sb_publishable_YviwlBy7i3PmxZ88mwsDeQ_P4Bg0naI'
-);
+  "https://xhzpvgiyvxcfwgnupkqv.supabase.co",
+  "sb_publishable_YviwlBy7i3PmxZ88mwsDeQ_P4Bg0naI"
+)
 
-let user, loginid, username, usertype;
-async function checkAuth() {
-  const { data } = await supabase.auth.getUser();
+let user
+
+async function init() {
+  const { data } = await supabase.auth.getUser()
   if (!data.user) {
-    window.location.href = "login.html";
-    return;
+    location.href = "login.html"
+    return
   }
-
-  user = data.user;
-  loginid = user.id;
-  username = user.user_metadata.username;
-  usertype = user.user_metadata.usertype;
-
-  renderMenu();
-  loadCrops();
+  user = data.user
+  loadCrops()
 }
-function renderMenu() {
-  const menu = document.getElementById('menu');
 
-  menu.innerHTML = `
-    <a href="Dashboard.html">Main Page</a>
-    ${usertype === "Farmer" ? `<a href="Notification.html">Notification</a>` : ""}
-    <a href="krishimitr.html">Crop Predictor and Advisor</a>
-    ${usertype === "Farmer" ? `<a href="Sell.html">Sell Crops</a>` : ""}
-  `;
-}
 async function loadCrops() {
   const { data: crops } = await supabase
-    .from('crop_sales')
-    .select('*')
-    .neq('ID', loginid)
-    .order('created_at', { ascending: false });
+    .from("crop_sales")
+    .select("*")
+    .neq("id", user.id)
+    .order("created_at", { ascending: false })
 
-  const container = document.getElementById('cropList');
-  container.innerHTML = '';
+  const container = document.getElementById("cropList")
+  container.innerHTML = ""
 
-  for (let row of crops) {
+  for (const row of crops) {
+    const { data: buy } = await supabase
+      .from("buy_table")
+      .select("yn")
+      .eq("fid", row.jid)
+      .eq("cid", user.id)
+      .single()
 
-    const { data: buyRow } = await supabase
-      .from('buy_table')
-      .select('"Y/N"')
-      .eq('FID', row.JID)
-      .eq('CID', loginid)
-      .single();
-
-    const yn = buyRow ? buyRow["Y/N"] : "No";
+    const yn = buy?.yn || "no"
 
     container.innerHTML += `
       <div class="col-md-4">
@@ -158,64 +137,57 @@ async function loadCrops() {
           <p><strong>Price:</strong> ₹${row.price} per kg</p>
           <p><strong>Location:</strong> ${row.location}</p>
           <p class="text-muted" style="font-size:12px;">Posted on: ${row.created_at}</p>
-
-          <button class="buy-btn"
-            onclick="toggleBuy('${row.JID}','${row.farmer_name}',this)">
+          <button class="buy-btn" onclick="toggleBuy('${row.jid}','${row.farmer_name}',this)">
             ${yn}
           </button>
         </div>
       </div>
-    `;
+    `
   }
 }
+
 async function toggleBuy(fid, fname, btn) {
-
-  const { data: farmer } = await supabase
-    .from('crop_sales')
-    .select('LID')
-    .eq('JID', fid)
-    .single();
-
-  const farmer_lid = farmer.LID;
-
   const { data: existing } = await supabase
-    .from('buy_table')
-    .select('"Y/N"')
-    .eq('FID', fid)
-    .eq('CID', loginid)
-    .eq('LID', farmer_lid)
-    .single();
+    .from("buy_table")
+    .select("*")
+    .eq("fid", fid)
+    .eq("cid", user.id)
+    .single()
 
   if (existing) {
-    const newVal = existing["Y/N"] === "Yes" ? "No" : "Yes";
-
+    const newVal = existing.yn === "yes" ? "no" : "yes"
     await supabase
-      .from('buy_table')
-      .update({ "Y/N": newVal })
-      .eq('FID', fid)
-      .eq('CID', loginid)
-      .eq('LID', farmer_lid);
-
-    btn.innerText = newVal;
+      .from("buy_table")
+      .update({ yn: newVal })
+      .eq("fid", fid)
+      .eq("cid", user.id)
+    btn.innerText = newVal
   } else {
-    await supabase.from('buy_table').insert({
-      FName: fname,
-      FID: fid,
-      CName: username,
-      CID: loginid,
-      LID: farmer_lid,
-      "Y/N": "Yes"
-    });
+    const { data: crop } = await supabase
+      .from("crop_sales")
+      .select("lid")
+      .eq("jid", fid)
+      .single()
 
-    btn.innerText = "Yes";
+    await supabase.from("buy_table").insert({
+      fid: fid,
+      cid: user.id,
+      lid: crop.lid,
+      fname: fname,
+      cname: user.email,
+      yn: "yes"
+    })
+
+    btn.innerText = "yes"
   }
 }
-document.getElementById('logoutBtn').onclick = async () => {
-  await supabase.auth.signOut();
-  window.location.href = "login.html";
-};
 
-checkAuth();
+document.getElementById("logout").onclick = async () => {
+  await supabase.auth.signOut()
+  location.href = "login.html"
+}
+
+init()
 </script>
 
 </body>
