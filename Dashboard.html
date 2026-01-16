@@ -80,12 +80,16 @@ h1 {
     color: #000080;
     font-size: 2.5em;
 }
+
+p {
+    font-size: 1.2em;
+}
 </style>
 </head>
 
 <body>
 
-<!-- NAV -->
+<!-- NAVBAR -->
 <div class="top-nav">
     <div class="nav-left" id="navMenu"></div>
     <button class="logout-btn" id="logoutBtn">Logout</button>
@@ -94,65 +98,56 @@ h1 {
 <!-- CONTENT -->
 <div class="container">
     <h1 id="welcomeText">Loading...</h1>
+    <p>Your Krishi Mitr Dashboard.</p>
     <p id="roleText"></p>
 </div>
 
-<!-- SUPABASE -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="supabase.js"></script>
-
 <script>
+const db = window.db;
+
 async function initDashboard() {
+    const loginid = sessionStorage.getItem("loginid");
+    const usertype = sessionStorage.getItem("usertype");
 
-  // ⏳ WAIT until supabase.js creates window.db
-  if (!window.db) {
-    setTimeout(initDashboard, 100);
-    return;
-  }
+    if (!loginid || !usertype) {
+        window.location.href = "login.html";
+        return;
+    }
 
-  const loginid = sessionStorage.getItem("loginid");
-  const usertype = sessionStorage.getItem("usertype");
+    // ✅ Fetch REAL NAME from database
+    const { data, error } = await db
+        .from("logindata")
+        .select("name")
+        .eq("loginid", loginid)
+        .single();
 
-  if (!loginid || !usertype) {
-    location.href = "login.html";
-    return;
-  }
+    if (error || !data) {
+        sessionStorage.clear();
+        window.location.href = "login.html";
+        return;
+    }
 
-  // ✅ FETCH FULL NAME
-  const { data, error } = await window.db
-    .from("logindata")
-    .select("name")
-    .eq("loginid", loginid)
-    .maybeSingle();
+    // Welcome text
+    document.getElementById("welcomeText").innerText =
+        `Welcome, ${data.name}`;
 
-  if (error || !data) {
-    sessionStorage.clear();
-    location.href = "login.html";
-    return;
-  }
+    document.getElementById("roleText").innerText =
+        usertype === "Farmer"
+        ? "Explore crop prices, sell harvests, and access AI insights."
+        : "Explore crop prices and buy fresh local produce.";
 
-  // SHOW NAME
-  document.getElementById("welcomeText").innerText =
-    `Welcome, ${data.name}`;
-
-  document.getElementById("roleText").innerText =
-    usertype === "Farmer"
-      ? "Explore crop prices, sell harvests, and access AI insights."
-      : "Explore crop prices and buy fresh local produce.";
-
-  // NAV MENU
-  document.getElementById("navMenu").innerHTML = `
-    <a class="nav-box" href="krishimitr.html">Crop Advisor</a>
-    ${usertype === "Farmer" ? `<a class="nav-box" href="Sell.html">Sell Crops</a>` : ""}
-    <a class="nav-box" href="Buy.html">Buy Crops</a>
-    ${usertype === "Farmer" ? `<a class="nav-box" href="Notification.html">Notifications</a>` : ""}
-  `;
+    // Navbar
+    document.getElementById("navMenu").innerHTML = `
+        <a class="nav-box" href="krishimitr.html">Crop Predictor</a>
+        ${usertype === "Farmer" ? `<a class="nav-box" href="Sell.html">Sell Crops</a>` : ""}
+        <a class="nav-box" href="Buy.html">Buy Crops</a>
+        ${usertype === "Farmer" ? `<a class="nav-box" href="Notification.html">Notification</a>` : ""}
+    `;
 }
 
-// LOGOUT
 document.getElementById("logoutBtn").onclick = () => {
-  sessionStorage.clear();
-  location.href = "login.html";
+    sessionStorage.clear();
+    window.location.href = "login.html";
 };
 
 initDashboard();
