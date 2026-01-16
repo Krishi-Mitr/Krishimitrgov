@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>KrishiMitra</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(to bottom, #FF9933 0%, #FFFFFF 50%, #138808 100%);
+      background-attachment: fixed;
+      color: #333;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 40px;
+      background-color: #ffffffdd;
+      backdrop-filter: blur(8px);
+      border-bottom: 2px solid rgba(0,0,0,0.15);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+
+    .logo {
+      font-size: 28px;
+      font-weight: bold;
+      color: #1d0a7a;
+      letter-spacing: 1px;
+    }
+
+    .login-btn {
+      padding: 12px 26px;
+      background: linear-gradient(to right, #FF9933, #138808);
+      color: white;
+      text-decoration: none;
+      border-radius: 8px;
+      font-weight: bold;
+      transition: 0.25s ease;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.25);
+    }
+
+    .login-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 16px rgba(0,0,0,0.3);
+    }
+
+    .hero h1 {
+      font-size: 56px;
+      margin-bottom: 20px;
+      font-weight: bold;
+      background: linear-gradient(to right, #FF9933, #138808);
+      -webkit-background-clip: text;
+      color: transparent;
+    }
+
+    .hero p {
+      font-size: 22px;
+      width: 70%;
+      margin: auto;
+      line-height: 1.5;
+      color: #0a7a25;
+      font-weight: 500;
+    }
+
+    .chakra-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-top: 40px;
+    }
+
+    .chakra {
+      width: 260px;
+      animation: spin 5s linear infinite;
+      opacity: 1;
+    }
+
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    .hero {
+      text-align: center;
+      padding: 60px 20px;
+      background: rgba(255,255,255,0.45);
+      backdrop-filter: blur(12px);
+      border-radius: 20px;
+      width: 70%;
+      margin: 40px auto;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+      color: #222;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo">KrishiMitra</div>
+    <a href="login.html" class="login-btn">Login</a>
+  </header>
+
+  <div class="chakra-container">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/1/17/Ashoka_Chakra.svg" class="chakra" />
+  </div>
+
+  <section class="hero">
+    <h1>Towards a Vikasit Bharat</h1>
+    <p>
+      Welcome to the KrishiMitra, a platform designed to empower citizens and farmers
+      with tools, knowledge, and digital solutions to help them in agriculture that contribute to a stronger, more
+      progressive nation.
+    </p>
+  </section>
+</body>
+</html>

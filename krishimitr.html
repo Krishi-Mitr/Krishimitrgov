@@ -1,0 +1,366 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>KrishiMitra — Local Crop Market Predictor & Crop Advisor</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+
+</style>
+</head>
+
+<body>
+
+<div class="top-navbar">
+  <div class="brand">🌾 KrishiMitra AI</div>
+
+  <div class="nav-center" id="navCenter">
+    <a href="Dashboard.html" class="nav-link-custom">Main Page</a>
+    <a href="Notification.html" class="nav-link-custom farmer-only">Notification</a>
+    <a href="Sell.html" class="nav-link-custom farmer-only">Sell Crops</a>
+    <a href="Buy.html" class="nav-link-custom">Buy Crops</a>
+  </div>
+
+  <div class="nav-right">
+    <button id="toggleDark" class="btn btn-light btn-sm">🌙 Dark Mode</button>
+    <a href="#" id="logoutBtn" class="logout-btn">Logout</a>
+  </div>
+</div>
+
+<div id="mainApp">
+  <div class="container">
+
+  </div>
+</div>
+
+<script>
+const supabase = supabase.createClient(
+  'https://xhzpvgiyvxcfwgnupkqv.supabase.co',
+  'sb_publishable_YviwlBy7i3PmxZ88mwsDeQ_P4Bg0naI'
+);
+async function initAuth() {
+  const { data } = await supabase.auth.getUser();
+
+  if (!data.user) {
+    location.href = "login.html";
+    return;
+  }
+
+  const usertype = data.user.user_metadata.usertype;
+
+  if (usertype !== "Farmer") {
+    document.querySelectorAll('.farmer-only').forEach(el => el.remove());
+  }
+}
+document.getElementById('logoutBtn').onclick = async () => {
+  await supabase.auth.signOut();
+  location.href = "login.html";
+};
+
+initAuth();
+</script>
+
+<script>
+const backBtn = document.getElementById('backBtn');
+if (backBtn) {
+  backBtn.addEventListener('click', ()=> {
+    window.scrollTo({top: 0, behavior: 'smooth'});
+  });
+}
+
+const toggleBtn = document.getElementById('toggleDark');
+if (toggleBtn) {
+  toggleBtn.addEventListener('click', () => {
+    document.body.classList.toggle('dark');
+    toggleBtn.innerText = document.body.classList.contains('dark') ? '☀️ Light Mode' : '🌙 Dark Mode';
+  });
+}
+
+
+
+
+const cropBase = {
+  Wheat:2000, Rice:2100, Sugarcane:1800, Cotton:2300,
+  Maize:1600, Sorghum:1500, Barley:1400, Millet:1300,
+  Soybean:1700, Groundnut:1600, Tomato:2000, Potato:1900
+};
+const volatility = {
+  Wheat:12, Rice:15, Sugarcane:10, Cotton:18,
+  Maize:14, Sorghum:13, Barley:11, Millet:10,
+  Soybean:15, Groundnut:12, Tomato:18, Potato:16
+};
+
+
+function genHistorical(crop, region){
+  const days = 90;
+  const base = cropBase[crop] || 2000;
+  const vol = volatility[crop] || 12;
+  const arr = [];
+
+  let p = base + (Math.random()-0.5)*40;
+  for(let i = days; i > 0; i--){
+ 
+    const seasonal = Math.sin(i/7)*8;
+    const regionBias = (region ? (region.length % 5) - 2 : 0) * 0.6;
+    const noise = (Math.random()-0.5) * vol;
+    p = Math.max(50, p + seasonal + noise + regionBias);
+    const d = new Date();
+    d.setDate(d.getDate() - i);
+    arr.push({date: d.toISOString().slice(0,10), price: Math.round(p*10)/10});
+  }
+  return arr;
+}
+
+function forecastPrices(hist, days, crop, scenario = 0){
+  if(!hist || !hist.length) return [];
+  const vol = volatility[crop] || 12;
+  const last = hist[hist.length-1].price;
+  const first = hist[0].price;
+  const slope = (last - first) / Math.max(1, (hist.length-1)); // per-day slope
+  const preds = [];
+  let p = last;
+  for(let i=1;i<=days;i++){
+    // scenario can be -1,0,1 for bad/neutral/good (or a small multiplier)
+    const noise = (Math.random()-0.5) * vol;
+    const shock = scenario * (Math.random()-0.4) * vol * 1.8;
+    // small decaying seasonal influence
+    const seasonal = Math.sin((i+hist.length)/7) * 6;
+    p = Math.max(20, p + slope*0.6 + noise + shock + seasonal*0.3);
+    const d = new Date();
+    d.setDate(new Date().getDate() + i);
+    preds.push({date: d.toISOString().slice(0,10), price: Math.round(p*10)/10});
+  }
+  return preds;
+}
+
+const chartCtx = document.getElementById('priceChart').getContext('2d');
+let priceChart = new Chart(chartCtx, {
+  type: 'line',
+  data: { labels: [], datasets: [] },
+  options: {
+    responsive: true,
+    interaction: { mode: 'index', intersect: false },
+    plugins: { legend: { position: 'top' } },
+    scales: {
+      x: { display: true },
+      y: { display: true, title: { display: true, text: 'Price (₹/qtl)' } }
+    }
+  }
+});
+
+function updateChart(hist, preds){
+  const histDates = hist.map(h => h.date);
+  const predDates = preds.map(p => p.date);
+  const labels = histDates.concat(predDates);
+
+  const histData = hist.map(h => h.price).concat(new Array(preds.length).fill(null));
+  const predData = new Array(Math.max(0, hist.length-1)).fill(null)
+                     .concat([hist[hist.length-1].price])
+                     .concat(preds.map(p => p.price));
+
+  if(histData.length !== labels.length || predData.length !== labels.length){
+
+    const L = labels.length;
+    while(histData.length < L) histData.push(null);
+    while(predData.length < L) predData.unshift(null);
+    histData.length = predData.length = labels.length;
+  }
+
+  priceChart.data.labels = labels;
+  priceChart.data.datasets = [
+    {
+      label: 'Historical',
+      data: histData,
+      borderWidth: 2,
+      tension: 0.2,
+      pointRadius: 2,
+      borderColor: '#0d6efd',
+      backgroundColor: 'rgba(13,110,253,0.04)',
+      fill: true
+    },
+    {
+      label: 'Forecast',
+      data: predData,
+      borderDash: [6,4],
+      borderWidth: 2,
+      tension: 0.2,
+      pointRadius: 2,
+      borderColor: '#198754',
+      backgroundColor: 'rgba(25,135,84,0.03)',
+      fill: true
+    }
+  ];
+  priceChart.update();
+}
+
+const hval = document.getElementById('hval');
+const hor = document.getElementById('horizon');
+hor.addEventListener('input', ()=> hval.innerText = hor.value);
+
+document.getElementById('predictBtn').addEventListener('click', ()=> { runPrediction(false); });
+document.getElementById('adviseBtn').addEventListener('click', ()=> { runAdvisor(false); });
+document.getElementById('combineBtn').addEventListener('click', ()=> { runPrediction(true); });
+document.getElementById('exportBtn').addEventListener('click', exportCSV);
+document.getElementById('voiceBtn').addEventListener('click', voiceInput);
+
+let lastForecast = [];
+let lastCrop = 'Wheat';
+let lastRegion = 'Punjab';
+
+function runPrediction(runAdvisorToo){
+  const crop = document.getElementById('cropSelect').value;
+  const region = document.getElementById('regionSelect').value;
+  const days = parseInt(document.getElementById('horizon').value, 10);
+  const hist = genHistorical(crop, region);
+  const scenario = 0; // neutral demo
+  const preds = forecastPrices(hist, days, crop, scenario);
+
+  updateChart(hist, preds);
+  lastForecast = preds;
+  lastCrop = crop;
+  lastRegion = region;
+
+  const now = hist[hist.length-1].price;
+  const futureAvg = preds.length ? preds.reduce((s,p)=>s+p.price,0)/preds.length : now;
+  const changePct = ((futureAvg - now)/Math.max(1, now))*100;
+
+  const actionCard = document.getElementById('actionCard');
+  let html = `<div><div class="recommend">Avg change: ${changePct.toFixed(1)}% over next ${days} days</div>`;
+  if(changePct > 4){
+    html += `<div class="mt-2 text-success">🌟 Tip: Prices look like they will go <strong>up</strong>. Consider storing a bit and selling later.</div>`;
+  } else if(changePct < -4){
+    html += `<div class="mt-2 text-danger">⚠️ Tip: Prices may go <strong>down</strong>. Consider selling soon.</div>`;
+  } else {
+    html += `<div class="mt-2 text-warning">Tip: Prices should stay about the same. You can sell some now and keep some.</div>`;
+  }
+  html += `<div class="mt-2 small-muted"></div>`;
+  html += `<div id="advisorTipSlot"></div></div>`;
+  actionCard.innerHTML = html;
+
+  if(runAdvisorToo) runAdvisor(true);
+}
+
+
+function runAdvisor(showOnRight){
+  const soil = document.getElementById('soilType').value;
+  const rain = parseFloat(document.getElementById('rainfall').value);
+  const temp = parseFloat(document.getElementById('temp').value);
+  const crop = document.getElementById('cropSelect').value;
+
+  const seedOptions = {
+    Rice:['Local high-yield rice','Flood-tolerant rice','Short-duration rice'],
+    Wheat:['Drought-tolerant wheat','Early-maturity wheat','High-protein wheat'],
+    Cotton:['Bt cotton (local)','Organic cotton','Short-staple cotton'],
+    Maize:['Hybrid maize','Sweet corn variety','High-yield maize'],
+    Sorghum:['Local millets mix','Drought-resilient sorghum','Red sorghum'],
+    Barley:['Certified barley','Malting barley','Hull-less barley'],
+    Millet:['Millet seeds mix','Finger millet','Foxtail millet'],
+    Soybean:['Local soybean','Early-maturing soybean','High-protein soybean'],
+    Groundnut:['Groundnut seeds','Spanish variety','Virginia variety'],
+    Tomato:['Tomato seeds','Cherry tomato','Disease-resistant tomato'],
+    Potato:['Potato seeds','Early variety','High-starch variety'],
+    Sugarcane:['High-yield sugarcane','Disease-resistant cane','Early-maturity cane']
+  };
+  const fertOptions = {
+    Rice:['Urea + SSP','NPK 12-32-16','Compost-enriched'],
+    Wheat:['NPK 10-26-26','Urea top-dressing','Organic mix'],
+    Cotton:['Potash-rich','NPK 12-12-17','Biofertilizer'],
+    Maize:['Balanced NPK','Compost+urea','Liquid fertilizer mix'],
+    Sorghum:['NPK 12-24-12','Organic compost','Urea split'],
+    Barley:['NPK 10-10-10','Farmyard manure','Micronutrient mix'],
+    Millet:['Organic compost','NPK 8-20-10','Green manure'],
+    Soybean:['NPK 12-12-12','Rhizobium inoculant','Balanced compost'],
+    Groundnut:['Potash-rich','NPK 10-20-10','FYM+Biofertilizer'],
+    Tomato:['NPK 10-10-10','Organic mix','Liquid foliar fertilizer'],
+    Potato:['Balanced NPK','FYM + urea','Potassium-rich fertilizer'],
+    Sugarcane:['NPK 14-14-14','Compost enriched','Micronutrient mix']
+  };
+
+  function pickRandom(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
+  const seed = pickRandom(seedOptions[crop] || ['Local seeds']);
+  const fert = pickRandom(fertOptions[crop] || ['Balanced fertilizer']);
+
+  let weatherAdvice = '';
+  if(rain < 50) weatherAdvice += 'Low rainfall expected; consider drought-tolerant varieties and water-saving practices. ';
+  else if(rain > 400) weatherAdvice += 'High rainfall expected; ensure drainage and flood-tolerant varieties. ';
+
+  if(temp > 35) weatherAdvice += 'High temperatures — shade and irrigation recommended. ';
+  else if(temp < 10) weatherAdvice += 'Low temperature — consider frost protection and early maturing varieties. ';
+
+  const advice = `💡 Advisor Tip for ${crop}: Soil: ${soil}, Rainfall: ${rain}mm, Temp: ${temp}°C. ${weatherAdvice}Recommended Seed: ${seed}. Recommended Fertilizer: ${fert}. Monitor local weather and pest alerts.`;
+
+  const advisorOutput = document.getElementById('advisorOutput');
+  advisorOutput.innerText = advice;
+  if(showOnRight){
+    const slot = document.getElementById('advisorTipSlot');
+    if(slot){
+      slot.innerHTML = `<div class="mt-2 text-info small" id="advisorTip">${advice.replace(/\n/g,'<br>')}</div>`;
+    } else {
+      const actionCard = document.getElementById('actionCard');
+      const tipDiv = document.createElement('div');
+      tipDiv.id = 'advisorTip';
+      tipDiv.className = 'mt-2 text-info small';
+      tipDiv.innerHTML = advice.replace(/\n/g,'<br>');
+      actionCard.appendChild(tipDiv);
+    }
+  }
+}
+
+function exportCSV(){
+  if(!lastForecast || !lastForecast.length){
+    alert('Run a prediction first');
+    return;
+  }
+  let csv = 'Date,Price (₹/qtl)\n';
+  lastForecast.forEach(r => { csv += `${r.date},${r.price}\n`; });
+  const blob = new Blob([csv], {type: 'text/csv'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+
+  const fname = `${(lastCrop||'crop')}_${(lastRegion||'region')}_forecast.csv`.replace(/\s+/g,'_');
+  a.download = fname;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+function generateQR(){
+  const canvas = document.getElementById('qrCanvas');
+
+  const url = 'https://krishimitr8c.netlify.app';
+
+  try{
+    QRCode.toCanvas(canvas, url, { width: 120 }, function (error) {
+      if (error) console.error('QR error', error);
+    });
+  } catch(e){
+    console.error('QRCode error', e);
+  }
+}
+
+function voiceInput(){
+  alert('Voice input not implemented in this demo.');
+}
+
+document.getElementById('predictBtn').disabled = false;
+document.getElementById('adviseBtn').disabled = false;
+
+document.getElementById('mainApp').style.display = 'block';
+generateQR();
+
+window.runPrediction = runPrediction;
+window.runAdvisor = runAdvisor;
+
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

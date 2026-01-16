@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Farmer Registration - Vikasit Bharat</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+body {
+    margin: 0;
+    font-family: 'Poppins', Arial, sans-serif;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(180deg, #FF9933 0%, #FFFFFF 50%, #138808 100%);
+}
+
+.container {
+    background: rgba(255,255,255,0.2);
+    backdrop-filter: blur(12px);
+    padding: 50px;
+    border-radius: 25px;
+    width: 400px;
+    max-width: 90%;
+    text-align: center;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.4);
+    border: 1px solid rgba(255,255,255,0.1);
+}
+
+h2 {
+    color: #0a3d62;
+    font-size: 2em;
+    margin-bottom: 25px;
+}
+
+input {
+    width: 100%;
+    padding: 14px;
+    margin: 12px 0;
+    border-radius: 12px;
+    border: none;
+    font-size: 16px;
+    background: rgba(255,255,255,0.15);
+}
+
+input:focus {
+    outline: none;
+    box-shadow: 0 0 12px #FF9933;
+}
+
+button {
+    width: 100%;
+    padding: 16px;
+    margin: 15px 0;
+    border-radius: 12px;
+    border: none;
+    font-weight: bold;
+    color: #fff;
+    background: linear-gradient(135deg, #FF9933, #138808);
+    cursor: pointer;
+}
+
+.message {
+    color: #FF3333;
+    font-weight: bold;
+    margin-bottom: 15px;
+}
+
+.success {
+    color: #0a7a25;
+    font-weight: bold;
+    margin-bottom: 15px;
+}
+</style>
+</head>
+
+<body>
+<div class="container">
+<h2>Farmer Registration</h2>
+
+<div id="message" class="message" style="display:none;"></div>
+<div id="success" class="success" style="display:none;"></div>
+
+<form id="registerForm">
+    <input type="text" id="username" placeholder="Username" required>
+    <input type="password" id="password" placeholder="Password" required>
+    <input type="text" id="name" placeholder="Full Name" required>
+    <button type="submit">Register</button>
+</form>
+
+<a href="login.html" style="color:#FF9933;">Back to Login</a>
+</div>
+
+<script>
+const supabase = supabase.createClient(
+  'https://xhzpvgiyvxcfwgnupkqv.supabase.co',
+  'sb_publishable_YviwlBy7i3PmxZ88mwsDeQ_P4Bg0naI'
+);
+
+const form = document.getElementById('registerForm');
+const msg = document.getElementById('message');
+const success = document.getElementById('success');
+
+form.addEventListener('submit', async (e) => {
+  e.preventDefault();
+
+  msg.style.display = "none";
+  success.style.display = "none";
+
+  const username = document.getElementById('username').value.trim();
+  const password = document.getElementById('password').value.trim();
+  const name = document.getElementById('name').value.trim();
+  const { data: existing } = await supabase
+    .from('logindata')
+    .select('username')
+    .eq('username', username)
+    .single();
+
+  if (existing) {
+    msg.innerText = "Username already exists!";
+    msg.style.display = "block";
+    return;
+  }
+  const { data, error } = await supabase.auth.signUp({
+    email: username + "@farmer.local",
+    password,
+    options: {
+      data: {
+        username,
+        name,
+        usertype: "Farmer"
+      }
+    }
+  });
+
+  if (error) {
+    msg.innerText = error.message;
+    msg.style.display = "block";
+    return;
+  }
+  await supabase.from('logindata').insert({
+    id: data.user.id,
+    username,
+    name,
+    usertype: "Farmer"
+  });
+
+  success.innerHTML =
+    `Registration successful! You can now <a href="login.html" style="color:#FF9933;">login</a>.`;
+
+  success.style.display = "block";
+  form.style.display = "none";
+});
+</script>
+</body>
+</html>

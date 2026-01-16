@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Sell Crops - KrishiMitra</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+body {
+  background: linear-gradient(to bottom, #FF9933 0%, #FFFFFF 50%, #138808 100%);
+  background-attachment: fixed;
+  font-family: Arial;
+  padding-top: 90px;
+}
+
+.topbar {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: 78px;
+  display: flex;
+  align-items: center;
+  padding: 0 18px;
+  background: linear-gradient(90deg, #FF9933, #FFFFFF 50%, #138808);
+  border-bottom: 3px solid #000080;
+  z-index: 9000;
+}
+
+.topbar-logo {
+  font-size: 26px;
+  font-weight: 900;
+  color: #000080;
+  margin-right: 25px;
+}
+
+.topbar-menu { display: flex; gap: 14px; }
+
+.topbar-menu a {
+  text-decoration: none;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-weight: 700;
+  color: #000080;
+}
+
+.topbar-right { margin-left: auto; }
+
+.topbar-right a {
+  padding: 8px 16px;
+  background: #000080;
+  color: white;
+  border-radius: 8px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.form-container {
+  width: 520px;
+  background: white;
+  padding: 25px;
+  border-radius: 15px;
+  margin: auto;
+  border: 3px solid #000080;
+}
+
+.success {
+  background: #d4edda;
+  padding: 10px;
+  border-left: 4px solid #138808;
+  margin-bottom: 15px;
+}
+
+.list-box {
+  background: white;
+  padding: 18px;
+  border-radius: 15px;
+  margin-top: 25px;
+  border: 2px solid #000080;
+}
+</style>
+</head>
+
+<body>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <div class="topbar-logo">🌾 KrishiMitra</div>
+
+  <div class="topbar-menu">
+    <a href="Dashboard.html">Dashboard</a>
+    <a href="Buy.html">Buy Crops</a>
+    <a href="krishimitr.html">Crop Predictor</a>
+    <a href="Notification.html">Notification</a>
+  </div>
+
+  <div class="topbar-right">
+    <a href="#" id="logoutBtn">Logout</a>
+  </div>
+</div>
+
+<div class="container mt-4">
+
+<div id="messageBox"></div>
+
+<!-- SELL FORM -->
+<div class="form-container">
+  <h4>Sell Your Crops</h4>
+
+  <form id="sellForm">
+    <label>Farmer</label>
+    <input type="text" id="farmerName" class="form-control" readonly>
+
+    <label class="mt-2">Crop Name</label>
+    <input type="text" id="crop_name" class="form-control" required>
+
+    <label class="mt-2">Quantity (kg)</label>
+    <input type="number" id="quantity" class="form-control" required>
+
+    <label class="mt-2">Price (₹)</label>
+    <input type="number" id="price" class="form-control" required>
+
+    <label class="mt-2">Address</label>
+    <input type="text" id="location" class="form-control" required>
+
+    <button class="btn btn-success w-100 mt-3">Submit</button>
+  </form>
+</div>
+
+<!-- LISTINGS -->
+<div class="list-box mt-4">
+  <h4>Your Listings</h4>
+  <hr>
+  <div id="listingContainer"></div>
+</div>
+
+</div>
+
+<script>
+const supabase = supabase.createClient(
+  'https://xhzpvgiyvxcfwgnupkqv.supabase.co',
+  'sb_publishable_YviwlBy7i3PmxZ88mwsDeQ_P4Bg0naI'
+);
+
+let formToken = crypto.randomUUID();
+async function init() {
+  const { data } = await supabase.auth.getUser();
+
+  if (!data.user) {
+    location.href = "login.html";
+    return;
+  }
+
+  const user = data.user;
+
+  if (user.user_metadata.usertype !== "Farmer") {
+    alert("Access denied");
+    location.href = "Dashboard.html";
+    return;
+  }
+
+  document.getElementById('farmerName').value =
+    user.user_metadata.username;
+
+  if (new URLSearchParams(location.search).has("success")) {
+    document.getElementById('messageBox').innerHTML =
+      "<div class='success'>🌾 Crop listed successfully!</div>";
+  }
+
+  loadListings(user.id);
+}
+document.getElementById('sellForm').addEventListener('submit', async e => {
+  e.preventDefault();
+
+  if (!formToken) return;
+
+  const user = (await supabase.auth.getUser()).data.user;
+
+  const { count } = await supabase
+    .from('crop_sales')
+    .select('*', { count: 'exact', head: true })
+    .eq('ID', user.id);
+
+  const jid = `${user.id}-${count + 1}`;
+
+  await supabase.from('crop_sales').insert({
+    ID: user.id,
+    JID: jid,
+    farmer_name: user.user_metadata.username,
+    crop_name: crop_name.value,
+    quantity: quantity.value,
+    price: price.value,
+    location: location.value,
+    created_at: new Date().toISOString(),
+    LID: user.id
+  });
+
+  formToken = null;
+  location.search = "?success=1";
+});
+async function loadListings(uid) {
+  const { data } = await supabase
+    .from('crop_sales')
+    .select('*')
+    .eq('ID', uid)
+    .order('created_at', { ascending: false });
+
+  const box = document.getElementById('listingContainer');
+  box.innerHTML = '';
+
+  data.forEach(row => {
+    box.innerHTML += `
+      <div class="card p-3 mb-3">
+        <strong>${row.crop_name}</strong><br>
+        Qty: ${row.quantity} kg<br>
+        Price: ₹${row.price}/kg<br>
+        Address: ${row.location}<br>
+        Time: ${row.created_at}<br>
+        <button class="btn btn-danger btn-sm mt-2"
+          onclick="deleteListing('${row.created_at}')">
+          Delete
+        </button>
+      </div>
+    `;
+  });
+}
+async function deleteListing(created_at) {
+  if (!confirm("Delete this listing?")) return;
+
+  const user = (await supabase.auth.getUser()).data.user;
+
+  await supabase
+    .from('crop_sales')
+    .delete()
+    .eq('ID', user.id)
+    .eq('created_at', created_at);
+
+  loadListings(user.id);
+}
+logoutBtn.onclick = async () => {
+  await supabase.auth.signOut();
+  location.href = "login.html";
+};
+
+init();
+</script>
+
+</body>
+</html>
