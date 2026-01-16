@@ -4,6 +4,7 @@
 <title>Buy Crops - KrishiMitra</title>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase.js"></script>
 
 <style>
 body {
@@ -91,42 +92,84 @@ body {
 </div>
 
 <script>
-const supabase = supabase.createClient(
-  "https://xhzpvgiyvxcfwgnupkqv.supabase.co",
-  "sb_publishable_YviwlBy7i3PmxZ88mwsDeQ_P4Bg0naI"
-)
+// Check authentication FIRST, synchronously (like Dashboard.html and Sell.html)
+const loginid = sessionStorage.getItem("loginid");
+const usertype = sessionStorage.getItem("usertype");
 
-let user
+// Kick out if not logged in
+if (!loginid || !usertype) {
+    window.location.href = "login.html";
+}
+
+// Wait for DOM and database to be ready, then load data
+async function waitForDB() {
+  let attempts = 0;
+  while (!window.db && attempts < 50) {
+    await new Promise(resolve => setTimeout(resolve, 100));
+    attempts++;
+  }
+  if (!window.db) {
+    console.error("Database client not available after waiting");
+    return false;
+  }
+  return true;
+}
 
 async function init() {
-  const { data } = await supabase.auth.getUser()
-  if (!data.user) {
-    location.href = "login.html"
-    return
+  // Wait for DOM to be ready
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+    return;
   }
-  user = data.user
-  loadCrops()
+
+  // Wait for database to be ready
+  const dbReady = await waitForDB();
+  if (!dbReady) {
+    alert("Database connection failed. Please refresh the page.");
+    return;
+  }
+
+  loadCrops();
 }
 
 async function loadCrops() {
-  const { data: crops } = await supabase
+  const currentLoginId = sessionStorage.getItem("loginid");
+  
+  if (!currentLoginId) {
+    window.location.href = "login.html";
+    return;
+  }
+
+  const { data: crops, error } = await window.db
     .from("crop_sales")
     .select("*")
-    .neq("id", user.id)
-    .order("created_at", { ascending: false })
+    .neq("lid", currentLoginId)  // Filter out crops posted by the current user
+    .order("created_at", { ascending: false });
 
-  const container = document.getElementById("cropList")
-  container.innerHTML = ""
+  if (error) {
+    console.error("Error loading crops:", error);
+    document.getElementById("cropList").innerHTML = 
+      "<p class='text-danger'>Error loading crops: " + error.message + "</p>";
+    return;
+  }
+
+  const container = document.getElementById("cropList");
+  container.innerHTML = "";
+
+  if (!crops || crops.length === 0) {
+    container.innerHTML = "<p class='text-muted text-center'>No crops available at the moment.</p>";
+    return;
+  }
 
   for (const row of crops) {
-    const { data: buy } = await supabase
+    const { data: buy } = await window.db
       .from("buy_table")
       .select("yn")
       .eq("fid", row.jid)
-      .eq("cid", user.id)
-      .single()
+      .eq("cid", currentLoginId)
+      .maybeSingle();
 
-    const yn = buy?.yn || "no"
+    const yn = buy?.yn || "no";
 
     container.innerHTML += `
       <div class="col-md-4">
@@ -136,58 +179,79 @@ async function loadCrops() {
           <p><strong>Quantity:</strong> ${row.quantity} kg</p>
           <p><strong>Price:</strong> ₹${row.price} per kg</p>
           <p><strong>Location:</strong> ${row.location}</p>
-          <p class="text-muted" style="font-size:12px;">Posted on: ${row.created_at}</p>
+          <p class="text-muted" style="font-size:12px;">Posted on: ${new Date(row.created_at).toLocaleString()}</p>
           <button class="buy-btn" onclick="toggleBuy('${row.jid}','${row.farmer_name}',this)">
-            ${yn}
+            ${yn === "yes" ? "Interested ✓" : "Show Interest"}
           </button>
         </div>
       </div>
-    `
+    `;
   }
 }
 
 async function toggleBuy(fid, fname, btn) {
-  const { data: existing } = await supabase
+  const currentLoginId = sessionStorage.getItem("loginid");
+  
+  if (!currentLoginId) {
+    alert("Please login again");
+    location.href = "login.html";
+    return;
+  }
+
+  const { data: existing } = await window.db
     .from("buy_table")
     .select("*")
     .eq("fid", fid)
-    .eq("cid", user.id)
-    .single()
+    .eq("cid", currentLoginId)
+    .maybeSingle();
 
   if (existing) {
-    const newVal = existing.yn === "yes" ? "no" : "yes"
-    await supabase
+    const newVal = existing.yn === "yes" ? "no" : "yes";
+    await window.db
       .from("buy_table")
       .update({ yn: newVal })
       .eq("fid", fid)
-      .eq("cid", user.id)
-    btn.innerText = newVal
+      .eq("cid", currentLoginId);
+    btn.innerText = newVal === "yes" ? "Interested ✓" : "Show Interest";
   } else {
-    const { data: crop } = await supabase
+    const { data: crop } = await window.db
       .from("crop_sales")
       .select("lid")
       .eq("jid", fid)
-      .single()
+      .maybeSingle();
 
-    await supabase.from("buy_table").insert({
+    if (!crop) {
+      alert("Crop not found. Please refresh the page.");
+      return;
+    }
+
+    // Get user's email/name from logindata
+    const { data: userData } = await window.db
+      .from("logindata")
+      .select("username")
+      .eq("loginid", currentLoginId)
+      .maybeSingle();
+
+    await window.db.from("buy_table").insert({
       fid: fid,
-      cid: user.id,
+      cid: currentLoginId,
       lid: crop.lid,
       fname: fname,
-      cname: user.email,
+      cname: userData?.username || currentLoginId,
       yn: "yes"
-    })
+    });
 
-    btn.innerText = "yes"
+    btn.innerText = "Interested ✓";
   }
 }
 
-document.getElementById("logout").onclick = async () => {
-  await supabase.auth.signOut()
-  location.href = "login.html"
-}
+document.getElementById("logout").onclick = () => {
+  sessionStorage.clear();
+  location.href = "login.html";
+};
 
-init()
+// Start initialization
+init();
 </script>
 
 </body>
