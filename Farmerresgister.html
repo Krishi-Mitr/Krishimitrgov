@@ -4,7 +4,10 @@
 <meta charset="UTF-8">
 <title>Farmer Registration - Vikasit Bharat</title>
 
+<!-- SUPABASE LIBRARY -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<!-- YOUR EXISTING SUPABASE CLIENT -->
+<script src="supabase.js"></script>
 
 <style>
 body {
@@ -26,7 +29,6 @@ body {
     max-width: 90%;
     text-align: center;
     box-shadow: 0 12px 40px rgba(0,0,0,0.4);
-    border: 1px solid rgba(255,255,255,0.1);
 }
 
 h2 {
@@ -42,12 +44,6 @@ input {
     border-radius: 12px;
     border: none;
     font-size: 16px;
-    background: rgba(255,255,255,0.15);
-}
-
-input:focus {
-    outline: none;
-    box-shadow: 0 0 12px #FF9933;
 }
 
 button {
@@ -65,13 +61,11 @@ button {
 .message {
     color: #FF3333;
     font-weight: bold;
-    margin-bottom: 15px;
 }
 
 .success {
     color: #0a7a25;
     font-weight: bold;
-    margin-bottom: 15px;
 }
 </style>
 </head>
@@ -94,64 +88,65 @@ button {
 </div>
 
 <script>
-const supabase = supabase.createClient(
-  'https://xhzpvgiyvxcfwgnupkqv.supabase.co',
-  'sb_publishable_YviwlBy7i3PmxZ88mwsDeQ_P4Bg0naI'
-);
+const form = document.getElementById("registerForm");
+const msg = document.getElementById("message");
+const success = document.getElementById("success");
 
-const form = document.getElementById('registerForm');
-const msg = document.getElementById('message');
-const success = document.getElementById('success');
-
-form.addEventListener('submit', async (e) => {
+form.addEventListener("submit", async (e) => {
   e.preventDefault();
 
   msg.style.display = "none";
   success.style.display = "none";
 
-  const username = document.getElementById('username').value.trim();
-  const password = document.getElementById('password').value.trim();
-  const name = document.getElementById('name').value.trim();
-  const { data: existing } = await supabase
-    .from('logindata')
-    .select('username')
-    .eq('username', username)
-    .single();
+  const username = document.getElementById("username").value.trim();
+  const password = document.getElementById("password").value.trim();
+  const name = document.getElementById("name").value.trim();
 
-  if (existing) {
-    msg.innerText = "Username already exists!";
-    msg.style.display = "block";
-    return;
-  }
-  const { data, error } = await supabase.auth.signUp({
-    email: username + "@farmer.local",
-    password,
-    options: {
-      data: {
-        username,
-        name,
-        usertype: "Farmer"
-      }
+  try {
+    /* 1️⃣ CHECK USERNAME */
+    const { data: existing } = await window.db
+      .from("logindata")
+      .select("username")
+      .eq("username", username);
+
+    if (existing.length > 0) {
+      msg.innerText = "Username already exists!";
+      msg.style.display = "block";
+      return;
     }
-  });
 
-  if (error) {
-    msg.innerText = error.message;
+    /* 2️⃣ GET MAX LOGINID */
+    const { data: last } = await window.db
+      .from("logindata")
+      .select("loginid")
+      .order("loginid", { ascending: false })
+      .limit(1);
+
+    const newLoginId = last.length > 0 ? parseInt(last[0].loginid) + 1 : 1;
+
+    /* 3️⃣ INSERT FARMER */
+    const { error } = await window.db
+      .from("logindata")
+      .insert({
+        username: username,
+        password: password,
+        name: name,
+        usertype: "Farmer",
+        loginid: newLoginId
+      });
+
+    if (error) throw error;
+
+    success.innerHTML =
+      `Registration successful! You can now <a href="login.html" style="color:#FF9933;">login</a>.`;
+    success.style.display = "block";
+    form.style.display = "none";
+
+  } catch (err) {
+    console.error(err);
+    msg.innerText = "Registration failed";
     msg.style.display = "block";
-    return;
   }
-  await supabase.from('logindata').insert({
-    id: data.user.id,
-    username,
-    name,
-    usertype: "Farmer"
-  });
-
-  success.innerHTML =
-    `Registration successful! You can now <a href="login.html" style="color:#FF9933;">login</a>.`;
-
-  success.style.display = "block";
-  form.style.display = "none";
 });
 </script>
 </body>
