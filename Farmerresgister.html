@@ -117,7 +117,7 @@ form.addEventListener("submit", async (e) => {
     if (existing.length > 0) {
       msg.innerText = "Username already exists!";
       msg.style.display = "block";
-      return;
+      return;  // Stop here if username exists
     }
 
     // 2️⃣ Generate new loginid (max + 1)
@@ -129,7 +129,6 @@ form.addEventListener("submit", async (e) => {
 
     if (e2) throw e2;
 
-    // loginid is varchar in your DB, so convert carefully
     let newLoginId = 1;
     if (last.length > 0) {
       const maxId = parseInt(last[0].loginid);
@@ -147,18 +146,26 @@ form.addEventListener("submit", async (e) => {
         loginid: newLoginId.toString()
       });
 
-    if (e3) throw e3;
+    if (e3) {
+      // Insert failed, probably duplicate key or other error
+      console.error(e3);
+      msg.innerText = "Registration failed: " + e3.message;
+      msg.style.display = "block";
+      return;
+    }
 
+    // 4️⃣ Success message
     success.innerHTML = `Registration successful! You can now <a href="login.html" style="color:#FF9933;">login</a>.`;
     success.style.display = "block";
     form.style.display = "none";
 
   } catch (err) {
     console.error(err);
-    msg.innerText = "Registration failed";
+    msg.innerText = "Registration failed: " + err.message;
     msg.style.display = "block";
   }
 });
+
 </script>
 </body>
 </html>
