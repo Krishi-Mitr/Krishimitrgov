@@ -136,9 +136,9 @@ document.getElementById("loginForm").addEventListener("submit", async function(e
     // Redirect based on user type after short delay
     setTimeout(() => {
       if (data.usertype === "Farmer") {
-        location.href = "/Farmer.html";
+        location.href = "/Dahboard.html";
       } else if (data.usertype === "Citizen") {
-        location.href = "/Citizen.html";
+        location.href = "/Dashboard.html";
       } else {
         // Default fallback
         location.href = "/Dashboard.html";
