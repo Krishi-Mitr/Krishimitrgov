@@ -397,34 +397,46 @@ body.dark h2, body.dark h4 {
 
 <script>
 // Check authentication - anyone logged in (Farmer or Citizen) can access this page
-const loginid = sessionStorage.getItem("loginid");
-const usertype = sessionStorage.getItem("usertype");
-
-// Debug logging to see what's happening
-console.log("🔍 Authentication Check:");
-console.log("  loginid:", loginid);
-console.log("  usertype:", usertype);
-console.log("  loginid type:", typeof loginid);
-console.log("  usertype type:", typeof usertype);
-console.log("  loginid truthy:", !!loginid);
-console.log("  usertype truthy:", !!usertype);
-
-// Only kick out if not logged in - both Farmers and Citizens can access
-if (!loginid || !usertype) {
-    console.error("❌ REDIRECTING TO LOGIN - Missing credentials:");
-    console.error("  loginid missing:", !loginid);
-    console.error("  usertype missing:", !usertype);
-    window.location.href = "login.html";
-    // Prevent further execution
-    throw new Error("Redirecting to login");
-}
-
-console.log("✅ Authentication passed - user can access page");
+// Use retry mechanism to handle navbar navigation timing issues
+(function() {
+    let retryCount = 0;
+    const MAX_RETRIES = 10;
+    
+    function checkAuth() {
+        try {
+            const loginid = sessionStorage.getItem("loginid");
+            const usertype = sessionStorage.getItem("usertype");
+            
+            if (loginid && usertype) {
+                console.log("✅ Authentication passed");
+                return; // Success, stop checking
+            }
+        } catch (e) {
+            console.log("SessionStorage access error, retrying...", e);
+        }
+        
+        // Retry if credentials not found yet (handles navbar navigation timing)
+        if (retryCount < MAX_RETRIES) {
+            retryCount++;
+            setTimeout(checkAuth, 50);
+        } else {
+            // After all retries, redirect if still no credentials
+            console.error("❌ Redirecting to login - no credentials found after retries");
+            window.location.href = "login.html";
+        }
+    }
+    
+    // Start check with a small initial delay to ensure sessionStorage is ready
+    setTimeout(checkAuth, 10);
+})();
 
 // Wait for DOM to be ready before manipulating elements
 function setupPage() {
+    // Get usertype from sessionStorage when needed
+    const currentUsertype = sessionStorage.getItem("usertype");
+    
     // Hide farmer-only navigation links if user is not a farmer (but they can still use the page)
-    if (usertype !== "Farmer") {
+    if (currentUsertype && currentUsertype !== "Farmer") {
         try {
             document.querySelectorAll('.farmer-only').forEach(el => el.remove());
         } catch (e) {
