@@ -396,11 +396,11 @@ body.dark h2, body.dark h4 {
 </div>
 
 <script>
-// Check authentication FIRST, synchronously (exactly like Dashboard.html)
+// Check authentication - anyone logged in (Farmer or Citizen) can access this page
 const loginid = sessionStorage.getItem("loginid");
 const usertype = sessionStorage.getItem("usertype");
 
-// Kick out if not logged in
+// Only kick out if not logged in - both Farmers and Citizens can access
 if (!loginid || !usertype) {
     window.location.href = "login.html";
     // Prevent further execution
@@ -409,7 +409,7 @@ if (!loginid || !usertype) {
 
 // Wait for DOM to be ready before manipulating elements
 function setupPage() {
-    // Hide farmer-only links if user is not a farmer
+    // Hide farmer-only navigation links if user is not a farmer (but they can still use the page)
     if (usertype !== "Farmer") {
         try {
             document.querySelectorAll('.farmer-only').forEach(el => el.remove());
