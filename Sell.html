@@ -142,52 +142,88 @@ let formToken = crypto.randomUUID();
 let currentLoginId = null;
 let currentUsername = null;
 
-async function init() {
-  // Check sessionStorage for authentication (like Dashboard.html)
-  const loginid = sessionStorage.getItem("loginid");
-  const usertype = sessionStorage.getItem("usertype");
+// Check authentication FIRST, synchronously (like Dashboard.html)
+const loginid = sessionStorage.getItem("loginid");
+const usertype = sessionStorage.getItem("usertype");
 
-  if (!loginid || !usertype) {
-    location.href = "login.html";
-    return;
-  }
+if (!loginid || !usertype) {
+    window.location.href = "login.html";
+}
 
-  if (usertype !== "Farmer") {
+if (usertype !== "Farmer") {
     alert("Access denied. Only farmers can sell crops.");
-    location.href = "Dashboard.html";
+    window.location.href = "Dashboard.html";
+}
+
+currentLoginId = loginid;
+
+// Wait for DOM and database to be ready, then load data
+async function waitForDB() {
+  let attempts = 0;
+  while (!window.db && attempts < 50) {
+    await new Promise(resolve => setTimeout(resolve, 100));
+    attempts++;
+  }
+  if (!window.db) {
+    console.error("Database client not available after waiting");
+    return false;
+  }
+  return true;
+}
+
+async function init() {
+  // Wait for DOM to be ready
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
     return;
   }
 
-  currentLoginId = loginid;
+  // Wait for database to be ready
+  const dbReady = await waitForDB();
+  if (!dbReady) {
+    alert("Database connection failed. Please refresh the page.");
+    return;
+  }
 
   // Get username from database
-  if (!window.db) {
-    console.error("Database client not available");
-    return;
+  try {
+    const { data: userData, error: userError } = await window.db
+      .from("logindata")
+      .select("username")
+      .eq("loginid", loginid)
+      .maybeSingle();
+
+    if (userError) {
+      console.error("Error fetching user data:", userError);
+      alert("Error loading user data: " + userError.message);
+      return;
+    }
+
+    if (!userData) {
+      console.error("User data not found for loginid:", loginid);
+      alert("User not found. Please login again.");
+      window.location.href = "login.html";
+      return;
+    }
+
+    currentUsername = userData.username;
+    const farmerNameInput = document.getElementById('farmerName');
+    if (farmerNameInput) {
+      farmerNameInput.value = currentUsername;
+    }
+
+    if (new URLSearchParams(location.search).has("success")) {
+      const messageBox = document.getElementById('messageBox');
+      if (messageBox) {
+        messageBox.innerHTML = "<div class='success'>🌾 Crop listed successfully!</div>";
+      }
+    }
+
+    loadListings(loginid);
+  } catch (error) {
+    console.error("Unexpected error in init:", error);
+    alert("An error occurred. Please try again.");
   }
-
-  const { data: userData, error: userError } = await window.db
-    .from("logindata")
-    .select("username")
-    .eq("loginid", loginid)
-    .maybeSingle();
-
-  if (userError || !userData) {
-    console.error("Error fetching user data:", userError);
-    alert("Error loading user data. Please login again.");
-    location.href = "login.html";
-    return;
-  }
-
-  currentUsername = userData.username;
-  document.getElementById('farmerName').value = currentUsername;
-
-  if (new URLSearchParams(location.search).has("success")) {
-    document.getElementById('messageBox').innerHTML =
-      "<div class='success'>🌾 Crop listed successfully!</div>";
-  }
-
-  loadListings(loginid);
 }
 document.getElementById('sellForm').addEventListener('submit', async e => {
   e.preventDefault();
@@ -302,11 +338,12 @@ async function deleteListing(created_at) {
 
   loadListings(loginid);
 }
-logoutBtn.onclick = () => {
+document.getElementById('logoutBtn').onclick = () => {
   sessionStorage.clear();
   location.href = "login.html";
 };
 
+// Start initialization
 init();
 </script>
 
