@@ -146,9 +146,13 @@ let currentUsername = null;
 const loginid = sessionStorage.getItem("loginid");
 const usertype = sessionStorage.getItem("usertype");
 
+// Kick out if not logged in
+if (!loginid || !usertype) {
+    window.location.href = "login.html";
+}
 
-
-if (usertype !== "Farmer") {
+// Kick out if user is a Citizen
+if (usertype === "Citizen") {
     alert("Access denied. Only farmers can sell crops.");
     window.location.href = "Dashboard.html";
 }
@@ -238,7 +242,7 @@ document.getElementById('sellForm').addEventListener('submit', async e => {
   const { count, error: countError } = await window.db
     .from('crop_sales')
     .select('*', { count: 'exact', head: true })
-    .eq('ID', loginid);
+    .eq('lid', loginid);
 
   if (countError) {
     console.error("Error counting listings:", countError);
@@ -254,15 +258,14 @@ document.getElementById('sellForm').addEventListener('submit', async e => {
   const location = document.getElementById('location').value;
 
   const { data, error } = await window.db.from('crop_sales').insert({
-    ID: loginid,
-    JID: jid,
+    jid: jid,
     farmer_name: currentUsername,
     crop_name: cropName,
     quantity: quantity,
     price: price,
     location: location,
     created_at: new Date().toISOString(),
-    LID: loginid
+    lid: loginid
   });
 
   if (error) {
@@ -278,7 +281,7 @@ async function loadListings(uid) {
   const { data, error } = await window.db
     .from('crop_sales')
     .select('*')
-    .eq('ID', uid)
+    .eq('lid', uid)
     .order('created_at', { ascending: false });
 
   if (error) {
@@ -325,7 +328,7 @@ async function deleteListing(created_at) {
   const { error } = await window.db
     .from('crop_sales')
     .delete()
-    .eq('ID', loginid)
+    .eq('lid', loginid)
     .eq('created_at', created_at);
 
   if (error) {
