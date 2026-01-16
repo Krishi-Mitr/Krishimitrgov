@@ -400,12 +400,26 @@ body.dark h2, body.dark h4 {
 const loginid = sessionStorage.getItem("loginid");
 const usertype = sessionStorage.getItem("usertype");
 
+// Debug logging to see what's happening
+console.log("🔍 Authentication Check:");
+console.log("  loginid:", loginid);
+console.log("  usertype:", usertype);
+console.log("  loginid type:", typeof loginid);
+console.log("  usertype type:", typeof usertype);
+console.log("  loginid truthy:", !!loginid);
+console.log("  usertype truthy:", !!usertype);
+
 // Only kick out if not logged in - both Farmers and Citizens can access
 if (!loginid || !usertype) {
+    console.error("❌ REDIRECTING TO LOGIN - Missing credentials:");
+    console.error("  loginid missing:", !loginid);
+    console.error("  usertype missing:", !usertype);
     window.location.href = "login.html";
     // Prevent further execution
     throw new Error("Redirecting to login");
 }
+
+console.log("✅ Authentication passed - user can access page");
 
 // Wait for DOM to be ready before manipulating elements
 function setupPage() {
