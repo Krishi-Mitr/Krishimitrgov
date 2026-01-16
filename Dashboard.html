@@ -133,12 +133,14 @@ p {
 </div>
 
 <script>
-function initDashboard() {
+(function() {
     const loginid = sessionStorage.getItem("loginid");
     const usertype = sessionStorage.getItem("usertype");
 
     if (!loginid || !usertype) {
-        window.location.href = "login.html";
+        setTimeout(() => {
+            window.location.href = "login.html";
+        }, 100);
         return;
     }
 
@@ -175,14 +177,7 @@ function initDashboard() {
             window.location.href = "login.html";
         };
     }
-}
-
-// Run when DOM is ready
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initDashboard);
-} else {
-    initDashboard();
-}
+})();
 </script>
 
 </body>
