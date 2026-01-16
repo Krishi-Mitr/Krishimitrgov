@@ -9,139 +9,256 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase.js"></script>
 
 <style>
-  /* ---------- Colors ---------- */
-:root{
-  --india-green:#0B6623;
-  --india-saffron:#FF9933;
-  --india-white:#FFFFFF;
-  --accent:#0B6623;
-  --muted:#6c757d;
-  --bg:#f7f9fb;
-  --card-bg:#FFFFFF;
-  --text-color:#000;
+body {
+  background: linear-gradient(to bottom, #FF9933 0%, #FFFFFF 50%, #138808 100%);
+  background-attachment: fixed;
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding-top: 80px;
 }
 
-/* page spacing (header fixed) */
-body{
-  background:var(--bg);
-  color:var(--text-color);
-  font-family:Inter,system-ui,Segoe UI,Roboto,Arial;
-  margin:0;
-  /* single navbar height ~88px */
-  padding-top:98px;
-}
-
-/* ---------- Top Navbar (REPLACED both previous bars) ---------- */
 .top-navbar {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
-  height: 78px;
   display: flex;
-  align-items: center;
   justify-content: space-between;
+  align-items: center;
   padding: 12px 20px;
-  background: linear-gradient(90deg, var(--india-green), #ffffff 45%, var(--india-saffron));
-  box-shadow: 0 6px 18px rgba(0,0,0,0.12);
-  z-index: 9999;
-  border-bottom: 3px solid #102014;
+  background: linear-gradient(90deg, #FF9933, #FFFFFF 50%, #138808);
+  border-bottom: 3px solid #000080;
+  z-index: 1000;
 }
 
-/* left brand area */
 .brand {
-  display:flex;
-  align-items:center;
-  gap:12px;
-  color:white;
-  font-weight:700;
-  font-size:20px;
+  font-size: 24px;
+  font-weight: 900;
+  color: #000080;
 }
 
-/* center nav items */
 .nav-center {
-  display:flex;
-  gap:12px;
-  align-items:center;
-  justify-content:center;
-  flex:1;
+  display: flex;
+  gap: 15px;
 }
 
-/* nav link styles */
 .nav-link-custom {
-  color: rgb(0, 0, 0);
-  font-weight:700;
-  text-decoration:none;
-  padding:8px 14px;
-  border-radius:8px;
-  transition: all .18s ease;
-  background: rgb(255, 255, 255);
-  box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+  text-decoration: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-weight: 700;
+  color: #000080;
+  transition: 0.2s;
 }
+
 .nav-link-custom:hover {
-  background: rgb(55, 0, 255);
-  transform: translateY(-2px);
+  background: rgba(0,0,128,0.1);
 }
 
-/* right area */
-.nav-right { display:flex; align-items:center; gap:12px; }
+.nav-right {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
 
-/* logout button */
 .logout-btn {
-  padding:8px 14px;
-  border-radius:10px;
-  background: linear-gradient(90deg, var(--india-saffron), var(--india-green));
+  padding: 8px 16px;
+  background: #000080;
   color: white;
-  font-weight:700;
-  text-decoration:none;
-  box-shadow: 0 6px 14px rgba(0,0,0,0.12);
+  border-radius: 8px;
+  font-weight: 700;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
 }
 
-/* small dark-mode button */
-#toggleDark { font-weight:700; }
-
-/* ---------- Cards & UI ---------- */
-.container{max-width:1100px}
-.card{
-  border-radius:14px;
-  box-shadow:0 6px 20px rgba(20,30,50,0.06);
-  background:var(--card-bg);
+.logout-btn:hover {
+  background: #FF9933;
+  color: #000;
 }
 
-.chip{
-  padding:6px 10px;
-  border-radius:999px;
-  background:#eef8ef;
-  color:var(--accent);
-  font-weight:600;
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
 }
 
-#chartWrap{height:360px;}
-
-/* small text */
-.small-muted{font-size:13px;color:#666}
-
-footer{font-size:13px;color:var(--muted);margin-top:1rem}
-
-/* ---------- Dark Mode ---------- */
-body.dark{
-  --bg:#0b0b0b;
-  --card-bg:#192022;
-  --text-color:#e8eef0;
-  --accent:#4caf50;
-}
-body.dark .chip{background:#2c2c2c;color:#4caf50}
-
-/* responsive */
-@media(max-width:720px){
-  #chartWrap{height:240px}
-  .nav-center{display:none} /* simplified small-screen nav, keep layout clean */
-  .brand{font-size:18px}
-  body{padding-top:88px}
+.card {
+  background: white;
+  padding: 20px;
+  border-radius: 15px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  border: 2px solid #000080;
 }
 
+.form-group {
+  margin-bottom: 15px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: 600;
+  color: #000080;
+}
+
+.form-control {
+  width: 100%;
+  padding: 10px;
+  border: 2px solid #000080;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+.btn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.btn-primary {
+  background: #000080;
+  color: white;
+}
+
+.btn-primary:hover {
+  background: #FF9933;
+  color: #000;
+}
+
+.btn-success {
+  background: #138808;
+  color: white;
+}
+
+.btn-success:hover {
+  background: #0d6e05;
+}
+
+.btn-info {
+  background: #0dcaf0;
+  color: #000;
+}
+
+.btn-info:hover {
+  background: #0aa2c0;
+}
+
+.btn-warning {
+  background: #ffc107;
+  color: #000;
+}
+
+.btn-warning:hover {
+  background: #ffb300;
+}
+
+.chart-container {
+  position: relative;
+  height: 400px;
+  margin: 20px 0;
+}
+
+.recommend {
+  font-size: 18px;
+  font-weight: 700;
+  color: #000080;
+  margin-bottom: 10px;
+}
+
+#actionCard {
+  margin-top: 20px;
+}
+
+.row {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.col-md-6 {
+  flex: 1;
+  min-width: 300px;
+}
+
+.text-success {
+  color: #138808;
+}
+
+.text-danger {
+  color: #dc3545;
+}
+
+.text-warning {
+  color: #ffc107;
+}
+
+.text-info {
+  color: #0dcaf0;
+}
+
+.small-muted {
+  font-size: 12px;
+  color: #666;
+}
+
+.mt-2 {
+  margin-top: 10px;
+}
+
+.mt-3 {
+  margin-top: 15px;
+}
+
+.mb-3 {
+  margin-bottom: 15px;
+}
+
+#qrCanvas {
+  margin-top: 10px;
+  border: 2px solid #000080;
+  border-radius: 8px;
+}
+
+body.dark {
+  background: #1a1a1a;
+  color: #fff;
+}
+
+body.dark .card {
+  background: #2d2d2d;
+  color: #fff;
+}
+
+body.dark .form-control {
+  background: #333;
+  color: #fff;
+  border-color: #555;
+}
+
+.w-100 {
+  width: 100%;
+}
+
+h2, h4 {
+  color: #000080;
+  margin-bottom: 15px;
+}
+
+body.dark h2, body.dark h4 {
+  color: #fff;
+}
+
+#mainApp {
+  display: block;
+}
 </style>
 </head>
 
@@ -162,156 +279,137 @@ body.dark .chip{background:#2c2c2c;color:#4caf50}
     <a href="#" id="logoutBtn" class="logout-btn">Logout</a>
   </div>
 </div>
+
 <div id="mainApp">
   <div class="container">
-
-    <div class="d-flex justify-content-between align-items-center mb-3" style="margin-top:6px;">
-      <!-- Back now scrolls to top (kept for convenience) -->
-      <button id="backBtn" class="btn btn-outline-secondary"> Back to Top</button>
-      <div class="small-muted">Demo</div>
+    
+    <div class="card">
+      <h2>🌾 Crop Price Predictor & Advisor</h2>
+      <p>Get price forecasts and farming advice for your crops</p>
     </div>
 
-    <header id="market_section" class="d-flex align-items-center gap-3 mb-4">
-      <div class="brand">🌾 KrishiMitra AI</div>
-      <div class="small-muted" id="subtitle">Local Crop Market Predictor & Crop Advisor</div>
-      <div class="ms-auto chip" id="chip">Atmanirbhar • Local-first</div>
-    </header>
-
-    <div class="row g-4">
-      <!-- LEFT: MARKET -->
-      <div class="col-lg-7">
-        <div class="card p-4">
-          <h5 id="mpTitle"> Market Predictor</h5>
-
-          <div class="row gy-2 controls">
-            <div class="col-md-6">
-              <label class="form-label" id="cropLabel">Crop</label>
-              <select id="cropSelect" class="form-select">
-                <option>Wheat</option>
-                <option>Rice</option>
-                <option>Sugarcane</option>
-                <option>Cotton</option>
-                <option>Maize</option>
-                <option>Sorghum</option>
-                <option>Barley</option>
-                <option>Millet</option>
-                <option>Soybean</option>
-                <option>Groundnut</option>
-                <option>Tomato</option>
-                <option>Potato</option>
-              </select>
-            </div>
-
-            <div class="col-md-6">
-              <label class="form-label" id="regionLabel">Region / District</label>
-              <select id="regionSelect" class="form-select">
-                <option>Punjab</option>
-                <option>Haryana</option>
-                <option>Uttar Pradesh</option>
-                <option>Maharashtra</option>
-                <option>Karnataka</option>
-                <option>Tamil Nadu</option>
-                <option>Kerala</option>
-                <option>Bihar</option>
-                <option>Rajasthan</option>
-              </select>
-            </div>
-
-            <div class="col-md-6">
-              <label class="form-label" id="horizonLabel">Days to Predict</label>
-              <input id="horizon" type="range" min="7" max="60" value="14" class="form-range">
-              <div class="small-muted">(<span id="hval">14</span> days)</div>
-            </div>
-
-            <div class="col-md-6 d-flex align-items-end gap-2">
-              <button id="predictBtn" class="btn btn-success w-100">Predict Price</button>
-              <button id="voiceBtn" class="btn btn-outline-secondary w-100">🎤 Voice</button>
-            </div>
-          </div>
-
-          <hr>
-
-          <div id="chartWrap">
-            <canvas id="priceChart"></canvas>
-          </div>
-
-          <div class="row mt-3">
-            <div class="col-md-6">
-              <div id="actionCard" class="p-3 bg-white rounded">Simple tip will show here after prediction.</div>
-            </div>
-            <div class="col-md-6 text-end">
-              <button id="exportBtn" class="btn btn-outline-primary">Download Price List</button>
-            </div>
-          </div>
-
-        </div>
-      </div>
-
-      <!-- RIGHT: ADVISOR -->
-      <div class="col-lg-5" id="advisor_section">
-        <div class="card p-4">
-          <h5 id="advisorTitle"> Crop Advisor</h5>
-
-          <div class="mb-2">
-            <label class="form-label" id="soilLabel">Soil Type</label>
-            <select id="soilType" class="form-select">
-              <option>Alluvial</option>
-              <option>Black</option>
-              <option>Red</option>
-              <option>Laterite</option>
+    <div class="row">
+      <div class="col-md-6">
+        <div class="card">
+          <h4>Price Prediction</h4>
+          
+          <div class="form-group">
+            <label for="cropSelect">Select Crop</label>
+            <select id="cropSelect" class="form-control">
+              <option value="Wheat">Wheat</option>
+              <option value="Rice">Rice</option>
+              <option value="Sugarcane">Sugarcane</option>
+              <option value="Cotton">Cotton</option>
+              <option value="Maize">Maize</option>
+              <option value="Sorghum">Sorghum</option>
+              <option value="Barley">Barley</option>
+              <option value="Millet">Millet</option>
+              <option value="Soybean">Soybean</option>
+              <option value="Groundnut">Groundnut</option>
+              <option value="Tomato">Tomato</option>
+              <option value="Potato">Potato</option>
             </select>
           </div>
 
-          <div class="mb-2">
-            <label class="form-label" id="rainLabel">Expected Rainfall (mm / season)</label>
-            <input id="rainfall" type="number" min="0" max="1000" value="120" class="form-control">
+          <div class="form-group">
+            <label for="regionSelect">Select Region</label>
+            <select id="regionSelect" class="form-control">
+              <option value="Punjab">Punjab</option>
+              <option value="Haryana">Haryana</option>
+              <option value="Uttar Pradesh">Uttar Pradesh</option>
+              <option value="Maharashtra">Maharashtra</option>
+              <option value="Karnataka">Karnataka</option>
+              <option value="Tamil Nadu">Tamil Nadu</option>
+              <option value="Gujarat">Gujarat</option>
+              <option value="Rajasthan">Rajasthan</option>
+            </select>
           </div>
 
-          <div class="mb-2">
-            <label class="form-label" id="tempLabel">Average Temperature (°C)</label>
-            <input id="temp" type="number" min="0" max="50" value="28" class="form-control">
+          <div class="form-group">
+            <label>Forecast Horizon: <span id="hval">30</span> days</label>
+            <input type="range" id="horizon" class="form-control" min="7" max="90" value="30">
           </div>
 
-          <div class="d-grid gap-2 mt-3">
-            <button id="adviseBtn" class="btn btn-primary">Get Tip</button>
-            <button id="combineBtn" class="btn btn-outline-success">Predict + Tip</button>
+          <button id="predictBtn" class="btn btn-primary w-100">Predict Prices</button>
+          <button id="combineBtn" class="btn btn-warning w-100 mt-2">Predict + Get Advice</button>
+          <button id="exportBtn" class="btn btn-info w-100 mt-2">Export CSV</button>
+          <button id="voiceBtn" class="btn btn-success w-100 mt-2">🎤 Voice Input</button>
+        </div>
+
+        <div class="card">
+          <h4>Crop Advisor</h4>
+          
+          <div class="form-group">
+            <label for="soilType">Soil Type</label>
+            <select id="soilType" class="form-control">
+              <option value="Loamy">Loamy</option>
+              <option value="Clayey">Clayey</option>
+              <option value="Sandy">Sandy</option>
+              <option value="Silty">Silty</option>
+            </select>
           </div>
 
-          <hr>
-          <div id="advisorOutput" class="small-muted">Advisor output will appear here.</div>
-
-          <hr>
-          <h6>QR Code</h6>
-          <div id="qrWrap" class="text-center my-2">
-            <canvas id="qrCanvas" width="120" height="120"></canvas>
+          <div class="form-group">
+            <label for="rainfall">Expected Rainfall (mm)</label>
+            <input type="number" id="rainfall" class="form-control" value="200" min="0" max="1000">
           </div>
 
-          <ul class="small-muted">
-            <li>Try the buttons to see price chart and simple tips.</li>
-            <li>Supplier names are demo-only and will be updated later.</li>
-          </ul>
+          <div class="form-group">
+            <label for="temp">Expected Temperature (°C)</label>
+            <input type="number" id="temp" class="form-control" value="25" min="-10" max="50">
+          </div>
 
+          <button id="adviseBtn" class="btn btn-success w-100">Get Farming Advice</button>
         </div>
       </div>
 
-    </div>
+      <div class="col-md-6">
+        <div class="card">
+          <h4>Price Chart</h4>
+          <div class="chart-container">
+            <canvas id="priceChart"></canvas>
+          </div>
+        </div>
 
-    <footer id="footer" class="text-center mt-5">
-      KrishiMitra AI • Demo version.
-    </footer>
+        <div class="card">
+          <h4>Recommendations</h4>
+          <div id="actionCard">
+            <p class="text-muted">Run a prediction to see recommendations</p>
+          </div>
+        </div>
+
+        <div class="card">
+          <h4>Advisor Output</h4>
+          <div id="advisorOutput" class="text-muted">
+            Get farming advice by clicking "Get Farming Advice"
+          </div>
+        </div>
+
+        <div class="card">
+          <h4>Share App</h4>
+          <canvas id="qrCanvas"></canvas>
+        </div>
+      </div>
+    </div>
 
   </div>
 </div>
- 
-
 
 <script>
-const supabase = supabase.createClient(
-  'https://xhzpvgiyvxcfwgnupkqv.supabase.co',
-  'sb_publishable_YviwlBy7i3PmxZ88mwsDeQ_P4Bg0naI'
-);
 async function initAuth() {
-  const { data } = await supabase.auth.getUser();
+  // Wait for window.db to be ready
+  let attempts = 0;
+  while (!window.db && attempts < 50) {
+    await new Promise(resolve => setTimeout(resolve, 100));
+    attempts++;
+  }
+  
+  if (!window.db) {
+    console.error("Database client not available");
+    return;
+  }
+  
+  const { data } = await window.db.auth.getUser();
 
   if (!data.user) {
     location.href = "login.html";
@@ -324,10 +422,16 @@ async function initAuth() {
     document.querySelectorAll('.farmer-only').forEach(el => el.remove());
   }
 }
-document.getElementById('logoutBtn').onclick = async () => {
-  await supabase.auth.signOut();
-  location.href = "login.html";
-};
+const logoutBtn = document.getElementById('logoutBtn');
+if (logoutBtn) {
+  logoutBtn.onclick = async () => {
+    if (window.db) {
+      await window.db.auth.signOut();
+    }
+    sessionStorage.clear();
+    location.href = "login.html";
+  };
+}
 
 initAuth();
 </script>
@@ -405,22 +509,36 @@ function forecastPrices(hist, days, crop, scenario = 0){
   return preds;
 }
 
-const chartCtx = document.getElementById('priceChart').getContext('2d');
-let priceChart = new Chart(chartCtx, {
-  type: 'line',
-  data: { labels: [], datasets: [] },
-  options: {
-    responsive: true,
-    interaction: { mode: 'index', intersect: false },
-    plugins: { legend: { position: 'top' } },
-    scales: {
-      x: { display: true },
-      y: { display: true, title: { display: true, text: 'Price (₹/qtl)' } }
-    }
+let priceChart = null;
+
+function initChart() {
+  const chartEl = document.getElementById('priceChart');
+  if (!chartEl) {
+    setTimeout(initChart, 100);
+    return;
   }
-});
+  const chartCtx = chartEl.getContext('2d');
+  priceChart = new Chart(chartCtx, {
+    type: 'line',
+    data: { labels: [], datasets: [] },
+    options: {
+      responsive: true,
+      interaction: { mode: 'index', intersect: false },
+      plugins: { legend: { position: 'top' } },
+      scales: {
+        x: { display: true },
+        y: { display: true, title: { display: true, text: 'Price (₹/qtl)' } }
+      }
+    }
+  });
+}
 
 function updateChart(hist, preds){
+  if (!priceChart) {
+    initChart();
+    setTimeout(() => updateChart(hist, preds), 200);
+    return;
+  }
   const histDates = hist.map(h => h.date);
   const predDates = preds.map(p => p.date);
   const labels = histDates.concat(predDates);
@@ -465,15 +583,25 @@ function updateChart(hist, preds){
   priceChart.update();
 }
 
-const hval = document.getElementById('hval');
-const hor = document.getElementById('horizon');
-hor.addEventListener('input', ()=> hval.innerText = hor.value);
+function setupEventListeners() {
+  const hval = document.getElementById('hval');
+  const hor = document.getElementById('horizon');
+  if (hval && hor) {
+    hor.addEventListener('input', ()=> hval.innerText = hor.value);
+  }
 
-document.getElementById('predictBtn').addEventListener('click', ()=> { runPrediction(false); });
-document.getElementById('adviseBtn').addEventListener('click', ()=> { runAdvisor(false); });
-document.getElementById('combineBtn').addEventListener('click', ()=> { runPrediction(true); });
-document.getElementById('exportBtn').addEventListener('click', exportCSV);
-document.getElementById('voiceBtn').addEventListener('click', voiceInput);
+  const predictBtn = document.getElementById('predictBtn');
+  const adviseBtn = document.getElementById('adviseBtn');
+  const combineBtn = document.getElementById('combineBtn');
+  const exportBtn = document.getElementById('exportBtn');
+  const voiceBtn = document.getElementById('voiceBtn');
+
+  if (predictBtn) predictBtn.addEventListener('click', ()=> { runPrediction(false); });
+  if (adviseBtn) adviseBtn.addEventListener('click', ()=> { runAdvisor(false); });
+  if (combineBtn) combineBtn.addEventListener('click', ()=> { runPrediction(true); });
+  if (exportBtn) exportBtn.addEventListener('click', exportCSV);
+  if (voiceBtn) voiceBtn.addEventListener('click', voiceInput);
+}
 
 let lastForecast = [];
 let lastCrop = 'Wheat';
@@ -616,11 +744,22 @@ function voiceInput(){
   alert('Voice input not implemented in this demo.');
 }
 
-document.getElementById('predictBtn').disabled = false;
-document.getElementById('adviseBtn').disabled = false;
-
-document.getElementById('mainApp').style.display = 'block';
-generateQR();
+// Initialize when DOM is ready
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', function() {
+    setupEventListeners();
+    initChart();
+    generateQR();
+    const mainApp = document.getElementById('mainApp');
+    if (mainApp) mainApp.style.display = 'block';
+  });
+} else {
+  setupEventListeners();
+  initChart();
+  generateQR();
+  const mainApp = document.getElementById('mainApp');
+  if (mainApp) mainApp.style.display = 'block';
+}
 
 window.runPrediction = runPrediction;
 window.runAdvisor = runAdvisor;
