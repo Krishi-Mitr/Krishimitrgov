@@ -112,7 +112,7 @@ async function loadCrops() {
   const { data: crops } = await supabase
     .from("crop_sales")
     .select("*")
-    .neq("lid", user.id)
+    .neq("id", user.id)
     .order("created_at", { ascending: false })
 
   const container = document.getElementById("cropList")
