@@ -396,44 +396,27 @@ body.dark h2, body.dark h4 {
 </div>
 
 <script>
-async function initAuth() {
-  // Wait for window.db to be ready
-  let attempts = 0;
-  while (!window.db && attempts < 50) {
-    await new Promise(resolve => setTimeout(resolve, 100));
-    attempts++;
-  }
-  
-  if (!window.db) {
-    console.error("Database client not available");
-    return;
-  }
-  
-  const { data } = await window.db.auth.getUser();
+// Check authentication FIRST, synchronously (like Dashboard.html and Sell.html)
+const loginid = sessionStorage.getItem("loginid");
+const usertype = sessionStorage.getItem("usertype");
 
-  if (!data.user) {
-    location.href = "login.html";
-    return;
-  }
-
-  const usertype = data.user.user_metadata.usertype;
-
-  if (usertype !== "Farmer") {
-    document.querySelectorAll('.farmer-only').forEach(el => el.remove());
-  }
+// Kick out if not logged in
+if (!loginid || !usertype) {
+    window.location.href = "login.html";
 }
+
+// Hide farmer-only links if user is not a farmer
+if (usertype !== "Farmer") {
+    document.querySelectorAll('.farmer-only').forEach(el => el.remove());
+}
+
 const logoutBtn = document.getElementById('logoutBtn');
 if (logoutBtn) {
-  logoutBtn.onclick = async () => {
-    if (window.db) {
-      await window.db.auth.signOut();
-    }
+  logoutBtn.onclick = () => {
     sessionStorage.clear();
     location.href = "login.html";
   };
 }
-
-initAuth();
 </script>
 
 <script>
