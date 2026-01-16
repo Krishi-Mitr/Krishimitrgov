@@ -146,9 +146,7 @@ let currentUsername = null;
 const loginid = sessionStorage.getItem("loginid");
 const usertype = sessionStorage.getItem("usertype");
 
-if (!loginid || !usertype) {
-    window.location.href = "login.html";
-}
+
 
 if (usertype !== "Farmer") {
     alert("Access denied. Only farmers can sell crops.");
