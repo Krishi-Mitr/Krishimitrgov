@@ -4,10 +4,12 @@
 <meta charset="UTF-8" />
 <title>Dashboard - Krishi Mitr</title>
 
+<!-- Supabase core -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<!-- Your supabase.js (DO NOT CHANGE IT) -->
+<script src="supabase.js"></script>
 
 <style>
-/* Your existing styles here... */
 body {
     margin: 0;
     padding: 0;
@@ -17,6 +19,7 @@ body {
     background-attachment: fixed;
     overflow-x: hidden;
 }
+
 .top-nav {
     display: flex;
     justify-content: space-between;
@@ -30,10 +33,12 @@ body {
     z-index: 1000;
     border-bottom: 3px solid #000080;
 }
+
 .nav-left {
     display: flex;
     gap: 25px;
 }
+
 .nav-box {
     background: #000080;
     color: #fff;
@@ -42,58 +47,31 @@ body {
     text-decoration: none;
     font-weight: 600;
     font-size: 15px;
-    box-shadow: 0 3px 10px rgba(0,0,40,0.25);
-    transition: 0.25s ease;
+    transition: 0.25s;
 }
+
 .nav-box:hover {
     background: #FF9933;
     color: #000;
-    transform: translateY(-3px);
 }
+
 .logout-btn {
     background: #FF9933;
     padding: 10px 20px;
-    margin-right: 20px;
     color: #fff;
     border-radius: 12px;
-    text-decoration: none;
-    font-weight: bold;
     border: 2px solid #000080;
-    transition: 0.25s;
+    font-weight: bold;
     cursor: pointer;
 }
-.logout-btn:hover {
-    background: #138808;
-    transform: translateY(-2px);
-}
+
 .container {
     max-width: 900px;
     margin: 150px auto 50px;
     background: rgba(255,255,255,0.9);
     padding: 45px 40px;
     border-radius: 20px;
-    box-shadow: 0 8px 25px rgba(0,0,0,0.25);
     text-align: center;
-    border-left: 6px solid #FF9933;
-    border-right: 6px solid #138808;
-}
-h1 {
-    font-size: 2.6em;
-    color: #000080;
-}
-p {
-    font-size: 1.2em;
-}
-@media (max-width: 768px) {
-    .top-nav {
-        flex-direction: column;
-        padding: 12px;
-        gap: 10px;
-    }
-    .nav-left {
-        flex-wrap: wrap;
-        justify-content: center;
-    }
 }
 </style>
 </head>
@@ -106,7 +84,7 @@ p {
     <button class="logout-btn" id="logoutBtn">Logout</button>
 </div>
 
-<!-- MAIN CONTENT -->
+<!-- CONTENT -->
 <div class="container">
     <h1 id="welcomeText">Loading...</h1>
     <p>Your Krishi Mitr Dashboard.</p>
@@ -114,56 +92,56 @@ p {
 </div>
 
 <script>
-  // Make sure supabase.js sets window.db properly
-  const db = window.db;
+const db = window.db;
 
-  async function initDashboard() {
+async function initDashboard() {
     const loginid = sessionStorage.getItem("loginid");
     const usertype = sessionStorage.getItem("usertype");
 
+    // ❌ Not logged in
     if (!loginid || !usertype) {
-      // No login info — redirect to login
-      window.location.href = "login.html";
-      return;
+        location.href = "login.html";
+        return;
     }
 
-    // Fetch username using loginid
+    // ✅ Fetch username (same as PHP session $name)
     const { data, error } = await db
-      .from("logindata")
-      .select("username")
-      .eq("loginid", loginid)
-      .maybeSingle();
+        .from("logindata")
+        .select("name")
+        .eq("loginid", loginid)
+        .maybeSingle();
 
     if (error || !data) {
-      // If user not found, force logout
-      alert("User data not found. Please login again.");
-      sessionStorage.clear();
-      window.location.href = "login.html";
-      return;
+        sessionStorage.clear();
+        location.href = "login.html";
+        return;
     }
 
-    // Render welcome and role info
-    document.getElementById("welcomeText").innerText = `Welcome, ${data.username}`;
-    document.getElementById("roleText").innerText = usertype === "Farmer"
-      ? "Explore crop prices, sell harvests, and access AI insights."
-      : "Explore crop prices and buy fresh local produce.";
+    document.getElementById("welcomeText").innerText =
+        `Welcome, ${data.name}`;
 
-    // Setup nav menu based on usertype
+    document.getElementById("roleText").innerText =
+        usertype === "Farmer"
+            ? "Explore crop prices, sell harvests, and access AI insights."
+            : "Explore crop prices and buy fresh local produce.";
+
+    // ✅ NAV MENU (same as PHP)
     const nav = document.getElementById("navMenu");
     nav.innerHTML = `
-      <a class="nav-box" href="krishimitr.html">Crop Predictor and Advisor</a>
-      ${usertype === "Farmer" ? `<a class="nav-box" href="Sell.html">Sell Your Crops</a>` : ""}
-      <a class="nav-box" href="Buy.html">Buy Crops</a>
-      ${usertype === "Farmer" ? `<a class="nav-box" href="Notification.html">Notification</a>` : ""}
+        <a class="nav-box" href="krishimitr.html">Crop Predictor and Advisor</a>
+        ${usertype === "Farmer" ? `<a class="nav-box" href="Sell.html">Sell Your Crops</a>` : ""}
+        <a class="nav-box" href="Buy.html">Buy Crops</a>
+        ${usertype === "Farmer" ? `<a class="nav-box" href="Notification.html">Notification</a>` : ""}
     `;
-  }
+}
 
-  document.getElementById("logoutBtn").addEventListener("click", () => {
+// LOGOUT
+document.getElementById("logoutBtn").onclick = () => {
     sessionStorage.clear();
-    window.location.href = "login.html";
-  });
+    location.href = "login.html";
+};
 
-  initDashboard();
+initDashboard();
 </script>
 
 </body>
