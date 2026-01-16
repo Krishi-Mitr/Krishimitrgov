@@ -162,6 +162,45 @@ body.dark .chip{background:#2c2c2c;color:#4caf50}
     <a href="#" id="logoutBtn" class="logout-btn">Logout</a>
   </div>
 </div>
+  <div class="container">
+
+  <div class="card p-3 mb-3" id="actionCard">
+    <canvas id="priceChart"></canvas>
+  </div>
+
+  <div class="card p-3 mb-3">
+    <label>Crop: 
+      <select id="cropSelect">
+        <option>Wheat</option>
+        <option>Rice</option>
+        <option>Maize</option>
+      </select>
+    </label>
+
+    <label>Region: 
+      <select id="regionSelect">
+        <option>Punjab</option>
+        <option>Maharashtra</option>
+      </select>
+    </label>
+
+    <label>Forecast Days: 
+      <input type="range" id="horizon" min="1" max="30" value="7">
+      <span id="hval">7</span> days
+    </label>
+
+    <button id="predictBtn" class="btn btn-primary">Predict Prices</button>
+    <button id="adviseBtn" class="btn btn-info">Get Advisor Tips</button>
+    <button id="combineBtn" class="btn btn-success">Both</button>
+    <button id="exportBtn" class="btn btn-secondary">Export CSV</button>
+    <button id="voiceBtn" class="btn btn-warning">🎤 Voice</button>
+
+    <div id="advisorOutput" class="mt-2 text-info"></div>
+  </div>
+
+  <canvas id="qrCanvas" class="mt-3"></canvas>
+</div>
+
 
 <div id="mainApp">
   <div class="container">
