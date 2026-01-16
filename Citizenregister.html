@@ -4,7 +4,10 @@
 <meta charset="UTF-8">
 <title>Citizen Registration - Vikasit Bharat</title>
 
+<!-- SUPABASE LIBRARY -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<!-- YOUR SUPABASE CLIENT -->
+<script src="supabase.js"></script>
 
 <style>
 body {
@@ -94,26 +97,26 @@ button {
 </div>
 
 <script>
-const form = document.getElementById('registerForm');
-const msg = document.getElementById('message');
-const success = document.getElementById('success');
+const form = document.getElementById("registerForm");
+const msg = document.getElementById("message");
+const success = document.getElementById("success");
 
-form.addEventListener('submit', async (e) => {
+form.addEventListener("submit", async (e) => {
   e.preventDefault();
 
   msg.style.display = "none";
   success.style.display = "none";
 
-  const username = document.getElementById('username').value.trim();
-  const password = document.getElementById('password').value.trim();
-  const name = document.getElementById('name').value.trim();
+  const username = document.getElementById("username").value.trim();
+  const password = document.getElementById("password").value.trim();
+  const name = document.getElementById("name").value.trim();
 
   try {
     /* 1️⃣ CHECK USERNAME */
-    const { data: existing, error: e1 } = await supabase
-      .from('logindata')
-      .select('username')
-      .eq('username', username);
+    const { data: existing, error: e1 } = await window.db
+      .from("logindata")
+      .select("username")
+      .eq("username", username);
 
     if (e1) throw e1;
 
@@ -124,10 +127,10 @@ form.addEventListener('submit', async (e) => {
     }
 
     /* 2️⃣ GENERATE citizenid */
-    const { data: last, error: e2 } = await supabase
-      .from('citizeninfo')
-      .select('citizenid')
-      .order('citizenid', { ascending: false })
+    const { data: last, error: e2 } = await window.db
+      .from("citizeninfo")
+      .select("citizenid")
+      .order("citizenid", { ascending: false })
       .limit(1);
 
     if (e2) throw e2;
@@ -135,8 +138,8 @@ form.addEventListener('submit', async (e) => {
     const citizenid = last.length > 0 ? last[0].citizenid + 1 : 1000;
 
     /* 3️⃣ INSERT citizeninfo */
-    const { error: e3 } = await supabase
-      .from('citizeninfo')
+    const { error: e3 } = await window.db
+      .from("citizeninfo")
       .insert({
         citizenid: citizenid,
         name: name
@@ -145,8 +148,8 @@ form.addEventListener('submit', async (e) => {
     if (e3) throw e3;
 
     /* 4️⃣ INSERT logindata */
-    const { error: e4 } = await supabase
-      .from('logindata')
+    const { error: e4 } = await window.db
+      .from("logindata")
       .insert({
         loginid: citizenid,
         username: username,
@@ -168,6 +171,5 @@ form.addEventListener('submit', async (e) => {
   }
 });
 </script>
-
 </body>
 </html>
