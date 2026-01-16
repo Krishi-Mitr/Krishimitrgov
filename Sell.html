@@ -300,22 +300,26 @@ async function loadListings(uid) {
   }
 
   data.forEach(row => {
+    // Escape the jid to prevent XSS and ensure it works in onclick
+    const jidEscaped = row.jid.replace(/'/g, "\\'").replace(/"/g, '&quot;');
     box.innerHTML += `
       <div class="card p-3 mb-3">
         <strong>${row.crop_name}</strong><br>
         Qty: ${row.quantity} kg<br>
         Price: ₹${row.price}/kg<br>
         Address: ${row.location}<br>
-        Time: ${row.created_at}<br>
+        Time: ${new Date(row.created_at).toLocaleString()}<br>
         <button class="btn btn-danger btn-sm mt-2"
-          onclick="deleteListing('${row.created_at}')">
+          onclick="deleteListing('${jidEscaped}')">
           Delete
         </button>
       </div>
     `;
   });
 }
-async function deleteListing(created_at) {
+
+// Make deleteListing globally accessible
+window.deleteListing = async function(jid) {
   if (!confirm("Delete this listing?")) return;
 
   const loginid = sessionStorage.getItem("loginid");
@@ -325,11 +329,35 @@ async function deleteListing(created_at) {
     return;
   }
 
+  // Verify the listing belongs to the current user before deleting
+  const { data: listing, error: checkError } = await window.db
+    .from('crop_sales')
+    .select('lid')
+    .eq('jid', jid)
+    .maybeSingle();
+
+  if (checkError) {
+    console.error("Error checking listing:", checkError);
+    alert("Error: " + checkError.message);
+    return;
+  }
+
+  if (!listing) {
+    alert("Listing not found.");
+    loadListings(loginid);
+    return;
+  }
+
+  if (listing.lid !== loginid) {
+    alert("You don't have permission to delete this listing.");
+    return;
+  }
+
   const { error } = await window.db
     .from('crop_sales')
     .delete()
-    .eq('lid', loginid)
-    .eq('created_at', created_at);
+    .eq('jid', jid)
+    .eq('lid', loginid);
 
   if (error) {
     console.error("Error deleting listing:", error);
@@ -338,7 +366,7 @@ async function deleteListing(created_at) {
   }
 
   loadListings(loginid);
-}
+};
 document.getElementById('logoutBtn').onclick = () => {
   sessionStorage.clear();
   location.href = "login.html";
