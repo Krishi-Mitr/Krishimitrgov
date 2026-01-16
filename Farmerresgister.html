@@ -91,7 +91,7 @@
 <!-- 2. Load your supabase.js that creates window.db -->
 <script src="supabase.js"></script>
 
-<!-- 3. Your Farmer Registration script -->
+<!-- 3. Farmer Registration script -->
 <script>
 document.getElementById("registerForm").addEventListener("submit", async function (e) {
     e.preventDefault();
@@ -155,7 +155,6 @@ document.getElementById("registerForm").addEventListener("submit", async functio
 
         // 4️⃣ Success message
         successBox.innerHTML = `Registration successful! You can now <a href="login" style="color:#FF9933;">login</a>.`;
-        successBox.style.display = "block";
         document.getElementById("registerForm").style.display = "none";
 
     } catch (err) {
