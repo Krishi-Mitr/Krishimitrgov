@@ -178,12 +178,13 @@ async function initDashboard() {
       : "Browse crop prices and procure fresh produce directly from farmers.";
 
   const nav = document.getElementById("navMenu");
-  nav.innerHTML = `
-    <a class="nav-box" href="krishimitr.html">Crop Advisor</a>
-    ${usertype === "Farmer" ? `<a class="nav-box" href="Sell.html">Sell Crops</a>` : ""}
-    <a class="nav-box" href="Buy.html">Buy Crops</a>
-    ${usertype === "Farmer" ? `<a class="nav-box" href="Notification.html">Notifications</a>` : ""}
-  `;
+nav.innerHTML = `
+  <a class="nav-box" href="krishimitr.html">Crop Advisor</a>
+  ${usertype === "Farmer" ? `<a class="nav-box" href="YourCrops">Your Crops</a>` : ""}
+  <a class="nav-box" href="Buy.html">Buy Crops</a>
+  ${usertype === "Farmer" ? `<a class="nav-box" href="Notification.html">Notifications</a>` : ""}
+`;
+
 }
 
 document.getElementById("logoutBtn").onclick = () => {
