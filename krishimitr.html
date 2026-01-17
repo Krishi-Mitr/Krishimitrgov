@@ -80,13 +80,12 @@ body::before {
   border-radius: 6px;
   font-weight: 500;
   color: #000080;
-  transition: background-color 0.2s ease, color 0.2s ease;
+  transition: background-color 0.15s ease;
   background: transparent;
 }
 
 .nav-link-custom:hover {
-  background: rgba(0, 0, 128, 0.08);
-  color: #000080;
+  background: rgba(0, 0, 128, 0.06);
 }
 
 .nav-right {
@@ -104,12 +103,12 @@ body::before {
   text-decoration: none;
   border: none;
   cursor: pointer;
-  transition: background-color 0.2s ease;
+  transition: background-color 0.15s ease;
   font-size: 14px;
 }
 
 .logout-btn:hover {
-  background: #1a1a8a;
+  background: rgba(0, 0, 128, 0.9);
 }
 
 .container {
@@ -128,12 +127,11 @@ body::before {
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
   border: 1px solid rgba(0, 0, 128, 0.1);
   position: relative;
-  transition: box-shadow 0.2s ease, border-color 0.2s ease;
+  transition: box-shadow 0.15s ease;
 }
 
 .card:hover {
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
-  border-color: rgba(0, 0, 128, 0.2);
+  box-shadow: 0 3px 16px rgba(0, 0, 0, 0.1);
 }
 
 .form-group {
@@ -155,7 +153,7 @@ body::before {
   border: 2px solid #e0e0e0;
   border-radius: 12px;
   font-size: 15px;
-  transition: all 0.3s ease;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
   background: white;
   font-family: 'Poppins', sans-serif;
 }
@@ -163,7 +161,7 @@ body::before {
 .form-control:focus {
   outline: none;
   border-color: #000080;
-  box-shadow: 0 0 0 3px rgba(0, 0, 128, 0.08);
+  box-shadow: 0 0 0 2px rgba(0, 0, 128, 0.06);
 }
 
 input[type="range"] {
@@ -184,8 +182,8 @@ input[type="range"]::-webkit-slider-thumb {
   border-radius: 50%;
   background: #000080;
   cursor: pointer;
-  box-shadow: 0 2px 10px rgba(0, 0, 128, 0.3);
-  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 128, 0.25);
+  transition: box-shadow 0.15s ease;
 }
 
 input[type="range"]::-moz-range-thumb {
@@ -196,13 +194,13 @@ input[type="range"]::-moz-range-thumb {
   border-radius: 50%;
   background: #000080;
   cursor: pointer;
-  box-shadow: 0 2px 10px rgba(0, 0, 128, 0.3);
-  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 128, 0.25);
+  transition: box-shadow 0.15s ease;
   border: none;
 }
 
 input[type="range"]::-webkit-slider-thumb:hover {
-  box-shadow: 0 3px 12px rgba(0, 0, 128, 0.4);
+  box-shadow: 0 2px 10px rgba(0, 0, 128, 0.3);
 }
 
 .btn {
@@ -211,57 +209,53 @@ input[type="range"]::-webkit-slider-thumb:hover {
   border-radius: 8px;
   font-weight: 600;
   cursor: pointer;
-  transition: background-color 0.2s ease, box-shadow 0.2s ease;
+  transition: background-color 0.15s ease, box-shadow 0.15s ease;
   font-size: 15px;
   font-family: 'Poppins', sans-serif;
-}
-
-.btn:active {
-  transform: scale(0.99);
 }
 
 .btn-primary {
   background: #000080;
   color: white;
-  box-shadow: 0 2px 8px rgba(0, 0, 128, 0.2);
+  box-shadow: 0 2px 8px rgba(0, 0, 128, 0.15);
 }
 
 .btn-primary:hover {
-  background: #1a1a8a;
-  box-shadow: 0 3px 12px rgba(0, 0, 128, 0.3);
+  background: rgba(0, 0, 128, 0.9);
+  box-shadow: 0 2px 10px rgba(0, 0, 128, 0.2);
 }
 
 .btn-success {
   background: #138808;
   color: white;
-  box-shadow: 0 2px 8px rgba(19, 136, 8, 0.2);
+  box-shadow: 0 2px 8px rgba(19, 136, 8, 0.15);
 }
 
 .btn-success:hover {
-  background: #16a309;
-  box-shadow: 0 3px 12px rgba(19, 136, 8, 0.3);
+  background: rgba(19, 136, 8, 0.9);
+  box-shadow: 0 2px 10px rgba(19, 136, 8, 0.2);
 }
 
 .btn-info {
   background: #0dcaf0;
   color: #000;
-  box-shadow: 0 2px 8px rgba(13, 202, 240, 0.2);
+  box-shadow: 0 2px 8px rgba(13, 202, 240, 0.15);
 }
 
 .btn-info:hover {
-  background: #0bb5d6;
-  box-shadow: 0 3px 12px rgba(13, 202, 240, 0.3);
+  background: rgba(13, 202, 240, 0.9);
+  box-shadow: 0 2px 10px rgba(13, 202, 240, 0.2);
 }
 
 .btn-warning {
   background: #ffc107;
   color: #000;
-  box-shadow: 0 2px 8px rgba(255, 193, 7, 0.2);
+  box-shadow: 0 2px 8px rgba(255, 193, 7, 0.15);
 }
 
 .btn-warning:hover {
-  background: #ffcd39;
-  box-shadow: 0 3px 12px rgba(255, 193, 7, 0.3);
+  background: rgba(255, 193, 7, 0.9);
+  box-shadow: 0 2px 10px rgba(255, 193, 7, 0.2);
 }
 
 .chart-container {
@@ -457,7 +451,7 @@ html {
   </div>
 
   <div class="nav-right">
-    <button id="toggleDark" class="btn btn-light btn-sm" style="background: transparent; border: 1px solid rgba(0,0,128,0.2); color: #000080; font-weight: 500; padding: 6px 14px; border-radius: 6px; font-size: 13px; transition: background-color 0.2s ease, border-color 0.2s ease;">🌙 Dark Mode</button>
+    <button id="toggleDark" class="btn btn-light btn-sm" style="background: transparent; border: 1px solid rgba(0,0,128,0.2); color: #000080; font-weight: 500; padding: 6px 14px; border-radius: 6px; font-size: 13px; transition: background-color 0.15s ease, border-color 0.15s ease;">🌙 Dark Mode</button>
     <a href="#" id="logoutBtn" class="logout-btn">Logout</a>
   </div>
 </div>
@@ -669,16 +663,16 @@ if (toggleBtn) {
     document.body.classList.toggle('dark');
     toggleBtn.innerText = document.body.classList.contains('dark') ? '☀️ Light Mode' : '🌙 Dark Mode';
     // Add smooth transition
-    document.body.style.transition = 'background 0.3s ease, color 0.3s ease';
+    document.body.style.transition = 'background 0.2s ease, color 0.2s ease';
     setTimeout(() => {
       document.body.style.transition = '';
-    }, 300);
+    }, 200);
   });
   
   // Add hover effect
   toggleBtn.addEventListener('mouseenter', () => {
-    toggleBtn.style.background = 'rgba(0, 0, 128, 0.08)';
-    toggleBtn.style.borderColor = 'rgba(0, 0, 128, 0.3)';
+    toggleBtn.style.background = 'rgba(0, 0, 128, 0.06)';
+    toggleBtn.style.borderColor = 'rgba(0, 0, 128, 0.25)';
   });
   
   toggleBtn.addEventListener('mouseleave', () => {
@@ -760,7 +754,7 @@ function initChart() {
       responsive: true,
       maintainAspectRatio: false,
       animation: {
-        duration: 600,
+        duration: 400,
         easing: 'easeOut'
       },
       interaction: { 
