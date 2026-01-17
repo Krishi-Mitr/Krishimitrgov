@@ -85,51 +85,52 @@ button {
 <a href="login" style="color:#FF9933;">Back to Login</a>
 </div>
 
-<!-- DO NOT CHANGE supabase.js -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="supabase.js"></script>
 
 <script>
 document.getElementById("registerForm").addEventListener("submit", async function (e) {
-    e.preventDefault();
+    e.preventDefault()
 
-    const username = document.getElementById("username").value.trim();
-    const password = document.getElementById("password").value.trim();
-    const name = document.getElementById("name").value.trim();
-    const usertype = "Citizen";
+    const username = document.getElementById("username").value.trim()
+    const password = document.getElementById("password").value.trim()
+    const name = document.getElementById("name").value.trim()
+    const usertype = "Citizen"
 
-    const messageBox = document.getElementById("message");
-    const successBox = document.getElementById("success");
+    const messageBox = document.getElementById("message")
+    const successBox = document.getElementById("success")
 
-    messageBox.innerText = "";
-    successBox.innerText = "";
+    messageBox.innerText = ""
+    successBox.innerText = ""
 
     try {
-        // 1️⃣ Check username exists
-        const { data: existingUser } = await db
+        const { data: existingUser, error: err1 } = await db
             .from("logindata")
             .select("loginid")
             .eq("username", username)
-            .maybeSingle();
+            .maybeSingle()
+
+        if (err1) throw err1
 
         if (existingUser) {
-            messageBox.innerText = "Username already exists!";
-            return;
+            messageBox.innerText = "Username already exists!"
+            return
         }
 
-        // 2️⃣ Get max loginid
-        const { data: maxData } = await db
+        const { data: maxData, error: err2 } = await db
             .from("logindata")
             .select("loginid")
             .order("loginid", { ascending: false })
-            .limit(1);
+            .limit(1)
 
-        let newLoginId = 1;
+        if (err2) throw err2
+
+        let newLoginId = 1
         if (maxData && maxData.length > 0) {
-            newLoginId = parseInt(maxData[0].loginid) + 1;
+            newLoginId = parseInt(maxData[0].loginid) + 1
         }
 
-        // 3️⃣ Insert citizen
-        const { error } = await db
+        const { error: err3 } = await db
             .from("logindata")
             .insert({
                 username: username,
@@ -137,25 +138,22 @@ document.getElementById("registerForm").addEventListener("submit", async functio
                 name: name,
                 usertype: usertype,
                 loginid: newLoginId.toString()
-            });
+            })
 
-        if (error) {
-            messageBox.innerText = "Registration failed. Try again.";
-            console.error(error);
-            return;
+        if (err3) {
+            messageBox.innerText = "Registration failed. Try again."
+            return
         }
 
-        successBox.innerHTML =
-            "Registration successful! You can now <a href='login' style='color:#FF9933;'>login</a>.";
-        document.getElementById("registerForm").style.display = "none";
+        successBox.innerHTML = 'Registration successful! You can now <a href="login" style="color:#FF9933;">login</a>.'
+        document.getElementById("registerForm").style.display = "none"
 
     } catch (err) {
-        console.error(err);
-        messageBox.innerText = "Something went wrong!";
+        console.error(err)
+        messageBox.innerText = "Something went wrong!"
     }
-});
+})
 </script>
 
 </body>
 </html>
-
