@@ -176,10 +176,12 @@ function renderNavbar(view, usertype) {
     html += `<div class="nav-box" onclick="showDashboard()">Dashboard</div>`;
   }
 
-  html += `<a class="nav-box" href="Buy.html">Buy Crops</a>`;
+  html += `<a class="nav-box" href="Buy">Buy Crops</a>`;
+    html += `<a class="nav-box" href="krishimitr">Crop price predictor</a>`;
+
 
   if (usertype === "Farmer") {
-    html += `<a class="nav-box" href="Notification.html">Notifications</a>`;
+    html += `<a class="nav-box" href="Notification">Notifications</a>`;
   }
 
   document.getElementById("navMenu").innerHTML = html;
@@ -202,7 +204,7 @@ async function initDashboard() {
   const usertype = sessionStorage.getItem("usertype");
 
   if (!loginid || !usertype) {
-    window.location.href = "login.html";
+    window.location.href = "login";
     return;
   }
 
@@ -225,7 +227,7 @@ async function initDashboard() {
 
 document.getElementById("logoutBtn").onclick = () => {
   sessionStorage.clear();
-  window.location.href = "login.html";
+  window.location.href = "login";
 };
 
 initDashboard();
