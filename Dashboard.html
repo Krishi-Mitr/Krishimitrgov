@@ -42,10 +42,10 @@ body {
   color: white;
   padding: 10px 20px;
   border-radius: 10px;
-  text-decoration: none;
   font-weight: 600;
   cursor: pointer;
   transition: .25s;
+  text-decoration: none;
 }
 
 .nav-box:hover {
@@ -132,7 +132,7 @@ p {
 
 <div class="container">
 
-  <!-- MAIN DASHBOARD VIEW -->
+  <!-- DASHBOARD VIEW -->
   <div id="dashboardView">
     <div class="welcome-card">
       <div class="welcome-inner">
@@ -163,14 +163,38 @@ p {
 <script>
 const db = window.db;
 
+function renderNavbar(view, usertype) {
+  let html = "";
+
+  if (view === "dashboard") {
+    if (usertype === "Farmer") {
+      html += `<div class="nav-box" onclick="showCrops()">Your Crops</div>`;
+    }
+  }
+
+  if (view === "crops") {
+    html += `<div class="nav-box" onclick="showDashboard()">Dashboard</div>`;
+  }
+
+  html += `<a class="nav-box" href="Buy.html">Buy Crops</a>`;
+
+  if (usertype === "Farmer") {
+    html += `<a class="nav-box" href="Notification.html">Notifications</a>`;
+  }
+
+  document.getElementById("navMenu").innerHTML = html;
+}
+
 function showDashboard() {
   document.getElementById("dashboardView").style.display = "block";
   document.getElementById("cropsView").style.display = "none";
+  renderNavbar("dashboard", sessionStorage.getItem("usertype"));
 }
 
 function showCrops() {
   document.getElementById("dashboardView").style.display = "none";
   document.getElementById("cropsView").style.display = "block";
+  renderNavbar("crops", sessionStorage.getItem("usertype"));
 }
 
 async function initDashboard() {
@@ -196,12 +220,7 @@ async function initDashboard() {
       ? "Access crop prices and manage your harvest."
       : "Browse crop prices and procure fresh produce.";
 
-  document.getElementById("navMenu").innerHTML = `
-    <div class="nav-box" onclick="showDashboard()">Dashboard</div>
-    ${usertype === "Farmer" ? `<div class="nav-box" onclick="showCrops()">Your Crops</div>` : ""}
-    <a class="nav-box" href="Buy.html">Buy Crops</a>
-    ${usertype === "Farmer" ? `<a class="nav-box" href="Notification.html">Notifications</a>` : ""}
-  `;
+  showDashboard(); // default view
 }
 
 document.getElementById("logoutBtn").onclick = () => {
