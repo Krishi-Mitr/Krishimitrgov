@@ -1,61 +1,123 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>Krishimitr Dashboard</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta charset="UTF-8" />
+<title>Dashboard - Krishi Mitr</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase.js"></script>
 
 <style>
-body{
-    margin:0;
-    font-family: Poppins, Arial, sans-serif;
-    background:#f4f6f8;
+body {
+  margin: 0;
+  font-family: "Poppins", Arial, sans-serif;
+  min-height: 100vh;
+  background: linear-gradient(180deg,#f6e2cc 0%,#f7f9f8 45%,#dceee3 100%);
+  color: #1f2937;
 }
 
 /* NAVBAR */
-.navbar{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    padding:14px 24px;
-    background:#138808;
-    color:white;
+.top-nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 78px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 32px;
+  background: linear-gradient(90deg,#ff9933,#ffffff,#138808);
+  border-bottom: 3px solid #0a3d62;
+  box-shadow: 0 6px 14px rgba(0,0,0,0.15);
 }
 
-.nav-links{
-    display:flex;
-    gap:20px;
+.nav-left {
+  display: flex;
+  gap: 16px;
 }
 
-.nav-links button{
-    background:none;
-    border:none;
-    color:white;
-    font-size:16px;
-    cursor:pointer;
+.nav-box {
+  background: #0a3d62;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 10px;
+  text-decoration: none;
+  font-weight: 600;
+  cursor: pointer;
+  transition: .25s;
 }
 
-.nav-links button:hover{
-    text-decoration:underline;
+.nav-box:hover {
+  background: linear-gradient(135deg,#ff9933,#ffd28a);
+  color: black;
+  transform: translateY(-3px);
 }
 
-/* PAGE */
-.page{
-    padding:30px;
-    display:none;
+.logout-btn {
+  background: white;
+  color: #0a3d62;
+  border: 2px solid #0a3d62;
+  padding: 10px 22px;
+  border-radius: 10px;
+  font-weight: 700;
+  cursor: pointer;
 }
 
-.page.active{
-    display:block;
+/* CONTENT */
+.container {
+  max-width: 900px;
+  margin: 150px auto 60px;
+  text-align: center;
 }
 
-/* CARD */
-.card{
-    background:white;
-    padding:20px;
-    border-radius:12px;
-    box-shadow:0 4px 10px rgba(0,0,0,0.1);
-    margin-bottom:20px;
+.welcome-card {
+  background: white;
+  border-radius: 26px;
+  padding: 8px;
+  box-shadow: 0 18px 40px rgba(0,0,0,0.18);
+}
+
+.welcome-inner {
+  background: white;
+  border-radius: 20px;
+  padding: 50px 45px;
+  border-top: 6px solid #ff9933;
+  border-bottom: 6px solid #138808;
+}
+
+h1 {
+  color: #0a3d62;
+  font-size: 2.6em;
+}
+
+p {
+  font-size: 1.15em;
+  color: #374151;
+}
+
+#roleText {
+  margin-top: 18px;
+  font-weight: 600;
+  color: #1e3a8a;
+}
+
+.action-btn {
+  display: inline-block;
+  margin: 15px;
+  padding: 16px 34px;
+  font-size: 1.1em;
+  font-weight: 700;
+  border-radius: 14px;
+  text-decoration: none;
+  color: white;
+  background: #0a3d62;
+  transition: .25s;
+}
+
+.action-btn:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px rgba(0,0,0,0.3);
 }
 </style>
 </head>
@@ -63,65 +125,91 @@ body{
 <body>
 
 <!-- NAVBAR -->
-<div class="navbar">
-    <div><b>Krishimitr</b></div>
-    <div class="nav-links" id="navbarButtons"></div>
+<div class="top-nav">
+  <div class="nav-left" id="navMenu"></div>
+  <button class="logout-btn" id="logoutBtn">Logout</button>
 </div>
 
-<!-- PAGES -->
-<div id="homePage" class="page active">
-    <div class="card">
-        <h2>Welcome Farmer 🌾</h2>
-        <p>This is main home view.</p>
-    </div>
-</div>
+<div class="container">
 
-<div id="dashboardPage" class="page">
-    <div class="card">
-        <h2>Your Crops Dashboard</h2>
-        <p>Crop status, prices, insights.</p>
+  <!-- MAIN DASHBOARD VIEW -->
+  <div id="dashboardView">
+    <div class="welcome-card">
+      <div class="welcome-inner">
+        <h1 id="welcomeText">Loading...</h1>
+        <p>Your Krishi Mitr Dashboard</p>
+        <p id="roleText"></p>
+      </div>
     </div>
-</div>
+  </div>
 
-<div id="buyPage" class="page">
-    <div class="card">
-        <h2>Buy Crops</h2>
-        <p>Available crops to buy.</p>
+  <!-- YOUR CROPS VIEW -->
+  <div id="cropsView" style="display:none; margin-top:40px;">
+    <div class="welcome-card">
+      <div class="welcome-inner">
+        <h1>Manage Your Harvest</h1>
+        <p>
+          Sell your crops or manage your existing crop listings
+          directly from your dashboard.
+        </p>
+        <a href="Sell" class="action-btn">Sell Your Crops</a>
+        <a href="Update_crops" class="action-btn">Manage Your Crops</a>
+      </div>
     </div>
-</div>
+  </div>
 
-<div id="notifyPage" class="page">
-    <div class="card">
-        <h2>Notifications</h2>
-        <p>All alerts here.</p>
-    </div>
 </div>
 
 <script>
-const navbar = document.getElementById("navbarButtons");
+const db = window.db;
 
-function showPage(page){
-    document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
-    document.getElementById(page).classList.add("active");
-
-    // Change navbar buttons
-    if(page === "homePage"){
-        navbar.innerHTML = `
-            <button onclick="showPage('dashboardPage')">Your Crops</button>
-            <button onclick="showPage('buyPage')">Buy Crops</button>
-            <button onclick="showPage('notifyPage')">Notifications</button>
-        `;
-    } else {
-        navbar.innerHTML = `
-            <button onclick="showPage('dashboardPage')">Dashboard</button>
-            <button onclick="showPage('buyPage')">Buy Crops</button>
-            <button onclick="showPage('notifyPage')">Notifications</button>
-        `;
-    }
+function showDashboard() {
+  document.getElementById("dashboardView").style.display = "block";
+  document.getElementById("cropsView").style.display = "none";
 }
 
-// initial navbar
-showPage("homePage");
+function showCrops() {
+  document.getElementById("dashboardView").style.display = "none";
+  document.getElementById("cropsView").style.display = "block";
+}
+
+async function initDashboard() {
+  const loginid = sessionStorage.getItem("loginid");
+  const usertype = sessionStorage.getItem("usertype");
+
+  if (!loginid || !usertype) {
+    window.location.href = "login.html";
+    return;
+  }
+
+  const { data } = await db
+    .from("logindata")
+    .select("name")
+    .eq("loginid", loginid)
+    .maybeSingle();
+
+  document.getElementById("welcomeText").innerText =
+    `Welcome, ${data.name}`;
+
+  document.getElementById("roleText").innerText =
+    usertype === "Farmer"
+      ? "Access crop prices and manage your harvest."
+      : "Browse crop prices and procure fresh produce.";
+
+  document.getElementById("navMenu").innerHTML = `
+    <div class="nav-box" onclick="showDashboard()">Dashboard</div>
+    ${usertype === "Farmer" ? `<div class="nav-box" onclick="showCrops()">Your Crops</div>` : ""}
+    <a class="nav-box" href="Buy.html">Buy Crops</a>
+    ${usertype === "Farmer" ? `<a class="nav-box" href="Notification.html">Notifications</a>` : ""}
+  `;
+}
+
+document.getElementById("logoutBtn").onclick = () => {
+  sessionStorage.clear();
+  window.location.href = "login.html";
+};
+
+initDashboard();
 </script>
 
 </body>
