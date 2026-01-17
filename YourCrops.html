@@ -12,26 +12,63 @@ body {
   background: linear-gradient(180deg,#f6e2cc,#f7f9f8,#dceee3);
 }
 
-/* TOP NAV */
+/* ===== NAVBAR (SAME AS DASHBOARD) ===== */
 .top-nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
   height: 78px;
   display: flex;
+  justify-content: space-between;
   align-items: center;
   padding: 0 32px;
   background: linear-gradient(90deg,#ff9933,#ffffff,#138808);
   border-bottom: 3px solid #0a3d62;
+  box-shadow: 0 6px 14px rgba(0,0,0,0.15);
+  z-index: 100;
 }
 
-.nav-title {
-  font-weight: 700;
-  font-size: 1.4em;
+.nav-left {
+  display: flex;
+  gap: 16px;
+}
+
+.nav-box {
+  background: #0a3d62;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 10px;
+  text-decoration: none;
+  font-weight: 600;
+  transition: .25s;
+}
+
+.nav-box:hover {
+  background: #ff9933;
+  color: black;
+  transform: translateY(-2px);
+}
+
+.logout-btn {
+  background: white;
+  border: 2px solid #0a3d62;
   color: #0a3d62;
+  padding: 10px 22px;
+  border-radius: 10px;
+  font-weight: 700;
+  cursor: pointer;
 }
 
-/* CONTENT */
+.logout-btn:hover {
+  background: #0a3d62;
+  color: white;
+}
+
+/* ===== CONTENT ===== */
 .container {
   max-width: 900px;
-  margin: 140px auto;
+  margin: 160px auto 60px;
   text-align: center;
 }
 
@@ -66,7 +103,7 @@ p {
   text-decoration: none;
   color: white;
   background: #0a3d62;
-  transition: transform .25s, box-shadow .25s;
+  transition: .25s;
 }
 
 .action-btn:hover {
@@ -77,13 +114,11 @@ p {
 </head>
 
 <body>
+
+<!-- ✅ SINGLE DASHBOARD NAVBAR -->
 <div class="top-nav">
   <div class="nav-left" id="navMenu"></div>
   <button class="logout-btn" id="logoutBtn">Logout</button>
-</div>
-
-<div class="top-nav">
-  <div class="nav-title">Your Crops</div>
 </div>
 
 <div class="container">
@@ -98,7 +133,8 @@ p {
     <a href="Update_crops" class="action-btn">Manage Your Crops</a>
   </div>
 </div>
-  <script>
+
+<script>
 function loadNavbar() {
   const usertype = sessionStorage.getItem("usertype");
 
@@ -107,9 +143,7 @@ function loadNavbar() {
     return;
   }
 
-  const nav = document.getElementById("navMenu");
-
-  nav.innerHTML = `
+  document.getElementById("navMenu").innerHTML = `
     <a class="nav-box" href="dashboard.html">Dashboard</a>
     <a class="nav-box" href="krishimitr.html">Crop Advisor</a>
     ${usertype === "Farmer" ? `<a class="nav-box" href="Sell">Sell Crops</a>` : ""}
@@ -125,7 +159,6 @@ document.getElementById("logoutBtn").onclick = () => {
 
 loadNavbar();
 </script>
-
 
 </body>
 </html>
