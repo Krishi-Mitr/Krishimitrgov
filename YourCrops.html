@@ -77,6 +77,10 @@ p {
 </head>
 
 <body>
+<div class="top-nav">
+  <div class="nav-left" id="navMenu"></div>
+  <button class="logout-btn" id="logoutBtn">Logout</button>
+</div>
 
 <div class="top-nav">
   <div class="nav-title">Your Crops</div>
@@ -94,6 +98,34 @@ p {
     <a href="Update_crops" class="action-btn">Manage Your Crops</a>
   </div>
 </div>
+  <script>
+function loadNavbar() {
+  const usertype = sessionStorage.getItem("usertype");
+
+  if (!usertype) {
+    window.location.href = "login.html";
+    return;
+  }
+
+  const nav = document.getElementById("navMenu");
+
+  nav.innerHTML = `
+    <a class="nav-box" href="dashboard.html">Dashboard</a>
+    <a class="nav-box" href="krishimitr.html">Crop Advisor</a>
+    ${usertype === "Farmer" ? `<a class="nav-box" href="Sell">Sell Crops</a>` : ""}
+    <a class="nav-box" href="Buy.html">Buy Crops</a>
+    ${usertype === "Farmer" ? `<a class="nav-box" href="Notification.html">Notifications</a>` : ""}
+  `;
+}
+
+document.getElementById("logoutBtn").onclick = () => {
+  sessionStorage.clear();
+  window.location.href = "login.html";
+};
+
+loadNavbar();
+</script>
+
 
 </body>
 </html>
