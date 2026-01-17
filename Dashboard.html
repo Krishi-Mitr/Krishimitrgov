@@ -21,7 +21,7 @@ body {
   color: #1f2937;
 }
 
-/* ===== NAVBAR ===== */
+/* NAVBAR */
 .top-nav {
   position: fixed;
   top: 0;
@@ -29,8 +29,8 @@ body {
   right: 0;
   height: 78px;
   display: flex;
-  align-items: center;
   justify-content: space-between;
+  align-items: center;
   padding: 0 32px;
   background: linear-gradient(90deg,#ff9933,#ffffff,#138808);
   border-bottom: 3px solid #0a3d62;
@@ -68,19 +68,13 @@ body {
   cursor: pointer;
 }
 
-.logout-btn:hover {
-  background: #0a3d62;
-  color: white;
-}
-
-/* ===== CONTENT ===== */
+/* CONTENT */
 .container {
   max-width: 900px;
   margin: 150px auto 60px;
   text-align: center;
 }
 
-/* CARD */
 .welcome-card {
   background: white;
   border-radius: 26px;
@@ -99,7 +93,6 @@ body {
 h1 {
   color: #0a3d62;
   font-size: 2.6em;
-  margin-bottom: 14px;
 }
 
 p {
@@ -113,7 +106,6 @@ p {
   color: #1e3a8a;
 }
 
-/* BUTTONS */
 .action-btn {
   display: inline-block;
   margin: 15px;
@@ -136,7 +128,6 @@ p {
 
 <body>
 
-<!-- NAVBAR -->
 <div class="top-nav">
   <div class="nav-left" id="navMenu"></div>
   <button class="logout-btn" id="logoutBtn">Logout</button>
@@ -153,7 +144,7 @@ p {
     </div>
   </div>
 
-  <!-- FARMER CROPS SECTION -->
+  <!-- CROPS SECTION -->
   <div id="farmerCropsCard" style="display:none; margin-top:40px;">
     <div class="welcome-card">
       <div class="welcome-inner">
@@ -174,6 +165,10 @@ p {
 <script>
 const db = window.db;
 
+function isCropsView() {
+  return new URLSearchParams(window.location.search).get("view") === "crops";
+}
+
 async function initDashboard() {
   const loginid = sessionStorage.getItem("loginid");
   const usertype = sessionStorage.getItem("usertype");
@@ -183,37 +178,30 @@ async function initDashboard() {
     return;
   }
 
-  const { data, error } = await db
+  const { data } = await db
     .from("logindata")
     .select("name")
     .eq("loginid", loginid)
     .maybeSingle();
-
-  if (error || !data) {
-    sessionStorage.clear();
-    window.location.href = "login.html";
-    return;
-  }
 
   document.getElementById("welcomeText").innerText =
     `Welcome, ${data.name}`;
 
   document.getElementById("roleText").innerText =
     usertype === "Farmer"
-      ? "Access crop prices, sell harvests, and receive AI-driven agricultural insights."
-      : "Browse crop prices and procure fresh produce directly from farmers.";
+      ? "Access crop prices and manage your harvest."
+      : "Browse crop prices and procure fresh produce.";
 
-  // NAVBAR
   document.getElementById("navMenu").innerHTML = `
-    <a class="nav-box" href="krishimitr.html">Crop Advisor</a>
-    ${usertype === "Farmer" ? `<a class="nav-box" href="Sell">Sell Crops</a>` : ""}
+    <a class="nav-box" href="dashboard.html">Dashboard</a>
+    ${usertype === "Farmer" ? `<a class="nav-box" href="dashboard.html?view=crops">Your Crops</a>` : ""}
     <a class="nav-box" href="Buy.html">Buy Crops</a>
     ${usertype === "Farmer" ? `<a class="nav-box" href="Notification.html">Notifications</a>` : ""}
   `;
 
-  // SHOW FARMER SECTION
-  if (usertype === "Farmer") {
+  if (usertype === "Farmer" && isCropsView()) {
     document.getElementById("farmerCropsCard").style.display = "block";
+    document.querySelector(".welcome-card").style.display = "none";
   }
 }
 
