@@ -20,18 +20,46 @@ body {
   padding-top: 80px;
 }
 
-.top-navbar {
+.top-nav {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
+  height: 78px;
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  padding: 12px 20px;
-  background: linear-gradient(90deg, #FF9933, #FFFFFF 50%, #138808);
-  border-bottom: 3px solid #000080;
-  z-index: 1000;
+  justify-content: space-between;
+  padding: 0 32px;
+  background: linear-gradient(
+    90deg,
+    #8c3a00,
+    #f4f4f4,
+    #0f4d1c
+  );
+  border-bottom: 4px solid #0a3d62;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.45);
+  box-sizing: border-box;
+}
+
+.nav-left {
+  display: flex;
+  gap: 18px;
+}
+
+.nav-box {
+  background: linear-gradient(135deg, #0a3d62, #001f54);
+  color: #ffffff;
+  padding: 12px 22px;
+  border-radius: 12px;
+  text-decoration: none;
+  font-weight: 600;
+  letter-spacing: 0.4px;
+  transition: all 0.25s ease;
+}
+
+.nav-box:hover {
+  background: linear-gradient(135deg, #c25a00, #f2a154);
+  color: #000;
 }
 
 .brand {
