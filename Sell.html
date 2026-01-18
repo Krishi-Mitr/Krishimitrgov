@@ -143,10 +143,11 @@ input:focus {
 <!-- NAVBAR -->
 <div class="top-nav">
   <div class="nav-left">
-    <a class="nav-box" href="Dashboard.html">Dashboard</a>
-    <a class="nav-box" href="Buy.html">Buy Crops</a>
+    <a class="nav-box" href="Dashboard">Dashboard</a>
+    <a class="nav-box" href="krishimitr">Crop price predictor</a>
+    <a class="nav-box" href="Buy">Buy Crops</a>
     <a class="nav-box" href="Update_crops">Manage Your Crops</a>
-    <a class="nav-box" href="Notification.html">Notifications</a>
+    <a class="nav-box" href="Notification">Notifications</a>
   </div>
   <button class="logout-btn" id="logoutBtn">Logout</button>
 </div>
@@ -188,7 +189,7 @@ const loginid = sessionStorage.getItem("loginid");
 const usertype = sessionStorage.getItem("usertype");
 
 if (!loginid || usertype !== "Farmer") {
-  location.href = "login.html";
+  location.href = "login";
 }
 
 async function init() {
@@ -229,7 +230,7 @@ document.getElementById("sellForm").addEventListener("submit", async e => {
 
 document.getElementById("logoutBtn").onclick = () => {
   sessionStorage.clear();
-  location.href = "login.html";
+  location.href = "login";
 };
 
 init();
