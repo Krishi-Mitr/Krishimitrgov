@@ -259,7 +259,6 @@ let selectedCrop = null;
 function setupNav() {
   let navHtml = `<a href="Dashboard" class="nav-box">Dashboard</a>`;
   navHtml += `<a href="krishimitr" class="nav-box">Crop Predictor</a>`;
-  navHtml += `<a href="Buy" class="nav-box active">Buy Crops</a>`;
 
   if (usertype === "Farmer") {
     navHtml += `<a href="YourCrops" class="nav-box">Your Crops</a>`;
@@ -282,7 +281,7 @@ async function loadCrops() {
   }
 
   if (!data || data.length === 0) {
-    cropList.innerHTML = "<p>No crops available right now.</p>";
+    cropList.innerHTML = "<H3>No crops available right now.</H3>";
     return;
   }
 
