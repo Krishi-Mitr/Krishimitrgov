@@ -1,263 +1,359 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>Dashboard – Notifications</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Farmer Dashboard - Krishi Mitr</title>
+
+<!-- Supabase JS -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
-/* ===== GLOBAL ===== */
-*{
-  box-sizing:border-box;
-}
-body{
-  margin:0;
-  font-family:Poppins, sans-serif;
-  background:#f4f6f8;
-}
+  /* Reset & basics */
+  * {
+    box-sizing: border-box;
+  }
+  body {
+    margin: 0;
+    font-family: 'Poppins', Arial, sans-serif;
+    background: linear-gradient(180deg, #f6e2cc 0%, #f7f9f8 45%, #dceee3 100%);
+    color: #1f2937;
+    min-height: 100vh;
+    padding-top: 80px;
+  }
 
-/* ===== NAVBAR ===== */
-.navbar{
-  position:fixed;
-  top:0;
-  left:0;
-  right:0;
-  height:90px;
-  background:#0a3d62;
-  color:white;
-  display:flex;
-  align-items:center;
-  padding:0 30px;
-  font-size:1.3em;
-  font-weight:600;
-  z-index:9999;
-}
+  /* Navbar */
+  .navbar {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    height: 78px;
+    background: linear-gradient(90deg,#ff9933,#138808);
+    display: flex;
+    align-items: center;
+    padding: 0 30px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    font-weight: 700;
+    color: white;
+    z-index: 1000;
+  }
 
-/* ===== PAGE CONTAINER ===== */
-.page-container{
-  max-width:900px;
-  margin:130px auto 60px;
-  padding:0 20px;
-}
+  /* Container */
+  .container {
+    max-width: 900px;
+    margin: 0 auto 40px;
+    padding: 20px;
+  }
 
-/* ===== NOTIFICATION CARD ===== */
-.notification-card{
-  background:white;
-  border-radius:20px;
-  padding:24px;
-  margin-bottom:22px;
-  box-shadow:0 14px 30px rgba(0,0,0,.15);
-  border-left:6px solid #3498db;
-}
+  /* Header */
+  h1 {
+    color: #0a3d62;
+    margin-bottom: 20px;
+  }
 
-.notification-card.accepted{
-  border-left-color:#138808;
-  background:#f2fff2;
-}
+  /* Notification Card */
+  .notification-card {
+    background: white;
+    border-radius: 18px;
+    padding: 20px 25px;
+    margin-bottom: 16px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
 
-.notification-card.declined{
-  border-left-color:#b30000;
-  background:#fff2f2;
-}
+  /* Status colors */
+  .status {
+    font-weight: 600;
+  }
+  .status.pending {
+    color: #2563eb; /* blue */
+  }
+  .status.accepted {
+    color: #16a34a; /* green */
+  }
+  .status.declined {
+    color: #dc2626; /* red */
+  }
 
-.notification-card h4{
-  margin:0 0 10px;
-  color:#0a3d62;
-}
+  /* Info lines */
+  .info-line {
+    font-size: 1.05em;
+  }
 
-.notification-info{
-  display:flex;
-  flex-direction:column;
-  gap:6px;
-  font-size:.95em;
-  color:#374151;
-}
+  /* Actions vertical */
+  .actions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 10px;
+    max-width: 150px;
+  }
+  .actions button {
+    padding: 12px;
+    border: none;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 1em;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  .actions button.accept {
+    background-color: #16a34a;
+    color: white;
+  }
+  .actions button.accept:hover {
+    background-color: #15803d;
+  }
+  .actions button.decline {
+    background-color: #dc2626;
+    color: white;
+  }
+  .actions button.decline:hover {
+    background-color: #b91c1c;
+  }
 
-.status-text{
-  margin-top:12px;
-  font-weight:700;
-}
+  /* Modal overlay */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+  }
 
-.status-accepted{ color:#138808; }
-.status-declined{ color:#b30000; }
-.status-pending{ color:#0a3d62; }
-
-/* ===== ACTION BUTTONS ===== */
-.notification-actions{
-  margin-top:18px;
-  display:flex;
-  flex-direction:column;
-  gap:12px;
-}
-
-.btn-accept{
-  background:#138808;
-  color:white;
-  padding:14px;
-  border:none;
-  border-radius:12px;
-  font-weight:700;
-  cursor:pointer;
-}
-
-.btn-decline{
-  background:#b30000;
-  color:white;
-  padding:14px;
-  border:none;
-  border-radius:12px;
-  font-weight:700;
-  cursor:pointer;
-}
-
-/* ===== CONFIRM POPUP ===== */
-.confirm-overlay{
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,.55);
-  display:none;
-  align-items:center;
-  justify-content:center;
-  z-index:10000;
-}
-
-.confirm-box{
-  background:white;
-  padding:28px;
-  border-radius:22px;
-  max-width:420px;
-  width:90%;
-  text-align:center;
-  box-shadow:0 25px 60px rgba(0,0,0,.3);
-}
-
-.confirm-box h3{
-  color:#0a3d62;
-  margin-bottom:12px;
-}
-
-.confirm-buttons{
-  display:flex;
-  flex-direction:column;
-  gap:12px;
-  margin-top:20px;
-}
+  /* Modal content */
+  .modal {
+    background: white;
+    border-radius: 16px;
+    max-width: 400px;
+    width: 90%;
+    padding: 30px 25px;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.25);
+    text-align: center;
+  }
+  .modal h2 {
+    margin-top: 0;
+    color: #0a3d62;
+  }
+  .modal p {
+    margin: 20px 0 30px;
+    font-size: 1.1em;
+    color: #374151;
+  }
+  .modal-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+  }
+  .modal-buttons button {
+    flex: 1;
+    padding: 12px 0;
+    border: none;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 1.1em;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  .modal-buttons button.confirm {
+    background-color: #16a34a;
+    color: white;
+  }
+  .modal-buttons button.confirm:hover {
+    background-color: #15803d;
+  }
+  .modal-buttons button.cancel {
+    background-color: #dc2626;
+    color: white;
+  }
+  .modal-buttons button.cancel:hover {
+    background-color: #b91c1c;
+  }
 </style>
 </head>
-
 <body>
 
-<!-- NAVBAR -->
-<div class="navbar">
-  Farmer Dashboard
+<div class="navbar">Farmer Dashboard - Krishi Mitr</div>
+
+<div class="container">
+  <h1>Buy Requests</h1>
+  <div id="notifications">
+    <!-- Notifications will appear here -->
+  </div>
 </div>
 
-<!-- CONTENT -->
-<div class="page-container" id="notifContainer">
-  <!-- notifications load here -->
-</div>
-
-<!-- CONFIRM POPUP -->
-<div class="confirm-overlay" id="confirmOverlay">
-  <div class="confirm-box">
-    <h3>Confirm Action</h3>
-    <p id="confirmText"></p>
-
-    <div class="confirm-buttons">
-      <button class="btn-accept" id="confirmYes">Yes, Confirm</button>
-      <button class="btn-decline" id="confirmNo">Cancel</button>
+<!-- Confirmation Modal -->
+<div id="confirmModal" class="modal-overlay">
+  <div class="modal">
+    <h2>Confirm Action</h2>
+    <p id="modalMessage">Are you sure?</p>
+    <div class="modal-buttons">
+      <button class="confirm" id="confirmBtn">Confirm</button>
+      <button class="cancel" id="cancelBtn">Cancel</button>
     </div>
   </div>
 </div>
 
 <script>
-/* ===== SAMPLE DATA (replace with Supabase fetch) ===== */
-const notifications = [
-  {id:1, buyer:"Ramesh", crop:"Wheat", qty:50, status:null},
-  {id:2, buyer:"Suresh", crop:"Rice", qty:30, status:true},
-  {id:3, buyer:"Mahesh", crop:"Corn", qty:40, status:false}
-];
+  // Supabase setup
+  const SUPABASE_URL = 'YOUR_SUPABASE_URL';
+  const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
+  const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-const container = document.getElementById("notifContainer");
+  // Session info
+  const loginid = sessionStorage.getItem("loginid");
+  const usertype = sessionStorage.getItem("usertype");
 
-function loadNotifications(){
-  container.innerHTML = "";
-
-  notifications.forEach(n => {
-    let statusText = "Pending";
-    let statusClass = "status-pending";
-    let cardClass = "";
-
-    if(n.status === true){
-      statusText = "Accepted";
-      statusClass = "status-accepted";
-      cardClass = "accepted";
-    }
-    if(n.status === false){
-      statusText = "Declined";
-      statusClass = "status-declined";
-      cardClass = "declined";
-    }
-
-    container.innerHTML += `
-      <div class="notification-card ${cardClass}">
-        <h4>Purchase Request</h4>
-
-        <div class="notification-info">
-          <div><b>${n.buyer}</b> wants to buy</div>
-          <div><b>${n.qty} kg</b> of <b>${n.crop}</b></div>
-          <div class="status-text ${statusClass}">
-            Status: ${statusText}
-          </div>
-        </div>
-
-        ${n.status === null ? `
-        <div class="notification-actions">
-          <button class="btn-accept" onclick="openConfirm(${n.id}, true)">
-            Accept
-          </button>
-          <button class="btn-decline" onclick="openConfirm(${n.id}, false)">
-            Decline
-          </button>
-        </div>
-        ` : ``}
-      </div>
-    `;
-  });
-}
-
-/* ===== CONFIRM LOGIC ===== */
-let selectedId = null;
-let selectedDecision = null;
-
-function openConfirm(id, decision){
-  selectedId = id;
-  selectedDecision = decision;
-
-  document.getElementById("confirmText").innerText =
-    decision
-      ? "Do you want to sell your crop to this buyer? This action cannot be changed."
-      : "Do you want to decline this request? This action cannot be changed.";
-
-  document.getElementById("confirmOverlay").style.display = "flex";
-}
-
-document.getElementById("confirmYes").onclick = () => {
-  const item = notifications.find(n => n.id === selectedId);
-  if(item){
-    item.status = selectedDecision;
+  if (!loginid || usertype !== "Farmer") {
+    window.location.href = "login";
   }
 
-  document.getElementById("confirmOverlay").style.display = "none";
-  loadNotifications();
-};
+  const notificationsEl = document.getElementById("notifications");
+  const confirmModal = document.getElementById("confirmModal");
+  const modalMessage = document.getElementById("modalMessage");
+  const confirmBtn = document.getElementById("confirmBtn");
+  const cancelBtn = document.getElementById("cancelBtn");
 
-document.getElementById("confirmNo").onclick = () => {
-  document.getElementById("confirmOverlay").style.display = "none";
-};
+  let currentRequest = null;
+  let currentAction = null;
 
-/* ===== INIT ===== */
-loadNotifications();
+  // Fetch buy_table entries for this farmer (fid == loginid) and status not confirmed yet
+  async function fetchNotifications() {
+    const { data, error } = await supabase
+      .from('buy_table')
+      .select('*')
+      .eq('fid', loginid)
+      .is('is_confirmed', null);  // only pending (is_confirmed null) or you can use false depending on your logic
+
+    if (error) {
+      notificationsEl.innerHTML = `<p style="color:red;">Failed to load notifications: ${error.message}</p>`;
+      return;
+    }
+
+    renderNotifications(data || []);
+  }
+
+  // Render notifications vertically
+  function renderNotifications(notifications) {
+    if (!notifications.length) {
+      notificationsEl.innerHTML = "<p>No buy requests at the moment.</p>";
+      return;
+    }
+
+    notificationsEl.innerHTML = '';
+
+    notifications.forEach(notif => {
+      // Show buyer's name by looking up in logindata by lid (buyer loginid)
+      // We'll fetch buyer name inside render for simplicity
+
+      getBuyerName(notif.lid).then(buyerName => {
+        const card = document.createElement('div');
+        card.className = 'notification-card';
+
+        // Status text and color
+        let statusText = 'Pending';
+        let statusClass = 'pending';
+        if (notif.is_confirmed === true) {
+          statusText = 'Accepted';
+          statusClass = 'accepted';
+        } else if (notif.is_confirmed === false) {
+          statusText = 'Declined';
+          statusClass = 'declined';
+        }
+
+        card.innerHTML = `
+          <div class="info-line"><b>${notif.fname}</b> wants to buy</div>
+          <div class="info-line"><b>${notif.quantity} kg</b> of <b>${notif.cname}</b> crop.</div>
+          <div class="status ${statusClass}">Status: ${statusText}</div>
+        `;
+
+        // Add Accept/Decline buttons only if pending
+        if (notif.is_confirmed === null || notif.is_confirmed === false) {
+          const actions = document.createElement('div');
+          actions.className = 'actions';
+
+          const acceptBtn = document.createElement('button');
+          acceptBtn.textContent = 'Accept';
+          acceptBtn.className = 'accept';
+          acceptBtn.onclick = () => openConfirmModal(notif, true);
+
+          const declineBtn = document.createElement('button');
+          declineBtn.textContent = 'Decline';
+          declineBtn.className = 'decline';
+          declineBtn.onclick = () => openConfirmModal(notif, false);
+
+          actions.appendChild(acceptBtn);
+          actions.appendChild(declineBtn);
+
+          card.appendChild(actions);
+        }
+
+        notificationsEl.appendChild(card);
+      });
+    });
+  }
+
+  // Get buyer name by loginid from logindata table
+  async function getBuyerName(buyerLoginId) {
+    const { data, error } = await supabase
+      .from('logindata')
+      .select('name')
+      .eq('loginid', buyerLoginId.toString())
+      .maybeSingle();
+
+    if (error || !data) return 'Unknown';
+    return data.name;
+  }
+
+  // Show modal with message and store current action
+  function openConfirmModal(request, action) {
+    currentRequest = request;
+    currentAction = action;
+    modalMessage.textContent = `Do you want to ${action ? 'accept' : 'decline'} the request from ${request.fname} for ${request.quantity} kg of ${request.cname}? This action cannot be undone.`;
+    confirmModal.style.display = 'flex';
+  }
+
+  // Close modal
+  function closeConfirmModal() {
+    confirmModal.style.display = 'none';
+    currentRequest = null;
+    currentAction = null;
+  }
+
+  // Confirm button clicked
+  async function onConfirm() {
+    if (!currentRequest) return;
+
+    // Update is_confirmed in buy_table
+    const { error } = await supabase
+      .from('buy_table')
+      .update({ is_confirmed: currentAction })
+      .eq('id', currentRequest.id);
+
+    if (error) {
+      alert(`Error updating status: ${error.message}`);
+      closeConfirmModal();
+      return;
+    }
+
+    closeConfirmModal();
+    fetchNotifications();  // refresh list
+  }
+
+  // Event listeners
+  confirmBtn.addEventListener('click', onConfirm);
+  cancelBtn.addEventListener('click', closeConfirmModal);
+
+  // Close modal if clicking outside modal content
+  confirmModal.addEventListener('click', e => {
+    if (e.target === confirmModal) closeConfirmModal();
+  });
+
+  // Initialize
+  fetchNotifications();
 </script>
 
 </body>
