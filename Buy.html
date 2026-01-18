@@ -220,7 +220,7 @@ const db = window.db;
 const loginid = sessionStorage.getItem("loginid");
 const usertype = sessionStorage.getItem("usertype");
 
-if (!loginid || usertype !== "Buyer" && usertype !== "Farmer") {
+if (!loginid || usertype !== "Citizen" && usertype !== "Farmer") {
   location.href = "login";
 }
 
