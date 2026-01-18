@@ -5,6 +5,7 @@
 <title>Notifications - Krishi Mitr</title>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase.js"></script>
 
 <style>
   body {
@@ -14,6 +15,7 @@
     background: linear-gradient(180deg,#f6e2cc 0%,#f7f9f8 45%,#dceee3 100%);
     color: #1f2937;
   }
+
   /* NAVBAR */
   .top-nav {
     position: fixed;
@@ -59,147 +61,108 @@
 
   /* CONTAINER */
   .container {
-    max-width: 900px;
+    max-width: 960px;
     margin: 110px auto 60px;
     padding: 0 20px;
   }
 
-  /* Notification card */
+  /* Notification Card */
   .notification-card {
     background: white;
     border-radius: 20px;
     padding: 20px;
-    margin-bottom: 18px;
+    margin-bottom: 20px;
     box-shadow: 0 10px 25px rgba(0,0,0,0.1);
     display: flex;
     flex-direction: column;
-    gap: 12px;
-    word-break: break-word;
+    gap: 10px;
   }
 
-  /* Notification text */
   .notification-text {
     font-size: 1.1em;
-    color: #1f2937;
+    color: #0a3d62;
+    font-weight: 600;
   }
 
-  /* Buttons container vertical */
   .actions {
     display: flex;
-    flex-direction: column;
-    gap: 10px;
-    width: 140px;
+    gap: 12px;
   }
 
-  button.accept-btn, button.decline-btn {
-    padding: 10px;
-    font-weight: 700;
+  .btn-accept {
+    background: #138808;
+    color: white;
     border: none;
-    border-radius: 10px;
-    cursor: pointer;
-    transition: background 0.3s ease;
-  }
-
-  button.accept-btn {
-    background-color: #138808;
-    color: white;
-  }
-  button.accept-btn:hover {
-    background: #0b5e07;
-  }
-
-  button.decline-btn {
-    background-color: #b30000;
-    color: white;
-  }
-  button.decline-btn:hover {
-    background: #7a0000;
-  }
-
-  /* Layout inside card */
-  .notification-content {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-  }
-
-  /* Status text */
-  .status-text {
+    padding: 8px 16px;
+    border-radius: 12px;
     font-weight: 700;
-    font-size: 1em;
-    padding: 8px 14px;
+    cursor: pointer;
+    transition: background 0.25s ease;
+  }
+  .btn-accept:hover {
+    background: #0a6600;
+  }
+
+  .btn-decline {
+    background: #b30000;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.25s ease;
+  }
+  .btn-decline:hover {
+    background: #7f0000;
+  }
+
+  /* Status badge */
+  .status-accepted {
+    color: white;
+    background-color: #138808;
+    padding: 6px 12px;
     border-radius: 14px;
+    font-weight: 700;
+    width: fit-content;
+  }
+  .status-declined {
+    color: white;
+    background-color: #b30000;
+    padding: 6px 12px;
+    border-radius: 14px;
+    font-weight: 700;
     width: fit-content;
   }
 
-  .status-accepted {
-    background-color: #daf6da;
-    color: #138808;
-    border: 1.5px solid #138808;
-  }
-
-  .status-declined {
-    background-color: #f8d7da;
-    color: #b30000;
-    border: 1.5px solid #b30000;
-  }
-
-  /* Popup overlay */
+  /* Popup modal */
   #popup {
-    display: none;
     position: fixed;
     top: 0; left: 0; right: 0; bottom: 0;
     background: rgba(0,0,0,0.5);
+    display: none;
     justify-content: center;
     align-items: center;
-    z-index: 11000;
+    z-index: 10000;
   }
-
   #popup-content {
     background: white;
-    padding: 30px 40px;
-    border-radius: 22px;
+    padding: 25px 30px;
+    border-radius: 18px;
+    width: 90%;
+    max-width: 480px;
     box-shadow: 0 15px 40px rgba(0,0,0,0.25);
-    max-width: 420px;
-    text-align: center;
     position: relative;
   }
-
+  #popup-content h2 {
+    margin-top: 0;
+    color: #0a3d62;
+  }
   #popup-content p {
-    font-size: 1.2em;
-    margin-bottom: 28px;
-    color: #1f2937;
+    margin: 15px 0;
+    font-size: 1.1em;
   }
-
-  #popup-content button {
-    padding: 12px 28px;
-    margin: 0 12px;
-    font-weight: 700;
-    border-radius: 14px;
-    cursor: pointer;
-    border: none;
-    transition: background 0.3s ease;
-    font-size: 1em;
-  }
-
-  #popup-accept-btn {
-    background-color: #138808;
-    color: white;
-  }
-  #popup-accept-btn:hover {
-    background: #0b5e07;
-  }
-
-  #popup-decline-btn {
-    background-color: #b30000;
-    color: white;
-  }
-  #popup-decline-btn:hover {
-    background: #7a0000;
-  }
-
-  #popup-close-btn {
+  #popup-close {
     position: absolute;
     top: 12px; right: 16px;
     background: #0a3d62;
@@ -211,204 +174,162 @@
     font-weight: 700;
     cursor: pointer;
   }
+  #popup-actions {
+    margin-top: 20px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+  }
 </style>
+
 </head>
 <body>
 
-<!-- NAVBAR -->
 <div class="top-nav">
-  <div class="nav-left" id="navMenu">
-    <!-- Nav links inserted here -->
+  <div class="nav-left">
+    <a class="nav-box" href="Dashboard">Dashboard</a>
+    <a class="nav-box" href="krishimitr">Crop Price Predictor</a>
+    <a class="nav-box" href="Buy">Buy Crops</a>
+    <a class="nav-box" href="YourCrops">Your crops</a>
   </div>
   <button id="logoutBtn" class="logout-btn">Logout</button>
 </div>
 
-<div class="container" id="notificationsContainer">
-  <!-- Notification cards inserted here -->
+<div class="container" id="notificationList">
+  <!-- Notifications will be shown here -->
 </div>
 
-<!-- Popup -->
+<!-- Confirmation Popup -->
 <div id="popup">
   <div id="popup-content">
-    <button id="popup-close-btn">&times;</button>
-    <p id="popup-message">Are you sure you want to take this action?</p>
-    <button id="popup-accept-btn">Accept</button>
-    <button id="popup-decline-btn">Decline</button>
+    <button id="popup-close">&times;</button>
+    <h2>Confirm Action</h2>
+    <p id="popup-message">Do you want to sell your crop to this person? This action cannot be undone.</p>
+    <div id="popup-actions">
+      <button id="popup-accept" class="btn-accept">Accept</button>
+      <button id="popup-decline" class="btn-decline">Decline</button>
+    </div>
   </div>
 </div>
 
 <script>
-  // Your Supabase config here
-  const SUPABASE_URL = "YOUR_SUPABASE_URL";
-  const SUPABASE_ANON_KEY = "YOUR_SUPABASE_ANON_KEY";
-
-  const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
+  const db = window.db;
   const loginid = sessionStorage.getItem("loginid");
   const usertype = sessionStorage.getItem("usertype");
 
   if (!loginid || usertype !== "Farmer") {
-    window.location.href = "login";
+    location.href = "login";
   }
 
-  // Render navbar with consistent dashboard style
-  function renderNavbar() {
-    let html = `
-      <a href="Dashboard" class="nav-box">Dashboard</a>
-      <a href="Sell" class="nav-box">Sell Your Crops</a>
-      <a href="Buy" class="nav-box">Buy Crops</a>
-      <a href="Notification" class="nav-box">Notifications</a>
-      <a href="krishimitr" class="nav-box">Crop Price Predictor</a>
-    `;
-    document.getElementById("navMenu").innerHTML = html;
-  }
-
-  const notificationsContainer = document.getElementById("notificationsContainer");
+  const notificationList = document.getElementById("notificationList");
   const popup = document.getElementById("popup");
+  const popupClose = document.getElementById("popup-close");
   const popupMessage = document.getElementById("popup-message");
-  const popupAcceptBtn = document.getElementById("popup-accept-btn");
-  const popupDeclineBtn = document.getElementById("popup-decline-btn");
-  const popupCloseBtn = document.getElementById("popup-close-btn");
+  const popupAccept = document.getElementById("popup-accept");
+  const popupDecline = document.getElementById("popup-decline");
 
   let selectedNotification = null;
   let selectedAction = null;
 
-  // Load notifications for this farmer (fid = loginid)
   async function loadNotifications() {
-    const { data, error } = await supabaseClient
+    const { data, error } = await db
       .from('buy_table')
-      .select(`
-        id,
-        fname,
-        lid,
-        cname,
-        quantity,
-        is_confirmed
-      `)
+      .select('id, fname, fid, cname, cid, status, lid, is_confirmed, quantity')
       .eq('fid', loginid)
       .order('created_at', { ascending: false });
 
     if (error) {
-      notificationsContainer.innerHTML = `<p style="color:red;">Error loading notifications: ${error.message}</p>`;
+      notificationList.innerHTML = `<p style="color:red;">Error loading notifications: ${error.message}</p>`;
       return;
     }
 
     if (!data || data.length === 0) {
-      notificationsContainer.innerHTML = `<h3>No notifications yet.</h3>`;
+      notificationList.innerHTML = `<h3>No notifications found.</h3>`;
       return;
     }
 
-    notificationsContainer.innerHTML = '';
+    notificationList.innerHTML = "";
 
-    for (const notification of data) {
-      // Get buyer name from logindata by lid
-      const { data: buyerData, error: buyerError } = await supabaseClient
-        .from('logindata')
-        .select('name')
-        .eq('loginid', notification.lid.toString())
-        .maybeSingle();
+    data.forEach(item => {
+      const card = document.createElement("div");
+      card.className = "notification-card";
 
-      const buyerName = buyerError || !buyerData ? 'Unknown Buyer' : buyerData.name;
-
-      const card = document.createElement('div');
-      card.className = 'notification-card';
-
-      let statusText = '';
-      if (notification.is_confirmed === true) {
-        statusText = `<div class="status-text status-accepted">Accepted</div>`;
-      } else if (notification.is_confirmed === false && notification.status === 'Declined') {
-        statusText = `<div class="status-text status-declined">Declined</div>`;
+      let statusHtml = "";
+      if (item.is_confirmed === true && item.status === "Accepted") {
+        statusHtml = `<div class="status-accepted">Accepted</div>`;
+      } else if (item.is_confirmed === true && item.status === "Declined") {
+        statusHtml = `<div class="status-declined">Declined</div>`;
       } else {
-        statusText = '';
+        statusHtml = `
+          <div class="actions">
+            <button class="btn-accept">Accept</button>
+            <button class="btn-decline">Decline</button>
+          </div>`;
       }
 
       card.innerHTML = `
-        <div class="notification-content">
-          <div class="notification-text">
-            <strong>${buyerName}</strong> wants to buy <strong>${notification.quantity} kg</strong> of your <strong>${notification.cname}</strong> crop.
-          </div>
-          ${statusText}
-          ${notification.is_confirmed === null || notification.is_confirmed === false
-            ? `<div class="actions">
-                <button class="accept-btn">Accept</button>
-                <button class="decline-btn">Decline</button>
-               </div>`
-            : ''
-          }
+        <div class="notification-text">
+          <strong>${item.fname}</strong> wants to buy <strong>${item.quantity} kg</strong> of your <strong>${item.cname}</strong> crop.
         </div>
+        ${statusHtml}
       `;
 
-      // Append card
-      notificationsContainer.appendChild(card);
+      notificationList.appendChild(card);
 
-      // Add event listeners to buttons if not confirmed yet
-      if (notification.is_confirmed === null || notification.is_confirmed === false) {
-        const acceptBtn = card.querySelector('.accept-btn');
-        const declineBtn = card.querySelector('.decline-btn');
+      // If not confirmed, enable buttons
+      if (!item.is_confirmed) {
+        const btnAccept = card.querySelector('.btn-accept');
+        const btnDecline = card.querySelector('.btn-decline');
 
-        acceptBtn.onclick = () => openConfirmPopup(notification, 'accept');
-        declineBtn.onclick = () => openConfirmPopup(notification, 'decline');
+        btnAccept.onclick = () => openPopup(item, "Accepted");
+        btnDecline.onclick = () => openPopup(item, "Declined");
       }
-    }
+    });
   }
 
-  function openConfirmPopup(notification, action) {
+  function openPopup(notification, action) {
     selectedNotification = notification;
     selectedAction = action;
-
-    popupMessage.textContent =
-      action === 'accept'
-        ? `Do you want to ACCEPT selling your crop to this person? This action cannot be undone.`
-        : `Do you want to DECLINE selling your crop to this person? This action cannot be undone.`;
-
-    popup.style.display = 'flex';
+    popupMessage.textContent = `Do you want to ${action.toLowerCase()} selling your crop to ${notification.fname}? This action cannot be undone.`;
+    popup.style.display = "flex";
   }
 
-  popupAcceptBtn.onclick = async () => {
-    await updateNotification(selectedNotification.id, selectedAction === 'accept');
-    popup.style.display = 'none';
+  popupClose.onclick = () => {
+    popup.style.display = "none";
+    selectedNotification = null;
+    selectedAction = null;
   };
 
-  popupDeclineBtn.onclick = async () => {
-    await updateNotification(selectedNotification.id, false, true);
-    popup.style.display = 'none';
-  };
+  popupAccept.onclick = () => updateNotification(true);
+  popupDecline.onclick = () => updateNotification(false);
 
-  popupCloseBtn.onclick = () => {
-    popup.style.display = 'none';
-  };
+  async function updateNotification(isAccept) {
+    if (!selectedNotification) return;
 
-  // Update is_confirmed and status in buy_table
-  async function updateNotification(id, isConfirmed, isDecline = false) {
-    let statusValue = isDecline ? 'Declined' : 'Accepted';
-    try {
-      const { error } = await supabaseClient
-        .from('buy_table')
-        .update({
-          is_confirmed: isConfirmed,
-          status: statusValue
-        })
-        .eq('id', id);
+    const newStatus = isAccept ? "Accepted" : "Declined";
 
-      if (error) {
-        alert("Error updating status: " + error.message);
-        return;
-      }
+    // Update the buy_table record with is_confirmed=true and status=Accepted/Declined
+    const { error } = await db
+      .from('buy_table')
+      .update({ is_confirmed: true, status: newStatus })
+      .eq('id', selectedNotification.id);
 
-      alert(`Request ${statusValue.toLowerCase()} successfully!`);
-      await loadNotifications();
-
-    } catch (err) {
-      alert("Unexpected error: " + err.message);
+    if (error) {
+      alert("Failed to update notification: " + error.message);
+      return;
     }
+
+    popup.style.display = "none";
+    selectedNotification = null;
+    selectedAction = null;
+    loadNotifications();
   }
 
   document.getElementById("logoutBtn").onclick = () => {
     sessionStorage.clear();
-    window.location.href = "login";
+    location.href = "login";
   };
 
-  renderNavbar();
   loadNotifications();
 </script>
 
