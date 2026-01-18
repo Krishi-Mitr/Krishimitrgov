@@ -2,250 +2,261 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Notifications - Krishi Mitr</title>
-
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="supabase.js"></script>
+<title>Dashboard – Notifications</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
+/* ===== GLOBAL ===== */
+*{
+  box-sizing:border-box;
+}
 body{
   margin:0;
-  font-family:Poppins,Arial,sans-serif;
-  background:linear-gradient(180deg,#f6e2cc,#f7f9f8,#dceee3);
+  font-family:Poppins, sans-serif;
+  background:#f4f6f8;
 }
 
-/* NAVBAR */
-.top-nav{
+/* ===== NAVBAR ===== */
+.navbar{
   position:fixed;
-  top:0;left:0;right:0;
-  height:78px;
+  top:0;
+  left:0;
+  right:0;
+  height:90px;
+  background:#0a3d62;
+  color:white;
   display:flex;
-  justify-content:space-between;
   align-items:center;
-  padding:0 32px;
-  background:linear-gradient(90deg,#ff9933,#fff,#138808);
-  border-bottom:3px solid #0a3d62;
+  padding:0 30px;
+  font-size:1.3em;
+  font-weight:600;
   z-index:9999;
 }
 
-.nav-box{
-  background:#0a3d62;
-  color:#fff;
-  padding:10px 20px;
-  border-radius:10px;
-  font-weight:600;
-  text-decoration:none;
-}
-
-.logout-btn{
-  background:#fff;
-  border:2px solid #0a3d62;
-  padding:10px 20px;
-  border-radius:10px;
-  font-weight:700;
-}
-
-/* CONTENT */
-.container{
+/* ===== PAGE CONTAINER ===== */
+.page-container{
   max-width:900px;
-  margin:120px auto 50px;
+  margin:130px auto 60px;
   padding:0 20px;
 }
 
-/* CARD */
-.request-card{
-  background:#fff;
-  border-radius:18px;
-  padding:22px;
-  margin-bottom:20px;
-  box-shadow:0 10px 25px rgba(0,0,0,.15);
+/* ===== NOTIFICATION CARD ===== */
+.notification-card{
+  background:white;
+  border-radius:20px;
+  padding:24px;
+  margin-bottom:22px;
+  box-shadow:0 14px 30px rgba(0,0,0,.15);
+  border-left:6px solid #3498db;
 }
 
-.request-text{
-  font-size:1.1em;
+.notification-card.accepted{
+  border-left-color:#138808;
+  background:#f2fff2;
+}
+
+.notification-card.declined{
+  border-left-color:#b30000;
+  background:#fff2f2;
+}
+
+.notification-card h4{
+  margin:0 0 10px;
   color:#0a3d62;
-  font-weight:600;
-  margin-bottom:14px;
 }
 
-/* BUTTONS VERTICAL */
-.btn-group{
+.notification-info{
   display:flex;
   flex-direction:column;
-  gap:10px;
+  gap:6px;
+  font-size:.95em;
+  color:#374151;
 }
 
-.accept-btn{
+.status-text{
+  margin-top:12px;
+  font-weight:700;
+}
+
+.status-accepted{ color:#138808; }
+.status-declined{ color:#b30000; }
+.status-pending{ color:#0a3d62; }
+
+/* ===== ACTION BUTTONS ===== */
+.notification-actions{
+  margin-top:18px;
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+}
+
+.btn-accept{
   background:#138808;
   color:white;
+  padding:14px;
   border:none;
-  padding:12px;
-  border-radius:10px;
+  border-radius:12px;
   font-weight:700;
   cursor:pointer;
 }
 
-.decline-btn{
+.btn-decline{
   background:#b30000;
   color:white;
+  padding:14px;
   border:none;
-  padding:12px;
-  border-radius:10px;
+  border-radius:12px;
   font-weight:700;
   cursor:pointer;
 }
 
-/* CONFIRM BOX */
+/* ===== CONFIRM POPUP ===== */
+.confirm-overlay{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.55);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  z-index:10000;
+}
+
 .confirm-box{
-  margin-top:14px;
-  padding:14px;
-  border:2px solid #0a3d62;
-  border-radius:10px;
-  background:#f0f9ff;
+  background:white;
+  padding:28px;
+  border-radius:22px;
+  max-width:420px;
+  width:90%;
+  text-align:center;
+  box-shadow:0 25px 60px rgba(0,0,0,.3);
 }
 
-.confirm-box p{
-  font-weight:600;
-  margin-bottom:10px;
+.confirm-box h3{
+  color:#0a3d62;
+  margin-bottom:12px;
 }
 
-.confirm-actions{
+.confirm-buttons{
   display:flex;
   flex-direction:column;
-  gap:8px;
-}
-
-.confirm-yes{
-  background:#138808;
-  color:white;
-  border:none;
-  padding:10px;
-  border-radius:8px;
-  font-weight:700;
-}
-
-.confirm-no{
-  background:#6b7280;
-  color:white;
-  border:none;
-  padding:10px;
-  border-radius:8px;
-  font-weight:700;
-}
-
-.disabled{
-  opacity:.6;
-  pointer-events:none;
+  gap:12px;
+  margin-top:20px;
 }
 </style>
 </head>
 
 <body>
 
-<div class="top-nav">
-  <a class="nav-box" href="Dashboard">Dashboard</a>
-  <button class="logout-btn" id="logoutBtn">Logout</button>
+<!-- NAVBAR -->
+<div class="navbar">
+  Farmer Dashboard
 </div>
 
-<div class="container" id="notificationList"></div>
+<!-- CONTENT -->
+<div class="page-container" id="notifContainer">
+  <!-- notifications load here -->
+</div>
+
+<!-- CONFIRM POPUP -->
+<div class="confirm-overlay" id="confirmOverlay">
+  <div class="confirm-box">
+    <h3>Confirm Action</h3>
+    <p id="confirmText"></p>
+
+    <div class="confirm-buttons">
+      <button class="btn-accept" id="confirmYes">Yes, Confirm</button>
+      <button class="btn-decline" id="confirmNo">Cancel</button>
+    </div>
+  </div>
+</div>
 
 <script>
-const db = window.db;
-const loginid = sessionStorage.getItem("loginid");
-const usertype = sessionStorage.getItem("usertype");
+/* ===== SAMPLE DATA (replace with Supabase fetch) ===== */
+const notifications = [
+  {id:1, buyer:"Ramesh", crop:"Wheat", qty:50, status:null},
+  {id:2, buyer:"Suresh", crop:"Rice", qty:30, status:true},
+  {id:3, buyer:"Mahesh", crop:"Corn", qty:40, status:false}
+];
 
-if (!loginid || usertype !== "Farmer") {
-  location.href = "login";
-}
+const container = document.getElementById("notifContainer");
 
-async function loadNotifications(){
-  const { data } = await db
-    .from("buy_table")
-    .select("*")
-    .eq("fid", loginid)
-    .order("created_at",{ascending:false});
-
-  const container = document.getElementById("notificationList");
+function loadNotifications(){
   container.innerHTML = "";
 
-  if (!data || data.length === 0){
-    container.innerHTML = "<h3>No notifications yet</h3>";
-    return;
-  }
+  notifications.forEach(n => {
+    let statusText = "Pending";
+    let statusClass = "status-pending";
+    let cardClass = "";
 
-  for (const req of data){
-
-    const { data: buyer } = await db
-      .from("logindata")
-      .select("name")
-      .eq("loginid", req.lid)
-      .maybeSingle();
-
-    const card = document.createElement("div");
-    card.className = "request-card";
-
-    card.innerHTML = `
-      <div class="request-text">
-        <strong>${buyer?.name || "Someone"}</strong> wants to buy
-        <strong>${req.quantity} kg</strong> of your
-        <strong>${req.cname}</strong> crop
-      </div>
-
-      <div class="btn-group">
-        <button class="accept-btn">Accept</button>
-        <button class="decline-btn">Decline</button>
-      </div>
-    `;
-
-    const acceptBtn = card.querySelector(".accept-btn");
-    const declineBtn = card.querySelector(".decline-btn");
-
-    if (req.is_confirmed){
-      acceptBtn.classList.add("disabled");
-      declineBtn.classList.add("disabled");
+    if(n.status === true){
+      statusText = "Accepted";
+      statusClass = "status-accepted";
+      cardClass = "accepted";
+    }
+    if(n.status === false){
+      statusText = "Declined";
+      statusClass = "status-declined";
+      cardClass = "declined";
     }
 
-    acceptBtn.onclick = () => showConfirm(card, req.id, "Accepted");
-    declineBtn.onclick = () => showConfirm(card, req.id, "Declined");
+    container.innerHTML += `
+      <div class="notification-card ${cardClass}">
+        <h4>Purchase Request</h4>
 
-    container.appendChild(card);
+        <div class="notification-info">
+          <div><b>${n.buyer}</b> wants to buy</div>
+          <div><b>${n.qty} kg</b> of <b>${n.crop}</b></div>
+          <div class="status-text ${statusClass}">
+            Status: ${statusText}
+          </div>
+        </div>
+
+        ${n.status === null ? `
+        <div class="notification-actions">
+          <button class="btn-accept" onclick="openConfirm(${n.id}, true)">
+            Accept
+          </button>
+          <button class="btn-decline" onclick="openConfirm(${n.id}, false)">
+            Decline
+          </button>
+        </div>
+        ` : ``}
+      </div>
+    `;
+  });
+}
+
+/* ===== CONFIRM LOGIC ===== */
+let selectedId = null;
+let selectedDecision = null;
+
+function openConfirm(id, decision){
+  selectedId = id;
+  selectedDecision = decision;
+
+  document.getElementById("confirmText").innerText =
+    decision
+      ? "Do you want to sell your crop to this buyer? This action cannot be changed."
+      : "Do you want to decline this request? This action cannot be changed.";
+
+  document.getElementById("confirmOverlay").style.display = "flex";
+}
+
+document.getElementById("confirmYes").onclick = () => {
+  const item = notifications.find(n => n.id === selectedId);
+  if(item){
+    item.status = selectedDecision;
   }
-}
 
-function showConfirm(card, id, status){
-  if (card.querySelector(".confirm-box")) return;
-
-  const box = document.createElement("div");
-  box.className = "confirm-box";
-  box.innerHTML = `
-    <p>Do you want to sell your crop to this person?</p>
-    <div class="confirm-actions">
-      <button class="confirm-yes">Yes, Confirm</button>
-      <button class="confirm-no">Cancel</button>
-    </div>
-  `;
-
-  card.appendChild(box);
-
-  box.querySelector(".confirm-yes").onclick = async () => {
-    await db.from("buy_table").update({
-      is_confirmed: true,
-      status: status
-    }).eq("id", id);
-
-    loadNotifications();
-  };
-
-  box.querySelector(".confirm-no").onclick = () => {
-    box.remove();
-  };
-}
-
-document.getElementById("logoutBtn").onclick = () => {
-  sessionStorage.clear();
-  location.href = "login";
+  document.getElementById("confirmOverlay").style.display = "none";
+  loadNotifications();
 };
 
+document.getElementById("confirmNo").onclick = () => {
+  document.getElementById("confirmOverlay").style.display = "none";
+};
+
+/* ===== INIT ===== */
 loadNotifications();
 </script>
 
