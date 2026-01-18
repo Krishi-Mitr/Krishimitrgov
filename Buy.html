@@ -77,11 +77,11 @@ body {
 <body>
 
 <div class="topbar">
-    <div class="topbar-logo">🌾 KrishiMitra</div>
+    <div class="topbar-logo"> KrishiMitra</div>
     <div class="topbar-menu">
-        <a href="Dashboard.html">Main Page</a>
-        <a href="krishimitr.html">Crop Predictor</a>
-        <a href="Sell.html">Sell Crops</a>
+        <a href="Dashboard">Main Page</a>
+        <a href="krishimitr">Crop price predictor</a>
+        <a href="YourCrops">Your Crops</a>
     </div>
     <div class="topbar-right"><a href="#" id="logout">Logout</a></div>
 </div>
@@ -92,13 +92,13 @@ body {
 </div>
 
 <script>
-// Check authentication FIRST, synchronously (like Dashboard.html and Sell.html)
+// Check authentication FIRST, synchronously (like Dashboard and Sell)
 const loginid = sessionStorage.getItem("loginid");
 const usertype = sessionStorage.getItem("usertype");
 
 // Kick out if not logged in
 if (!loginid || !usertype) {
-    window.location.href = "login.html";
+    window.location.href = "login";
 }
 
 // Wait for DOM and database to be ready, then load data
@@ -136,7 +136,7 @@ async function loadCrops() {
   const currentLoginId = sessionStorage.getItem("loginid");
   
   if (!currentLoginId) {
-    window.location.href = "login.html";
+    window.location.href = "login";
     return;
   }
 
@@ -194,7 +194,7 @@ async function toggleBuy(fid, fname, btn) {
   
   if (!currentLoginId) {
     alert("Please login again");
-    location.href = "login.html";
+    location.href = "login";
     return;
   }
 
@@ -253,7 +253,7 @@ async function toggleBuy(fid, fname, btn) {
 
 document.getElementById("logout").onclick = () => {
   sessionStorage.clear();
-  location.href = "login.html";
+  location.href = "login";
 };
 
 // Start initialization
