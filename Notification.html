@@ -230,62 +230,74 @@
 
   let selectedNotification = null;
   let selectedAction = null;
+async function loadNotifications() {
+  const { data, error } = await db
+    .from('buy_table')
+    .select('id, fname, fid, cname, cid, status, lid, is_confirmed, quantity')
+    .eq('fid', loginid)
+    .order('created_at', { ascending: false });
 
-  async function loadNotifications() {
-    const { data, error } = await db
-      .from('buy_table')
-      .select('id, fname, fid, cname, cid, status, lid, is_confirmed, quantity')
-      .eq('fid', loginid)
-      .order('created_at', { ascending: false });
-
-    if (error) {
-      notificationList.innerHTML = `<p style="color:red;">Error loading notifications: ${error.message}</p>`;
-      return;
-    }
-
-    if (!data || data.length === 0) {
-      notificationList.innerHTML = `<h3>No notifications found.</h3>`;
-      return;
-    }
-
-    notificationList.innerHTML = "";
-
-    data.forEach(item => {
-      const card = document.createElement("div");
-      card.className = "notification-card";
-
-      let statusHtml = "";
-      if (item.is_confirmed === true && item.status === "Accepted") {
-        statusHtml = `<div class="status-accepted">Accepted</div>`;
-      } else if (item.is_confirmed === true && item.status === "Declined") {
-        statusHtml = `<div class="status-declined">Declined</div>`;
-      } else {
-        statusHtml = `
-          <div class="actions">
-            <button class="btn-accept">Accept</button>
-            <button class="btn-decline">Decline</button>
-          </div>`;
-      }
-
-      card.innerHTML = `
-        <div class="notification-text">
-          <strong>${item.fname}</strong> wants to buy <strong>${item.quantity} kg</strong> of your <strong>${item.cname}</strong> crop.
-        </div>
-        ${statusHtml}
-      `;
-
-      notificationList.appendChild(card);
-
-      // If not confirmed, enable buttons
-      if (!item.is_confirmed) {
-        const btnAccept = card.querySelector('.btn-accept');
-        const btnDecline = card.querySelector('.btn-decline');
-
-        btnAccept.onclick = () => openPopup(item, "Accepted");
-        btnDecline.onclick = () => openPopup(item, "Declined");
-      }
-    });
+  if (error) {
+    notificationList.innerHTML = `<p style="color:red;">Error loading notifications: ${error.message}</p>`;
+    return;
   }
+
+  if (!data || data.length === 0) {
+    notificationList.innerHTML = `<h3>No notifications found.</h3>`;
+    return;
+  }
+
+  notificationList.innerHTML = "";
+
+  for (const item of data) {
+    // Fetch buyer name from logindata where loginid = lid
+    const { data: buyerData, error: buyerError } = await db
+      .from('logindata')
+      .select('name')
+      .eq('loginid', item.lid.toString())
+      .single();
+
+    let buyerName = item.fname; // fallback farmer name if buyer name not found
+    if (!buyerError && buyerData && buyerData.name) {
+      buyerName = buyerData.name;
+    }
+
+    const card = document.createElement("div");
+    card.className = "notification-card";
+
+    let statusHtml = "";
+    if (item.is_confirmed === true && item.status === "Accepted") {
+      statusHtml = `<div class="status-accepted">Accepted</div>`;
+    } else if (item.is_confirmed === true && item.status === "Declined") {
+      statusHtml = `<div class="status-declined">Declined</div>`;
+    } else {
+      statusHtml = `
+        <div class="actions">
+          <button class="btn-accept">Accept</button>
+          <button class="btn-decline">Decline</button>
+        </div>`;
+    }
+
+    card.innerHTML = `
+      <div class="notification-text">
+        <strong>${buyerName}</strong> wants to buy <strong>${item.quantity} kg</strong> of your <strong>${item.cname}</strong> crop.
+      </div>
+      ${statusHtml}
+    `;
+
+    notificationList.appendChild(card);
+
+    // If not confirmed, enable buttons
+    if (!item.is_confirmed) {
+      const btnAccept = card.querySelector('.btn-accept');
+      const btnDecline = card.querySelector('.btn-decline');
+
+      btnAccept.onclick = () => openPopup(item, "Accepted");
+      btnDecline.onclick = () => openPopup(item, "Declined");
+    }
+  }
+}
+
 
   function openPopup(notification, action) {
     selectedNotification = notification;
