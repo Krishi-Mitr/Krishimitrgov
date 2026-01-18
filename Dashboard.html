@@ -167,6 +167,7 @@ function renderNavbar(view, usertype) {
   let html = "";
 
   if (view === "dashboard") {
+     html += `<a class="nav-box" href="krishimitr">Crop price predictor</a>`;
     if (usertype === "Farmer") {
       html += `<div class="nav-box" onclick="showCrops()">Your Crops</div>`;
     }
@@ -177,7 +178,7 @@ function renderNavbar(view, usertype) {
   }
 
   html += `<a class="nav-box" href="Buy">Buy Crops</a>`;
-    html += `<a class="nav-box" href="krishimitr">Crop price predictor</a>`;
+   
 
 
   if (usertype === "Farmer") {
