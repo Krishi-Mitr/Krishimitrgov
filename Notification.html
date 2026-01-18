@@ -10,25 +10,32 @@
 
 <style>
 body{
-  background:#f7f9fb;
-  padding-top:98px;
-  font-family:Inter,Arial;
+  background:#f4f6f9;
+  padding-top:90px;
+  font-family:Inter,Arial,sans-serif;
 }
 .top-navbar{
-  position:fixed;top:0;left:0;right:0;height:78px;
+  position:fixed;top:0;left:0;right:0;height:75px;
   display:flex;align-items:center;justify-content:space-between;
-  padding:12px 20px;
-  background:linear-gradient(90deg,#0B6623,#fff 45%,#FF9933);
-  border-bottom:3px solid #102014;
+  padding:12px 22px;
+  background:#0B6623;
+  color:#fff;
   z-index:9999;
 }
 .nav-link-custom{
-  background:#fff;padding:8px 14px;border-radius:8px;
-  font-weight:700;text-decoration:none;color:#000;
+  background:#fff;
+  padding:8px 14px;
+  border-radius:8px;
+  font-weight:600;
+  text-decoration:none;
+  color:#000;
 }
 .card{
   border-radius:14px;
-  box-shadow:0 6px 20px rgba(0,0,0,.08);
+  box-shadow:0 6px 18px rgba(0,0,0,.08);
+}
+.badge-confirmed{
+  background:#198754;
 }
 </style>
 </head>
@@ -37,163 +44,105 @@ body{
 
 <!-- NAVBAR -->
 <div class="top-navbar">
-  <div class="fw-bold">🌾 KrishiMitra</div>
+  <div class="fw-bold fs-5">KrishiMitra</div>
   <div class="d-flex gap-2">
-    <a href="Dashboard.html" class="nav-link-custom">Main Page</a>
-    <a href="Sell.html" class="nav-link-custom">Sell Your Crop</a>
-    <a href="Buy.html" class="nav-link-custom">Buy Crops</a>
-    <a href="krishimitr.html" class="nav-link-custom">Crop Predictor and Advisor</a>
+    <a href="Dashboard" class="nav-link-custom">Dashboard</a>
+     <a href="krishimitr" class="nav-link-custom">Crop price predictor</a>
+    <a href="YourCrops" class="nav-link-custom">Your crops</a>
+    <a href="Buy" class="nav-link-custom">Buy</a>
     <a href="#" id="logoutBtn" class="nav-link-custom">Logout</a>
   </div>
 </div>
 
 <!-- CONTENT -->
-<div class="container mt-4" id="contentContainer" style="display: none;">
-  <h3 class="mb-4">🔔 Notifications</h3>
+<div class="container" id="content" style="display:none">
+  <h4 class="mb-4">Purchase Notifications</h4>
   <div id="notifContainer"></div>
 </div>
 
-<div class="container mt-4" id="accessDeniedContainer" style="display: none;">
+<div class="container" id="denied" style="display:none">
   <div class="card p-4 text-center">
-    <h4 class="text-danger">Access Denied</h4>
-    <p>Only farmers can access the notifications page.</p>
-    <a href="Dashboard.html" class="btn btn-primary">Go to Dashboard</a>
+    <h5 class="text-danger">Access Denied</h5>
+    <p>Only farmers can view notifications.</p>
   </div>
 </div>
 
 <script>
-// Check authentication FIRST, synchronously (like Dashboard.html and Sell.html)
 const loginid = sessionStorage.getItem("loginid");
 const usertype = sessionStorage.getItem("usertype");
 
-// Immediate redirect if not logged in
 if (!loginid || !usertype) {
-    window.location.replace("login.html");
-    throw new Error("Redirecting to login"); // Stop script execution
+  location.href = "login";
+  throw "";
 }
 
-// Immediate redirect if user is not a Farmer
 if (usertype !== "Farmer") {
-    // Show access denied message
-    document.getElementById("accessDeniedContainer").style.display = "block";
-    document.getElementById("contentContainer").style.display = "none";
-    // Also redirect after a short delay
-    setTimeout(() => {
-        window.location.replace("Dashboard.html");
-    }, 2000);
-    throw new Error("Access denied - not a farmer"); // Stop script execution
+  document.getElementById("denied").style.display = "block";
+  throw "";
 }
 
-// Show content only if user is a farmer
-document.getElementById("contentContainer").style.display = "block";
-document.getElementById("accessDeniedContainer").style.display = "none";
+document.getElementById("content").style.display = "block";
 
-// Wait for DOM and database to be ready, then load data
-async function waitForDB() {
-  let attempts = 0;
-  while (!window.db && attempts < 50) {
-    await new Promise(resolve => setTimeout(resolve, 100));
-    attempts++;
-  }
-  if (!window.db) {
-    console.error("Database client not available after waiting");
-    return false;
-  }
-  return true;
-}
+async function loadNotifications() {
 
-async function initNotifications() {
-  // Double-check user is a farmer before proceeding
-  const currentUsertype = sessionStorage.getItem("usertype");
-  if (currentUsertype !== "Farmer") {
-    window.location.replace("Dashboard.html");
-    return;
-  }
+  const { data: buys, error } = await window.db
+    .from("buy_table")
+    .select("*")
+    .eq("lid", loginid)
+    .eq("is_confirmed", true)
+    .order("created_at", { ascending: false });
 
-  // Wait for DOM to be ready
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initNotifications);
-    return;
-  }
-
-  // Wait for database to be ready
-  const dbReady = await waitForDB();
-  if (!dbReady) {
-    alert("Database connection failed. Please refresh the page.");
-    return;
-  }
-
-  loadNotifications(loginid);
-}
-
-async function loadNotifications(farmerLoginId) {
-  // Get all buy_table entries where the farmer's crops are being shown interest
-  const { data: interests, error } = await window.db
-    .from('buy_table')
-    .select('*')
-    .eq('lid', farmerLoginId)
-    .eq('yn', 'yes')
-    .order('created_at', { ascending: false });
+  const container = document.getElementById("notifContainer");
+  container.innerHTML = "";
 
   if (error) {
-    console.error("Error loading notifications:", error);
-    document.getElementById('notifContainer').innerHTML = 
-      "<div class='card p-4 text-center text-danger'>Error loading notifications: " + error.message + "</div>";
+    container.innerHTML = `<div class="card p-3 text-danger">Error loading notifications</div>`;
     return;
   }
 
-  const container = document.getElementById('notifContainer');
-  container.innerHTML = '';
-
-  if (!interests || interests.length === 0) {
+  if (!buys || buys.length === 0) {
     container.innerHTML = `
-      <div class="card p-4 text-center text-muted">
-        No notifications yet. You'll see notifications here when buyers show interest in your crops.
-      </div>
-    `;
+      <div class="card p-4 text-muted text-center">
+        No confirmed purchases yet
+      </div>`;
     return;
   }
 
-  // Fetch crop details for each interest
-  for (const interest of interests) {
-    let crop = null;
-    if (interest.fid) {
-      const { data: cropData } = await window.db
-        .from('crop_sales')
-        .select('crop_name, quantity, price, location')
-        .eq('jid', interest.fid)
-        .maybeSingle();
-      crop = cropData;
-    }
+  for (const buy of buys) {
 
-    const cropName = crop ? crop.crop_name : 'Unknown Crop';
-    const buyerName = interest.cname || 'A buyer';
-    const timestamp = interest.created_at ? new Date(interest.created_at).toLocaleString() : 'Recently';
-    
+    const { data: crop } = await window.db
+      .from("crop_sales")
+      .select("crop_name, price, location")
+      .eq("jid", buy.fid)
+      .maybeSingle();
+
     container.innerHTML += `
       <div class="card p-4 mb-3">
-        <div class="d-flex align-items-start">
-          <div class="me-3" style="font-size: 2rem;">🔔</div>
-          <div class="flex-grow-1">
-            <h5 class="mb-2">New Interest in Your Crop!</h5>
-            <p class="mb-1"><strong>${buyerName}</strong> has shown interest in your crop listing.</p>
-            <p class="mb-1"><strong>Crop:</strong> ${cropName}</p>
-            ${crop ? `<p class="mb-1"><strong>Quantity:</strong> ${crop.quantity} kg | <strong>Price:</strong> ₹${crop.price}/kg</p>` : ''}
-            <p class="text-muted mb-0" style="font-size: 0.9rem;">${timestamp}</p>
+        <div class="d-flex justify-content-between align-items-start">
+          <div>
+            <h6 class="mb-1">${crop?.crop_name || "Crop"}</h6>
+            <p class="mb-1">
+              Buyer: <strong>${buy.cname}</strong><br>
+              Quantity: <strong>${buy.quantity} kg</strong><br>
+              Price: ₹${crop?.price}/kg<br>
+              Location: ${crop?.location}
+            </p>
+            <small class="text-muted">
+              ${new Date(buy.created_at).toLocaleString()}
+            </small>
           </div>
+          <span class="badge badge-confirmed">Confirmed</span>
         </div>
-      </div>
-    `;
+      </div>`;
   }
 }
 
-document.getElementById('logoutBtn').onclick = () => {
+document.getElementById("logoutBtn").onclick = () => {
   sessionStorage.clear();
-  location.href = "login.html";
+  location.href = "login";
 };
 
-// Start initialization
-initNotifications();
+loadNotifications();
 </script>
 
 </body>
