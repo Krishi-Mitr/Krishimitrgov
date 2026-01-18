@@ -2,208 +2,248 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Farmer Dashboard - Krishi Mitr</title>
+<title>Notifications - Krishi Mitr</title>
 
-<!-- Supabase JS -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
-  /* Reset & basics */
-  * {
-    box-sizing: border-box;
-  }
   body {
     margin: 0;
-    font-family: 'Poppins', Arial, sans-serif;
-    background: linear-gradient(180deg, #f6e2cc 0%, #f7f9f8 45%, #dceee3 100%);
-    color: #1f2937;
+    font-family: "Poppins", Arial, sans-serif;
     min-height: 100vh;
-    padding-top: 80px;
+    background: linear-gradient(180deg,#f6e2cc 0%,#f7f9f8 45%,#dceee3 100%);
+    color: #1f2937;
   }
-
-  /* Navbar */
-  .navbar {
+  /* NAVBAR */
+  .top-nav {
     position: fixed;
     top: 0; left: 0; right: 0;
     height: 78px;
-    background: linear-gradient(90deg,#ff9933,#138808);
     display: flex;
+    justify-content: space-between;
     align-items: center;
-    padding: 0 30px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-    font-weight: 700;
+    padding: 0 32px;
+    background: linear-gradient(90deg,#ff9933,#ffffff,#138808);
+    border-bottom: 3px solid #0a3d62;
+    box-shadow: 0 6px 14px rgba(0,0,0,0.15);
+    z-index: 9999;
+  }
+  .nav-left {
+    display: flex;
+    gap: 16px;
+  }
+  .nav-box {
+    background: #0a3d62;
     color: white;
-    z-index: 1000;
+    padding: 10px 20px;
+    border-radius: 10px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: .25s;
+    cursor: pointer;
+  }
+  .nav-box:hover {
+    background: linear-gradient(135deg,#ff9933,#ffd28a);
+    color: black;
+    transform: translateY(-3px);
+  }
+  .logout-btn {
+    background: white;
+    color: #0a3d62;
+    border: 2px solid #0a3d62;
+    padding: 10px 22px;
+    border-radius: 10px;
+    font-weight: 700;
+    cursor: pointer;
   }
 
-  /* Container */
+  /* CONTAINER */
   .container {
     max-width: 900px;
-    margin: 0 auto 40px;
-    padding: 20px;
+    margin: 110px auto 60px;
+    padding: 0 20px;
   }
 
-  /* Header */
-  h1 {
-    color: #0a3d62;
-    margin-bottom: 20px;
-  }
-
-  /* Notification Card */
+  /* Notification card */
   .notification-card {
     background: white;
-    border-radius: 18px;
-    padding: 20px 25px;
-    margin-bottom: 16px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    border-radius: 20px;
+    padding: 20px;
+    margin-bottom: 18px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 12px;
+    word-break: break-word;
   }
 
-  /* Status colors */
-  .status {
-    font-weight: 600;
-  }
-  .status.pending {
-    color: #2563eb; /* blue */
-  }
-  .status.accepted {
-    color: #16a34a; /* green */
-  }
-  .status.declined {
-    color: #dc2626; /* red */
+  /* Notification text */
+  .notification-text {
+    font-size: 1.1em;
+    color: #1f2937;
   }
 
-  /* Info lines */
-  .info-line {
-    font-size: 1.05em;
-  }
-
-  /* Actions vertical */
+  /* Buttons container vertical */
   .actions {
     display: flex;
     flex-direction: column;
     gap: 10px;
-    margin-top: 10px;
-    max-width: 150px;
+    width: 140px;
   }
-  .actions button {
-    padding: 12px;
+
+  button.accept-btn, button.decline-btn {
+    padding: 10px;
+    font-weight: 700;
     border: none;
     border-radius: 10px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+  }
+
+  button.accept-btn {
+    background-color: #138808;
+    color: white;
+  }
+  button.accept-btn:hover {
+    background: #0b5e07;
+  }
+
+  button.decline-btn {
+    background-color: #b30000;
+    color: white;
+  }
+  button.decline-btn:hover {
+    background: #7a0000;
+  }
+
+  /* Layout inside card */
+  .notification-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  /* Status text */
+  .status-text {
     font-weight: 700;
     font-size: 1em;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-  }
-  .actions button.accept {
-    background-color: #16a34a;
-    color: white;
-  }
-  .actions button.accept:hover {
-    background-color: #15803d;
-  }
-  .actions button.decline {
-    background-color: #dc2626;
-    color: white;
-  }
-  .actions button.decline:hover {
-    background-color: #b91c1c;
+    padding: 8px 14px;
+    border-radius: 14px;
+    width: fit-content;
   }
 
-  /* Modal overlay */
-  .modal-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.6);
+  .status-accepted {
+    background-color: #daf6da;
+    color: #138808;
+    border: 1.5px solid #138808;
+  }
+
+  .status-declined {
+    background-color: #f8d7da;
+    color: #b30000;
+    border: 1.5px solid #b30000;
+  }
+
+  /* Popup overlay */
+  #popup {
     display: none;
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.5);
     justify-content: center;
     align-items: center;
-    z-index: 2000;
+    z-index: 11000;
   }
 
-  /* Modal content */
-  .modal {
+  #popup-content {
     background: white;
-    border-radius: 16px;
-    max-width: 400px;
-    width: 90%;
-    padding: 30px 25px;
+    padding: 30px 40px;
+    border-radius: 22px;
     box-shadow: 0 15px 40px rgba(0,0,0,0.25);
+    max-width: 420px;
     text-align: center;
+    position: relative;
   }
-  .modal h2 {
-    margin-top: 0;
-    color: #0a3d62;
+
+  #popup-content p {
+    font-size: 1.2em;
+    margin-bottom: 28px;
+    color: #1f2937;
   }
-  .modal p {
-    margin: 20px 0 30px;
-    font-size: 1.1em;
-    color: #374151;
-  }
-  .modal-buttons {
-    display: flex;
-    justify-content: center;
-    gap: 20px;
-  }
-  .modal-buttons button {
-    flex: 1;
-    padding: 12px 0;
-    border: none;
-    border-radius: 10px;
+
+  #popup-content button {
+    padding: 12px 28px;
+    margin: 0 12px;
     font-weight: 700;
-    font-size: 1.1em;
+    border-radius: 14px;
     cursor: pointer;
-    transition: background-color 0.3s ease;
+    border: none;
+    transition: background 0.3s ease;
+    font-size: 1em;
   }
-  .modal-buttons button.confirm {
-    background-color: #16a34a;
+
+  #popup-accept-btn {
+    background-color: #138808;
     color: white;
   }
-  .modal-buttons button.confirm:hover {
-    background-color: #15803d;
+  #popup-accept-btn:hover {
+    background: #0b5e07;
   }
-  .modal-buttons button.cancel {
-    background-color: #dc2626;
+
+  #popup-decline-btn {
+    background-color: #b30000;
     color: white;
   }
-  .modal-buttons button.cancel:hover {
-    background-color: #b91c1c;
+  #popup-decline-btn:hover {
+    background: #7a0000;
+  }
+
+  #popup-close-btn {
+    position: absolute;
+    top: 12px; right: 16px;
+    background: #0a3d62;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    font-weight: 700;
+    cursor: pointer;
   }
 </style>
 </head>
 <body>
 
-<div class="navbar">Farmer Dashboard - Krishi Mitr</div>
-
-<div class="container">
-  <h1>Buy Requests</h1>
-  <div id="notifications">
-    <!-- Notifications will appear here -->
+<!-- NAVBAR -->
+<div class="top-nav">
+  <div class="nav-left" id="navMenu">
+    <!-- Nav links inserted here -->
   </div>
+  <button id="logoutBtn" class="logout-btn">Logout</button>
 </div>
 
-<!-- Confirmation Modal -->
-<div id="confirmModal" class="modal-overlay">
-  <div class="modal">
-    <h2>Confirm Action</h2>
-    <p id="modalMessage">Are you sure?</p>
-    <div class="modal-buttons">
-      <button class="confirm" id="confirmBtn">Confirm</button>
-      <button class="cancel" id="cancelBtn">Cancel</button>
-    </div>
+<div class="container" id="notificationsContainer">
+  <!-- Notification cards inserted here -->
+</div>
+
+<!-- Popup -->
+<div id="popup">
+  <div id="popup-content">
+    <button id="popup-close-btn">&times;</button>
+    <p id="popup-message">Are you sure you want to take this action?</p>
+    <button id="popup-accept-btn">Accept</button>
+    <button id="popup-decline-btn">Decline</button>
   </div>
 </div>
 
 <script>
-  // Supabase setup
-  const SUPABASE_URL = 'YOUR_SUPABASE_URL';
-  const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
-  const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  // Your Supabase config here
+  const SUPABASE_URL = "YOUR_SUPABASE_URL";
+  const SUPABASE_ANON_KEY = "YOUR_SUPABASE_ANON_KEY";
 
-  // Session info
+  const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
   const loginid = sessionStorage.getItem("loginid");
   const usertype = sessionStorage.getItem("usertype");
 
@@ -211,149 +251,165 @@
     window.location.href = "login";
   }
 
-  const notificationsEl = document.getElementById("notifications");
-  const confirmModal = document.getElementById("confirmModal");
-  const modalMessage = document.getElementById("modalMessage");
-  const confirmBtn = document.getElementById("confirmBtn");
-  const cancelBtn = document.getElementById("cancelBtn");
+  // Render navbar with consistent dashboard style
+  function renderNavbar() {
+    let html = `
+      <a href="Dashboard" class="nav-box">Dashboard</a>
+      <a href="Sell" class="nav-box">Sell Your Crops</a>
+      <a href="Buy" class="nav-box">Buy Crops</a>
+      <a href="Notification" class="nav-box">Notifications</a>
+      <a href="krishimitr" class="nav-box">Crop Price Predictor</a>
+    `;
+    document.getElementById("navMenu").innerHTML = html;
+  }
 
-  let currentRequest = null;
-  let currentAction = null;
+  const notificationsContainer = document.getElementById("notificationsContainer");
+  const popup = document.getElementById("popup");
+  const popupMessage = document.getElementById("popup-message");
+  const popupAcceptBtn = document.getElementById("popup-accept-btn");
+  const popupDeclineBtn = document.getElementById("popup-decline-btn");
+  const popupCloseBtn = document.getElementById("popup-close-btn");
 
-  // Fetch buy_table entries for this farmer (fid == loginid) and status not confirmed yet
-  async function fetchNotifications() {
-    const { data, error } = await supabase
+  let selectedNotification = null;
+  let selectedAction = null;
+
+  // Load notifications for this farmer (fid = loginid)
+  async function loadNotifications() {
+    const { data, error } = await supabaseClient
       .from('buy_table')
-      .select('*')
+      .select(`
+        id,
+        fname,
+        lid,
+        cname,
+        quantity,
+        is_confirmed
+      `)
       .eq('fid', loginid)
-      .is('is_confirmed', null);  // only pending (is_confirmed null) or you can use false depending on your logic
+      .order('created_at', { ascending: false });
 
     if (error) {
-      notificationsEl.innerHTML = `<p style="color:red;">Failed to load notifications: ${error.message}</p>`;
+      notificationsContainer.innerHTML = `<p style="color:red;">Error loading notifications: ${error.message}</p>`;
       return;
     }
 
-    renderNotifications(data || []);
-  }
-
-  // Render notifications vertically
-  function renderNotifications(notifications) {
-    if (!notifications.length) {
-      notificationsEl.innerHTML = "<p>No buy requests at the moment.</p>";
+    if (!data || data.length === 0) {
+      notificationsContainer.innerHTML = `<h3>No notifications yet.</h3>`;
       return;
     }
 
-    notificationsEl.innerHTML = '';
+    notificationsContainer.innerHTML = '';
 
-    notifications.forEach(notif => {
-      // Show buyer's name by looking up in logindata by lid (buyer loginid)
-      // We'll fetch buyer name inside render for simplicity
+    for (const notification of data) {
+      // Get buyer name from logindata by lid
+      const { data: buyerData, error: buyerError } = await supabaseClient
+        .from('logindata')
+        .select('name')
+        .eq('loginid', notification.lid.toString())
+        .maybeSingle();
 
-      getBuyerName(notif.lid).then(buyerName => {
-        const card = document.createElement('div');
-        card.className = 'notification-card';
+      const buyerName = buyerError || !buyerData ? 'Unknown Buyer' : buyerData.name;
 
-        // Status text and color
-        let statusText = 'Pending';
-        let statusClass = 'pending';
-        if (notif.is_confirmed === true) {
-          statusText = 'Accepted';
-          statusClass = 'accepted';
-        } else if (notif.is_confirmed === false) {
-          statusText = 'Declined';
-          statusClass = 'declined';
-        }
+      const card = document.createElement('div');
+      card.className = 'notification-card';
 
-        card.innerHTML = `
-          <div class="info-line"><b>${notif.fname}</b> wants to buy</div>
-          <div class="info-line"><b>${notif.quantity} kg</b> of <b>${notif.cname}</b> crop.</div>
-          <div class="status ${statusClass}">Status: ${statusText}</div>
-        `;
+      let statusText = '';
+      if (notification.is_confirmed === true) {
+        statusText = `<div class="status-text status-accepted">Accepted</div>`;
+      } else if (notification.is_confirmed === false && notification.status === 'Declined') {
+        statusText = `<div class="status-text status-declined">Declined</div>`;
+      } else {
+        statusText = '';
+      }
 
-        // Add Accept/Decline buttons only if pending
-        if (notif.is_confirmed === null || notif.is_confirmed === false) {
-          const actions = document.createElement('div');
-          actions.className = 'actions';
+      card.innerHTML = `
+        <div class="notification-content">
+          <div class="notification-text">
+            <strong>${buyerName}</strong> wants to buy <strong>${notification.quantity} kg</strong> of your <strong>${notification.cname}</strong> crop.
+          </div>
+          ${statusText}
+          ${notification.is_confirmed === null || notification.is_confirmed === false
+            ? `<div class="actions">
+                <button class="accept-btn">Accept</button>
+                <button class="decline-btn">Decline</button>
+               </div>`
+            : ''
+          }
+        </div>
+      `;
 
-          const acceptBtn = document.createElement('button');
-          acceptBtn.textContent = 'Accept';
-          acceptBtn.className = 'accept';
-          acceptBtn.onclick = () => openConfirmModal(notif, true);
+      // Append card
+      notificationsContainer.appendChild(card);
 
-          const declineBtn = document.createElement('button');
-          declineBtn.textContent = 'Decline';
-          declineBtn.className = 'decline';
-          declineBtn.onclick = () => openConfirmModal(notif, false);
+      // Add event listeners to buttons if not confirmed yet
+      if (notification.is_confirmed === null || notification.is_confirmed === false) {
+        const acceptBtn = card.querySelector('.accept-btn');
+        const declineBtn = card.querySelector('.decline-btn');
 
-          actions.appendChild(acceptBtn);
-          actions.appendChild(declineBtn);
-
-          card.appendChild(actions);
-        }
-
-        notificationsEl.appendChild(card);
-      });
-    });
-  }
-
-  // Get buyer name by loginid from logindata table
-  async function getBuyerName(buyerLoginId) {
-    const { data, error } = await supabase
-      .from('logindata')
-      .select('name')
-      .eq('loginid', buyerLoginId.toString())
-      .maybeSingle();
-
-    if (error || !data) return 'Unknown';
-    return data.name;
-  }
-
-  // Show modal with message and store current action
-  function openConfirmModal(request, action) {
-    currentRequest = request;
-    currentAction = action;
-    modalMessage.textContent = `Do you want to ${action ? 'accept' : 'decline'} the request from ${request.fname} for ${request.quantity} kg of ${request.cname}? This action cannot be undone.`;
-    confirmModal.style.display = 'flex';
-  }
-
-  // Close modal
-  function closeConfirmModal() {
-    confirmModal.style.display = 'none';
-    currentRequest = null;
-    currentAction = null;
-  }
-
-  // Confirm button clicked
-  async function onConfirm() {
-    if (!currentRequest) return;
-
-    // Update is_confirmed in buy_table
-    const { error } = await supabase
-      .from('buy_table')
-      .update({ is_confirmed: currentAction })
-      .eq('id', currentRequest.id);
-
-    if (error) {
-      alert(`Error updating status: ${error.message}`);
-      closeConfirmModal();
-      return;
+        acceptBtn.onclick = () => openConfirmPopup(notification, 'accept');
+        declineBtn.onclick = () => openConfirmPopup(notification, 'decline');
+      }
     }
-
-    closeConfirmModal();
-    fetchNotifications();  // refresh list
   }
 
-  // Event listeners
-  confirmBtn.addEventListener('click', onConfirm);
-  cancelBtn.addEventListener('click', closeConfirmModal);
+  function openConfirmPopup(notification, action) {
+    selectedNotification = notification;
+    selectedAction = action;
 
-  // Close modal if clicking outside modal content
-  confirmModal.addEventListener('click', e => {
-    if (e.target === confirmModal) closeConfirmModal();
-  });
+    popupMessage.textContent =
+      action === 'accept'
+        ? `Do you want to ACCEPT selling your crop to this person? This action cannot be undone.`
+        : `Do you want to DECLINE selling your crop to this person? This action cannot be undone.`;
 
-  // Initialize
-  fetchNotifications();
+    popup.style.display = 'flex';
+  }
+
+  popupAcceptBtn.onclick = async () => {
+    await updateNotification(selectedNotification.id, selectedAction === 'accept');
+    popup.style.display = 'none';
+  };
+
+  popupDeclineBtn.onclick = async () => {
+    await updateNotification(selectedNotification.id, false, true);
+    popup.style.display = 'none';
+  };
+
+  popupCloseBtn.onclick = () => {
+    popup.style.display = 'none';
+  };
+
+  // Update is_confirmed and status in buy_table
+  async function updateNotification(id, isConfirmed, isDecline = false) {
+    let statusValue = isDecline ? 'Declined' : 'Accepted';
+    try {
+      const { error } = await supabaseClient
+        .from('buy_table')
+        .update({
+          is_confirmed: isConfirmed,
+          status: statusValue
+        })
+        .eq('id', id);
+
+      if (error) {
+        alert("Error updating status: " + error.message);
+        return;
+      }
+
+      alert(`Request ${statusValue.toLowerCase()} successfully!`);
+      await loadNotifications();
+
+    } catch (err) {
+      alert("Unexpected error: " + err.message);
+    }
+  }
+
+  document.getElementById("logoutBtn").onclick = () => {
+    sessionStorage.clear();
+    window.location.href = "login";
+  };
+
+  renderNavbar();
+  loadNotifications();
 </script>
 
 </body>
