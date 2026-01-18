@@ -169,17 +169,42 @@
     background: linear-gradient(135deg,#ff9933,#ffd28a);
     color: black;
   }
+
+  /* Confirmation inside popup */
+  #confirm-box {
+    margin: 15px 0;
+    padding: 10px;
+    border: 2px solid #138808;
+    border-radius: 8px;
+    background-color: #e6f4ea;
+  }
+  #confirm-box p {
+    margin: 0 0 10px 0;
+  }
+  #confirm-box button {
+    padding: 8px 16px;
+    margin-right: 10px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+  }
+  #confirmYesBtn {
+    background: #138808;
+    color: white;
+  }
+  #confirmNoBtn {
+    background: #b30000;
+    color: white;
+  }
 </style>
 
 </head>
 <body>
 
 <div class="top-nav">
-  <div class="nav-left">
-    <a href="Dashboard" class="nav-box">Dashboard</a>
-    <a href="krishimitr" class="nav-box">Crop Predictor</a>
-    <a href="YourCrops" class="nav-box">Your crops</a>
-    <a href="Notification" class="nav-box">Notifications</a>
+  <div class="nav-left" id="navMenu">
+    <!-- Nav links will be loaded here -->
   </div>
   <button id="logoutBtn" class="logout-btn">Logout</button>
 </div>
@@ -223,17 +248,33 @@ if (!loginid || (usertype !== "Citizen" && usertype !== "Farmer")) {
   location.href = "login";
 }
 
-
+const navMenu = document.getElementById("navMenu");
 const cropList = document.getElementById("cropList");
 const popup = document.getElementById("popup");
 const popupClose = document.getElementById("popup-close");
 
 let selectedCrop = null;
 
+// Setup nav menu based on usertype
+function setupNav() {
+  let navHtml = `<a href="Dashboard" class="nav-box">Dashboard</a>`;
+  navHtml += `<a href="krishimitr" class="nav-box">Crop Predictor</a>`;
+  navHtml += `<a href="Buy" class="nav-box active">Buy Crops</a>`;
+
+  if (usertype === "Farmer") {
+    navHtml += `<a href="YourCrops" class="nav-box">Your Crops</a>`;
+    navHtml += `<a href="Notification" class="nav-box">Notifications</a>`;
+  }
+  navMenu.innerHTML = navHtml;
+}
+
 async function loadCrops() {
-  const { data, error } = await db.from('crop_sales')
-    .select('*')
-    .order('created_at', { ascending: false });
+  // Farmer should NOT see their own crops
+  const filter = usertype === "Farmer"
+    ? db.from('crop_sales').select('*').neq('lid', parseInt(loginid))
+    : db.from('crop_sales').select('*');
+
+  const { data, error } = await filter.order('created_at', { ascending: false });
 
   if (error) {
     cropList.innerHTML = `<p style="color:red;">Error loading crops: ${error.message}</p>`;
@@ -289,15 +330,18 @@ function openPopup(crop) {
   buyInput.min = crop.min_quantity || 1;
   document.getElementById("error-msg").style.display = "none";
 
+  // Remove confirm box if exists
+  const confirmBox = document.getElementById("confirm-box");
+  if (confirmBox) confirmBox.remove();
+
   popup.style.display = "flex";
 }
 
 popupClose.addEventListener("click", () => {
-  popup.style.display = "none";
-  selectedCrop = null;
+  closePopupAndReset();
 });
 
-document.getElementById("confirmBuyBtn").addEventListener("click", async () => {
+document.getElementById("confirmBuyBtn").addEventListener("click", () => {
   const buyInput = document.getElementById("buyQuantity");
   const quantity = parseInt(buyInput.value);
 
@@ -317,40 +361,84 @@ document.getElementById("confirmBuyBtn").addEventListener("click", async () => {
     return;
   }
 
-  // Confirm purchase
-  if (!confirm(`Are you sure you want to buy ${quantity} kg of ${selectedCrop.crop_name}?`)) {
-    return;
+  // Clear error if any
+  const errorDiv = document.getElementById("error-msg");
+  errorDiv.style.display = "none";
+
+  // Show custom confirmation inside popup
+  showConfirmPurchase(quantity);
+});
+
+function showConfirmPurchase(quantity) {
+  const popupContent = document.getElementById("popup-content");
+
+  // Create confirmation message container if not exists
+  let confirmBox = document.getElementById("confirm-box");
+  if (!confirmBox) {
+    confirmBox = document.createElement("div");
+    confirmBox.id = "confirm-box";
+    confirmBox.style.margin = "15px 0";
+    confirmBox.style.padding = "10px";
+    confirmBox.style.border = "2px solid #138808";
+    confirmBox.style.borderRadius = "8px";
+    confirmBox.style.backgroundColor = "#e6f4ea";
+    popupContent.insertBefore(confirmBox, document.getElementById("buyQuantity"));
   }
 
-  // Insert into buy_table
-  const { error } = await db.from("buy_table").insert([{
-    fname: selectedCrop.farmer_name,
-    fid: selectedCrop.lid.toString(),
-    cname: selectedCrop.crop_name,
-    cid: selectedCrop.jid,
-    status: "Pending",
-    lid: parseInt(loginid),
-    created_at: new Date().toISOString(),
-    is_confirmed: false,
-    quantity: quantity
-  }]);
+  confirmBox.innerHTML = `
+    <p>Are you sure you want to buy <strong>${quantity} kg</strong> of <strong>${selectedCrop.crop_name}</strong>?</p>
+    <button id="confirmYesBtn">Yes</button>
+    <button id="confirmNoBtn">No</button>
+  `;
 
-  if (error) {
-    alert(`Failed to place order: ${error.message}`);
-    return;
-  }
+  // Disable the main confirm button to prevent double clicks
+  document.getElementById("confirmBuyBtn").disabled = true;
 
-  alert("Purchase request sent! Farmer will confirm soon.");
+  document.getElementById("confirmYesBtn").onclick = async () => {
+    // Insert into buy_table
+    const { error } = await db.from("buy_table").insert([{
+      fname: selectedCrop.farmer_name,
+      fid: selectedCrop.lid.toString(),
+      cname: selectedCrop.crop_name,
+      cid: selectedCrop.jid,
+      status: "Pending",
+      lid: parseInt(loginid),
+      created_at: new Date().toISOString(),
+      is_confirmed: false,
+      quantity: quantity
+    }]);
+
+    if (error) {
+      alert(`Failed to place order: ${error.message}`);
+      return;
+    }
+
+    alert("Purchase request sent! Farmer will confirm soon.");
+    closePopupAndReset();
+  };
+
+  document.getElementById("confirmNoBtn").onclick = () => {
+    // Remove confirmation box and enable confirm button
+    confirmBox.remove();
+    document.getElementById("confirmBuyBtn").disabled = false;
+  };
+}
+
+function closePopupAndReset() {
   popup.style.display = "none";
   selectedCrop = null;
+  document.getElementById("confirmBuyBtn").disabled = false;
+  const confirmBox = document.getElementById("confirm-box");
+  if (confirmBox) confirmBox.remove();
   loadCrops();
-});
+}
 
 document.getElementById("logoutBtn").onclick = () => {
   sessionStorage.clear();
   location.href = "login";
 };
 
+setupNav();
 loadCrops();
 </script>
 
