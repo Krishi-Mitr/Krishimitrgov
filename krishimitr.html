@@ -12,37 +12,12 @@
 <script src="supabase.js"></script>
 
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap');
-
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
 body {
-  background: linear-gradient(135deg, #FF9933 0%, #FFFFFF 30%, #FFFFFF 70%, #138808 100%);
+  background: linear-gradient(to bottom, #FF9933 0%, #FFFFFF 50%, #138808 100%);
   background-attachment: fixed;
-  font-family: 'Poppins', sans-serif;
+  font-family: Arial, sans-serif;
   margin: 0;
   padding-top: 80px;
-  min-height: 100vh;
-  position: relative;
-  overflow-x: hidden;
-}
-
-/* Subtle background elements */
-body::before {
-  content: '';
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: radial-gradient(circle at 20% 50%, rgba(255, 153, 51, 0.08) 0%, transparent 50%),
-              radial-gradient(circle at 80% 50%, rgba(19, 136, 8, 0.08) 0%, transparent 50%);
-  pointer-events: none;
-  z-index: 0;
 }
 
 .top-navbar {
@@ -53,209 +28,203 @@ body::before {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 18px 40px;
-  background: rgba(255, 255, 255, 0.98);
-  border-bottom: 2px solid #000080;
+  padding: 12px 20px;
+  background: linear-gradient(90deg, #FF9933, #FFFFFF 50%, #138808);
+  border-bottom: 3px solid #000080;
   z-index: 1000;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
-  backdrop-filter: blur(10px);
 }
 
 .brand {
-  font-size: 26px;
-  font-weight: 700;
+  font-size: 24px;
+  font-weight: 900;
   color: #000080;
-  letter-spacing: 0.5px;
 }
 
 .nav-center {
   display: flex;
-  gap: 20px;
-  flex-wrap: wrap;
+  gap: 15px;
 }
 
 .nav-link-custom {
   text-decoration: none;
-  padding: 8px 18px;
-  border-radius: 6px;
-  font-weight: 500;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-weight: 700;
   color: #000080;
-  transition: background-color 0.15s ease;
-  background: transparent;
+  transition: 0.2s;
 }
 
 .nav-link-custom:hover {
-  background: rgba(0, 0, 128, 0.06);
+  background: rgba(0,0,128,0.1);
 }
 
 .nav-right {
   display: flex;
-  gap: 15px;
+  gap: 10px;
   align-items: center;
 }
 
 .logout-btn {
-  padding: 8px 18px;
+  padding: 8px 16px;
   background: #000080;
   color: white;
-  border-radius: 6px;
-  font-weight: 600;
+  border-radius: 8px;
+  font-weight: 700;
   text-decoration: none;
   border: none;
   cursor: pointer;
-  transition: background-color 0.15s ease;
-  font-size: 14px;
 }
 
 .logout-btn:hover {
-  background: rgba(0, 0, 128, 0.9);
+  background: #FF9933;
+  color: #000;
 }
 
 .container {
-  max-width: 1400px;
+  max-width: 1200px;
   margin: 0 auto;
-  padding: 30px 20px;
-  position: relative;
-  z-index: 1;
+  padding: 20px;
 }
 
 .card {
-  background: rgba(255, 255, 255, 0.95);
-  padding: 30px;
-  border-radius: 12px;
-  margin-bottom: 25px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
-  border: 1px solid rgba(0, 0, 128, 0.1);
-  position: relative;
-  transition: box-shadow 0.15s ease;
-}
-
-.card:hover {
-  box-shadow: 0 3px 16px rgba(0, 0, 0, 0.1);
+  background: white;
+  padding: 20px;
+  border-radius: 15px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  border: 2px solid #000080;
 }
 
 .form-group {
-  margin-bottom: 20px;
+  margin-bottom: 15px;
 }
 
 .form-group label {
   display: block;
-  margin-bottom: 8px;
+  margin-bottom: 5px;
   font-weight: 600;
   color: #000080;
-  font-size: 15px;
-  letter-spacing: 0.5px;
 }
 
 .form-control {
   width: 100%;
-  padding: 12px 15px;
-  border: 2px solid #e0e0e0;
-  border-radius: 12px;
-  font-size: 15px;
-  transition: border-color 0.15s ease, box-shadow 0.15s ease;
-  background: white;
-  font-family: 'Poppins', sans-serif;
+  padding: 10px;
+  border: 2px solid #000080;
+  border-radius: 8px;
+  font-size: 14px;
 }
 
-.form-control:focus {
-  outline: none;
-  border-color: #000080;
-  box-shadow: 0 0 0 2px rgba(0, 0, 128, 0.06);
-}
-
-input[type="range"] {
+/* Smaller forecast horizon slider */
+#horizon {
   width: 100%;
-  height: 8px;
-  border-radius: 5px;
-  background: linear-gradient(to right, #FF9933, #FFFFFF, #138808);
+  height: 6px;
+  padding: 0;
+  margin: 8px 0;
+  cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+  background: #e0e0e0;
+  border-radius: 3px;
   outline: none;
-  -webkit-appearance: none;
-  appearance: none;
 }
 
-input[type="range"]::-webkit-slider-thumb {
+#horizon::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
+  width: 18px;
+  height: 18px;
   background: #000080;
+  border-radius: 50%;
   cursor: pointer;
-  box-shadow: 0 2px 8px rgba(0, 0, 128, 0.25);
-  transition: box-shadow 0.15s ease;
+  transition: 0.2s;
 }
 
-input[type="range"]::-moz-range-thumb {
-  appearance: none;
-  -moz-appearance: none;
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
+#horizon::-webkit-slider-thumb:hover {
+  background: #FF9933;
+  transform: scale(1.1);
+}
+
+#horizon::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
   background: #000080;
+  border-radius: 50%;
   cursor: pointer;
-  box-shadow: 0 2px 8px rgba(0, 0, 128, 0.25);
-  transition: box-shadow 0.15s ease;
   border: none;
+  transition: 0.2s;
 }
 
-input[type="range"]::-webkit-slider-thumb:hover {
-  box-shadow: 0 2px 10px rgba(0, 0, 128, 0.3);
+#horizon::-moz-range-thumb:hover {
+  background: #FF9933;
+  transform: scale(1.1);
+}
+
+.horizon-label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 5px;
+}
+
+.horizon-value {
+  font-weight: 700;
+  color: #000080;
+  font-size: 16px;
+  min-width: 50px;
+  text-align: right;
+}
+
+.help-text {
+  font-size: 12px;
+  color: #666;
+  margin-top: 4px;
+  font-style: italic;
 }
 
 .btn {
-  padding: 12px 25px;
+  padding: 10px 20px;
   border: none;
   border-radius: 8px;
   font-weight: 600;
   cursor: pointer;
-  transition: background-color 0.15s ease, box-shadow 0.15s ease;
-  font-size: 15px;
-  font-family: 'Poppins', sans-serif;
+  transition: 0.2s;
 }
 
 .btn-primary {
   background: #000080;
   color: white;
-  box-shadow: 0 2px 8px rgba(0, 0, 128, 0.15);
 }
 
 .btn-primary:hover {
-  background: rgba(0, 0, 128, 0.9);
-  box-shadow: 0 2px 10px rgba(0, 0, 128, 0.2);
+  background: #FF9933;
+  color: #000;
 }
 
 .btn-success {
   background: #138808;
   color: white;
-  box-shadow: 0 2px 8px rgba(19, 136, 8, 0.15);
 }
 
 .btn-success:hover {
-  background: rgba(19, 136, 8, 0.9);
-  box-shadow: 0 2px 10px rgba(19, 136, 8, 0.2);
+  background: #0d6e05;
 }
 
 .btn-info {
   background: #0dcaf0;
   color: #000;
-  box-shadow: 0 2px 8px rgba(13, 202, 240, 0.15);
 }
 
 .btn-info:hover {
-  background: rgba(13, 202, 240, 0.9);
-  box-shadow: 0 2px 10px rgba(13, 202, 240, 0.2);
+  background: #0aa2c0;
 }
 
 .btn-warning {
   background: #ffc107;
   color: #000;
-  box-shadow: 0 2px 8px rgba(255, 193, 7, 0.15);
 }
 
 .btn-warning:hover {
-  background: rgba(255, 193, 7, 0.9);
-  box-shadow: 0 2px 10px rgba(255, 193, 7, 0.2);
+  background: #ffb300;
 }
 
 .chart-container {
@@ -265,14 +234,10 @@ input[type="range"]::-webkit-slider-thumb:hover {
 }
 
 .recommend {
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 700;
   color: #000080;
-  margin-bottom: 15px;
-  padding: 12px;
-  background: linear-gradient(90deg, rgba(255, 153, 51, 0.1), rgba(19, 136, 8, 0.1));
-  border-radius: 8px;
-  border-left: 4px solid #000080;
+  margin-bottom: 10px;
 }
 
 #actionCard {
@@ -281,70 +246,62 @@ input[type="range"]::-webkit-slider-thumb:hover {
 
 .row {
   display: flex;
-  gap: 25px;
+  gap: 20px;
   flex-wrap: wrap;
 }
 
 .col-md-6 {
   flex: 1;
-  min-width: 320px;
+  min-width: 300px;
 }
 
 .text-success {
   color: #138808;
-  font-weight: 600;
 }
 
 .text-danger {
   color: #dc3545;
-  font-weight: 600;
 }
 
 .text-warning {
-  color: #ff9800;
-  font-weight: 600;
+  color: #ffc107;
 }
 
 .text-info {
   color: #0dcaf0;
-  font-weight: 600;
 }
 
 .small-muted {
-  font-size: 13px;
+  font-size: 12px;
   color: #666;
 }
 
 .mt-2 {
-  margin-top: 15px;
+  margin-top: 10px;
 }
 
 .mt-3 {
-  margin-top: 20px;
+  margin-top: 15px;
 }
 
 .mb-3 {
-  margin-bottom: 20px;
+  margin-bottom: 15px;
 }
 
 #qrCanvas {
-  margin-top: 15px;
+  margin-top: 10px;
   border: 2px solid #000080;
   border-radius: 8px;
-  padding: 10px;
-  background: white;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
 body.dark {
-  background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 50%, #1a1a1a 100%);
+  background: #1a1a1a;
   color: #fff;
 }
 
 body.dark .card {
-  background: rgba(45, 45, 45, 0.95);
+  background: #2d2d2d;
   color: #fff;
-  border-color: #555;
 }
 
 body.dark .form-control {
@@ -353,25 +310,13 @@ body.dark .form-control {
   border-color: #555;
 }
 
-body.dark .form-control:focus {
-  border-color: #FF9933;
-  box-shadow: 0 0 0 4px rgba(255, 153, 51, 0.2);
-}
-
 .w-100 {
   width: 100%;
 }
 
 h2, h4 {
   color: #000080;
-  margin-bottom: 20px;
-  font-weight: 700;
-  letter-spacing: 0.5px;
-}
-
-h2 {
-  font-size: 32px;
-  color: #000080;
+  margin-bottom: 15px;
 }
 
 body.dark h2, body.dark h4 {
@@ -381,60 +326,6 @@ body.dark h2, body.dark h4 {
 #mainApp {
   display: block;
 }
-
-/* Loading state */
-.loading {
-  opacity: 0.7;
-  pointer-events: none;
-}
-
-/* Responsive design */
-@media (max-width: 768px) {
-  .top-navbar {
-    flex-direction: column;
-    padding: 15px;
-    gap: 15px;
-  }
-  
-  .nav-center {
-    flex-direction: column;
-    width: 100%;
-    gap: 10px;
-  }
-  
-  .nav-link-custom {
-    width: 100%;
-    text-align: center;
-  }
-  
-  .brand {
-    font-size: 22px;
-  }
-  
-  body {
-    padding-top: 150px;
-  }
-  
-  .card {
-    padding: 20px;
-  }
-  
-  h2 {
-    font-size: 24px;
-  }
-}
-
-/* Smooth scroll */
-html {
-  scroll-behavior: smooth;
-}
-
-/* Button loading state */
-.btn.loading {
-  pointer-events: none;
-  opacity: 0.7;
-}
-
 </style>
 </head>
 
@@ -451,7 +342,7 @@ html {
   </div>
 
   <div class="nav-right">
-    <button id="toggleDark" class="btn btn-light btn-sm" style="background: transparent; border: 1px solid rgba(0,0,128,0.2); color: #000080; font-weight: 500; padding: 6px 14px; border-radius: 6px; font-size: 13px; transition: background-color 0.15s ease, border-color 0.15s ease;">🌙 Dark Mode</button>
+    <button id="toggleDark" class="btn btn-light btn-sm">🌙 Dark Mode</button>
     <a href="#" id="logoutBtn" class="logout-btn">Logout</a>
   </div>
 </div>
@@ -459,23 +350,20 @@ html {
 <div id="mainApp">
   <div class="container">
     
-    <div class="card" style="text-align: center; background: linear-gradient(135deg, rgba(255, 153, 51, 0.1), rgba(255, 255, 255, 0.95), rgba(19, 136, 8, 0.1)); border: 3px solid #000080;">
-      <h2 style="margin-bottom: 15px;">🌾 Crop Price Predictor & Advisor</h2>
-      <p style="font-size: 18px; color: #333; font-weight: 500; margin-bottom: 0;">Get intelligent price forecasts and expert farming advice for your crops</p>
-      <div style="margin-top: 15px; display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;">
-        <span style="padding: 5px 15px; background: rgba(255, 153, 51, 0.2); border-radius: 20px; font-size: 13px; font-weight: 600; color: #000080;">📊 Real-time Predictions</span>
-        <span style="padding: 5px 15px; background: rgba(19, 136, 8, 0.2); border-radius: 20px; font-size: 13px; font-weight: 600; color: #000080;">💡 Expert Advice</span>
-        <span style="padding: 5px 15px; background: rgba(0, 0, 128, 0.2); border-radius: 20px; font-size: 13px; font-weight: 600; color: #000080;">📈 Market Trends</span>
-      </div>
+    <div class="card">
+      <h2>🌾 Crop Price Predictor & Advisor</h2>
+      <p style="margin-bottom: 0;">Get price forecasts and farming advice for your crops</p>
+      <p class="help-text" style="margin-top: 8px;">Select your crop and region, then click "Predict Prices" to see future price trends</p>
     </div>
 
     <div class="row">
       <div class="col-md-6">
         <div class="card">
-          <h4>Price Prediction</h4>
+          <h4>📊 Price Prediction</h4>
+          <p class="help-text" style="margin-top: -10px; margin-bottom: 15px;">Get price forecasts for your crops to make better selling decisions</p>
           
           <div class="form-group">
-            <label for="cropSelect">Select Crop</label>
+            <label for="cropSelect">🌾 Select Crop</label>
             <select id="cropSelect" class="form-control">
               <option value="Wheat">Wheat</option>
               <option value="Rice">Rice</option>
@@ -493,7 +381,7 @@ html {
           </div>
 
           <div class="form-group">
-            <label for="regionSelect">Select Region</label>
+            <label for="regionSelect">📍 Select Region</label>
             <select id="regionSelect" class="form-control">
               <option value="Punjab">Punjab</option>
               <option value="Haryana">Haryana</option>
@@ -507,23 +395,27 @@ html {
           </div>
 
           <div class="form-group">
-            <label>Forecast Horizon: <span id="hval">30</span> days</label>
-            <input type="range" id="horizon" class="form-control" min="7" max="90" value="30">
+            <div class="horizon-label">
+              <label for="horizon" style="margin: 0;">📅 Forecast Period</label>
+              <span class="horizon-value"><span id="hval">30</span> days</span>
+            </div>
+            <input type="range" id="horizon" min="7" max="90" value="30" step="1">
+            <div class="help-text">Adjust to see prices for next 7-90 days</div>
           </div>
 
-          <button id="predictBtn" class="btn btn-primary w-100">Predict Prices</button>
-          <button id="combineBtn" class="btn btn-warning w-100 mt-2">Predict + Get Advice</button>
-          <button id="exportBtn" class="btn btn-info w-100 mt-2">Export CSV</button>
-          <button id="voiceBtn" class="btn btn-success w-100 mt-2">🎤 Voice Input</button>
+          <button id="predictBtn" class="btn btn-primary w-100">🔮 Predict Prices</button>
+          <button id="combineBtn" class="btn btn-warning w-100 mt-2">✨ Predict + Get Advice</button>
+          <button id="exportBtn" class="btn btn-info w-100 mt-2">📥 Export CSV</button>
         </div>
 
         <div class="card">
-          <h4>Crop Advisor</h4>
+          <h4>💡 Crop Advisor</h4>
+          <p class="help-text" style="margin-top: -10px; margin-bottom: 15px;">Get personalized farming recommendations based on your conditions</p>
           
           <div class="form-group">
-            <label for="soilType">Soil Type</label>
+            <label for="soilType">🌱 Soil Type</label>
             <select id="soilType" class="form-control">
-              <option value="Loamy">Loamy</option>
+              <option value="Loamy">Loamy (Best for most crops)</option>
               <option value="Clayey">Clayey</option>
               <option value="Sandy">Sandy</option>
               <option value="Silty">Silty</option>
@@ -531,16 +423,18 @@ html {
           </div>
 
           <div class="form-group">
-            <label for="rainfall">Expected Rainfall (mm)</label>
+            <label for="rainfall">🌧️ Expected Rainfall (mm)</label>
             <input type="number" id="rainfall" class="form-control" value="200" min="0" max="1000">
+            <div class="help-text">Typical range: 100-400 mm</div>
           </div>
 
           <div class="form-group">
-            <label for="temp">Expected Temperature (°C)</label>
+            <label for="temp">🌡️ Expected Temperature (°C)</label>
             <input type="number" id="temp" class="form-control" value="25" min="-10" max="50">
+            <div class="help-text">Average temperature during growing season</div>
           </div>
 
-          <button id="adviseBtn" class="btn btn-success w-100">Get Farming Advice</button>
+          <button id="adviseBtn" class="btn btn-success w-100">🌾 Get Farming Advice</button>
         </div>
       </div>
 
@@ -553,16 +447,16 @@ html {
         </div>
 
         <div class="card">
-          <h4>Recommendations</h4>
+          <h4>💡 Recommendations</h4>
           <div id="actionCard">
-            <p class="text-muted">Run a prediction to see recommendations</p>
+            <p class="text-muted">Click "Predict Prices" to see buying/selling recommendations</p>
           </div>
         </div>
 
         <div class="card">
-          <h4>Advisor Output</h4>
+          <h4>📋 Farming Advice</h4>
           <div id="advisorOutput" class="text-muted">
-            Get farming advice by clicking "Get Farming Advice"
+            Click "Get Farming Advice" to receive personalized recommendations for seeds and fertilizers
           </div>
         </div>
 
@@ -662,22 +556,6 @@ if (toggleBtn) {
   toggleBtn.addEventListener('click', () => {
     document.body.classList.toggle('dark');
     toggleBtn.innerText = document.body.classList.contains('dark') ? '☀️ Light Mode' : '🌙 Dark Mode';
-    // Add smooth transition
-    document.body.style.transition = 'background 0.2s ease, color 0.2s ease';
-    setTimeout(() => {
-      document.body.style.transition = '';
-    }, 200);
-  });
-  
-  // Add hover effect
-  toggleBtn.addEventListener('mouseenter', () => {
-    toggleBtn.style.background = 'rgba(0, 0, 128, 0.06)';
-    toggleBtn.style.borderColor = 'rgba(0, 0, 128, 0.25)';
-  });
-  
-  toggleBtn.addEventListener('mouseleave', () => {
-    toggleBtn.style.background = 'transparent';
-    toggleBtn.style.borderColor = 'rgba(0, 0, 128, 0.2)';
   });
 }
 
@@ -752,80 +630,11 @@ function initChart() {
     data: { labels: [], datasets: [] },
     options: {
       responsive: true,
-      maintainAspectRatio: false,
-      animation: {
-        duration: 400,
-        easing: 'easeOut'
-      },
-      interaction: { 
-        mode: 'index', 
-        intersect: false 
-      },
-      plugins: { 
-        legend: { 
-          position: 'top',
-          labels: {
-            font: {
-              family: 'Poppins',
-              size: 14,
-              weight: '600'
-            },
-            padding: 15,
-            usePointStyle: true
-          }
-        },
-        tooltip: {
-          backgroundColor: 'rgba(0, 0, 0, 0.8)',
-          padding: 12,
-          titleFont: {
-            family: 'Poppins',
-            size: 14,
-            weight: '600'
-          },
-          bodyFont: {
-            family: 'Poppins',
-            size: 13
-          },
-          borderColor: '#000080',
-          borderWidth: 2,
-          cornerRadius: 8
-        }
-      },
+      interaction: { mode: 'index', intersect: false },
+      plugins: { legend: { position: 'top' } },
       scales: {
-        x: { 
-          display: true,
-          grid: {
-            color: 'rgba(0, 0, 128, 0.1)'
-          },
-          ticks: {
-            font: {
-              family: 'Poppins',
-              size: 12
-            }
-          }
-        },
-        y: { 
-          display: true, 
-          title: { 
-            display: true, 
-            text: 'Price (₹/qtl)',
-            font: {
-              family: 'Poppins',
-              size: 14,
-              weight: '600'
-            },
-            color: '#000080'
-          },
-          grid: {
-            color: 'rgba(0, 0, 128, 0.1)'
-          },
-          ticks: {
-            font: {
-              family: 'Poppins',
-              size: 12
-            }
-          }
-        }
+        x: { display: true },
+        y: { display: true, title: { display: true, text: 'Price (₹/qtl)' } }
       }
     }
   });
@@ -859,31 +668,23 @@ function updateChart(hist, preds){
     {
       label: 'Historical',
       data: histData,
-      borderWidth: 3,
-      tension: 0.4,
-      pointRadius: 4,
-      pointHoverRadius: 6,
-      borderColor: '#000080',
-      backgroundColor: 'rgba(0, 0, 128, 0.1)',
-      fill: true,
-      pointBackgroundColor: '#000080',
-      pointBorderColor: '#FFFFFF',
-      pointBorderWidth: 2
+      borderWidth: 2,
+      tension: 0.2,
+      pointRadius: 2,
+      borderColor: '#0d6efd',
+      backgroundColor: 'rgba(13,110,253,0.04)',
+      fill: true
     },
     {
       label: 'Forecast',
       data: predData,
-      borderDash: [8, 4],
-      borderWidth: 3,
-      tension: 0.4,
-      pointRadius: 4,
-      pointHoverRadius: 6,
-      borderColor: '#138808',
-      backgroundColor: 'rgba(19, 136, 8, 0.1)',
-      fill: true,
-      pointBackgroundColor: '#138808',
-      pointBorderColor: '#FFFFFF',
-      pointBorderWidth: 2
+      borderDash: [6,4],
+      borderWidth: 2,
+      tension: 0.2,
+      pointRadius: 2,
+      borderColor: '#198754',
+      backgroundColor: 'rgba(25,135,84,0.03)',
+      fill: true
     }
   ];
   priceChart.update();
@@ -900,13 +701,11 @@ function setupEventListeners() {
   const adviseBtn = document.getElementById('adviseBtn');
   const combineBtn = document.getElementById('combineBtn');
   const exportBtn = document.getElementById('exportBtn');
-  const voiceBtn = document.getElementById('voiceBtn');
 
   if (predictBtn) predictBtn.addEventListener('click', ()=> { runPrediction(false); });
   if (adviseBtn) adviseBtn.addEventListener('click', ()=> { runAdvisor(false); });
   if (combineBtn) combineBtn.addEventListener('click', ()=> { runPrediction(true); });
   if (exportBtn) exportBtn.addEventListener('click', exportCSV);
-  if (voiceBtn) voiceBtn.addEventListener('click', voiceInput);
 }
 
 let lastForecast = [];
@@ -914,145 +713,102 @@ let lastCrop = 'Wheat';
 let lastRegion = 'Punjab';
 
 function runPrediction(runAdvisorToo){
-  const predictBtn = document.getElementById('predictBtn');
-  const combineBtn = document.getElementById('combineBtn');
-  const btn = runAdvisorToo ? combineBtn : predictBtn;
-  
-  // Add loading state
-  if (btn) {
-    const originalText = btn.innerHTML;
-    btn.innerHTML = 'Processing...';
-    btn.classList.add('loading');
-    btn.disabled = true;
+  const crop = document.getElementById('cropSelect').value;
+  const region = document.getElementById('regionSelect').value;
+  const days = parseInt(document.getElementById('horizon').value, 10);
+  const hist = genHistorical(crop, region);
+  const scenario = 0; // neutral demo
+  const preds = forecastPrices(hist, days, crop, scenario);
+
+  updateChart(hist, preds);
+  lastForecast = preds;
+  lastCrop = crop;
+  lastRegion = region;
+
+  const now = hist[hist.length-1].price;
+  const futureAvg = preds.length ? preds.reduce((s,p)=>s+p.price,0)/preds.length : now;
+  const changePct = ((futureAvg - now)/Math.max(1, now))*100;
+
+  const actionCard = document.getElementById('actionCard');
+  let html = `<div><div class="recommend">Avg change: ${changePct.toFixed(1)}% over next ${days} days</div>`;
+  if(changePct > 4){
+    html += `<div class="mt-2 text-success">🌟 Tip: Prices look like they will go <strong>up</strong>. Consider storing a bit and selling later.</div>`;
+  } else if(changePct < -4){
+    html += `<div class="mt-2 text-danger">⚠️ Tip: Prices may go <strong>down</strong>. Consider selling soon.</div>`;
+  } else {
+    html += `<div class="mt-2 text-warning">Tip: Prices should stay about the same. You can sell some now and keep some.</div>`;
   }
-  
-  // Simulate processing delay for better UX
-  setTimeout(() => {
-    const crop = document.getElementById('cropSelect').value;
-    const region = document.getElementById('regionSelect').value;
-    const days = parseInt(document.getElementById('horizon').value, 10);
-    const hist = genHistorical(crop, region);
-    const scenario = 0; // neutral demo
-    const preds = forecastPrices(hist, days, crop, scenario);
+  html += `<div class="mt-2 small-muted"></div>`;
+  html += `<div id="advisorTipSlot"></div></div>`;
+  actionCard.innerHTML = html;
 
-    updateChart(hist, preds);
-    lastForecast = preds;
-    lastCrop = crop;
-    lastRegion = region;
-
-    const now = hist[hist.length-1].price;
-    const futureAvg = preds.length ? preds.reduce((s,p)=>s+p.price,0)/preds.length : now;
-    const changePct = ((futureAvg - now)/Math.max(1, now))*100;
-
-    const actionCard = document.getElementById('actionCard');
-    let html = `<div><div class="recommend">📊 Avg change: ${changePct.toFixed(1)}% over next ${days} days</div>`;
-    if(changePct > 4){
-      html += `<div class="mt-2 text-success">🌟 Tip: Prices look like they will go <strong>up</strong>. Consider storing a bit and selling later.</div>`;
-    } else if(changePct < -4){
-      html += `<div class="mt-2 text-danger">⚠️ Tip: Prices may go <strong>down</strong>. Consider selling soon.</div>`;
-    } else {
-      html += `<div class="mt-2 text-warning">💡 Tip: Prices should stay about the same. You can sell some now and keep some.</div>`;
-    }
-    html += `<div class="mt-2 small-muted"></div>`;
-    html += `<div id="advisorTipSlot"></div></div>`;
-    actionCard.innerHTML = html;
-
-    // Remove loading state
-    if (btn) {
-      btn.innerHTML = originalText;
-      btn.classList.remove('loading');
-      btn.disabled = false;
-    }
-
-    if(runAdvisorToo) runAdvisor(true);
-  }, 800);
+  if(runAdvisorToo) runAdvisor(true);
 }
 
 
 function runAdvisor(showOnRight){
-  const adviseBtn = document.getElementById('adviseBtn');
-  
-  // Add loading state if not called from combine
-  if (adviseBtn && !showOnRight) {
-    const originalText = adviseBtn.innerHTML;
-    adviseBtn.innerHTML = 'Analyzing...';
-    adviseBtn.classList.add('loading');
-    adviseBtn.disabled = true;
+  const soil = document.getElementById('soilType').value;
+  const rain = parseFloat(document.getElementById('rainfall').value);
+  const temp = parseFloat(document.getElementById('temp').value);
+  const crop = document.getElementById('cropSelect').value;
+
+  const seedOptions = {
+    Rice:['Local high-yield rice','Flood-tolerant rice','Short-duration rice'],
+    Wheat:['Drought-tolerant wheat','Early-maturity wheat','High-protein wheat'],
+    Cotton:['Bt cotton (local)','Organic cotton','Short-staple cotton'],
+    Maize:['Hybrid maize','Sweet corn variety','High-yield maize'],
+    Sorghum:['Local millets mix','Drought-resilient sorghum','Red sorghum'],
+    Barley:['Certified barley','Malting barley','Hull-less barley'],
+    Millet:['Millet seeds mix','Finger millet','Foxtail millet'],
+    Soybean:['Local soybean','Early-maturing soybean','High-protein soybean'],
+    Groundnut:['Groundnut seeds','Spanish variety','Virginia variety'],
+    Tomato:['Tomato seeds','Cherry tomato','Disease-resistant tomato'],
+    Potato:['Potato seeds','Early variety','High-starch variety'],
+    Sugarcane:['High-yield sugarcane','Disease-resistant cane','Early-maturity cane']
+  };
+  const fertOptions = {
+    Rice:['Urea + SSP','NPK 12-32-16','Compost-enriched'],
+    Wheat:['NPK 10-26-26','Urea top-dressing','Organic mix'],
+    Cotton:['Potash-rich','NPK 12-12-17','Biofertilizer'],
+    Maize:['Balanced NPK','Compost+urea','Liquid fertilizer mix'],
+    Sorghum:['NPK 12-24-12','Organic compost','Urea split'],
+    Barley:['NPK 10-10-10','Farmyard manure','Micronutrient mix'],
+    Millet:['Organic compost','NPK 8-20-10','Green manure'],
+    Soybean:['NPK 12-12-12','Rhizobium inoculant','Balanced compost'],
+    Groundnut:['Potash-rich','NPK 10-20-10','FYM+Biofertilizer'],
+    Tomato:['NPK 10-10-10','Organic mix','Liquid foliar fertilizer'],
+    Potato:['Balanced NPK','FYM + urea','Potassium-rich fertilizer'],
+    Sugarcane:['NPK 14-14-14','Compost enriched','Micronutrient mix']
+  };
+
+  function pickRandom(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
+  const seed = pickRandom(seedOptions[crop] || ['Local seeds']);
+  const fert = pickRandom(fertOptions[crop] || ['Balanced fertilizer']);
+
+  let weatherAdvice = '';
+  if(rain < 50) weatherAdvice += 'Low rainfall expected; consider drought-tolerant varieties and water-saving practices. ';
+  else if(rain > 400) weatherAdvice += 'High rainfall expected; ensure drainage and flood-tolerant varieties. ';
+
+  if(temp > 35) weatherAdvice += 'High temperatures — shade and irrigation recommended. ';
+  else if(temp < 10) weatherAdvice += 'Low temperature — consider frost protection and early maturing varieties. ';
+
+  const advice = `💡 Advisor Tip for ${crop}: Soil: ${soil}, Rainfall: ${rain}mm, Temp: ${temp}°C. ${weatherAdvice}Recommended Seed: ${seed}. Recommended Fertilizer: ${fert}. Monitor local weather and pest alerts.`;
+
+  const advisorOutput = document.getElementById('advisorOutput');
+  advisorOutput.innerText = advice;
+  if(showOnRight){
+    const slot = document.getElementById('advisorTipSlot');
+    if(slot){
+      slot.innerHTML = `<div class="mt-2 text-info small" id="advisorTip">${advice.replace(/\n/g,'<br>')}</div>`;
+    } else {
+      const actionCard = document.getElementById('actionCard');
+      const tipDiv = document.createElement('div');
+      tipDiv.id = 'advisorTip';
+      tipDiv.className = 'mt-2 text-info small';
+      tipDiv.innerHTML = advice.replace(/\n/g,'<br>');
+      actionCard.appendChild(tipDiv);
+    }
   }
-  
-  // Simulate processing delay for better UX
-  setTimeout(() => {
-    const soil = document.getElementById('soilType').value;
-    const rain = parseFloat(document.getElementById('rainfall').value);
-    const temp = parseFloat(document.getElementById('temp').value);
-    const crop = document.getElementById('cropSelect').value;
-
-    const seedOptions = {
-      Rice:['Local high-yield rice','Flood-tolerant rice','Short-duration rice'],
-      Wheat:['Drought-tolerant wheat','Early-maturity wheat','High-protein wheat'],
-      Cotton:['Bt cotton (local)','Organic cotton','Short-staple cotton'],
-      Maize:['Hybrid maize','Sweet corn variety','High-yield maize'],
-      Sorghum:['Local millets mix','Drought-resilient sorghum','Red sorghum'],
-      Barley:['Certified barley','Malting barley','Hull-less barley'],
-      Millet:['Millet seeds mix','Finger millet','Foxtail millet'],
-      Soybean:['Local soybean','Early-maturing soybean','High-protein soybean'],
-      Groundnut:['Groundnut seeds','Spanish variety','Virginia variety'],
-      Tomato:['Tomato seeds','Cherry tomato','Disease-resistant tomato'],
-      Potato:['Potato seeds','Early variety','High-starch variety'],
-      Sugarcane:['High-yield sugarcane','Disease-resistant cane','Early-maturity cane']
-    };
-    const fertOptions = {
-      Rice:['Urea + SSP','NPK 12-32-16','Compost-enriched'],
-      Wheat:['NPK 10-26-26','Urea top-dressing','Organic mix'],
-      Cotton:['Potash-rich','NPK 12-12-17','Biofertilizer'],
-      Maize:['Balanced NPK','Compost+urea','Liquid fertilizer mix'],
-      Sorghum:['NPK 12-24-12','Organic compost','Urea split'],
-      Barley:['NPK 10-10-10','Farmyard manure','Micronutrient mix'],
-      Millet:['Organic compost','NPK 8-20-10','Green manure'],
-      Soybean:['NPK 12-12-12','Rhizobium inoculant','Balanced compost'],
-      Groundnut:['Potash-rich','NPK 10-20-10','FYM+Biofertilizer'],
-      Tomato:['NPK 10-10-10','Organic mix','Liquid foliar fertilizer'],
-      Potato:['Balanced NPK','FYM + urea','Potassium-rich fertilizer'],
-      Sugarcane:['NPK 14-14-14','Compost enriched','Micronutrient mix']
-    };
-
-    function pickRandom(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
-    const seed = pickRandom(seedOptions[crop] || ['Local seeds']);
-    const fert = pickRandom(fertOptions[crop] || ['Balanced fertilizer']);
-
-    let weatherAdvice = '';
-    if(rain < 50) weatherAdvice += 'Low rainfall expected; consider drought-tolerant varieties and water-saving practices. ';
-    else if(rain > 400) weatherAdvice += 'High rainfall expected; ensure drainage and flood-tolerant varieties. ';
-
-    if(temp > 35) weatherAdvice += 'High temperatures — shade and irrigation recommended. ';
-    else if(temp < 10) weatherAdvice += 'Low temperature — consider frost protection and early maturing varieties. ';
-
-    const advice = `💡 Advisor Tip for ${crop}: Soil: ${soil}, Rainfall: ${rain}mm, Temp: ${temp}°C. ${weatherAdvice}Recommended Seed: ${seed}. Recommended Fertilizer: ${fert}. Monitor local weather and pest alerts.`;
-
-    const advisorOutput = document.getElementById('advisorOutput');
-    advisorOutput.innerHTML = `<div>${advice}</div>`;
-    
-    if(showOnRight){
-      const slot = document.getElementById('advisorTipSlot');
-      if(slot){
-        slot.innerHTML = `<div class="mt-2 text-info small" id="advisorTip">${advice.replace(/\n/g,'<br>')}</div>`;
-      } else {
-        const actionCard = document.getElementById('actionCard');
-        const tipDiv = document.createElement('div');
-        tipDiv.id = 'advisorTip';
-        tipDiv.className = 'mt-2 text-info small';
-        tipDiv.innerHTML = advice.replace(/\n/g,'<br>');
-        actionCard.appendChild(tipDiv);
-      }
-    }
-    
-    // Remove loading state
-    if (adviseBtn && !showOnRight) {
-      adviseBtn.innerHTML = originalText;
-      adviseBtn.classList.remove('loading');
-      adviseBtn.disabled = false;
-    }
-  }, 600);
 }
 
 function exportCSV(){
