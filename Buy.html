@@ -1,263 +1,336 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<title>Buy Crops - KrishiMitra</title>
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<meta charset="UTF-8" />
+<title>Buy Crops - Krishi Mitr</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="supabase.js"></script>
 
 <style>
-body {
-  background: linear-gradient(to bottom, #FF9933 0%, #FFFFFF 50%, #138808 100%);
-  background-attachment: fixed;
-  font-family: Arial;
-  padding-top: 90px;
-}
-.topbar {
+  body {
+    margin: 0;
+    font-family: "Poppins", Arial, sans-serif;
+    min-height: 100vh;
+    background: linear-gradient(180deg, #f6e2cc 0%, #f7f9f8 45%, #dceee3 100%);
+    color: #1f2937;
+  }
+  /* NAVBAR */
+  .top-nav {
     position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
+    top: 0; left: 0; right: 0;
     height: 78px;
     display: flex;
+    justify-content: space-between;
     align-items: center;
-    padding: 0 18px;
-    background: linear-gradient(90deg, #FF9933, #FFFFFF 50%, #138808);
-    border-bottom: 3px solid #000080;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.25);
-    z-index: 9000;
-}
-.topbar-logo {
-    font-size: 26px;
-    font-weight: 900;
-    color: #000080;
-    margin-right: 25px;
-}
-.topbar-menu {
+    padding: 0 32px;
+    background: linear-gradient(90deg, #ff9933, #ffffff, #138808);
+    border-bottom: 3px solid #0a3d62;
+    box-shadow: 0 6px 14px rgba(0,0,0,0.15);
+    z-index: 9999;
+  }
+  .nav-left {
     display: flex;
-    gap: 14px;
-}
-.topbar-menu a {
-    text-decoration: none;
-    padding: 10px 16px;
-    border-radius: 8px;
-    font-weight: 700;
-    color: #000080;
-}
-.topbar-right {
-    margin-left: auto;
-}
-.topbar-right a {
-    padding: 8px 16px;
-    background: #000080;
+    gap: 16px;
+  }
+  .nav-box {
+    background: #0a3d62;
     color: white;
+    padding: 10px 20px;
+    border-radius: 10px;
+    font-weight: 600;
     text-decoration: none;
-    border-radius: 8px;
-    font-weight: 700;
-}
-.card-custom {
-    border: 3px solid #000080;
-    border-radius: 15px;
+    transition: .25s;
+  }
+  .nav-box:hover {
+    background: linear-gradient(135deg,#ff9933,#ffd28a);
+    color: black;
+    transform: translateY(-3px);
+  }
+  .logout-btn {
     background: white;
-    padding: 18px;
-    box-shadow: 0 4px 18px rgba(0,0,0,0.22);
-}
-.buy-btn {
-    width: 100%;
-    padding: 10px;
+    color: #0a3d62;
+    border: 2px solid #0a3d62;
+    padding: 10px 22px;
+    border-radius: 10px;
     font-weight: 700;
-    border-radius: 8px;
-    border: none;
-    background: #000080;
-    color: white;
-}
-</style>
-</head>
+    cursor: pointer;
+  }
 
+  /* CONTENT */
+  .container {
+    max-width: 900px;
+    margin: 120px auto 60px;
+  }
+  .crop-card {
+    background: white;
+    border-radius: 20px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+    cursor: pointer;
+    transition: box-shadow 0.3s ease;
+  }
+  .crop-card:hover {
+    box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+  }
+  .crop-title {
+    font-weight: 700;
+    font-size: 1.3em;
+    margin-bottom: 8px;
+    color: #0a3d62;
+  }
+  .crop-info {
+    font-size: 1em;
+    margin-bottom: 6px;
+    color: #374151;
+  }
+
+  /* POPUP */
+  .popup-bg {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 10000;
+    justify-content: center;
+    align-items: center;
+  }
+  .popup-content {
+    background: white;
+    border-radius: 20px;
+    max-width: 500px;
+    padding: 30px;
+    box-shadow: 0 12px 30px rgba(0,0,0,0.25);
+    position: relative;
+  }
+  .popup-close {
+    position: absolute;
+    top: 16px;
+    right: 20px;
+    font-size: 1.5em;
+    font-weight: 700;
+    cursor: pointer;
+    color: #0a3d62;
+  }
+  .popup-section {
+    margin-bottom: 18px;
+  }
+  .popup-section h3 {
+    margin-bottom: 10px;
+    color: #138808;
+  }
+  .popup-section p {
+    margin: 4px 0;
+  }
+
+  /* BUY FORM */
+  .buy-form label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 600;
+  }
+  .buy-form input[type=number] {
+    width: 100%;
+    padding: 8px 10px;
+    font-size: 1em;
+    border-radius: 8px;
+    border: 2px solid #0a3d62;
+    margin-bottom: 12px;
+  }
+  .buy-btn {
+    background: #138808;
+    color: white;
+    font-weight: 700;
+    padding: 12px 0;
+    width: 100%;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    font-size: 1.1em;
+    transition: background 0.3s ease;
+  }
+  .buy-btn:hover {
+    background: #0f6606;
+  }
+</style>
+
+</head>
 <body>
 
-<div class="topbar">
-    <div class="topbar-logo"> KrishiMitra</div>
-    <div class="topbar-menu">
-        <a href="Dashboard">Main Page</a>
-        <a href="krishimitr">Crop price predictor</a>
-        <a href="YourCrops">Your Crops</a>
-    </div>
-    <div class="topbar-right"><a href="#" id="logout">Logout</a></div>
+<!-- NAVBAR -->
+<div class="top-nav">
+  <div class="nav-left">
+    <a href="Dashboard" class="nav-box">Dashboard</a>
+    <a href="Buy" class="nav-box">Buy Crops</a>
+    <a href="krishimitr" class="nav-box">Crop Predictor</a>
+    <a href="Update_crops" class="nav-box">Manage Your Crops</a>
+    <a href="Notification" class="nav-box">Notifications</a>
+  </div>
+  <button class="logout-btn" id="logoutBtn">Logout</button>
 </div>
 
-<div class="container">
-    <h2 class="text-center mb-4" style="color:#000080;">Available Crops & Seeds</h2>
-    <div class="row g-4" id="cropList"></div>
+<div class="container" id="cropsContainer">
+  <!-- Crop cards inserted here -->
+</div>
+
+<!-- POPUP -->
+<div class="popup-bg" id="popupBg">
+  <div class="popup-content">
+    <span class="popup-close" id="popupClose">&times;</span>
+    <div id="popupDetails">
+      <!-- Filled dynamically -->
+    </div>
+    <form id="buyForm" class="buy-form" style="margin-top: 20px;">
+      <label for="buyQuantity">Enter Quantity (kg):</label>
+      <input type="number" id="buyQuantity" name="buyQuantity" min="1" required />
+      <button type="submit" class="buy-btn">Confirm Purchase</button>
+    </form>
+  </div>
 </div>
 
 <script>
-// Check authentication FIRST, synchronously (like Dashboard and Sell)
-const loginid = sessionStorage.getItem("loginid");
-const usertype = sessionStorage.getItem("usertype");
+  const db = window.db;
+  const loginid = sessionStorage.getItem("loginid");
+  const usertype = sessionStorage.getItem("usertype");
 
-// Kick out if not logged in
-if (!loginid || !usertype) {
-    window.location.href = "login";
-}
-
-// Wait for DOM and database to be ready, then load data
-async function waitForDB() {
-  let attempts = 0;
-  while (!window.db && attempts < 50) {
-    await new Promise(resolve => setTimeout(resolve, 100));
-    attempts++;
-  }
-  if (!window.db) {
-    console.error("Database client not available after waiting");
-    return false;
-  }
-  return true;
-}
-
-async function init() {
-  // Wait for DOM to be ready
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', init);
-    return;
-  }
-
-  // Wait for database to be ready
-  const dbReady = await waitForDB();
-  if (!dbReady) {
-    alert("Database connection failed. Please refresh the page.");
-    return;
-  }
-
-  loadCrops();
-}
-
-async function loadCrops() {
-  const currentLoginId = sessionStorage.getItem("loginid");
-  
-  if (!currentLoginId) {
-    window.location.href = "login";
-    return;
-  }
-
-  const { data: crops, error } = await window.db
-    .from("crop_sales")
-    .select("*")
-    .neq("lid", currentLoginId)  // Filter out crops posted by the current user
-    .order("created_at", { ascending: false });
-
-  if (error) {
-    console.error("Error loading crops:", error);
-    document.getElementById("cropList").innerHTML = 
-      "<p class='text-danger'>Error loading crops: " + error.message + "</p>";
-    return;
-  }
-
-  const container = document.getElementById("cropList");
-  container.innerHTML = "";
-
-  if (!crops || crops.length === 0) {
-    container.innerHTML = "<p class='text-muted text-center'>No crops available at the moment.</p>";
-    return;
-  }
-
-  for (const row of crops) {
-    const { data: buy } = await window.db
-      .from("buy_table")
-      .select("yn")
-      .eq("fid", row.jid)
-      .eq("cid", currentLoginId)
-      .maybeSingle();
-
-    const yn = buy?.yn || "no";
-
-    container.innerHTML += `
-      <div class="col-md-4">
-        <div class="card-custom">
-          <h4 style="color:#000080;font-weight:700;">${row.crop_name}</h4>
-          <p><strong>Farmer:</strong> ${row.farmer_name}</p>
-          <p><strong>Quantity:</strong> ${row.quantity} kg</p>
-          <p><strong>Price:</strong> ₹${row.price} per kg</p>
-          <p><strong>Location:</strong> ${row.location}</p>
-          <p class="text-muted" style="font-size:12px;">Posted on: ${new Date(row.created_at).toLocaleString()}</p>
-          <button class="buy-btn" onclick="toggleBuy('${row.jid}','${row.farmer_name}',this)">
-            ${yn === "yes" ? "Interested ✓" : "Show Interest"}
-          </button>
-        </div>
-      </div>
-    `;
-  }
-}
-
-async function toggleBuy(fid, fname, btn) {
-  const currentLoginId = sessionStorage.getItem("loginid");
-  
-  if (!currentLoginId) {
-    alert("Please login again");
+  if (!loginid) {
     location.href = "login";
-    return;
   }
 
-  const { data: existing } = await window.db
-    .from("buy_table")
-    .select("*")
-    .eq("fid", fid)
-    .eq("cid", currentLoginId)
-    .maybeSingle();
+  document.getElementById("logoutBtn").onclick = () => {
+    sessionStorage.clear();
+    location.href = "login";
+  };
 
-  if (existing) {
-    const newVal = existing.yn === "yes" ? "no" : "yes";
-    // Update with timestamp when showing interest (yes), keep existing timestamp when removing interest
-    const updateData = { yn: newVal };
-    if (newVal === "yes") {
-      updateData.created_at = new Date().toISOString();
-    }
-    await window.db
-      .from("buy_table")
-      .update(updateData)
-      .eq("fid", fid)
-      .eq("cid", currentLoginId);
-    btn.innerText = newVal === "yes" ? "Interested ✓" : "Show Interest";
-  } else {
-    const { data: crop } = await window.db
-      .from("crop_sales")
-      .select("lid, crop_name")
-      .eq("jid", fid)
-      .maybeSingle();
+  // Close popup function
+  function closePopup() {
+    document.getElementById('popupBg').style.display = 'none';
+  }
+  document.getElementById('popupClose').onclick = closePopup;
+  document.getElementById('popupBg').onclick = function(e) {
+    if (e.target === this) closePopup();
+  };
 
-    if (!crop) {
-      alert("Crop not found. Please refresh the page.");
+  // Load crops from DB and render cards
+  async function loadCrops() {
+    const { data, error } = await db.from('crop_sales')
+      .select('*')
+      .gt('quantity', 0)
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      alert("Failed to load crops: " + error.message);
       return;
     }
 
-    // Get user's email/name from logindata
-    const { data: userData } = await window.db
-      .from("logindata")
-      .select("username")
-      .eq("loginid", currentLoginId)
-      .maybeSingle();
+    const container = document.getElementById('cropsContainer');
+    container.innerHTML = "";
 
-    await window.db.from("buy_table").insert({
-      fid: fid,
-      cid: currentLoginId,
-      lid: crop.lid,
-      fname: fname,
-      cname: userData?.username || currentLoginId,
-      yn: "yes",
-      created_at: new Date().toISOString()
+    data.forEach(crop => {
+      const card = document.createElement('div');
+      card.className = "crop-card";
+      card.tabIndex = 0; // for accessibility
+      card.innerHTML = `
+        <div class="crop-title">${crop.crop_name}</div>
+        <div class="crop-info"><strong>Category:</strong> ${crop.crop_category || 'N/A'}</div>
+        <div class="crop-info"><strong>Price:</strong> ₹${crop.price} / kg</div>
+        <div class="crop-info"><strong>Available:</strong> ${crop.quantity} kg</div>
+        <div class="crop-info"><strong>Min Order:</strong> ${crop.min_quantity || 1} kg</div>
+        <div class="crop-info"><strong>Quality:</strong> ${crop.quality || 'N/A'}</div>
+        <div class="crop-info"><strong>Location:</strong> ${crop.location}</div>
+        <div class="crop-info"><strong>Delivery:</strong> ${crop.delivery_type || 'N/A'}</div>
+        <button type="button" class="buy-btn" style="margin-top:10px;">View Details</button>
+      `;
+
+      // Show popup with all details when "View Details" clicked
+      card.querySelector('.buy-btn').onclick = () => openPopup(crop);
+      container.appendChild(card);
     });
-
-    btn.innerText = "Interested ✓";
   }
-}
 
-document.getElementById("logout").onclick = () => {
-  sessionStorage.clear();
-  location.href = "login";
-};
+  // Open popup and fill data
+  function openPopup(crop) {
+    const popup = document.getElementById('popupBg');
+    const details = document.getElementById('popupDetails');
 
-// Start initialization
-init();
+    details.innerHTML = `
+      <div class="popup-section">
+        <h3>Farmer Details</h3>
+        <p><strong>Name:</strong> ${crop.farmer_name}</p>
+        <p><strong>Contact:</strong> ${crop.contact_info || 'N/A'}</p>
+      </div>
+      <div class="popup-section">
+        <h3>Crop Details</h3>
+        <p><strong>Name:</strong> ${crop.crop_name}</p>
+        <p><strong>Category:</strong> ${crop.crop_category || 'N/A'}</p>
+        <p><strong>Quality:</strong> ${crop.quality || 'N/A'}</p>
+        <p><strong>Harvest Date:</strong> ${crop.harvest_date || 'N/A'}</p>
+        <p><strong>Available Until:</strong> ${crop.available_until || 'N/A'}</p>
+        <p><strong>Description:</strong> ${crop.description || 'No description'}</p>
+      </div>
+      <div class="popup-section">
+        <h3>Sale Details</h3>
+        <p><strong>Price:</strong> ₹${crop.price} / kg</p>
+        <p><strong>Available Quantity:</strong> ${crop.quantity} kg</p>
+        <p><strong>Minimum Order Quantity:</strong> ${crop.min_quantity || 1} kg</p>
+        <p><strong>Location:</strong> ${crop.location}</p>
+        <p><strong>Delivery Type:</strong> ${crop.delivery_type || 'N/A'}</p>
+      </div>
+    `;
+
+    // Save crop object for buying
+    popup.dataset.currentCrop = JSON.stringify(crop);
+    document.getElementById('buyQuantity').value = crop.min_quantity || 1;
+
+    popup.style.display = "flex";
+  }
+
+  // Handle purchase form submission
+  document.getElementById('buyForm').onsubmit = async (e) => {
+    e.preventDefault();
+
+    const popup = document.getElementById('popupBg');
+    const crop = JSON.parse(popup.dataset.currentCrop);
+    const buyQuantity = parseInt(document.getElementById('buyQuantity').value);
+
+    if (isNaN(buyQuantity) || buyQuantity < (crop.min_quantity || 1)) {
+      alert(`Please enter a quantity of at least ${crop.min_quantity || 1} kg`);
+      return;
+    }
+    if (buyQuantity > crop.quantity) {
+      alert("Entered quantity exceeds available stock.");
+      return;
+    }
+
+    if (!confirm(`Are you sure you want to buy ${buyQuantity} kg of ${crop.crop_name} from ${crop.farmer_name}?`)) {
+      return;
+    }
+
+    // Insert into buy_table
+    const { error } = await db.from('buy_table').insert([{
+      fname: crop.farmer_name,
+      fid: crop.lid.toString(),
+      cname: crop.crop_name,
+      cid: crop.jid,
+      status: 'Pending',
+      lid: parseInt(loginid),
+      created_at: new Date().toISOString(),
+      is_confirmed: false
+    }]);
+
+    if (error) {
+      alert("Failed to place order: " + error.message);
+      return;
+    }
+
+    alert("Order placed successfully! Farmer will contact you soon.");
+    closePopup();
+
+    // Optionally refresh crop list or update UI
+    loadCrops();
+  };
+
+  loadCrops();
 </script>
 
 </body>
