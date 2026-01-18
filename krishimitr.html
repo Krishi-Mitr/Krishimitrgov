@@ -359,11 +359,11 @@ body.dark h2, body.dark h4 {
     <div class="row">
       <div class="col-md-6">
         <div class="card">
-          <h4>📊 Price Prediction</h4>
+          <h4> Price Prediction</h4>
           <p class="help-text" style="margin-top: -10px; margin-bottom: 15px;">Get price forecasts for your crops to make better selling decisions</p>
           
           <div class="form-group">
-            <label for="cropSelect">🌾 Select Crop</label>
+            <label for="cropSelect"> Select Crop</label>
             <select id="cropSelect" class="form-control">
               <option value="Wheat">Wheat</option>
               <option value="Rice">Rice</option>
@@ -381,7 +381,7 @@ body.dark h2, body.dark h4 {
           </div>
 
           <div class="form-group">
-            <label for="regionSelect">📍 Select Region</label>
+            <label for="regionSelect"> Select Region</label>
             <select id="regionSelect" class="form-control">
               <option value="Punjab">Punjab</option>
               <option value="Haryana">Haryana</option>
@@ -396,24 +396,24 @@ body.dark h2, body.dark h4 {
 
           <div class="form-group">
             <div class="horizon-label">
-              <label for="horizon" style="margin: 0;">📅 Forecast Period</label>
+              <label for="horizon" style="margin: 0;"> Forecast Period</label>
               <span class="horizon-value"><span id="hval">30</span> days</span>
             </div>
             <input type="range" id="horizon" min="7" max="90" value="30" step="1">
             <div class="help-text">Adjust to see prices for next 7-90 days</div>
           </div>
 
-          <button id="predictBtn" class="btn btn-primary w-100">🔮 Predict Prices</button>
-          <button id="combineBtn" class="btn btn-warning w-100 mt-2">✨ Predict + Get Advice</button>
+          <button id="predictBtn" class="btn btn-primary w-100"> Predict Prices</button>
+          <button id="combineBtn" class="btn btn-warning w-100 mt-2"> Predict + Get Advice</button>
           <button id="exportBtn" class="btn btn-info w-100 mt-2">📥 Export CSV</button>
         </div>
 
         <div class="card">
-          <h4>💡 Crop Advisor</h4>
+          <h4> Crop Advisor</h4>
           <p class="help-text" style="margin-top: -10px; margin-bottom: 15px;">Get personalized farming recommendations based on your conditions</p>
           
           <div class="form-group">
-            <label for="soilType">🌱 Soil Type</label>
+            <label for="soilType"> Soil Type</label>
             <select id="soilType" class="form-control">
               <option value="Loamy">Loamy (Best for most crops)</option>
               <option value="Clayey">Clayey</option>
@@ -423,18 +423,18 @@ body.dark h2, body.dark h4 {
           </div>
 
           <div class="form-group">
-            <label for="rainfall">🌧️ Expected Rainfall (mm)</label>
+            <label for="rainfall"> Expected Rainfall (mm)</label>
             <input type="number" id="rainfall" class="form-control" value="200" min="0" max="1000">
             <div class="help-text">Typical range: 100-400 mm</div>
           </div>
 
           <div class="form-group">
-            <label for="temp">🌡️ Expected Temperature (°C)</label>
+            <label for="temp"> Expected Temperature (°C)</label>
             <input type="number" id="temp" class="form-control" value="25" min="-10" max="50">
             <div class="help-text">Average temperature during growing season</div>
           </div>
 
-          <button id="adviseBtn" class="btn btn-success w-100">🌾 Get Farming Advice</button>
+          <button id="adviseBtn" class="btn btn-success w-100"> Get Farming Advice</button>
         </div>
       </div>
 
@@ -447,14 +447,14 @@ body.dark h2, body.dark h4 {
         </div>
 
         <div class="card">
-          <h4>💡 Recommendations</h4>
+          <h4> Recommendations</h4>
           <div id="actionCard">
             <p class="text-muted">Click "Predict Prices" to see buying/selling recommendations</p>
           </div>
         </div>
 
         <div class="card">
-          <h4>📋 Farming Advice</h4>
+          <h4> Farming Advice</h4>
           <div id="advisorOutput" class="text-muted">
             Click "Get Farming Advice" to receive personalized recommendations for seeds and fertilizers
           </div>
@@ -471,8 +471,7 @@ body.dark h2, body.dark h4 {
 </div>
 
 <script>
-// Check authentication - anyone logged in (Farmer or Citizen) can access this page
-// Use retry mechanism to handle navbar navigation timing issues
+
 (function() {
     let retryCount = 0;
     const MAX_RETRIES = 10;
@@ -732,9 +731,9 @@ function runPrediction(runAdvisorToo){
   const actionCard = document.getElementById('actionCard');
   let html = `<div><div class="recommend">Avg change: ${changePct.toFixed(1)}% over next ${days} days</div>`;
   if(changePct > 4){
-    html += `<div class="mt-2 text-success">🌟 Tip: Prices look like they will go <strong>up</strong>. Consider storing a bit and selling later.</div>`;
+    html += `<div class="mt-2 text-success"> Tip: Prices look like they will go <strong>up</strong>. Consider storing a bit and selling later.</div>`;
   } else if(changePct < -4){
-    html += `<div class="mt-2 text-danger">⚠️ Tip: Prices may go <strong>down</strong>. Consider selling soon.</div>`;
+    html += `<div class="mt-2 text-danger"> Tip: Prices may go <strong>down</strong>. Consider selling soon.</div>`;
   } else {
     html += `<div class="mt-2 text-warning">Tip: Prices should stay about the same. You can sell some now and keep some.</div>`;
   }
@@ -834,7 +833,7 @@ function exportCSV(){
 function generateQR(){
   const canvas = document.getElementById('qrCanvas');
 
-  const url = 'https://krishimitr8c.netlify.app';
+  const url = 'https://krishi-mitr.github.io/Krishimitrgov';
 
   try{
     QRCode.toCanvas(canvas, url, { width: 120 }, function (error) {
