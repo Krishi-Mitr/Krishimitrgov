@@ -8,132 +8,111 @@
 <script src="supabase.js"></script>
 
 <style>
-body {
-  margin: 0;
-  font-family: "Poppins", Arial, sans-serif;
-  min-height: 100vh;
-  background: linear-gradient(180deg,#f6e2cc 0%,#f7f9f8 45%,#dceee3 100%);
-  color: #1f2937;
+body{
+  margin:0;
+  font-family:Poppins,Arial,sans-serif;
+  min-height:100vh;
+  background:linear-gradient(180deg,#f6e2cc,#f7f9f8,#dceee3);
 }
 
-/* ===== NAVBAR (DASHBOARD STYLE) ===== */
-.top-nav {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 78px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0 32px;
-  background: linear-gradient(90deg,#ff9933,#ffffff,#138808);
-  border-bottom: 3px solid #0a3d62;
-  box-shadow: 0 6px 14px rgba(0,0,0,0.15);
-  z-index: 9999;
+/* NAVBAR */
+.top-nav{
+  position:fixed;
+  top:0; left:0; right:0;
+  height:78px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:0 30px;
+  background:linear-gradient(90deg,#ff9933,#ffffff,#138808);
+  border-bottom:3px solid #0a3d62;
+  z-index:100;
 }
 
-.nav-left {
-  display: flex;
-  gap: 16px;
+.nav-left{
+  display:flex;
+  gap:15px;
 }
 
-.nav-box {
-  background: #0a3d62;
-  color: white;
-  padding: 10px 20px;
-  border-radius: 10px;
-  font-weight: 600;
-  text-decoration: none;
-  transition: .25s;
+.nav-box{
+  background:#0a3d62;
+  color:#fff;
+  padding:10px 18px;
+  border-radius:10px;
+  text-decoration:none;
+  font-weight:600;
 }
 
-.nav-box:hover {
-  background: linear-gradient(135deg,#ff9933,#ffd28a);
-  color: black;
-  transform: translateY(-3px);
+.logout-btn{
+  background:white;
+  border:2px solid #0a3d62;
+  padding:10px 22px;
+  border-radius:10px;
+  font-weight:700;
+  cursor:pointer;
 }
 
-.logout-btn {
-  background: white;
-  color: #0a3d62;
-  border: 2px solid #0a3d62;
-  padding: 10px 22px;
-  border-radius: 10px;
-  font-weight: 700;
-  cursor: pointer;
+/* CONTENT */
+.container{
+  max-width:950px;
+  margin:140px auto 60px;
 }
 
-/* ===== CONTENT ===== */
-.container {
-  max-width: 900px;
-  margin: 150px auto 60px;
+.card{
+  background:white;
+  border-radius:22px;
+  padding:40px;
+  box-shadow:0 18px 35px rgba(0,0,0,.18);
+  border-top:6px solid #ff9933;
+  border-bottom:6px solid #138808;
 }
 
-/* SELL CARD */
-.sell-card {
-  background: white;
-  border-radius: 26px;
-  padding: 8px;
-  box-shadow: 0 18px 40px rgba(0,0,0,0.18);
+h1{
+  text-align:center;
+  color:#0a3d62;
+  margin-bottom:30px;
 }
 
-.sell-inner {
-  background: white;
-  border-radius: 20px;
-  padding: 50px;
-  border-top: 6px solid #ff9933;
-  border-bottom: 6px solid #138808;
+.form-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:22px;
 }
 
-.sell-inner h1 {
-  color: #0a3d62;
-  margin-bottom: 10px;
+.full{
+  grid-column:1 / -1;
 }
 
-.sell-inner p {
-  color: #374151;
-  margin-bottom: 30px;
+label{
+  font-weight:600;
+  display:block;
+  margin-bottom:6px;
 }
 
-label {
-  font-weight: 600;
-  margin-top: 14px;
-  display: block;
+input,select,textarea{
+  width:100%;
+  padding:12px;
+  border-radius:10px;
+  border:1px solid #cbd5e1;
+  font-size:15px;
 }
 
-input {
-  width: 100%;
-  padding: 12px;
-  border-radius: 12px;
-  border: 2px solid #0a3d62;
-  font-size: 1em;
+textarea{
+  resize:none;
+  height:90px;
 }
 
-input:focus {
-  outline: none;
-  border-color: #ff9933;
-  box-shadow: 0 0 0 .2rem rgba(255,153,51,.3);
-}
-
-.submit-btn {
-  margin-top: 30px;
-  width: 100%;
-  padding: 16px;
-  border: none;
-  border-radius: 14px;
-  font-size: 1.1em;
-  font-weight: 700;
-  background: linear-gradient(135deg,#138808,#2ecc71);
-  color: white;
-  cursor: pointer;
-  transition: .25s;
-}
-
-.submit-btn:hover {
-  background: linear-gradient(135deg,#ff9933,#ffd28a);
-  color: black;
-  transform: translateY(-3px);
+.submit-btn{
+  margin-top:30px;
+  width:100%;
+  padding:16px;
+  font-size:18px;
+  font-weight:700;
+  background:#0a3d62;
+  color:white;
+  border:none;
+  border-radius:14px;
+  cursor:pointer;
 }
 </style>
 </head>
@@ -144,96 +123,166 @@ input:focus {
 <div class="top-nav">
   <div class="nav-left">
     <a class="nav-box" href="Dashboard">Dashboard</a>
-    <a class="nav-box" href="krishimitr">Crop price predictor</a>
-    <a class="nav-box" href="Buy">Buy Crops</a>
-    <a class="nav-box" href="Update_crops">Manage Your Crops</a>
-    <a class="nav-box" href="Notification">Notifications</a>
+    <a class="nav-box" href="Sell">Sell Crops</a>
+    <a class="nav-box" href="Update_crops">Manage Crops</a>
   </div>
   <button class="logout-btn" id="logoutBtn">Logout</button>
 </div>
 
 <div class="container">
-
-<!-- SELL FORM -->
-<div class="sell-card">
-  <div class="sell-inner">
+  <div class="card">
     <h1>Sell Your Crops</h1>
-    <p>List your harvest securely on Krishi Mitr for verified buyers.</p>
 
     <form id="sellForm">
-      <label>Farmer Name</label>
-      <input type="text" id="farmerName" readonly>
+      <div class="form-grid">
 
-      <label>Crop Name</label>
-      <input type="text" id="crop_name" required>
+        <div>
+          <label>Farmer Name</label>
+          <input type="text" id="farmerName" readonly>
+        </div>
 
-      <label>Quantity (kg)</label>
-      <input type="number" id="quantity" required>
+        <div>
+          <label>Contact Info</label>
+          <input type="text" id="contactInfo" required>
+        </div>
 
-      <label>Price per kg (₹)</label>
-      <input type="number" id="price" required>
+        <div>
+          <label>Crop Name</label>
+          <input type="text" id="cropName" required>
+        </div>
 
-      <label>Address</label>
-      <input type="text" id="location" required>
+        <div>
+          <label>Crop Category</label>
+          <select id="cropCategory" required>
+            <option value="">Select</option>
+            <option>Grain</option>
+            <option>Vegetable</option>
+            <option>Fruit</option>
+            <option>Pulse</option>
+            <option>Spice</option>
+            <option>Other</option>
+          </select>
+        </div>
+
+        <div>
+          <label>Total Quantity (kg)</label>
+          <input type="number" id="quantity" required>
+        </div>
+
+        <div>
+          <label>Minimum Order Quantity (kg)</label>
+          <input type="number" id="minQuantity" required>
+        </div>
+
+        <div>
+          <label>Price (₹ / kg)</label>
+          <input type="text" id="price" required>
+        </div>
+
+        <div>
+          <label>Quality</label>
+          <select id="quality" required>
+            <option value="">Select</option>
+            <option>Premium</option>
+            <option>Standard</option>
+            <option>Low</option>
+          </select>
+        </div>
+
+        <div>
+          <label>Harvest Date</label>
+          <input type="date" id="harvestDate" required>
+        </div>
+
+        <div>
+          <label>Available Until</label>
+          <input type="date" id="availableUntil" required>
+        </div>
+
+        <div>
+          <label>Delivery Type</label>
+          <select id="deliveryType" required>
+            <option value="">Select</option>
+            <option>Self Pickup</option>
+            <option>Farmer Delivery</option>
+            <option>Transport Available</option>
+          </select>
+        </div>
+
+        <div>
+          <label>Location / Address</label>
+          <input type="text" id="location" required>
+        </div>
+
+        <div class="full">
+          <label>Description (Optional)</label>
+          <textarea id="description"></textarea>
+        </div>
+
+      </div>
 
       <button class="submit-btn">Submit Crop</button>
     </form>
   </div>
 </div>
 
-</div>
-
 <script>
 const db = window.db;
-const loginid = sessionStorage.getItem("loginid");
-const usertype = sessionStorage.getItem("usertype");
 
-if (!loginid || usertype !== "Farmer") {
-  location.href = "login";
-}
+async function loadFarmer(){
+  const loginid = sessionStorage.getItem("loginid");
+  if(!loginid){
+    location.href="login";
+    return;
+  }
 
-async function init() {
-  const { data } = await db
+  const {data} = await db
     .from("logindata")
-    .select("username")
-    .eq("loginid", loginid)
-    .maybeSingle();
+    .select("name")
+    .eq("loginid",loginid)
+    .single();
 
-  document.getElementById("farmerName").value = data.username;
+  document.getElementById("farmerName").value = data.name;
 }
 
-document.getElementById("sellForm").addEventListener("submit", async e => {
+document.getElementById("sellForm").addEventListener("submit",async(e)=>{
   e.preventDefault();
 
-  const { count } = await db
-    .from("crop_sales")
-    .select("*", { count: "exact", head: true })
-    .eq("lid", loginid);
+  const loginid = sessionStorage.getItem("loginid");
 
-  const jid = `${loginid}-${(count || 0) + 1}`;
-
-  await db.from("crop_sales").insert({
-    jid,
+  const {error} = await db.from("crop_sales").insert({
     farmer_name: farmerName.value,
-    crop_name: crop_name.value,
+    crop_name: cropName.value,
+    crop_category: cropCategory.value,
     quantity: quantity.value,
+    min_quantity: minQuantity.value,
     price: price.value,
+    quality: quality.value,
+    harvest_date: harvestDate.value,
+    available_until: availableUntil.value,
+    delivery_type: deliveryType.value,
     location: location.value,
-    created_at: new Date().toISOString(),
+    contact_info: contactInfo.value,
+    description: description.value,
+    jid: crypto.randomUUID(),
     lid: loginid
   });
 
-  alert("Crop listed successfully!");
-  document.getElementById("sellForm").reset();
-  document.getElementById("farmerName").value = farmerName.value;
+  if(error){
+    alert(error.message);
+  }else{
+    alert("Crop listed successfully");
+    e.target.reset();
+    loadFarmer();
+  }
 });
 
-document.getElementById("logoutBtn").onclick = () => {
+document.getElementById("logoutBtn").onclick=()=>{
   sessionStorage.clear();
-  location.href = "login";
+  location.href="login";
 };
 
-init();
+loadFarmer();
 </script>
 
 </body>
