@@ -2,97 +2,110 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Manage Your Crops - Krishi Mitr</title>
+<title>Manage Crops - Krishi Mitr</title>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="supabase.js"></script>
 
 <style>
+* { box-sizing: border-box; }
+
 body {
   margin: 0;
   font-family: "Poppins", Arial, sans-serif;
-  background: linear-gradient(180deg,#f6e2cc,#ffffff,#dceee3);
-  padding-top: 90px;
+  min-height: 100vh;
+  background: linear-gradient(
+    180deg,
+    #f6e2cc 0%,
+    #f7f9f8 45%,
+    #dceee3 100%
+  );
+  color: #1f2937;
 }
 
 /* NAVBAR */
-.topbar {
+.top-nav {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   height: 78px;
   display: flex;
+  justify-content: space-between;
   align-items: center;
-  padding: 0 28px;
+  padding: 0 32px;
   background: linear-gradient(90deg,#ff9933,#ffffff,#138808);
   border-bottom: 3px solid #0a3d62;
+  box-shadow: 0 6px 14px rgba(0,0,0,0.15);
   z-index: 1000;
 }
 
-.logo {
-  font-size: 22px;
-  font-weight: 800;
-  color: #0a3d62;
-}
-
-.menu {
+.nav-left {
   display: flex;
   gap: 16px;
-  margin-left: 30px;
 }
 
-.menu a {
-  text-decoration: none;
-  padding: 10px 18px;
-  border-radius: 10px;
-  font-weight: 600;
-  color: #0a3d62;
-}
-
-.menu a:hover {
-  background: #ff9933;
-  color: #111;
-}
-
-.logout {
-  margin-left: auto;
+.nav-box {
   background: #0a3d62;
   color: white;
-  padding: 10px 18px;
+  padding: 10px 20px;
   border-radius: 10px;
+  text-decoration: none;
+  font-weight: 600;
+  transition: .25s;
+}
+
+.nav-box:hover {
+  background: linear-gradient(135deg,#ff9933,#ffd28a);
+  color: black;
+  transform: translateY(-3px);
+}
+
+.logout-btn {
+  background: white;
+  color: #0a3d62;
+  border: 2px solid #0a3d62;
+  padding: 10px 22px;
+  border-radius: 10px;
+  font-weight: 700;
   cursor: pointer;
 }
 
 /* CONTENT */
 .container {
   max-width: 900px;
-  margin: auto;
+  margin: 130px auto 60px;
 }
 
-h1 {
+/* PAGE TITLE */
+.page-title {
   text-align: center;
+  font-size: 2.4em;
+  font-weight: 800;
   color: #0a3d62;
-  margin-bottom: 30px;
+  margin-bottom: 40px;
 }
 
 /* CROP CARD */
 .crop-card {
   background: white;
-  padding: 20px;
-  border-radius: 16px;
-  margin-bottom: 16px;
-  box-shadow: 0 10px 24px rgba(0,0,0,0.18);
+  border-radius: 22px;
+  padding: 26px;
+  margin-bottom: 18px;
+  box-shadow: 0 16px 36px rgba(0,0,0,0.18);
   cursor: pointer;
-  transition: transform .2s;
+  transition: .25s;
+  border-top: 5px solid #ff9933;
+  border-bottom: 5px solid #138808;
 }
 
 .crop-card:hover {
   transform: translateY(-4px);
 }
 
-.crop-card strong {
+.crop-card span {
   font-size: 1.1em;
+  font-weight: 700;
   color: #0a3d62;
 }
 
@@ -100,30 +113,39 @@ h1 {
 .modal {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,.55);
+  background: rgba(0,0,0,0.55);
   display: none;
   align-items: center;
   justify-content: center;
+  z-index: 2000;
 }
 
 .modal-box {
+  width: 420px;
   background: white;
-  padding: 30px;
-  border-radius: 20px;
-  width: 400px;
+  padding: 34px;
+  border-radius: 26px;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.35);
 }
 
 .modal-box h3 {
   color: #0a3d62;
+  margin-bottom: 20px;
 }
 
-.close {
-  margin-top: 20px;
+.modal-box p {
+  font-size: 1.05em;
+  margin: 8px 0;
+}
+
+.close-btn {
+  margin-top: 26px;
+  text-align: center;
+  padding: 12px;
   background: #0a3d62;
   color: white;
-  padding: 10px;
-  border-radius: 10px;
-  text-align: center;
+  font-weight: 700;
+  border-radius: 12px;
   cursor: pointer;
 }
 </style>
@@ -131,19 +153,19 @@ h1 {
 
 <body>
 
-<!-- NAV -->
-<div class="topbar">
-  <div class="logo">🌾 KrishiMitr</div>
-  <div class="menu">
-    <a href="Dashboard.html">Dashboard</a>
-    <a href="Buy.html">Buy Crops</a>
-    <a href="Notification.html">Notifications</a>
+<!-- NAVBAR -->
+<div class="top-nav">
+  <div class="nav-left">
+    <a class="nav-box" href="Dashboard">Dashboard</a>
+    <a class="nav-box" href="Buy">Buy Crops</a>
+    <a class="nav-box" href="Notification">Notifications</a>
   </div>
-  <div class="logout" id="logoutBtn">Logout</div>
+  <button class="logout-btn" id="logoutBtn">Logout</button>
 </div>
 
+<!-- CONTENT -->
 <div class="container">
-  <h1>Your Sold Crops</h1>
+  <div class="page-title">Manage Your Crops</div>
   <div id="cropList"></div>
 </div>
 
@@ -154,9 +176,8 @@ h1 {
     <p><b>Quantity:</b> <span id="mQty"></span> kg</p>
     <p><b>Price:</b> ₹<span id="mPrice"></span>/kg</p>
     <p><b>Location:</b> <span id="mLoc"></span></p>
-    <p><b>Listed on:</b> <span id="mTime"></span></p>
-
-    <div class="close" onclick="closeModal()">Close</div>
+    <p><b>Listed On:</b> <span id="mTime"></span></p>
+    <div class="close-btn" onclick="closeModal()">Close</div>
   </div>
 </div>
 
@@ -165,7 +186,7 @@ const loginid = sessionStorage.getItem("loginid");
 const usertype = sessionStorage.getItem("usertype");
 
 if (!loginid || usertype !== "Farmer") {
-  location.href = "login.html";
+  location.href = "login";
 }
 
 async function loadCrops() {
@@ -175,19 +196,21 @@ async function loadCrops() {
     .eq("lid", loginid)
     .order("created_at", { ascending: false });
 
+  const box = document.getElementById("cropList");
+
   if (error) {
-    document.getElementById("cropList").innerHTML = "Error loading crops";
+    box.innerHTML = "Failed to load crops.";
     return;
   }
 
   if (!data.length) {
-    document.getElementById("cropList").innerHTML = "No crops sold yet.";
+    box.innerHTML = "No crops listed yet.";
     return;
   }
 
-  document.getElementById("cropList").innerHTML = data.map(c => `
+  box.innerHTML = data.map(c => `
     <div class="crop-card" onclick='openModal(${JSON.stringify(c)})'>
-      <strong>You sold:</strong> ${c.crop_name}
+      <span>You sold: ${c.crop_name}</span>
     </div>
   `).join("");
 }
@@ -199,7 +222,6 @@ function openModal(c) {
   document.getElementById("mLoc").innerText = c.location;
   document.getElementById("mTime").innerText =
     new Date(c.created_at).toLocaleString();
-
   document.getElementById("modal").style.display = "flex";
 }
 
@@ -209,7 +231,7 @@ function closeModal() {
 
 document.getElementById("logoutBtn").onclick = () => {
   sessionStorage.clear();
-  location.href = "login.html";
+  location.href = "login";
 };
 
 loadCrops();
