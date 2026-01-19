@@ -1,172 +1,192 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
+<meta charset="UTF-8" />
 <title>Manage Crops - Krishi Mitr</title>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="supabase.js"></script>
 
 <style>
-* { box-sizing: border-box; }
+  /* Your existing styles */
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: "Poppins", Arial, sans-serif;
+    min-height: 100vh;
+    background: linear-gradient(180deg, #f6e2cc 0%, #f7f9f8 45%, #dceee3 100%);
+    color: #1f2937;
+  }
+  .top-nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    height: 78px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 32px;
+    background: linear-gradient(90deg,#ff9933,#ffffff,#138808);
+    border-bottom: 3px solid #0a3d62;
+    box-shadow: 0 6px 14px rgba(0,0,0,0.15);
+    z-index: 1000;
+  }
+  .nav-left {
+    display: flex;
+    gap: 16px;
+  }
+  .nav-box {
+    background: #0a3d62;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 10px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: .25s;
+  }
+  .nav-box:hover {
+    background: linear-gradient(135deg,#ff9933,#ffd28a);
+    color: black;
+    transform: translateY(-3px);
+  }
+  .logout-btn {
+    background: white;
+    color: #0a3d62;
+    border: 2px solid #0a3d62;
+    padding: 10px 22px;
+    border-radius: 10px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  .container {
+    max-width: 900px;
+    margin: 130px auto 60px;
+  }
+  .page-title {
+    text-align: center;
+    font-size: 2.4em;
+    font-weight: 800;
+    color: #0a3d62;
+    margin-bottom: 40px;
+  }
+  .crop-card {
+    background: white;
+    border-radius: 22px;
+    padding: 26px;
+    margin-bottom: 18px;
+    box-shadow: 0 16px 36px rgba(0,0,0,0.18);
+    cursor: pointer;
+    transition: .25s;
+    border-top: 5px solid #ff9933;
+    border-bottom: 5px solid #138808;
+  }
+  .crop-card:hover {
+    transform: translateY(-4px);
+  }
+  .crop-card span {
+    font-size: 1.1em;
+    font-weight: 700;
+    color: #0a3d62;
+  }
 
-body {
-  margin: 0;
-  font-family: "Poppins", Arial, sans-serif;
-  min-height: 100vh;
-  background: linear-gradient(
-    180deg,
-    #f6e2cc 0%,
-    #f7f9f8 45%,
-    #dceee3 100%
-  );
-  color: #1f2937;
-}
+  /* Modal styles */
+  .modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.55);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+  }
+  .modal-box {
+    width: 480px;
+    background: white;
+    padding: 34px 40px;
+    border-radius: 26px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.35);
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+  .modal-box h3 {
+    color: #0a3d62;
+    margin-bottom: 20px;
+    font-size: 1.8em;
+    font-weight: 800;
+    border-bottom: 2px solid #ff9933;
+    padding-bottom: 8px;
+  }
+  .modal-box p, .modal-box label {
+    font-size: 1.1em;
+    margin: 10px 0;
+    color: #333;
+  }
+  .modal-box label {
+    font-weight: 600;
+    display: block;
+  }
+  .modal-box input[type="text"],
+  .modal-box input[type="number"],
+  .modal-box input[type="date"],
+  .modal-box textarea {
+    width: 100%;
+    padding: 10px 14px;
+    margin-top: 6px;
+    border-radius: 10px;
+    border: 2px solid #0a3d62;
+    font-size: 1em;
+    font-family: inherit;
+    resize: vertical;
+  }
+  .modal-box textarea {
+    min-height: 60px;
+  }
 
-/* NAVBAR */
-.top-nav {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 78px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0 32px;
-  background: linear-gradient(90deg,#ff9933,#ffffff,#138808);
-  border-bottom: 3px solid #0a3d62;
-  box-shadow: 0 6px 14px rgba(0,0,0,0.15);
-  z-index: 1000;
-}
-
-.nav-left {
-  display: flex;
-  gap: 16px;
-}
-
-.nav-box {
-  background: #0a3d62;
-  color: white;
-  padding: 10px 20px;
-  border-radius: 10px;
-  text-decoration: none;
-  font-weight: 600;
-  transition: .25s;
-}
-
-.nav-box:hover {
-  background: linear-gradient(135deg,#ff9933,#ffd28a);
-  color: black;
-  transform: translateY(-3px);
-}
-
-.logout-btn {
-  background: white;
-  color: #0a3d62;
-  border: 2px solid #0a3d62;
-  padding: 10px 22px;
-  border-radius: 10px;
-  font-weight: 700;
-  cursor: pointer;
-}
-
-/* CONTENT */
-.container {
-  max-width: 900px;
-  margin: 130px auto 60px;
-}
-
-/* PAGE TITLE */
-.page-title {
-  text-align: center;
-  font-size: 2.4em;
-  font-weight: 800;
-  color: #0a3d62;
-  margin-bottom: 40px;
-}
-
-/* CROP CARD */
-.crop-card {
-  background: white;
-  border-radius: 22px;
-  padding: 26px;
-  margin-bottom: 18px;
-  box-shadow: 0 16px 36px rgba(0,0,0,0.18);
-  cursor: pointer;
-  transition: .25s;
-  border-top: 5px solid #ff9933;
-  border-bottom: 5px solid #138808;
-}
-
-.crop-card:hover {
-  transform: translateY(-4px);
-}
-
-.crop-card span {
-  font-size: 1.1em;
-  font-weight: 700;
-  color: #0a3d62;
-}
-
-/* MODAL */
-.modal {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.55);
-  display: none;
-  align-items: center;
-  justify-content: center;
-  z-index: 2000;
-}
-
-.modal-box {
-  width: 420px;
-  background: white;
-  padding: 34px;
-  border-radius: 26px;
-  box-shadow: 0 20px 40px rgba(0,0,0,0.35);
-}
-
-.modal-box h3 {
-  color: #0a3d62;
-  margin-bottom: 20px;
-}
-
-.modal-box p {
-  font-size: 1.05em;
-  margin: 8px 0;
-}
-
-.close-btn {
-  margin-top: 20px;
-  text-align: center;
-  padding: 12px;
-  background: #0a3d62;
-  color: white;
-  font-weight: 700;
-  border-radius: 12px;
-  cursor: pointer;
-}
-
-.delete-btn-modal {
-  margin-top: 12px;
-  text-align: center;
-  padding: 12px;
-  background: #dc3545;
-  color: white;
-  font-weight: 700;
-  border-radius: 12px;
-  cursor: pointer;
-  transition: .25s;
-  box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
-}
-
-.delete-btn-modal:hover {
-  background: #c82333;
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(220, 53, 69, 0.4);
-}
+  .modal-buttons {
+    margin-top: 24px;
+    display: flex;
+    justify-content: space-between;
+  }
+  .btn-primary {
+    background: #ff9933;
+    color: white;
+    border: none;
+    font-weight: 700;
+    padding: 12px 28px;
+    border-radius: 14px;
+    cursor: pointer;
+    transition: background 0.3s;
+  }
+  .btn-primary:hover {
+    background: #e68a00;
+  }
+  .btn-secondary {
+    background: #0a3d62;
+    color: white;
+    border: none;
+    font-weight: 700;
+    padding: 12px 28px;
+    border-radius: 14px;
+    cursor: pointer;
+    transition: background 0.3s;
+  }
+  .btn-secondary:hover {
+    background: #072945;
+  }
+  .delete-btn-modal {
+    margin-top: 16px;
+    background: #dc3545;
+    color: white;
+    font-weight: 700;
+    padding: 12px 20px;
+    border-radius: 14px;
+    cursor: pointer;
+    transition: background 0.3s;
+    width: 100%;
+    text-align: center;
+  }
+  .delete-btn-modal:hover {
+    background: #c82333;
+  }
 </style>
 </head>
 
@@ -189,125 +209,305 @@ body {
 </div>
 
 <!-- MODAL -->
-<div class="modal" id="modal">
+<div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
   <div class="modal-box">
-    <h3 id="mCrop"></h3>
-    <p><b>Quantity:</b> <span id="mQty"></span> kg</p>
-    <p><b>Price:</b> ₹<span id="mPrice"></span>/kg</p>
-    <p><b>Location:</b> <span id="mLoc"></span></p>
-    <p><b>Listed On:</b> <span id="mTime"></span></p>
-    <div class="delete-btn-modal" id="deleteBtnModal" onclick="deleteCropFromBuyTable()">Delete</div>
-    <div class="close-btn" onclick="closeModal()">Close</div>
+
+    <!-- VIEW MODE -->
+    <div id="viewDetails">
+      <h3 id="modalTitle"></h3>
+      <p><b>Farmer Name:</b> <span id="mFarmerName"></span></p>
+      <p><b>Crop Name:</b> <span id="mCrop"></span></p>
+      <p><b>Quantity:</b> <span id="mQty"></span> kg</p>
+      <p><b>Price:</b> ₹<span id="mPrice"></span>/kg</p>
+      <p><b>Location:</b> <span id="mLoc"></span></p>
+      <p><b>Category:</b> <span id="mCategory"></span></p>
+      <p><b>Min Quantity:</b> <span id="mMinQty"></span></p>
+      <p><b>Quality:</b> <span id="mQuality"></span></p>
+      <p><b>Harvest Date:</b> <span id="mHarvest"></span></p>
+      <p><b>Available Until:</b> <span id="mAvailableUntil"></span></p>
+      <p><b>Delivery Type:</b> <span id="mDelivery"></span></p>
+      <p><b>Contact Info:</b> <span id="mContact"></span></p>
+      <p><b>Description:</b> <span id="mDescription"></span></p>
+      <p><b>Listed On:</b> <span id="mTime"></span></p>
+
+      <div class="modal-buttons" style="margin-top: 24px;">
+        <button id="editBtn" class="btn-primary">Edit</button>
+        <button class="btn-secondary" id="closeViewBtn">Close</button>
+      </div>
+      <div class="delete-btn-modal" id="deleteBtnModal">Delete Crop</div>
+    </div>
+
+    <!-- EDIT MODE -->
+    <form id="updateForm" style="display:none;">
+      <h3>Edit Crop Details</h3>
+
+      <label for="editFarmerName">Farmer Name</label>
+      <input type="text" id="editFarmerName" required autocomplete="off" />
+
+      <label for="editCropName">Crop Name</label>
+      <input type="text" id="editCropName" required autocomplete="off" />
+
+      <label for="editQuantity">Quantity (kg)</label>
+      <input type="number" id="editQuantity" required min="1" />
+
+      <label for="editPrice">Price (₹/kg)</label>
+      <input type="number" id="editPrice" required min="0" />
+
+      <label for="editLocation">Location</label>
+      <input type="text" id="editLocation" required autocomplete="off" />
+
+      <label for="editCategory">Category</label>
+      <input type="text" id="editCategory" autocomplete="off" />
+
+      <label for="editMinQty">Min Quantity</label>
+      <input type="number" id="editMinQty" min="0" />
+
+      <label for="editQuality">Quality</label>
+      <input type="text" id="editQuality" autocomplete="off" />
+
+      <label for="editHarvest">Harvest Date</label>
+      <input type="date" id="editHarvest" />
+
+      <label for="editAvailableUntil">Available Until</label>
+      <input type="date" id="editAvailableUntil" />
+
+      <label for="editDelivery">Delivery Type</label>
+      <input type="text" id="editDelivery" autocomplete="off" />
+
+      <label for="editContact">Contact Info</label>
+      <textarea id="editContact" rows="3"></textarea>
+
+      <label for="editDescription">Description</label>
+      <textarea id="editDescription" rows="4"></textarea>
+
+      <div class="modal-buttons" style="margin-top: 24px;">
+        <button type="submit" class="btn-primary">Save Changes</button>
+        <button type="button" class="btn-secondary" id="cancelEditBtn">Cancel</button>
+      </div>
+    </form>
+
   </div>
 </div>
 
 <script>
-const loginid = sessionStorage.getItem("loginid");
-const usertype = sessionStorage.getItem("usertype");
+  const loginid = sessionStorage.getItem("loginid");
+  const usertype = sessionStorage.getItem("usertype");
 
-if (!loginid || usertype !== "Farmer") {
-  location.href = "login";
-}
-
-async function loadCrops() {
-  const { data, error } = await db
-    .from("crop_sales")
-    .select("*")
-    .eq("lid", loginid)
-    .order("created_at", { ascending: false });
-
-  const box = document.getElementById("cropList");
-
-  if (error) {
-    box.innerHTML = "Failed to load crops.";
-    return;
+  if (!loginid || usertype !== "Farmer") {
+    location.href = "login";
   }
 
-  if (!data.length) {
-    box.innerHTML = "No crops listed yet.";
-    return;
-  }
+  let currentCropId = null;
+  let currentCropJid = null;
 
-  box.innerHTML = data.map(c => `
-    <div class="crop-card" onclick='openModal(${JSON.stringify(c)})'>
-      <span>You sold: ${c.crop_name}</span>
-    </div>
-  `).join("");
-}
+  async function loadCrops() {
+    const { data, error } = await db
+      .from("crop_sales")
+      .select("*")
+      .eq("lid", loginid)
+      .order("created_at", { ascending: false });
 
-let currentCropId = null;
-let currentCropJid = null;
+    const box = document.getElementById("cropList");
 
-function openModal(c) {
-  currentCropId = c.id;
-  currentCropJid = c.jid;
-  document.getElementById("mCrop").innerText = c.crop_name;
-  document.getElementById("mQty").innerText = c.quantity;
-  document.getElementById("mPrice").innerText = c.price;
-  document.getElementById("mLoc").innerText = c.location;
-  document.getElementById("mTime").innerText =
-    new Date(c.created_at).toLocaleString();
-  document.getElementById("modal").style.display = "flex";
-}
-
-function closeModal() {
-  document.getElementById("modal").style.display = "none";
-  currentCropId = null;
-  currentCropJid = null;
-}
-
-async function deleteCropFromBuyTable() {
-  if (!currentCropId || !currentCropJid) {
-    alert('No crop selected.');
-    return;
-  }
-  
-  if (!confirm('Are you sure you want to delete this crop? This will permanently remove it.')) {
-    return;
-  }
-  
-  try {
-    // First, delete all entries from buy_table where fid matches the crop's jid
-    const { error: buyTableError } = await db
-      .from('buy_table')
-      .delete()
-      .eq('cid',currentCropJid);
-    
-    if (buyTableError) {
-      console.error('Error deleting:', buyTableError);
-      alert('An error occurred while deleting : ' + buyTableError.message);
+    if (error) {
+      box.innerHTML = "<p style='color:red;'>Failed to load crops.</p>";
       return;
     }
-    
-    // Then, delete the crop from crop_sales using its id
-    const { error: cropSalesError } = await db
-      .from('crop_sales')
-      .delete()
-      .eq('id', currentCropId);
-    
-    if (cropSalesError) {
-      console.error('Error deleting :', cropSalesError);
-      alert('An error occurred while deleting: ' + cropSalesError.message);
+
+    if (!data.length) {
+      box.innerHTML = "<p>No crops listed yet.</p>";
       return;
     }
-    
-    alert('Crop has been successfully deleted!');
-    closeModal();
-    // Reload crops to refresh the list
-    loadCrops();
-  } catch (error) {
-    console.error('Error deleting crop:', error);
-    alert('An error occurred while deleting crop. Please try again.');
+
+    box.innerHTML = data
+      .map(
+        (c) => `
+      <div class="crop-card" tabindex="0" role="button" aria-pressed="false" onclick='openModal(${JSON.stringify(
+        c
+      )})'>
+        <span>${c.crop_name}</span>
+      </div>
+    `
+      )
+      .join("");
   }
-}
 
-document.getElementById("logoutBtn").onclick = () => {
-  sessionStorage.clear();
-  location.href = "login";
-};
+  function openModal(c) {
+    currentCropId = c.id;
+    currentCropJid = c.jid;
 
-loadCrops();
+    // Fill view mode fields
+    document.getElementById("modalTitle").innerText = `Crop Details - ${c.crop_name}`;
+    document.getElementById("mFarmerName").innerText = c.farmer_name;
+    document.getElementById("mCrop").innerText = c.crop_name;
+    document.getElementById("mQty").innerText = c.quantity;
+    document.getElementById("mPrice").innerText = c.price;
+    document.getElementById("mLoc").innerText = c.location;
+    document.getElementById("mCategory").innerText = c.crop_category || "-";
+    document.getElementById("mMinQty").innerText = c.min_quantity ?? "-";
+    document.getElementById("mQuality").innerText = c.quality || "-";
+    document.getElementById("mHarvest").innerText = c.harvest_date
+      ? new Date(c.harvest_date).toLocaleDateString()
+      : "-";
+    document.getElementById("mAvailableUntil").innerText = c.available_until
+      ? new Date(c.available_until).toLocaleDateString()
+      : "-";
+    document.getElementById("mDelivery").innerText = c.delivery_type || "-";
+    document.getElementById("mContact").innerText = c.contact_info || "-";
+    document.getElementById("mDescription").innerText = c.description || "-";
+    document.getElementById("mTime").innerText = new Date(c.created_at).toLocaleString();
+
+    // Show view mode and hide edit form
+    document.getElementById("viewDetails").style.display = "block";
+    document.getElementById("updateForm").style.display = "none";
+
+    document.getElementById("modal").style.display = "flex";
+  }
+
+  // Close modal
+  function closeModal() {
+    document.getElementById("modal").style.display = "none";
+    currentCropId = null;
+    currentCropJid = null;
+  }
+
+  // Delete crop function
+  async function deleteCropFromBuyTable() {
+    if (!currentCropId || !currentCropJid) {
+      alert("No crop selected.");
+      return;
+    }
+
+    if (!confirm("Are you sure you want to delete this crop? This action cannot be undone.")) {
+      return;
+    }
+
+    try {
+      // Delete related entries from buy_table
+      const { error: buyTableError } = await db.from("buy_table").delete().eq("cid", currentCropJid);
+      if (buyTableError) {
+        alert("Error deleting related buy entries: " + buyTableError.message);
+        return;
+      }
+
+      // Delete crop_sales row
+      const { error: cropSalesError } = await db.from("crop_sales").delete().eq("id", currentCropId);
+      if (cropSalesError) {
+        alert("Error deleting crop: " + cropSalesError.message);
+        return;
+      }
+
+      alert("Crop deleted successfully!");
+      closeModal();
+      loadCrops();
+    } catch (error) {
+      alert("Error deleting crop: " + error.message);
+    }
+  }
+
+  // Start editing
+  document.getElementById("editBtn").addEventListener("click", () => {
+    // Hide view mode, show edit form
+    document.getElementById("viewDetails").style.display = "none";
+    document.getElementById("updateForm").style.display = "block";
+
+    // Prefill form fields
+    document.getElementById("editFarmerName").value = document.getElementById("mFarmerName").innerText;
+    document.getElementById("editCropName").value = document.getElementById("mCrop").innerText;
+    document.getElementById("editQuantity").value = document.getElementById("mQty").innerText;
+    document.getElementById("editPrice").value = document.getElementById("mPrice").innerText;
+    document.getElementById("editLocation").value = document.getElementById("mLoc").innerText;
+    document.getElementById("editCategory").value = document.getElementById("mCategory").innerText === "-" ? "" : document.getElementById("mCategory").innerText;
+    document.getElementById("editMinQty").value = document.getElementById("mMinQty").innerText === "-" ? "" : document.getElementById("mMinQty").innerText;
+    document.getElementById("editQuality").value = document.getElementById("mQuality").innerText === "-" ? "" : document.getElementById("mQuality").innerText;
+    // Format date input value to yyyy-mm-dd or empty
+    const harvestDate = document.getElementById("mHarvest").innerText;
+    document.getElementById("editHarvest").value = harvestDate === "-" ? "" : new Date(harvestDate).toISOString().split("T")[0];
+    const availUntil = document.getElementById("mAvailableUntil").innerText;
+    document.getElementById("editAvailableUntil").value = availUntil === "-" ? "" : new Date(availUntil).toISOString().split("T")[0];
+    document.getElementById("editDelivery").value = document.getElementById("mDelivery").innerText === "-" ? "" : document.getElementById("mDelivery").innerText;
+    document.getElementById("editContact").value = document.getElementById("mContact").innerText === "-" ? "" : document.getElementById("mContact").innerText;
+    document.getElementById("editDescription").value = document.getElementById("mDescription").innerText === "-" ? "" : document.getElementById("mDescription").innerText;
+  });
+
+  // Cancel editing
+  document.getElementById("cancelEditBtn").addEventListener("click", () => {
+    document.getElementById("updateForm").style.display = "none";
+    document.getElementById("viewDetails").style.display = "block";
+  });
+
+  // Close buttons
+  document.getElementById("closeViewBtn").addEventListener("click", closeModal);
+
+  // Delete button
+  document.getElementById("deleteBtnModal").addEventListener("click", deleteCropFromBuyTable);
+
+  // Handle form submit for update
+  document.getElementById("updateForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    // Get updated values
+    const farmer_name = document.getElementById("editFarmerName").value.trim();
+    const crop_name = document.getElementById("editCropName").value.trim();
+    const quantity = parseInt(document.getElementById("editQuantity").value);
+    const price = parseInt(document.getElementById("editPrice").value);
+    const location = document.getElementById("editLocation").value.trim();
+    const crop_category = document.getElementById("editCategory").value.trim() || null;
+    const min_quantity = document.getElementById("editMinQty").value ? parseInt(document.getElementById("editMinQty").value) : null;
+    const quality = document.getElementById("editQuality").value.trim() || null;
+    const harvest_date = document.getElementById("editHarvest").value || null;
+    const available_until = document.getElementById("editAvailableUntil").value || null;
+    const delivery_type = document.getElementById("editDelivery").value.trim() || null;
+    const contact_info = document.getElementById("editContact").value.trim() || null;
+    const description = document.getElementById("editDescription").value.trim() || null;
+
+    if (!farmer_name || !crop_name || isNaN(quantity) || isNaN(price) || !location) {
+      alert("Please fill in all required fields correctly.");
+      return;
+    }
+
+    try {
+      const { error } = await db
+        .from("crop_sales")
+        .update({
+          farmer_name,
+          crop_name,
+          quantity,
+          price,
+          location,
+          crop_category,
+          min_quantity,
+          quality,
+          harvest_date,
+          available_until,
+          delivery_type,
+          contact_info,
+          description,
+        })
+        .eq("id", currentCropId)
+        .eq("lid", parseInt(loginid));
+
+      if (error) {
+        alert("Failed to update crop: " + error.message);
+        return;
+      }
+
+      alert("Crop updated successfully!");
+      closeModal();
+      loadCrops();
+    } catch (err) {
+      alert("Error updating crop: " + err.message);
+    }
+  });
+
+  // Logout
+  document.getElementById("logoutBtn").onclick = () => {
+    sessionStorage.clear();
+    location.href = "login";
+  };
+
+  // Load crops on page load
+  loadCrops();
 </script>
-
 </body>
 </html>
