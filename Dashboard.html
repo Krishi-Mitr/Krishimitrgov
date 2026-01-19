@@ -1,123 +1,194 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
+<meta charset="UTF-8">
 <title>Dashboard - Krishi Mitr</title>
-
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="supabase.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
-body {
-  margin: 0;
-  font-family: "Poppins", Arial, sans-serif;
-  min-height: 100vh;
-  background: linear-gradient(180deg,#f6e2cc 0%,#f7f9f8 45%,#dceee3 100%);
-  color: #1f2937;
+* {
+    box-sizing: border-box;
 }
 
-/* NAVBAR */
+body {
+    margin: 0;
+    font-family: 'Poppins', sans-serif;
+    min-height: 100vh;
+    background: linear-gradient(
+        180deg,
+        #FF9933 0%,
+        #FFFFFF 50%,
+        #138808 100%
+    );
+    background-attachment: fixed;
+}
+
+/* ===== NAVBAR ===== */
 .top-nav {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 78px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0 32px;
-  background: linear-gradient(90deg,#ff9933,#ffffff,#138808);
-  border-bottom: 3px solid #0a3d62;
-  box-shadow: 0 6px 14px rgba(0,0,0,0.15);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 24px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background: rgba(255, 255, 255, 0.65);
+    backdrop-filter: blur(8px);
+    border-bottom: 3px solid #000080;
+    z-index: 1000;
 }
 
 .nav-left {
-  display: flex;
-  gap: 16px;
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
 }
 
 .nav-box {
-  background: #0a3d62;
-  color: white;
-  padding: 10px 20px;
-  border-radius: 10px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: .25s;
-  text-decoration: none;
+    background: #000080;
+    color: white;
+    padding: 10px 18px;
+    border-radius: 10px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 14px;
+    transition: 0.25s ease;
+    box-shadow: 0 3px 8px rgba(0,0,40,0.25);
 }
 
 .nav-box:hover {
-  background: linear-gradient(135deg,#ff9933,#ffd28a);
-  color: black;
-  transform: translateY(-3px);
+    background: #FF9933;
+    color: #000;
+    transform: translateY(-2px);
 }
 
 .logout-btn {
-  background: white;
-  color: #0a3d62;
-  border: 2px solid #0a3d62;
-  padding: 10px 22px;
-  border-radius: 10px;
-  font-weight: 700;
-  cursor: pointer;
+    background: #FF9933;
+    color: white;
+    padding: 9px 18px;
+    border-radius: 10px;
+    text-decoration: none;
+    font-weight: 600;
+    border: 2px solid #000080;
+    transition: 0.25s ease;
+    white-space: nowrap;
 }
 
-/* CONTENT */
+.logout-btn:hover {
+    background: #138808;
+    transform: translateY(-2px);
+}
+
+/* ===== CONTENT ===== */
 .container {
-  max-width: 900px;
-  margin: 150px auto 60px;
-  text-align: center;
-}
-
-.welcome-card {
-  background: white;
-  border-radius: 26px;
-  padding: 8px;
-  box-shadow: 0 18px 40px rgba(0,0,0,0.18);
-}
-
-.welcome-inner {
-  background: white;
-  border-radius: 20px;
-  padding: 50px 45px;
-  border-top: 6px solid #ff9933;
-  border-bottom: 6px solid #138808;
+    max-width: 900px;
+    margin: 140px auto 50px;
+    background: rgba(255,255,255,0.95);
+    padding: 40px;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+    text-align: center;
+    border-left: 6px solid #FF9933;
+    border-right: 6px solid #138808;
 }
 
 h1 {
-  color: #0a3d62;
-  font-size: 2.6em;
+    color: #000080;
+    font-size: 2.5em;
 }
 
 p {
-  font-size: 1.15em;
-  color: #374151;
+    font-size: 1.15em;
 }
 
-#roleText {
-  margin-top: 18px;
-  font-weight: 600;
-  color: #1e3a8a;
+.btn-dark-toggle {
+    background: rgba(255, 255, 255, 0.9);
+    color: #000080;
+    padding: 9px 18px;
+    border-radius: 10px;
+    font-weight: 600;
+    border: 2px solid #000080;
+    cursor: pointer;
+    transition: 0.25s ease;
+    white-space: nowrap;
+    font-size: 14px;
 }
 
-.action-btn {
-  display: inline-block;
-  margin: 15px;
-  padding: 16px 34px;
-  font-size: 1.1em;
-  font-weight: 700;
-  border-radius: 14px;
-  text-decoration: none;
-  color: white;
-  background: #0a3d62;
-  transition: .25s;
+.btn-dark-toggle:hover {
+    background: #000080;
+    color: white;
+    transform: translateY(-2px);
 }
 
-.action-btn:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 12px 24px rgba(0,0,0,0.3);
+/* ===== DARK MODE ===== */
+body.dark {
+    background: linear-gradient(180deg, #1a1a1a 0%, #2d2d2d 50%, #1a1a1a 100%);
+    color: #e0e0e0;
+}
+
+body.dark .top-nav {
+    background: rgba(45, 45, 45, 0.95);
+    border-bottom: 3px solid #4a9eff;
+}
+
+body.dark .nav-box {
+    background: #4a9eff;
+    color: white;
+}
+
+body.dark .nav-box:hover {
+    background: #6bb0ff;
+    color: #fff;
+}
+
+body.dark .logout-btn {
+    background: #4a9eff;
+    color: white;
+    border-color: #4a9eff;
+}
+
+body.dark .logout-btn:hover {
+    background: #6bb0ff;
+}
+
+body.dark .container {
+    background: rgba(45, 45, 45, 0.95);
+    color: #e0e0e0;
+    border-left: 6px solid #4a9eff;
+    border-right: 6px solid #4a9eff;
+}
+
+body.dark h1 {
+    color: #e0e0e0;
+}
+
+body.dark p {
+    color: #d0d0d0;
+}
+
+body.dark .btn-dark-toggle {
+    background: #3d3d3d;
+    color: #e0e0e0;
+    border-color: #555;
+}
+
+body.dark .btn-dark-toggle:hover {
+    background: #4d4d4d;
+    color: #fff;
+}
+
+/* ===== MOBILE ===== */
+@media (max-width: 768px) {
+    .top-nav {
+        flex-direction: column;
+        gap: 10px;
+        padding: 12px;
+    }
+
+    .nav-left {
+        justify-content: center;
+    }
 }
 </style>
 </head>
@@ -126,112 +197,107 @@ p {
 
 <!-- NAVBAR -->
 <div class="top-nav">
-  <div class="nav-left" id="navMenu"></div>
-  <button class="logout-btn" id="logoutBtn">Logout</button>
+    <div class="nav-left" id="navMenu"></div>
+    <div style="display: flex; gap: 10px; align-items: center;">
+        <button id="toggleDark" class="btn-dark-toggle">🌙 Dark Mode</button>
+        <a href="#" class="logout-btn" id="logoutBtn">Logout</a>
+    </div>
 </div>
 
+<!-- MAIN -->
 <div class="container">
-
-  <!-- DASHBOARD VIEW -->
-  <div id="dashboardView">
-    <div class="welcome-card">
-      <div class="welcome-inner">
-        <h1 id="welcomeText">Loading...</h1>
-        <p>Your Krishi Mitr Dashboard</p>
-        <p id="roleText"></p>
-      </div>
-    </div>
-  </div>
-
-  <!-- YOUR CROPS VIEW -->
-  <div id="cropsView" style="display:none; margin-top:40px;">
-    <div class="welcome-card">
-      <div class="welcome-inner">
-        <h1>Manage Your Harvest</h1>
-        <p>
-          Sell your crops or manage your existing crop listings
-          directly from your dashboard.
-        </p>
-        <a href="Sell" class="action-btn">Sell Your Crops</a>
-        <a href="Update_crops" class="action-btn">Manage Your Crops</a>
-      </div>
-    </div>
-  </div>
-
+    <h1 id="welcomeText">Loading...</h1>
+    <p>Your Krishi Mitr Dashboard</p>
+    <p id="roleText"></p>
 </div>
 
 <script>
-const db = window.db;
+let retryCount = 0;
+const MAX_RETRIES = 20;
 
-function renderNavbar(view, usertype) {
-  let html = "";
+function initDashboard() {
+    const loginid = sessionStorage.getItem("loginid");
+    const usertype = sessionStorage.getItem("usertype");
 
-  if (view === "dashboard") {
-     html += `<a class="nav-box" href="krishimitr">Crop price predictor</a>`;
-    if (usertype === "Farmer") {
-      html += `<div class="nav-box" onclick="showCrops()">Your Crops</div>`;
+    if (!loginid || !usertype) {
+        window.location.href = "login.html";
+        return;
     }
-  }
 
-  if (view === "crops") {
-    html += `<div class="nav-box" onclick="showDashboard()">Dashboard</div>`;
-      html += `<a class="nav-box" href="krishimitr">Crop price predictor</a>`;
-  }
+    // Check if elements exist, if not retry after a short delay
+    const welcomeTextEl = document.getElementById("welcomeText");
+    const roleTextEl = document.getElementById("roleText");
+    const nav = document.getElementById("navMenu");
+    const logoutBtn = document.getElementById("logoutBtn");
 
-  html += `<a class="nav-box" href="Buy">Buy Crops</a>`;
-   
+    if ((!welcomeTextEl || !roleTextEl || !nav || !logoutBtn) && retryCount < MAX_RETRIES) {
+        // Elements not ready yet, retry
+        retryCount++;
+        setTimeout(initDashboard, 50);
+        return;
+    }
 
+    // Set welcome text
+    if (welcomeTextEl) {
+        welcomeTextEl.innerText = `Welcome, ${usertype}`;
+    }
 
-  if (usertype === "Farmer") {
-    html += `<a class="nav-box" href="Notification">Notifications</a>`;
-  }
+    // Set role text
+    if (roleTextEl) {
+        roleTextEl.innerText = usertype === "Farmer"
+            ? "Manage crops, sell harvests, and get smart insights."
+            : "Explore and buy fresh produce directly from farmers.";
+    }
 
-  document.getElementById("navMenu").innerHTML = html;
+    // Set navigation menu
+    if (nav) {
+        nav.innerHTML = `
+            <a class="nav-box" href="krishimitr.html">Crop Advisor</a>
+            ${usertype === "Farmer" ? `<a class="nav-box" href="Sell.html">Sell Crops</a>` : ""}
+            <a class="nav-box" href="Buy.html">Buy Crops</a>
+            ${usertype === "Farmer" ? `<a class="nav-box" href="Notification.html">Notifications</a>` : ""}
+        `;
+    }
+
+    // Set logout button
+    if (logoutBtn) {
+        logoutBtn.onclick = () => {
+            sessionStorage.clear();
+            window.location.href = "login.html";
+        };
+    }
 }
 
-function showDashboard() {
-  document.getElementById("dashboardView").style.display = "block";
-  document.getElementById("cropsView").style.display = "none";
-  renderNavbar("dashboard", sessionStorage.getItem("usertype"));
+// Dark mode functionality
+function initDarkMode() {
+    const savedDarkMode = localStorage.getItem('darkMode') === 'true';
+    if (savedDarkMode) {
+        document.body.classList.add('dark');
+    }
+    updateDarkModeButton();
 }
 
-function showCrops() {
-  document.getElementById("dashboardView").style.display = "none";
-  document.getElementById("cropsView").style.display = "block";
-  renderNavbar("crops", sessionStorage.getItem("usertype"));
+function updateDarkModeButton() {
+    const toggleBtn = document.getElementById('toggleDark');
+    if (toggleBtn) {
+        toggleBtn.innerText = document.body.classList.contains('dark') ? '☀️ Light Mode' : '🌙 Dark Mode';
+    }
 }
 
-async function initDashboard() {
-  const loginid = sessionStorage.getItem("loginid");
-  const usertype = sessionStorage.getItem("usertype");
-
-  if (!loginid || !usertype) {
-    window.location.href = "login";
-    return;
-  }
-
-  const { data } = await db
-    .from("logindata")
-    .select("name")
-    .eq("loginid", loginid)
-    .maybeSingle();
-
-  document.getElementById("welcomeText").innerText =
-    `Welcome, ${data.name}`;
-
-  document.getElementById("roleText").innerText =
-    usertype === "Farmer"
-      ? "Access crop prices and manage your harvest."
-      : "Browse crop prices and procure fresh produce.";
-
-  showDashboard(); // default view
+const toggleBtn = document.getElementById('toggleDark');
+if (toggleBtn) {
+    toggleBtn.addEventListener('click', () => {
+        document.body.classList.toggle('dark');
+        const isDark = document.body.classList.contains('dark');
+        localStorage.setItem('darkMode', isDark);
+        updateDarkModeButton();
+    });
 }
 
-document.getElementById("logoutBtn").onclick = () => {
-  sessionStorage.clear();
-  window.location.href = "login";
-};
+// Initialize dark mode
+initDarkMode();
 
+// Start initialization
 initDashboard();
 </script>
 
