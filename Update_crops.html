@@ -1,424 +1,513 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<title>Manage Your Crops - Krishi Mitr</title>
+<meta charset="UTF-8">
+<title>Manage Crops - Krishi Mitr</title>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="supabase.js"></script>
 
 <style>
-  body {
-    margin: 0;
-    font-family: "Poppins", Arial, sans-serif;
-    min-height: 100vh;
-    background: linear-gradient(180deg, #f6e2cc 0%, #f7f9f8 45%, #dceee3 100%);
-    color: #1f2937;
-  }
-  /* Navbar styles */
-  .top-nav {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 78px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0 32px;
-    background: linear-gradient(90deg, #ff9933, #ffffff, #138808);
-    border-bottom: 3px solid #0a3d62;
-    box-shadow: 0 6px 14px rgba(0,0,0,0.15);
-    z-index: 9999;
-  }
-  .nav-left {
-    display: flex;
-    gap: 16px;
-  }
-  .nav-box {
-    background: #0a3d62;
-    color: white;
-    padding: 10px 20px;
-    border-radius: 10px;
-    font-weight: 600;
-    text-decoration: none;
-    transition: .25s;
-  }
-  .nav-box:hover {
-    background: linear-gradient(135deg,#ff9933,#ffd28a);
-    color: black;
-    transform: translateY(-3px);
-  }
-  .logout-btn {
-    background: white;
-    color: #0a3d62;
-    border: 2px solid #0a3d62;
-    padding: 10px 22px;
-    border-radius: 10px;
-    font-weight: 700;
-    cursor: pointer;
-  }
-  /* Container */
-  .container {
-    max-width: 900px;
-    margin: 130px auto 60px;
-  }
-  /* Crop Card */
-  .crop-card {
-    background: white;
-    border-radius: 22px;
-    padding: 20px;
-    margin-bottom: 18px;
-    box-shadow: 0 16px 36px rgba(0,0,0,0.18);
-    cursor: pointer;
-    transition: .25s;
-    border-top: 5px solid #ff9933;
-    border-bottom: 5px solid #138808;
-  }
-  .crop-card:hover {
-    transform: translateY(-4px);
-  }
-  .crop-card span {
-    font-size: 1.2em;
-    font-weight: 700;
-    color: #0a3d62;
-  }
-  /* Modal */
-  .modal {
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.55);
-    display: none;
-    align-items: center;
-    justify-content: center;
-    z-index: 2000;
-  }
-  .modal-box {
-    width: 460px;
-    background: white;
-    padding: 30px 36px;
-    border-radius: 26px;
-    box-shadow: 0 20px 40px rgba(0,0,0,0.35);
-  }
-  .modal-box h3 {
-    color: #0a3d62;
-    margin-bottom: 20px;
-  }
-  label {
-    display: block;
-    font-weight: 600;
-    margin: 12px 0 6px;
-  }
-  input, textarea {
-    width: 100%;
-    padding: 10px;
-    border-radius: 12px;
-    border: 2px solid #0a3d62;
-    font-size: 1em;
-  }
-  textarea {
-    resize: vertical;
-  }
-  input:focus, textarea:focus {
-    outline: none;
-    border-color: #ff9933;
-  }
-  .input-error {
-    border-color: #dc2626 !important;
-    background: #fff5f5;
-  }
-  .button-group {
-    margin-top: 20px;
-    display: flex;
-    gap: 12px;
-    justify-content: flex-end;
-  }
-  button {
-    padding: 12px 24px;
-    font-weight: 700;
-    border-radius: 14px;
-    cursor: pointer;
-    border: none;
-    font-size: 1em;
-  }
-  .btn-cancel {
-    background: #0a3d62;
-    color: white;
-    transition: background 0.3s;
-  }
-  .btn-cancel:hover {
-    background: #08304e;
-  }
-  .btn-save {
-    background: linear-gradient(135deg,#138808,#2ecc71);
-    color: white;
-    transition: background 0.3s;
-  }
-  .btn-save:hover {
-    background: linear-gradient(135deg,#0a8000,#27ae60);
-  }
-  .btn-delete {
-    background: #dc3545;
-    color: white;
-    transition: background 0.3s;
-  }
-  .btn-delete:hover {
-    background: #c82333;
-  }
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: "Poppins", Arial, sans-serif;
+  min-height: 100vh;
+  background: linear-gradient(
+    180deg,
+    #f6e2cc 0%,
+    #f7f9f8 45%,
+    #dceee3 100%
+  );
+  color: #1f2937;
+}
+
+/* NAVBAR */
+.top-nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 78px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 32px;
+  background: linear-gradient(90deg,#ff9933,#ffffff,#138808);
+  border-bottom: 3px solid #0a3d62;
+  box-shadow: 0 6px 14px rgba(0,0,0,0.15);
+  z-index: 1000;
+}
+
+.nav-left {
+  display: flex;
+  gap: 16px;
+}
+
+.nav-box {
+  background: #0a3d62;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 10px;
+  text-decoration: none;
+  font-weight: 600;
+  transition: .25s;
+}
+
+.nav-box:hover {
+  background: linear-gradient(135deg,#ff9933,#ffd28a);
+  color: black;
+  transform: translateY(-3px);
+}
+
+/* Your Crops dropdown */
+.nav-dropdown {
+  position: relative;
+  display: inline-block;
+}
+.nav-dropdown-toggle {
+  background: #0a3d62;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 10px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: .25s;
+  font-size: 1em;
+}
+.nav-dropdown-toggle:hover {
+  background: linear-gradient(135deg,#ff9933,#ffd28a);
+  color: black;
+  transform: translateY(-3px);
+}
+.nav-dropdown-menu {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background: white;
+  min-width: 200px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+  border-radius: 10px;
+  z-index: 1001;
+  margin-top: 4px;
+  overflow: hidden;
+  border: 2px solid #0a3d62;
+}
+.nav-dropdown:hover .nav-dropdown-menu {
+  display: block;
+}
+.nav-dropdown-menu a {
+  display: block;
+  padding: 12px 20px;
+  color: #0a3d62;
+  text-decoration: none;
+  font-weight: 600;
+}
+.nav-dropdown-menu a:hover {
+  background: #f6e2cc;
+}
+
+.logout-btn {
+  background: white;
+  color: #0a3d62;
+  border: 2px solid #0a3d62;
+  padding: 10px 22px;
+  border-radius: 10px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+/* CONTENT */
+.container {
+  max-width: 900px;
+  margin: 130px auto 60px;
+}
+
+/* PAGE TITLE */
+.page-title {
+  text-align: center;
+  font-size: 2.4em;
+  font-weight: 800;
+  color: #0a3d62;
+  margin-bottom: 40px;
+}
+
+/* CROP CARD */
+.crop-card {
+  background: white;
+  border-radius: 22px;
+  padding: 26px;
+  margin-bottom: 18px;
+  box-shadow: 0 16px 36px rgba(0,0,0,0.18);
+  cursor: pointer;
+  transition: .25s;
+  border-top: 5px solid #ff9933;
+  border-bottom: 5px solid #138808;
+}
+
+.crop-card:hover {
+  transform: translateY(-4px);
+}
+
+.crop-card span {
+  font-size: 1.1em;
+  font-weight: 700;
+  color: #0a3d62;
+}
+
+/* MODAL */
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.55);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+}
+
+.modal-box {
+  width: 420px;
+  background: white;
+  padding: 34px;
+  border-radius: 26px;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.35);
+}
+
+.modal-box h3 {
+  color: #0a3d62;
+  margin-bottom: 20px;
+}
+
+.modal-box p {
+  font-size: 1.05em;
+  margin: 8px 0;
+}
+
+.close-btn {
+  margin-top: 20px;
+  text-align: center;
+  padding: 12px;
+  background: #0a3d62;
+  color: white;
+  font-weight: 700;
+  border-radius: 12px;
+  cursor: pointer;
+}
+
+.delete-btn-modal {
+  margin-top: 12px;
+  text-align: center;
+  padding: 12px;
+  background: #dc3545;
+  color: white;
+  font-weight: 700;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: .25s;
+  box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
+}
+
+.delete-btn-modal:hover {
+  background: #c82333;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(220, 53, 69, 0.4);
+}
+
+.btn-dark-toggle {
+  background: white;
+  color: #0a3d62;
+  border: 2px solid #0a3d62;
+  padding: 10px 22px;
+  border-radius: 10px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: .25s;
+}
+
+.btn-dark-toggle:hover {
+  background: #0a3d62;
+  color: white;
+}
+
+/* Dark Mode Styles */
+body.dark {
+  background: linear-gradient(180deg, #1a1a1a 0%, #2d2d2d 45%, #1a1a1a 100%);
+  color: #e0e0e0;
+}
+
+body.dark .top-nav {
+  background: linear-gradient(90deg, #2d2d2d, #3d3d3d, #2d2d2d);
+  border-bottom: 3px solid #4a9eff;
+}
+
+body.dark .nav-box {
+  background: #4a9eff;
+  color: white;
+}
+
+body.dark .nav-box:hover {
+  background: #6bb0ff;
+  color: #fff;
+}
+
+body.dark .nav-dropdown-toggle {
+  background: #4a9eff;
+  color: white;
+}
+body.dark .nav-dropdown-toggle:hover {
+  background: #6bb0ff;
+  color: #fff;
+}
+body.dark .nav-dropdown-menu {
+  background: #2d2d2d;
+  border-color: #4a9eff;
+}
+body.dark .nav-dropdown-menu a {
+  color: #e0e0e0;
+}
+body.dark .nav-dropdown-menu a:hover {
+  background: #3d3d3d;
+}
+
+body.dark .logout-btn {
+  background: #4a9eff;
+  color: white;
+  border-color: #4a9eff;
+}
+
+body.dark .logout-btn:hover {
+  background: #6bb0ff;
+}
+
+body.dark .page-title {
+  color: #e0e0e0;
+}
+
+body.dark .crop-card {
+  background: #2d2d2d;
+  border-top-color: #4a9eff;
+  border-bottom-color: #4a9eff;
+  color: #e0e0e0;
+}
+
+body.dark .crop-card span {
+  color: #e0e0e0;
+}
+
+body.dark .modal {
+  background: rgba(0, 0, 0, 0.8);
+}
+
+body.dark .modal-box {
+  background: #2d2d2d;
+  color: #e0e0e0;
+}
+
+body.dark .modal-box h3 {
+  color: #e0e0e0;
+}
+
+body.dark .close-btn {
+  background: #4a9eff;
+}
+
+body.dark .close-btn:hover {
+  background: #6bb0ff;
+}
+
+body.dark .btn-dark-toggle {
+  background: #3d3d3d;
+  color: #e0e0e0;
+  border-color: #555;
+}
+
+body.dark .btn-dark-toggle:hover {
+  background: #4d4d4d;
+  color: #fff;
+}
 </style>
 </head>
+
 <body>
 
+<!-- NAVBAR -->
 <div class="top-nav">
   <div class="nav-left">
-    <a href="Dashboard" class="nav-box">Dashboard</a>
-    <a href="Sell" class="nav-box">Sell Crops</a>
-    <a href="Buy" class="nav-box">Buy Crops</a>
-    <a href="Notification" class="nav-box">Notifications</a>
+    <a class="nav-box" href="Dashboard.html">Dashboard</a>
+    <div class="nav-dropdown">
+      <button type="button" class="nav-dropdown-toggle">Your Crops ▼</button>
+      <div class="nav-dropdown-menu">
+        <a href="Sell.html">Sell your crops</a>
+        <a href="Update_crops.html">Manage your crops</a>
+      </div>
+    </div>
+    <a class="nav-box" href="Buy.html">Buy Crops</a>
+    <a class="nav-box" href="Notification.html">Notifications</a>
   </div>
-  <button id="logoutBtn" class="logout-btn">Logout</button>
+  <div style="display: flex; gap: 10px; align-items: center;">
+    <button id="toggleDark" class="btn-dark-toggle">🌙 Dark Mode</button>
+    <button class="logout-btn" id="logoutBtn">Logout</button>
+  </div>
 </div>
 
+<!-- CONTENT -->
 <div class="container">
-  <h1 style="text-align:center; margin-bottom:40px; color:#0a3d62;">Manage Your Crops</h1>
-
-  <div id="cropList">
-    <!-- Crops will load here -->
-  </div>
+  <div class="page-title">Manage Your Crops</div>
+  <div id="cropList"></div>
 </div>
 
-<!-- Modal for viewing & editing crop -->
+<!-- MODAL -->
 <div class="modal" id="modal">
   <div class="modal-box">
-    <h3>Edit Crop Details</h3>
-    <form id="updateForm">
-      <label for="farmerName">Farmer Name</label>
-      <input type="text" id="farmerName" readonly />
-
-      <label for="cropName">Crop Name *</label>
-      <input type="text" id="cropName" required />
-
-      <label for="cropCategory">Crop Category *</label>
-      <input type="text" id="cropCategory" required />
-
-      <label for="quantity">Quantity (kg) *</label>
-      <input type="number" id="quantity" min="1" required />
-
-      <label for="minQuantity">Minimum Order Quantity (kg)</label>
-      <input type="number" id="minQuantity" min="1" />
-
-      <label for="price">Price per kg (₹) *</label>
-      <input type="number" id="price" min="0" required />
-
-      <label for="quality">Quality</label>
-      <input type="text" id="quality" />
-
-      <label for="harvestDate">Harvest Date</label>
-      <input type="date" id="harvestDate" />
-
-      <label for="availableUntil">Available Until</label>
-      <input type="date" id="availableUntil" />
-
-      <label for="deliveryType">Delivery Type</label>
-      <input type="text" id="deliveryType" />
-
-      <label for="cropLocation">Location *</label>
-      <input type="text" id="cropLocation" required />
-
-      <label for="contactInfo">Contact Number *</label>
-      <input type="tel" id="contactInfo" pattern="\d{10}" required />
-
-      <label for="description">Description</label>
-      <textarea id="description" rows="3"></textarea>
-
-      <div class="button-group">
-        <button type="button" class="btn-delete" id="deleteBtn">Delete</button>
-        <button type="button" class="btn-cancel" id="cancelBtn">Cancel</button>
-        <button type="submit" class="btn-save">Save</button>
-      </div>
-    </form>
+    <h3 id="mCrop"></h3>
+    <p><b>Quantity:</b> <span id="mQty"></span> kg</p>
+    <p><b>Price:</b> ₹<span id="mPrice"></span>/kg</p>
+    <p><b>Location:</b> <span id="mLoc"></span></p>
+    <p><b>Listed On:</b> <span id="mTime"></span></p>
+    <div class="delete-btn-modal" id="deleteBtnModal" onclick="deleteCropFromBuyTable()">Delete from Buy Table</div>
+    <div class="close-btn" onclick="closeModal()">Close</div>
   </div>
 </div>
 
 <script>
-  const db = window.db;
-  const loginid = sessionStorage.getItem("loginid");
-  const usertype = sessionStorage.getItem("usertype");
+const loginid = sessionStorage.getItem("loginid");
+const usertype = sessionStorage.getItem("usertype");
 
-  if (!loginid || usertype !== "Farmer") {
-    location.href = "login";
+if (!loginid || usertype !== "Farmer") {
+  location.href = "login";
+}
+
+async function loadCrops() {
+  const { data, error } = await db
+    .from("crop_sales")
+    .select("*")
+    .eq("lid", loginid)
+    .order("created_at", { ascending: false });
+
+  const box = document.getElementById("cropList");
+
+  if (error) {
+    box.innerHTML = "Failed to load crops.";
+    return;
   }
 
-  let currentCropId = null;
-
-  // Load all crops for this farmer
-  async function loadCrops() {
-    const { data, error } = await db
-      .from("crop_sales")
-      .select("*")
-      .eq("lid", loginid)
-      .order("created_at", { ascending: false });
-
-    const cropList = document.getElementById("cropList");
-    if (error) {
-      cropList.innerHTML = `<p style="color:red;">Failed to load crops: ${error.message}</p>`;
-      return;
-    }
-    if (!data.length) {
-      cropList.innerHTML = `<p>No crops found. Start selling your crops!</p>`;
-      return;
-    }
-
-    cropList.innerHTML = data.map(crop => `
-      <div class="crop-card" data-id="${crop.id}">
-        <span>${crop.crop_name}</span> - <small>Quantity: ${crop.quantity} kg</small>
-      </div>
-    `).join("");
-
-    // Add click handlers to open modal
-    document.querySelectorAll(".crop-card").forEach(card => {
-      card.addEventListener("click", () => openModal(card.dataset.id));
-    });
+  if (!data.length) {
+    box.innerHTML = "No crops listed yet.";
+    return;
   }
 
-  // Open modal & populate form for selected crop
-  async function openModal(id) {
-    currentCropId = id;
+  box.innerHTML = data.map(c => `
+    <div class="crop-card" onclick='openModal(${JSON.stringify(c)})'>
+      <span>You sold: ${c.crop_name}</span>
+    </div>
+  `).join("");
+}
 
-    const { data, error } = await db
-      .from("crop_sales")
-      .select("*")
-      .eq("id", id)
-      .eq("lid", loginid)
-      .maybeSingle();
+let currentCropId = null;
+let currentCropJid = null;
 
-    if (error || !data) {
-      alert("Failed to load crop details.");
-      return;
-    }
+function openModal(c) {
+  currentCropId = c.id;
+  currentCropJid = c.jid;
+  document.getElementById("mCrop").innerText = c.crop_name;
+  document.getElementById("mQty").innerText = c.quantity;
+  document.getElementById("mPrice").innerText = c.price;
+  document.getElementById("mLoc").innerText = c.location;
+  document.getElementById("mTime").innerText =
+    new Date(c.created_at).toLocaleString();
+  document.getElementById("modal").style.display = "flex";
+}
 
-    // Fill form
-    document.getElementById("farmerName").value = data.farmer_name;
-    document.getElementById("cropName").value = data.crop_name;
-    document.getElementById("cropCategory").value = data.crop_category || "";
-    document.getElementById("quantity").value = data.quantity;
-    document.getElementById("minQuantity").value = data.min_quantity || "";
-    document.getElementById("price").value = data.price;
-    document.getElementById("quality").value = data.quality || "";
-    document.getElementById("harvestDate").value = data.harvest_date || "";
-    document.getElementById("availableUntil").value = data.available_until || "";
-    document.getElementById("deliveryType").value = data.delivery_type || "";
-    document.getElementById("cropLocation").value = data.location;
-    document.getElementById("contactInfo").value = data.contact_info;
-    document.getElementById("description").value = data.description || "";
+function closeModal() {
+  document.getElementById("modal").style.display = "none";
+  currentCropId = null;
+  currentCropJid = null;
+}
 
-    document.getElementById("modal").style.display = "flex";
+async function deleteCropFromBuyTable() {
+  if (!currentCropId || !currentCropJid) {
+    alert('No crop selected.');
+    return;
   }
-
-  // Close modal and reset currentCropId
-  function closeModal() {
-    document.getElementById("modal").style.display = "none";
-    currentCropId = null;
-    document.getElementById("updateForm").reset();
+  
+  if (!confirm('Are you sure you want to delete this crop? This will permanently remove it from both buy_table and crop_sales.')) {
+    return;
   }
-
-  // Form submit handler: update crop
-  document.getElementById("updateForm").addEventListener("submit", async (e) => {
-    e.preventDefault();
-
-    // Validate required fields
-    const cropName = document.getElementById("cropName");
-    const quantity = document.getElementById("quantity");
-    const price = document.getElementById("price");
-    const cropLocation = document.getElementById("cropLocation");
-    const contactInfo = document.getElementById("contactInfo");
-
-    [cropName, quantity, price, cropLocation, contactInfo].forEach(el => el.classList.remove("input-error"));
-
-    let valid = true;
-    if (!cropName.value.trim()) {
-      cropName.classList.add("input-error");
-      valid = false;
-    }
-    if (!(quantity.value > 0)) {
-      quantity.classList.add("input-error");
-      valid = false;
-    }
-    if (!(price.value >= 0)) {
-      price.classList.add("input-error");
-      valid = false;
-    }
-    if (!cropLocation.value.trim()) {
-      cropLocation.classList.add("input-error");
-      valid = false;
-    }
-    if (!/^\d{10}$/.test(contactInfo.value.trim())) {
-      contactInfo.classList.add("input-error");
-      valid = false;
-    }
-    if (!valid) return;
-
-    // Prepare update data
-    const updateData = {
-      crop_name: cropName.value.trim(),
-      crop_category: document.getElementById("cropCategory").value.trim() || null,
-      quantity: parseInt(quantity.value),
-      min_quantity: document.getElementById("minQuantity").value ? parseInt(document.getElementById("minQuantity").value) : null,
-      price: parseInt(price.value),
-      quality: document.getElementById("quality").value.trim() || null,
-      harvest_date: document.getElementById("harvestDate").value || null,
-      available_until: document.getElementById("availableUntil").value || null,
-      delivery_type: document.getElementById("deliveryType").value.trim() || null,
-      location: cropLocation.value.trim(),
-      contact_info: contactInfo.value.trim(),
-      description: document.getElementById("description").value.trim() || null,
-    };
-
-    const { error } = await db
-      .from("crop_sales")
-      .update(updateData)
-      .eq("id", currentCropId)
-      .eq("lid", loginid);
-
-    if (error) {
-      alert("Failed to update crop: " + error.message);
-      return;
-    }
-
-    alert("Crop updated successfully!");
-    closeModal();
-    loadCrops();
-  });
-
-  // Delete crop handler
-  document.getElementById("deleteBtn").addEventListener("click", async () => {
-    if (!confirm("Are you sure you want to delete this crop? This action cannot be undone.")) return;
-    const { error } = await db
-      .from("crop_sales")
+  
+  try {
+    // First, delete all entries from buy_table where fid matches the crop's jid
+    const { error: buyTableError } = await db
+      .from('buy_table')
       .delete()
-      .eq("id", currentCropId)
-      .eq("lid", loginid);
-    if (error) {
-      alert("Failed to delete crop: " + error.message);
+      .eq('fid', currentCropJid);
+    
+    if (buyTableError) {
+      console.error('Error deleting from buy_table:', buyTableError);
+      alert('An error occurred while deleting from buy_table: ' + buyTableError.message);
       return;
     }
-    alert("Crop deleted successfully!");
+    
+    // Then, delete the crop from crop_sales using its id
+    const { error: cropSalesError } = await db
+      .from('crop_sales')
+      .delete()
+      .eq('id', currentCropId);
+    
+    if (cropSalesError) {
+      console.error('Error deleting from crop_sales:', cropSalesError);
+      alert('An error occurred while deleting from crop_sales: ' + cropSalesError.message);
+      return;
+    }
+    
+    alert('Crop has been successfully deleted from both buy_table and crop_sales!');
     closeModal();
+    // Reload crops to refresh the list
     loadCrops();
-  });
+  } catch (error) {
+    console.error('Error deleting crop:', error);
+    alert('An error occurred while deleting crop. Please try again.');
+  }
+}
 
-  // Cancel button closes modal
-  document.getElementById("cancelBtn").addEventListener("click", () => {
-    closeModal();
-  });
+document.getElementById("logoutBtn").onclick = () => {
+  sessionStorage.clear();
+  location.href = "login";
+};
 
-  // Logout button
-  document.getElementById("logoutBtn").addEventListener("click", () => {
-    sessionStorage.clear();
-    location.href = "login";
-  });
+// Dark mode functionality
+function initDarkMode() {
+    const savedDarkMode = localStorage.getItem('darkMode') === 'true';
+    if (savedDarkMode) {
+        document.body.classList.add('dark');
+    }
+    updateDarkModeButton();
+}
 
-  // Load crops on page load
-  loadCrops();
+function updateDarkModeButton() {
+    const toggleBtn = document.getElementById('toggleDark');
+    if (toggleBtn) {
+        toggleBtn.innerText = document.body.classList.contains('dark') ? '☀️ Light Mode' : '🌙 Dark Mode';
+    }
+}
+
+const toggleBtn = document.getElementById('toggleDark');
+if (toggleBtn) {
+    toggleBtn.addEventListener('click', () => {
+        document.body.classList.toggle('dark');
+        const isDark = document.body.classList.contains('dark');
+        localStorage.setItem('darkMode', isDark);
+        updateDarkModeButton();
+    });
+}
+
+// Initialize dark mode
+initDarkMode();
+
+loadCrops();
 </script>
 
 </body>
