@@ -94,12 +94,74 @@
       box-shadow: 0 10px 40px rgba(0,0,0,0.2);
       color: #222;
     }
+
+    .btn-dark-toggle {
+      padding: 12px 26px;
+      background: rgba(255, 255, 255, 0.9);
+      color: #1d0a7a;
+      border: 2px solid #1d0a7a;
+      border-radius: 8px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.25s ease;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.25);
+    }
+
+    .btn-dark-toggle:hover {
+      background: #1d0a7a;
+      color: white;
+      transform: translateY(-3px);
+    }
+
+    /* Dark Mode Styles */
+    body.dark {
+      background: linear-gradient(to bottom, #1a1a1a 0%, #2d2d2d 50%, #1a1a1a 100%);
+      color: #e0e0e0;
+    }
+
+    body.dark header {
+      background-color: rgba(45, 45, 45, 0.95);
+      border-bottom: 2px solid #4a9eff;
+    }
+
+    body.dark .logo {
+      color: #4a9eff;
+    }
+
+    body.dark .hero {
+      background: rgba(45, 45, 45, 0.7);
+      color: #e0e0e0;
+    }
+
+    body.dark .hero h1 {
+      background: linear-gradient(to right, #4a9eff, #6bb0ff);
+      -webkit-background-clip: text;
+      color: transparent;
+    }
+
+    body.dark .hero p {
+      color: #d0d0d0;
+    }
+
+    body.dark .btn-dark-toggle {
+      background: #3d3d3d;
+      color: #e0e0e0;
+      border-color: #555;
+    }
+
+    body.dark .btn-dark-toggle:hover {
+      background: #4d4d4d;
+      color: #fff;
+    }
   </style>
 </head>
 <body>
   <header>
     <div class="logo">KrishiMitra</div>
-    <a href="login.html" class="login-btn">Login</a>
+    <div style="display: flex; gap: 15px; align-items: center;">
+      <button id="toggleDark" class="btn-dark-toggle">🌙 Dark Mode</button>
+      <a href="login.html" class="login-btn">Login</a>
+    </div>
   </header>
 
   <div class="chakra-container">
@@ -113,7 +175,37 @@
       with tools, knowledge, and digital solutions to help them in agriculture that contribute to a stronger, more
       progressive nation.
     </p>
-    <p> Made by Midhun and Anirudh</p>
   </section>
+
+  <script>
+    // Dark mode functionality
+    function initDarkMode() {
+        const savedDarkMode = localStorage.getItem('darkMode') === 'true';
+        if (savedDarkMode) {
+            document.body.classList.add('dark');
+        }
+        updateDarkModeButton();
+    }
+
+    function updateDarkModeButton() {
+        const toggleBtn = document.getElementById('toggleDark');
+        if (toggleBtn) {
+            toggleBtn.innerText = document.body.classList.contains('dark') ? '☀️ Light Mode' : '🌙 Dark Mode';
+        }
+    }
+
+    const toggleBtn = document.getElementById('toggleDark');
+    if (toggleBtn) {
+        toggleBtn.addEventListener('click', () => {
+            document.body.classList.toggle('dark');
+            const isDark = document.body.classList.contains('dark');
+            localStorage.setItem('darkMode', isDark);
+            updateDarkModeButton();
+        });
+    }
+
+    // Initialize dark mode
+    initDarkMode();
+  </script>
 </body>
 </html>
