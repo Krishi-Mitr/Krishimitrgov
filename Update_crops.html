@@ -196,7 +196,7 @@ body {
     <p><b>Price:</b> ₹<span id="mPrice"></span>/kg</p>
     <p><b>Location:</b> <span id="mLoc"></span></p>
     <p><b>Listed On:</b> <span id="mTime"></span></p>
-    <div class="delete-btn-modal" id="deleteBtnModal" onclick="deleteCropFromBuyTable()">Delete from Buy Table</div>
+    <div class="delete-btn-modal" id="deleteBtnModal" onclick="deleteCropFromBuyTable()">Delete</div>
     <div class="close-btn" onclick="closeModal()">Close</div>
   </div>
 </div>
@@ -262,7 +262,7 @@ async function deleteCropFromBuyTable() {
     return;
   }
   
-  if (!confirm('Are you sure you want to delete this crop? This will permanently remove it from both buy_table and crop_sales.')) {
+  if (!confirm('Are you sure you want to delete this crop? This will permanently remove it.')) {
     return;
   }
   
@@ -271,11 +271,11 @@ async function deleteCropFromBuyTable() {
     const { error: buyTableError } = await db
       .from('buy_table')
       .delete()
-      .eq('fid', currentCropJid);
+      .eq('cid',currentCropJid);
     
     if (buyTableError) {
-      console.error('Error deleting from buy_table:', buyTableError);
-      alert('An error occurred while deleting from buy_table: ' + buyTableError.message);
+      console.error('Error deleting:', buyTableError);
+      alert('An error occurred while deleting : ' + buyTableError.message);
       return;
     }
     
@@ -286,12 +286,12 @@ async function deleteCropFromBuyTable() {
       .eq('id', currentCropId);
     
     if (cropSalesError) {
-      console.error('Error deleting from crop_sales:', cropSalesError);
-      alert('An error occurred while deleting from crop_sales: ' + cropSalesError.message);
+      console.error('Error deleting :', cropSalesError);
+      alert('An error occurred while deleting: ' + cropSalesError.message);
       return;
     }
     
-    alert('Crop has been successfully deleted from both buy_table and crop_sales!');
+    alert('Crop has been successfully deleted!');
     closeModal();
     // Reload crops to refresh the list
     loadCrops();
