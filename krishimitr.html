@@ -29,8 +29,8 @@ body {
   justify-content: space-between;
   align-items: center;
   padding: 12px 20px;
-  background: linear-gradient(90deg, #ffffff, #FFFFFF 50%, #ffffff);
-  border-bottom: 3px solid #ffffff;
+  background: linear-gradient(90deg, #FF9933, #FFFFFF 50%, #138808);
+  border-bottom: 3px solid #000080;
   z-index: 1000;
 }
 
@@ -55,7 +55,7 @@ body {
 }
 
 .nav-link-custom:hover {
-  background: rgba(255, 136, 0, 0.5);
+  background: rgba(0,0,128,0.1);
 }
 
 .nav-right {
@@ -66,7 +66,7 @@ body {
 
 .logout-btn {
   padding: 8px 16px;
-  background: #ff7b00;
+  background: #000080;
   color: white;
   border-radius: 8px;
   font-weight: 700;
@@ -92,7 +92,7 @@ body {
   border-radius: 15px;
   margin-bottom: 20px;
   box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-  border: 2px solid #000000;
+  border: 2px solid #000080;
 }
 
 .form-group {
@@ -103,13 +103,13 @@ body {
   display: block;
   margin-bottom: 5px;
   font-weight: 600;
-  color: #000000;
+  color: #000080;
 }
 
 .form-control {
   width: 100%;
   padding: 10px;
-  border: 2px solid #000000;
+  border: 2px solid #000080;
   border-radius: 8px;
   font-size: 14px;
 }
@@ -168,7 +168,7 @@ body {
 
 .horizon-value {
   font-weight: 700;
-  color: #000000;
+  color: #000080;
   font-size: 16px;
   min-width: 50px;
   text-align: right;
@@ -191,7 +191,7 @@ body {
 }
 
 .btn-primary {
-  background: #0cb915;
+  background: #000080;
   color: white;
 }
 
@@ -236,7 +236,7 @@ body {
 .recommend {
   font-size: 18px;
   font-weight: 700;
-  color: #000000;
+  color: #000080;
   margin-bottom: 10px;
 }
 
@@ -290,24 +290,193 @@ body {
 
 #qrCanvas {
   margin-top: 10px;
-  border: 2px solid #000000;
+  border: 2px solid #000080;
   border-radius: 8px;
 }
 
 body.dark {
-  background: #000000;
+  background: linear-gradient(to bottom, #1a1a1a 0%, #2d2d2d 50%, #1a1a1a 100%);
+  color: #e0e0e0;
+}
+
+body.dark .top-navbar {
+  background: linear-gradient(90deg, #2d2d2d, #3d3d3d 50%, #2d2d2d);
+  border-bottom: 3px solid #4a9eff;
+}
+
+body.dark .brand {
+  color: #4a9eff;
+}
+
+body.dark .nav-link-custom {
+  color: #e0e0e0;
+}
+
+body.dark .nav-link-custom:hover {
+  background: rgba(74, 158, 255, 0.2);
+  color: #fff;
+}
+
+body.dark .logout-btn {
+  background: #4a9eff;
+  color: white;
+}
+
+body.dark .logout-btn:hover {
+  background: #6bb0ff;
   color: #fff;
 }
 
 body.dark .card {
-  background: #ffffff;
-  color: #000000;
+  background: #2d2d2d;
+  color: #e0e0e0;
+  border-color: #4a9eff;
 }
 
 body.dark .form-control {
-  background: #000000;
-  color: #fff;
+  background: #1e1e1e;
+  color: #e0e0e0;
   border-color: #555;
+}
+
+body.dark .form-control:focus {
+  background: #1e1e1e;
+  color: #fff;
+  border-color: #4a9eff;
+  outline: none;
+}
+
+body.dark .form-group label {
+  color: #e0e0e0;
+}
+
+body.dark .help-text {
+  color: #999;
+}
+
+body.dark .horizon-value {
+  color: #e0e0e0;
+}
+
+body.dark #horizon {
+  background: #444;
+}
+
+body.dark #horizon::-webkit-slider-thumb {
+  background: #4a9eff;
+}
+
+body.dark #horizon::-webkit-slider-thumb:hover {
+  background: #6bb0ff;
+}
+
+body.dark #horizon::-moz-range-thumb {
+  background: #4a9eff;
+}
+
+body.dark #horizon::-moz-range-thumb:hover {
+  background: #6bb0ff;
+}
+
+body.dark .btn-primary {
+  background: #4a9eff;
+  color: white;
+}
+
+body.dark .btn-primary:hover {
+  background: #6bb0ff;
+  color: #fff;
+}
+
+body.dark .btn-success {
+  background: #28a745;
+  color: white;
+}
+
+body.dark .btn-success:hover {
+  background: #34ce57;
+}
+
+body.dark .btn-info {
+  background: #17a2b8;
+  color: #fff;
+}
+
+body.dark .btn-info:hover {
+  background: #1fc8e3;
+}
+
+body.dark .btn-warning {
+  background: #ffc107;
+  color: #000;
+}
+
+body.dark .btn-warning:hover {
+  background: #ffca2c;
+}
+
+body.dark .btn-light {
+  background: #3d3d3d;
+  color: #e0e0e0;
+  border: 1px solid #555;
+}
+
+body.dark .btn-light:hover {
+  background: #4d4d4d;
+  color: #fff;
+}
+
+body.dark .recommend {
+  color: #e0e0e0;
+}
+
+body.dark .text-success {
+  color: #6cff6c;
+}
+
+body.dark .text-danger {
+  color: #ff6c6c;
+}
+
+body.dark .text-warning {
+  color: #ffd93d;
+}
+
+body.dark .text-info {
+  color: #6bd4ff;
+}
+
+body.dark .text-muted {
+  color: #999;
+}
+
+body.dark .small-muted {
+  color: #aaa;
+}
+
+body.dark #qrCanvas {
+  border-color: #4a9eff;
+  background: #1e1e1e;
+}
+
+body.dark h2, body.dark h4 {
+  color: #e0e0e0;
+}
+
+body.dark select {
+  background-color: #1e1e1e;
+  color: #e0e0e0;
+}
+
+body.dark select option {
+  background: #2d2d2d;
+  color: #e0e0e0;
+}
+
+body.dark select:focus {
+  background-color: #1e1e1e;
+  color: #fff;
+  border-color: #4a9eff;
 }
 
 .w-100 {
@@ -317,10 +486,6 @@ body.dark .form-control {
 h2, h4 {
   color: #000080;
   margin-bottom: 15px;
-}
-
-body.dark h2, body.dark h4 {
-  color: #fff;
 }
 
 #mainApp {
@@ -359,11 +524,11 @@ body.dark h2, body.dark h4 {
     <div class="row">
       <div class="col-md-6">
         <div class="card">
-          <h4> Price Prediction</h4>
+          <h4>📊 Price Prediction</h4>
           <p class="help-text" style="margin-top: -10px; margin-bottom: 15px;">Get price forecasts for your crops to make better selling decisions</p>
           
           <div class="form-group">
-            <label for="cropSelect"> Select Crop</label>
+            <label for="cropSelect">🌾 Select Crop</label>
             <select id="cropSelect" class="form-control">
               <option value="Wheat">Wheat</option>
               <option value="Rice">Rice</option>
@@ -381,7 +546,7 @@ body.dark h2, body.dark h4 {
           </div>
 
           <div class="form-group">
-            <label for="regionSelect"> Select Region</label>
+            <label for="regionSelect">📍 Select Region</label>
             <select id="regionSelect" class="form-control">
               <option value="Punjab">Punjab</option>
               <option value="Haryana">Haryana</option>
@@ -396,24 +561,24 @@ body.dark h2, body.dark h4 {
 
           <div class="form-group">
             <div class="horizon-label">
-              <label for="horizon" style="margin: 0;"> Forecast Period</label>
+              <label for="horizon" style="margin: 0;">📅 Forecast Period</label>
               <span class="horizon-value"><span id="hval">30</span> days</span>
             </div>
             <input type="range" id="horizon" min="7" max="90" value="30" step="1">
             <div class="help-text">Adjust to see prices for next 7-90 days</div>
           </div>
 
-          <button id="predictBtn" class="btn btn-primary w-100"> Predict Prices</button>
-          <button id="combineBtn" class="btn btn-warning w-100 mt-2"> Predict + Get Advice</button>
+          <button id="predictBtn" class="btn btn-primary w-100">🔮 Predict Prices</button>
+          <button id="combineBtn" class="btn btn-warning w-100 mt-2">✨ Predict + Get Advice</button>
           <button id="exportBtn" class="btn btn-info w-100 mt-2">📥 Export CSV</button>
         </div>
 
         <div class="card">
-          <h4> Crop Advisor</h4>
+          <h4>💡 Crop Advisor</h4>
           <p class="help-text" style="margin-top: -10px; margin-bottom: 15px;">Get personalized farming recommendations based on your conditions</p>
           
           <div class="form-group">
-            <label for="soilType"> Soil Type</label>
+            <label for="soilType">🌱 Soil Type</label>
             <select id="soilType" class="form-control">
               <option value="Loamy">Loamy (Best for most crops)</option>
               <option value="Clayey">Clayey</option>
@@ -423,18 +588,18 @@ body.dark h2, body.dark h4 {
           </div>
 
           <div class="form-group">
-            <label for="rainfall"> Expected Rainfall (mm)</label>
+            <label for="rainfall">🌧️ Expected Rainfall (mm)</label>
             <input type="number" id="rainfall" class="form-control" value="200" min="0" max="1000">
             <div class="help-text">Typical range: 100-400 mm</div>
           </div>
 
           <div class="form-group">
-            <label for="temp"> Expected Temperature (°C)</label>
+            <label for="temp">🌡️ Expected Temperature (°C)</label>
             <input type="number" id="temp" class="form-control" value="25" min="-10" max="50">
             <div class="help-text">Average temperature during growing season</div>
           </div>
 
-          <button id="adviseBtn" class="btn btn-success w-100"> Get Farming Advice</button>
+          <button id="adviseBtn" class="btn btn-success w-100">🌾 Get Farming Advice</button>
         </div>
       </div>
 
@@ -447,14 +612,14 @@ body.dark h2, body.dark h4 {
         </div>
 
         <div class="card">
-          <h4> Recommendations</h4>
+          <h4>💡 Recommendations</h4>
           <div id="actionCard">
             <p class="text-muted">Click "Predict Prices" to see buying/selling recommendations</p>
           </div>
         </div>
 
         <div class="card">
-          <h4> Farming Advice</h4>
+          <h4>📋 Farming Advice</h4>
           <div id="advisorOutput" class="text-muted">
             Click "Get Farming Advice" to receive personalized recommendations for seeds and fertilizers
           </div>
@@ -471,7 +636,8 @@ body.dark h2, body.dark h4 {
 </div>
 
 <script>
-
+// Check authentication - anyone logged in (Farmer or Citizen) can access this page
+// Use retry mechanism to handle navbar navigation timing issues
 (function() {
     let retryCount = 0;
     const MAX_RETRIES = 10;
@@ -550,11 +716,62 @@ if (backBtn) {
   });
 }
 
+// Dark mode persistence and initialization
+function initDarkMode() {
+  const savedDarkMode = localStorage.getItem('darkMode') === 'true';
+  if (savedDarkMode) {
+    document.body.classList.add('dark');
+  }
+  updateDarkModeButton();
+}
+
+function updateDarkModeButton() {
+  const toggleBtn = document.getElementById('toggleDark');
+  if (toggleBtn) {
+    toggleBtn.innerText = document.body.classList.contains('dark') ? '☀️ Light Mode' : '🌙 Dark Mode';
+  }
+}
+
+function refreshChartColors() {
+  if (priceChart && priceChart.data && priceChart.data.labels && priceChart.data.labels.length > 0) {
+    const isDark = document.body.classList.contains('dark');
+    const textColor = isDark ? '#e0e0e0' : '#333';
+    const gridColor = isDark ? '#444' : '#e0e0e0';
+    const histColor = isDark ? '#4a9eff' : '#0d6efd';
+    const predColor = isDark ? '#28a745' : '#198754';
+    const histBg = isDark ? 'rgba(74, 158, 255, 0.1)' : 'rgba(13,110,253,0.04)';
+    const predBg = isDark ? 'rgba(40, 167, 69, 0.1)' : 'rgba(25,135,84,0.03)';
+    
+    if (priceChart.data.datasets.length > 0) {
+      priceChart.data.datasets[0].borderColor = histColor;
+      priceChart.data.datasets[0].backgroundColor = histBg;
+      if (priceChart.data.datasets.length > 1) {
+        priceChart.data.datasets[1].borderColor = predColor;
+        priceChart.data.datasets[1].backgroundColor = predBg;
+      }
+    }
+    
+    priceChart.options.plugins.legend.labels.color = textColor;
+    priceChart.options.scales.x.ticks.color = textColor;
+    priceChart.options.scales.x.grid.color = gridColor;
+    priceChart.options.scales.y.ticks.color = textColor;
+    priceChart.options.scales.y.grid.color = gridColor;
+    priceChart.options.scales.y.title.color = textColor;
+    priceChart.update();
+  }
+}
+
+// Initialize dark mode on page load
+initDarkMode();
+
 const toggleBtn = document.getElementById('toggleDark');
 if (toggleBtn) {
   toggleBtn.addEventListener('click', () => {
     document.body.classList.toggle('dark');
-    toggleBtn.innerText = document.body.classList.contains('dark') ? '☀️ Light Mode' : '🌙 Dark Mode';
+    const isDark = document.body.classList.contains('dark');
+    localStorage.setItem('darkMode', isDark);
+    updateDarkModeButton();
+    refreshChartColors();
   });
 }
 
@@ -624,16 +841,38 @@ function initChart() {
     return;
   }
   const chartCtx = chartEl.getContext('2d');
+  const isDark = document.body.classList.contains('dark');
+  const textColor = isDark ? '#e0e0e0' : '#333';
+  const gridColor = isDark ? '#444' : '#e0e0e0';
+  
   priceChart = new Chart(chartCtx, {
     type: 'line',
     data: { labels: [], datasets: [] },
     options: {
       responsive: true,
       interaction: { mode: 'index', intersect: false },
-      plugins: { legend: { position: 'top' } },
+      plugins: { 
+        legend: { 
+          position: 'top',
+          labels: { color: textColor }
+        } 
+      },
       scales: {
-        x: { display: true },
-        y: { display: true, title: { display: true, text: 'Price (₹/qtl)' } }
+        x: { 
+          display: true,
+          ticks: { color: textColor },
+          grid: { color: gridColor }
+        },
+        y: { 
+          display: true, 
+          title: { 
+            display: true, 
+            text: 'Price (₹/qtl)',
+            color: textColor
+          },
+          ticks: { color: textColor },
+          grid: { color: gridColor }
+        }
       }
     }
   });
@@ -662,6 +901,14 @@ function updateChart(hist, preds){
     histData.length = predData.length = labels.length;
   }
 
+  const isDark = document.body.classList.contains('dark');
+  const histColor = isDark ? '#4a9eff' : '#0d6efd';
+  const predColor = isDark ? '#28a745' : '#198754';
+  const histBg = isDark ? 'rgba(74, 158, 255, 0.1)' : 'rgba(13,110,253,0.04)';
+  const predBg = isDark ? 'rgba(40, 167, 69, 0.1)' : 'rgba(25,135,84,0.03)';
+  const textColor = isDark ? '#e0e0e0' : '#333';
+  const gridColor = isDark ? '#444' : '#e0e0e0';
+
   priceChart.data.labels = labels;
   priceChart.data.datasets = [
     {
@@ -670,8 +917,8 @@ function updateChart(hist, preds){
       borderWidth: 2,
       tension: 0.2,
       pointRadius: 2,
-      borderColor: '#0d6efd',
-      backgroundColor: 'rgba(13,110,253,0.04)',
+      borderColor: histColor,
+      backgroundColor: histBg,
       fill: true
     },
     {
@@ -681,11 +928,20 @@ function updateChart(hist, preds){
       borderWidth: 2,
       tension: 0.2,
       pointRadius: 2,
-      borderColor: '#198754',
-      backgroundColor: 'rgba(25,135,84,0.03)',
+      borderColor: predColor,
+      backgroundColor: predBg,
       fill: true
     }
   ];
+  
+  // Update chart colors for dark mode
+  priceChart.options.plugins.legend.labels.color = textColor;
+  priceChart.options.scales.x.ticks.color = textColor;
+  priceChart.options.scales.x.grid.color = gridColor;
+  priceChart.options.scales.y.ticks.color = textColor;
+  priceChart.options.scales.y.grid.color = gridColor;
+  priceChart.options.scales.y.title.color = textColor;
+  
   priceChart.update();
 }
 
@@ -731,9 +987,9 @@ function runPrediction(runAdvisorToo){
   const actionCard = document.getElementById('actionCard');
   let html = `<div><div class="recommend">Avg change: ${changePct.toFixed(1)}% over next ${days} days</div>`;
   if(changePct > 4){
-    html += `<div class="mt-2 text-success"> Tip: Prices look like they will go <strong>up</strong>. Consider storing a bit and selling later.</div>`;
+    html += `<div class="mt-2 text-success">🌟 Tip: Prices look like they will go <strong>up</strong>. Consider storing a bit and selling later.</div>`;
   } else if(changePct < -4){
-    html += `<div class="mt-2 text-danger"> Tip: Prices may go <strong>down</strong>. Consider selling soon.</div>`;
+    html += `<div class="mt-2 text-danger">⚠️ Tip: Prices may go <strong>down</strong>. Consider selling soon.</div>`;
   } else {
     html += `<div class="mt-2 text-warning">Tip: Prices should stay about the same. You can sell some now and keep some.</div>`;
   }
@@ -833,7 +1089,7 @@ function exportCSV(){
 function generateQR(){
   const canvas = document.getElementById('qrCanvas');
 
-  const url = 'https://krishi-mitr.github.io/Krishimitrgov';
+  const url = 'https://krishimitr8c.netlify.app';
 
   try{
     QRCode.toCanvas(canvas, url, { width: 120 }, function (error) {
