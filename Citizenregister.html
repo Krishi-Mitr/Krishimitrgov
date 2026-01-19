@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
+<meta charset="UTF-8">
 <title>Citizen Registration - Vikasit Bharat</title>
-<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
 body {
@@ -64,10 +64,94 @@ button {
     font-weight: bold;
     margin-bottom: 10px;
 }
+
+.btn-dark-toggle {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  padding: 10px 20px;
+  background: rgba(255, 255, 255, 0.9);
+  color: #0a3d62;
+  border: 2px solid #0a3d62;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.3s;
+  z-index: 1000;
+}
+
+.btn-dark-toggle:hover {
+  background: #0a3d62;
+  color: white;
+}
+
+/* Dark Mode Styles */
+body.dark {
+  background: linear-gradient(180deg, #1a1a1a 0%, #2d2d2d 50%, #1a1a1a 100%);
+}
+
+body.dark .container {
+  background: rgba(45, 45, 45, 0.95);
+  color: #e0e0e0;
+}
+
+body.dark h2 {
+  color: #e0e0e0;
+}
+
+body.dark input {
+  background: #1e1e1e;
+  color: #e0e0e0;
+  border: 2px solid #555;
+}
+
+body.dark input:focus {
+  background: #1e1e1e;
+  color: #fff;
+  border-color: #4a9eff;
+  outline: none;
+}
+
+body.dark input::placeholder {
+  color: #999;
+}
+
+body.dark button {
+  background: linear-gradient(135deg, #4a9eff, #6bb0ff);
+}
+
+body.dark button:hover {
+  background: linear-gradient(135deg, #6bb0ff, #8cc5ff);
+}
+
+body.dark .message {
+  color: #ff6c6c;
+}
+
+body.dark .success {
+  color: #6cff6c;
+}
+
+body.dark a {
+  color: #6bd4ff;
+}
+
+body.dark .btn-dark-toggle {
+  background: #3d3d3d;
+  color: #e0e0e0;
+  border-color: #555;
+}
+
+body.dark .btn-dark-toggle:hover {
+  background: #4d4d4d;
+  color: #fff;
+}
 </style>
 </head>
 
 <body>
+
+<button id="toggleDark" class="btn-dark-toggle">🌙 Dark Mode</button>
 
 <div class="container">
 <h2>Citizen Registration</h2>
@@ -76,61 +160,60 @@ button {
 <div id="success" class="success"></div>
 
 <form id="registerForm">
-    <input type="text" id="username" placeholder="Username" required />
-    <input type="password" id="password" placeholder="Password" required />
-    <input type="text" id="name" placeholder="Full Name" required />
+    <input type="text" id="username" placeholder="Username" required>
+    <input type="password" id="password" placeholder="Password" required>
+    <input type="text" id="name" placeholder="Full Name" required>
     <button type="submit">Register</button>
 </form>
 
 <a href="login" style="color:#FF9933;">Back to Login</a>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<!-- DO NOT CHANGE supabase.js -->
 <script src="supabase.js"></script>
 
 <script>
 document.getElementById("registerForm").addEventListener("submit", async function (e) {
-    e.preventDefault()
+    e.preventDefault();
 
-    const username = document.getElementById("username").value.trim()
-    const password = document.getElementById("password").value.trim()
-    const name = document.getElementById("name").value.trim()
-    const usertype = "Citizen"
+    const username = document.getElementById("username").value.trim();
+    const password = document.getElementById("password").value.trim();
+    const name = document.getElementById("name").value.trim();
+    const usertype = "Citizen";
 
-    const messageBox = document.getElementById("message")
-    const successBox = document.getElementById("success")
+    const messageBox = document.getElementById("message");
+    const successBox = document.getElementById("success");
 
-    messageBox.innerText = ""
-    successBox.innerText = ""
+    messageBox.innerText = "";
+    successBox.innerText = "";
 
     try {
-        const { data: existingUser, error: err1 } = await db
+        // 1️⃣ Check username exists
+        const { data: existingUser } = await db
             .from("logindata")
             .select("loginid")
             .eq("username", username)
-            .maybeSingle()
-
-        if (err1) throw err1
+            .maybeSingle();
 
         if (existingUser) {
-            messageBox.innerText = "Username already exists!"
-            return
+            messageBox.innerText = "Username already exists!";
+            return;
         }
 
-        const { data: maxData, error: err2 } = await db
+        // 2️⃣ Get max loginid
+        const { data: maxData } = await db
             .from("logindata")
             .select("loginid")
             .order("loginid", { ascending: false })
-            .limit(1)
+            .limit(1);
 
-        if (err2) throw err2
-
-        let newLoginId = 1
+        let newLoginId = 1;
         if (maxData && maxData.length > 0) {
-            newLoginId = parseInt(maxData[0].loginid) + 1
+            newLoginId = parseInt(maxData[0].loginid) + 1;
         }
 
-        const { error: err3 } = await db
+        // 3️⃣ Insert citizen
+        const { error } = await db
             .from("logindata")
             .insert({
                 username: username,
@@ -138,22 +221,54 @@ document.getElementById("registerForm").addEventListener("submit", async functio
                 name: name,
                 usertype: usertype,
                 loginid: newLoginId.toString()
-            })
+            });
 
-        if (err3) {
-            messageBox.innerText = "Registration failed. Try again."
-            return
+        if (error) {
+            messageBox.innerText = "Registration failed. Try again.";
+            console.error(error);
+            return;
         }
 
-        successBox.innerHTML = 'Registration successful! You can now <a href="login" style="color:#FF9933;">login</a>.'
-        document.getElementById("registerForm").style.display = "none"
+        successBox.innerHTML =
+            "Registration successful! You can now <a href='login' style='color:#FF9933;'>login</a>.";
+        document.getElementById("registerForm").style.display = "none";
 
     } catch (err) {
-        console.error(err)
-        messageBox.innerText = "Something went wrong!"
+        console.error(err);
+        messageBox.innerText = "Something went wrong!";
     }
-})
+});
+
+// Dark mode functionality
+function initDarkMode() {
+    const savedDarkMode = localStorage.getItem('darkMode') === 'true';
+    if (savedDarkMode) {
+        document.body.classList.add('dark');
+    }
+    updateDarkModeButton();
+}
+
+function updateDarkModeButton() {
+    const toggleBtn = document.getElementById('toggleDark');
+    if (toggleBtn) {
+        toggleBtn.innerText = document.body.classList.contains('dark') ? '☀️ Light Mode' : '🌙 Dark Mode';
+    }
+}
+
+const toggleBtn = document.getElementById('toggleDark');
+if (toggleBtn) {
+    toggleBtn.addEventListener('click', () => {
+        document.body.classList.toggle('dark');
+        const isDark = document.body.classList.contains('dark');
+        localStorage.setItem('darkMode', isDark);
+        updateDarkModeButton();
+    });
+}
+
+// Initialize dark mode
+initDarkMode();
 </script>
 
 </body>
 </html>
+
