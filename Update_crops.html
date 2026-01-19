@@ -97,9 +97,6 @@ body {
   transition: .25s;
   border-top: 5px solid #ff9933;
   border-bottom: 5px solid #138808;
-  display: flex;
-  align-items: center;
-  gap: 16px;
 }
 
 .crop-card:hover {
@@ -110,48 +107,6 @@ body {
   font-size: 1.1em;
   font-weight: 700;
   color: #0a3d62;
-  flex: 1;
-}
-
-.crop-checkbox {
-  width: 24px;
-  height: 24px;
-  cursor: pointer;
-  accent-color: #0a3d62;
-}
-
-.crop-checkbox:checked {
-  accent-color: #ff9933;
-}
-
-/* DELETE BUTTON */
-.delete-container {
-  text-align: center;
-  margin-bottom: 20px;
-}
-
-.delete-btn {
-  background: #dc3545;
-  color: white;
-  border: none;
-  padding: 14px 32px;
-  border-radius: 12px;
-  font-weight: 700;
-  font-size: 1.1em;
-  cursor: pointer;
-  transition: .25s;
-  display: none;
-  box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
-}
-
-.delete-btn:hover {
-  background: #c82333;
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(220, 53, 69, 0.4);
-}
-
-.delete-btn.show {
-  display: inline-block;
 }
 
 /* MODAL */
@@ -184,7 +139,7 @@ body {
 }
 
 .close-btn {
-  margin-top: 26px;
+  margin-top: 20px;
   text-align: center;
   padding: 12px;
   background: #0a3d62;
@@ -192,6 +147,25 @@ body {
   font-weight: 700;
   border-radius: 12px;
   cursor: pointer;
+}
+
+.delete-btn-modal {
+  margin-top: 12px;
+  text-align: center;
+  padding: 12px;
+  background: #dc3545;
+  color: white;
+  font-weight: 700;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: .25s;
+  box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
+}
+
+.delete-btn-modal:hover {
+  background: #c82333;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(220, 53, 69, 0.4);
 }
 </style>
 </head>
@@ -211,9 +185,6 @@ body {
 <!-- CONTENT -->
 <div class="container">
   <div class="page-title">Manage Your Crops</div>
-  <div class="delete-container">
-    <button class="delete-btn" id="deleteBtn" onclick="deleteSelectedCrops()">Delete Selected</button>
-  </div>
   <div id="cropList"></div>
 </div>
 
@@ -225,6 +196,7 @@ body {
     <p><b>Price:</b> ₹<span id="mPrice"></span>/kg</p>
     <p><b>Location:</b> <span id="mLoc"></span></p>
     <p><b>Listed On:</b> <span id="mTime"></span></p>
+    <div class="delete-btn-modal" id="deleteBtnModal" onclick="deleteCropFromBuyTable()">Delete from Buy Table</div>
     <div class="close-btn" onclick="closeModal()">Close</div>
   </div>
 </div>
@@ -257,16 +229,16 @@ async function loadCrops() {
   }
 
   box.innerHTML = data.map(c => `
-    <div class="crop-card">
-      <input type="checkbox" class="crop-checkbox" data-jid="${c.jid}" onchange="updateDeleteButton()" onclick="event.stopPropagation()">
-      <span onclick='openModal(${JSON.stringify(c)})'>You sold: ${c.crop_name}</span>
+    <div class="crop-card" onclick='openModal(${JSON.stringify(c)})'>
+      <span>You sold: ${c.crop_name}</span>
     </div>
   `).join("");
-  
-  updateDeleteButton();
 }
 
+let currentCropJid = null;
+
 function openModal(c) {
+  currentCropJid = c.jid;
   document.getElementById("mCrop").innerText = c.crop_name;
   document.getElementById("mQty").innerText = c.quantity;
   document.getElementById("mPrice").innerText = c.price;
@@ -278,53 +250,40 @@ function openModal(c) {
 
 function closeModal() {
   document.getElementById("modal").style.display = "none";
+  currentCropJid = null;
 }
 
-function updateDeleteButton() {
-  const checkboxes = document.querySelectorAll('.crop-checkbox:checked');
-  const deleteBtn = document.getElementById('deleteBtn');
-  
-  if (checkboxes.length > 0) {
-    deleteBtn.classList.add('show');
-  } else {
-    deleteBtn.classList.remove('show');
-  }
-}
-
-async function deleteSelectedCrops() {
-  const checkboxes = document.querySelectorAll('.crop-checkbox:checked');
-  
-  if (checkboxes.length === 0) {
-    alert('Please select at least one crop to delete.');
+async function deleteCropFromBuyTable() {
+  if (!currentCropJid) {
+    alert('No crop selected.');
     return;
   }
   
-  if (!confirm(`Are you sure you want to delete ${checkboxes.length} selected crop(s) from buy_table?`)) {
+  if (!confirm('Are you sure you want to delete this crop from buy_table? This will remove all buyer interest entries for this crop.')) {
     return;
   }
-  
-  const jids = Array.from(checkboxes).map(cb => cb.getAttribute('data-jid'));
   
   try {
-    // Delete all entries from buy_table where fid matches any of the selected crop jids
-    for (const jid of jids) {
-      const { error } = await db
-        .from('buy_table')
-        .delete()
-        .eq('fid', jid);
-      
-      if (error) {
-        console.error('Error deleting from buy_table:', error);
-      }
+    // Delete all entries from buy_table where fid matches the crop's jid and lid matches the farmer's login ID
+    const { error } = await db
+      .from('buy_table')
+      .delete()
+      .eq('fid', currentCropJid)
+      .eq('lid', loginid);
+    
+    if (error) {
+      console.error('Error deleting from buy_table:', error);
+      alert('An error occurred while deleting from buy_table: ' + error.message);
+      return;
     }
     
-    alert('Selected crops have been removed from buy_table successfully!');
-    
+    alert('Crop has been removed from buy_table successfully!');
+    closeModal();
     // Reload crops to refresh the list
     loadCrops();
   } catch (error) {
-    console.error('Error deleting crops:', error);
-    alert('An error occurred while deleting crops. Please try again.');
+    console.error('Error deleting crop:', error);
+    alert('An error occurred while deleting crop. Please try again.');
   }
 }
 
