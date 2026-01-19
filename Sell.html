@@ -54,6 +54,55 @@ body {
   transform: translateY(-3px);
 }
 
+/* Your Crops dropdown */
+.nav-dropdown {
+  position: relative;
+  display: inline-block;
+}
+.nav-dropdown-toggle {
+  background: #0a3d62;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 10px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: .25s;
+  font-size: 1em;
+}
+.nav-dropdown-toggle:hover {
+  background: linear-gradient(135deg,#ff9933,#ffd28a);
+  color: black;
+  transform: translateY(-3px);
+}
+.nav-dropdown-menu {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background: white;
+  min-width: 200px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+  border-radius: 10px;
+  z-index: 10000;
+  margin-top: 4px;
+  overflow: hidden;
+  border: 2px solid #0a3d62;
+}
+.nav-dropdown:hover .nav-dropdown-menu {
+  display: block;
+}
+.nav-dropdown-menu a {
+  display: block;
+  padding: 12px 20px;
+  color: #0a3d62;
+  text-decoration: none;
+  font-weight: 600;
+}
+.nav-dropdown-menu a:hover {
+  background: #f6e2cc;
+}
+
 .logout-btn {
   background: white;
   color: #0a3d62;
@@ -133,11 +182,17 @@ input:focus, textarea:focus {
 <!-- NAVBAR -->
 <div class="top-nav">
   <div class="nav-left">
-    <a class="nav-box" href="Dashboard">Dashboard</a>
-    <a class="nav-box" href="krishimitr">Crop Price Predictor</a>
-    <a class="nav-box" href="Buy">Buy Crops</a>
-    <a class="nav-box" href="Update_crops">Manage Your Crops</a>
-    <a class="nav-box" href="Notification">Notifications</a>
+    <a class="nav-box" href="Dashboard.html">Dashboard</a>
+    <a class="nav-box" href="krishimitr.html">Crop Price Predictor</a>
+    <a class="nav-box" href="Buy.html">Buy Crops</a>
+    <div class="nav-dropdown">
+      <button type="button" class="nav-dropdown-toggle">Your Crops ▼</button>
+      <div class="nav-dropdown-menu">
+        <a href="Sell.html">Sell your crops</a>
+        <a href="Update_crops.html">Manage your crops</a>
+      </div>
+    </div>
+    <a class="nav-box" href="Notification.html">Notifications</a>
   </div>
   <button class="logout-btn" id="logoutBtn">Logout</button>
 </div>
