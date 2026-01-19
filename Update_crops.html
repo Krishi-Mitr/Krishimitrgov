@@ -235,9 +235,11 @@ async function loadCrops() {
   `).join("");
 }
 
+let currentCropId = null;
 let currentCropJid = null;
 
 function openModal(c) {
+  currentCropId = c.id;
   currentCropJid = c.jid;
   document.getElementById("mCrop").innerText = c.crop_name;
   document.getElementById("mQty").innerText = c.quantity;
@@ -250,34 +252,46 @@ function openModal(c) {
 
 function closeModal() {
   document.getElementById("modal").style.display = "none";
+  currentCropId = null;
   currentCropJid = null;
 }
 
 async function deleteCropFromBuyTable() {
-  if (!currentCropJid) {
+  if (!currentCropId || !currentCropJid) {
     alert('No crop selected.');
     return;
   }
   
-  if (!confirm('Are you sure you want to delete this crop from buy_table? This will remove all buyer interest entries for this crop.')) {
+  if (!confirm('Are you sure you want to delete this crop? This will permanently remove it from both buy_table and crop_sales.')) {
     return;
   }
   
   try {
-    // Delete all entries from buy_table where fid matches the crop's jid and lid matches the farmer's login ID
-    const { error } = await db
+    // First, delete all entries from buy_table where fid matches the crop's jid
+    const { error: buyTableError } = await db
       .from('buy_table')
       .delete()
-      .eq('fid', currentCropJid)
-      .eq('lid', loginid);
+      .eq('fid', currentCropJid);
     
-    if (error) {
-      console.error('Error deleting from buy_table:', error);
-      alert('An error occurred while deleting from buy_table: ' + error.message);
+    if (buyTableError) {
+      console.error('Error deleting from buy_table:', buyTableError);
+      alert('An error occurred while deleting from buy_table: ' + buyTableError.message);
       return;
     }
     
-    alert('Crop has been removed from buy_table successfully!');
+    // Then, delete the crop from crop_sales using its id
+    const { error: cropSalesError } = await db
+      .from('crop_sales')
+      .delete()
+      .eq('id', currentCropId);
+    
+    if (cropSalesError) {
+      console.error('Error deleting from crop_sales:', cropSalesError);
+      alert('An error occurred while deleting from crop_sales: ' + cropSalesError.message);
+      return;
+    }
+    
+    alert('Crop has been successfully deleted from both buy_table and crop_sales!');
     closeModal();
     // Reload crops to refresh the list
     loadCrops();
