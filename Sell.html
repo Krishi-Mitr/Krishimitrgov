@@ -35,7 +35,94 @@ body {
 
 .nav-left {
   display: flex;
-  gap: 16px;
+  align-items: center;
+  gap: 12px;
+}
+
+/* Hamburger button */
+.hamburger {
+  display: inline-flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  border: 2px solid #0a3d62;
+  background: rgba(255,255,255,0.85);
+  cursor: pointer;
+  padding: 6px;
+  transition: background 0.25s, transform 0.25s, box-shadow 0.25s;
+}
+
+.hamburger span {
+  display: block;
+  height: 3px;
+  border-radius: 999px;
+  background: #0a3d62;
+  transition: transform 0.25s, opacity 0.25s;
+}
+
+.hamburger:hover {
+  background: #ffe0b8;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.18);
+  transform: translateY(-1px);
+}
+
+.hamburger.open span:nth-child(1) {
+  transform: translateY(5px) rotate(45deg);
+}
+
+.hamburger.open span:nth-child(2) {
+  opacity: 0;
+}
+
+.hamburger.open span:nth-child(3) {
+  transform: translateY(-5px) rotate(-45deg);
+}
+
+/* Slide-out nav menu */
+.nav-menu {
+  position: fixed;
+  top: 78px;
+  left: 0;
+  width: 240px;
+  max-width: 70%;
+  background: #ffffff;
+  box-shadow: 4px 10px 22px rgba(0,0,0,0.25);
+  border-right: 3px solid #0a3d62;
+  border-bottom-right-radius: 16px;
+  padding: 10px 0;
+  transform: translateX(-100%);
+  opacity: 0;
+  visibility: hidden;
+  transition: transform 0.3s ease, opacity 0.3s ease, visibility 0.3s ease;
+  z-index: 9998;
+}
+
+.nav-menu.open {
+  transform: translateX(0);
+  opacity: 1;
+  visibility: visible;
+}
+
+.nav-menu a {
+  display: block;
+  padding: 12px 20px;
+  font-weight: 600;
+  color: #0a3d62;
+  text-decoration: none;
+  border-bottom: 1px solid #f0f0f0;
+  transition: background 0.2s, padding-left 0.2s;
+}
+
+.nav-menu a:last-child {
+  border-bottom: none;
+}
+
+.nav-menu a:hover {
+  background: #f6e2cc;
+  padding-left: 28px;
 }
 
 .nav-box {
@@ -113,6 +200,18 @@ body {
   cursor: pointer;
 }
 
+/* Responsive tweaks */
+@media (max-width: 600px) {
+  .top-nav {
+    padding: 0 16px;
+  }
+
+  .logout-btn {
+    padding: 8px 16px;
+    font-size: 0.9em;
+  }
+}
+
 /* ===== CONTENT ===== */
 .container {
   max-width: 900px;
@@ -174,100 +273,30 @@ input:focus, textarea:focus {
   color: white;
   cursor: pointer;
 }
-  /* HAMBURGER BUTTON */
-.hamburger {
-  display: none;
-  font-size: 1.8em;
-  background: none;
-  border: none;
-  cursor: pointer;
-  color: white;
-  margin-left: auto;
-}
-
-/* HAMBURGER MENU */
-.hamburger-menu {
-  display: none;
-  position: fixed;
-  top: 78px;
-  right: 0;
-  width: 250px;
-  height: calc(100% - 78px);
-  background: linear-gradient(180deg,#ff9933,#138808);
-  padding: 20px;
-  box-shadow: -4px 0 14px rgba(0,0,0,0.25);
-  overflow-y: auto;
-  z-index: 9998;
-}
-
-.menu-section h4 {
-  color: white;
-  margin-bottom: 10px;
-  font-size: 1.2em;
-  border-bottom: 1px solid rgba(255,255,255,0.5);
-  padding-bottom: 4px;
-}
-
-.menu-section a {
-  display: block;
-  color: white;
-  text-decoration: none;
-  padding: 8px 0;
-  font-weight: 600;
-  transition: 0.2s;
-}
-
-.menu-section a:hover {
-  color: #000;
-}
-
-/* RESPONSIVE: SHOW HAMBURGER ON SMALL SCREENS */
-@media (max-width: 900px) {
-  .nav-left a,
-  .nav-dropdown {
-    display: none;
-  }
-  .hamburger {
-    display: block;
-  }
-}
-
 </style>
 </head>
 
 <body>
 
-<!-- TOP NAVBAR -->
-
-
-  <button class="hamburger" id="hamburgerBtn">☰</button>
+<!-- NAVBAR -->
+<div class="top-nav">
+  <div class="nav-left">
+    <button class="hamburger" id="hamburgerBtn" aria-label="Open navigation menu">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+  </div>
   <button class="logout-btn" id="logoutBtn">Logout</button>
 </div>
 
-<!-- HAMBURGER MENU -->
-<div class="hamburger-menu" id="hamburgerMenu">
-  <div class="menu-section">
-    <h4>Main</h4>
-    <a href="Dashboard.html">Dashboard</a>
-    <a href="krishimitr.html">Crop Price Predictor</a>
-  </div>
-  <div class="menu-section">
-    <h4>Market</h4>
-    <a href="Buy.html">Buy Crops</a>
-    <a href="Sell.html">Sell Crops</a>
-    <a href="Update_crops.html">Manage Crops</a>
-  </div>
-  <div class="menu-section">
-    <h4>Tools</h4>
-    <a href="Notification.html">Notifications</a>
-    <a href="#">Price Charts</a>
-  </div>
-  <div class="menu-section">
-    <h4>System</h4>
-    <a href="#">Settings</a>
-  </div>
-</div>
-
+<!-- Slide-out menu items -->
+<nav class="nav-menu" id="navMenu" aria-label="Main navigation">
+  <a href="Dashboard.html">Main</a>
+  <a href="Buy.html">Market</a>
+  <a href="krishimitr.html">Tools</a>
+  <a href="Notification.html">System</a>
+</nav>
 
 <div class="container">
 
@@ -324,31 +353,6 @@ input:focus, textarea:focus {
 </div>
 
 <script>
-  // Toggle Hamburger Menu
-const hamburgerBtn = document.getElementById("hamburgerBtn");
-const hamburgerMenu = document.getElementById("hamburgerMenu");
-
-hamburgerBtn.addEventListener("click", () => {
-  if (hamburgerMenu.style.display === "block") {
-    hamburgerMenu.style.display = "none";
-  } else {
-    hamburgerMenu.style.display = "block";
-  }
-});
-
-// Optional: Close menu when clicking outside
-window.addEventListener("click", (e) => {
-  if (!hamburgerMenu.contains(e.target) && !hamburgerBtn.contains(e.target)) {
-    hamburgerMenu.style.display = "none";
-  }
-});
-
-// Logout button outside menu
-document.getElementById("logoutBtn").onclick = () => {
-  sessionStorage.clear();
-  location.href = "login";
-};
-
 const db = window.db;
 
 const loginid = sessionStorage.getItem("loginid");
@@ -428,6 +432,23 @@ document.getElementById("logoutBtn").onclick = () => {
   sessionStorage.clear();
   location.href = "login";
 };
+
+// Hamburger nav toggle
+const hamburgerBtn = document.getElementById("hamburgerBtn");
+const navMenu = document.getElementById("navMenu");
+
+hamburgerBtn.addEventListener("click", () => {
+  hamburgerBtn.classList.toggle("open");
+  navMenu.classList.toggle("open");
+});
+
+// Optional: close menu when a link is clicked (better UX on mobile)
+navMenu.querySelectorAll("a").forEach(link => {
+  link.addEventListener("click", () => {
+    hamburgerBtn.classList.remove("open");
+    navMenu.classList.remove("open");
+  });
+});
 
 loadFarmer();
 </script>
