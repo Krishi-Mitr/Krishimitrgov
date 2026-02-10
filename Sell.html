@@ -174,12 +174,70 @@ input:focus, textarea:focus {
   color: white;
   cursor: pointer;
 }
+  /* HAMBURGER BUTTON */
+.hamburger {
+  display: none;
+  font-size: 1.8em;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: white;
+  margin-left: auto;
+}
+
+/* HAMBURGER MENU */
+.hamburger-menu {
+  display: none;
+  position: fixed;
+  top: 78px;
+  right: 0;
+  width: 250px;
+  height: calc(100% - 78px);
+  background: linear-gradient(180deg,#ff9933,#138808);
+  padding: 20px;
+  box-shadow: -4px 0 14px rgba(0,0,0,0.25);
+  overflow-y: auto;
+  z-index: 9998;
+}
+
+.menu-section h4 {
+  color: white;
+  margin-bottom: 10px;
+  font-size: 1.2em;
+  border-bottom: 1px solid rgba(255,255,255,0.5);
+  padding-bottom: 4px;
+}
+
+.menu-section a {
+  display: block;
+  color: white;
+  text-decoration: none;
+  padding: 8px 0;
+  font-weight: 600;
+  transition: 0.2s;
+}
+
+.menu-section a:hover {
+  color: #000;
+}
+
+/* RESPONSIVE: SHOW HAMBURGER ON SMALL SCREENS */
+@media (max-width: 900px) {
+  .nav-left a,
+  .nav-dropdown {
+    display: none;
+  }
+  .hamburger {
+    display: block;
+  }
+}
+
 </style>
 </head>
 
 <body>
 
-<!-- NAVBAR -->
+<!-- TOP NAVBAR -->
 <div class="top-nav">
   <div class="nav-left">
     <a class="nav-box" href="Dashboard.html">Dashboard</a>
@@ -194,8 +252,35 @@ input:focus, textarea:focus {
     </div>
     <a class="nav-box" href="Notification.html">Notifications</a>
   </div>
+
+  <button class="hamburger" id="hamburgerBtn">☰</button>
   <button class="logout-btn" id="logoutBtn">Logout</button>
 </div>
+
+<!-- HAMBURGER MENU -->
+<div class="hamburger-menu" id="hamburgerMenu">
+  <div class="menu-section">
+    <h4>Main</h4>
+    <a href="Dashboard.html">Dashboard</a>
+    <a href="krishimitr.html">Crop Price Predictor</a>
+  </div>
+  <div class="menu-section">
+    <h4>Market</h4>
+    <a href="Buy.html">Buy Crops</a>
+    <a href="Sell.html">Sell Crops</a>
+    <a href="Update_crops.html">Manage Crops</a>
+  </div>
+  <div class="menu-section">
+    <h4>Tools</h4>
+    <a href="Notification.html">Notifications</a>
+    <a href="#">Price Charts</a>
+  </div>
+  <div class="menu-section">
+    <h4>System</h4>
+    <a href="#">Settings</a>
+  </div>
+</div>
+
 
 <div class="container">
 
@@ -252,6 +337,31 @@ input:focus, textarea:focus {
 </div>
 
 <script>
+  // Toggle Hamburger Menu
+const hamburgerBtn = document.getElementById("hamburgerBtn");
+const hamburgerMenu = document.getElementById("hamburgerMenu");
+
+hamburgerBtn.addEventListener("click", () => {
+  if (hamburgerMenu.style.display === "block") {
+    hamburgerMenu.style.display = "none";
+  } else {
+    hamburgerMenu.style.display = "block";
+  }
+});
+
+// Optional: Close menu when clicking outside
+window.addEventListener("click", (e) => {
+  if (!hamburgerMenu.contains(e.target) && !hamburgerBtn.contains(e.target)) {
+    hamburgerMenu.style.display = "none";
+  }
+});
+
+// Logout button outside menu
+document.getElementById("logoutBtn").onclick = () => {
+  sessionStorage.clear();
+  location.href = "login";
+};
+
 const db = window.db;
 
 const loginid = sessionStorage.getItem("loginid");
