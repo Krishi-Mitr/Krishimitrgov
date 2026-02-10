@@ -15,6 +15,9 @@ body {
   background: linear-gradient(180deg,#f6e2cc 0%,#f7f9f8 45%,#dceee3 100%);
   color: #1f2937;
 }
+body.drawer-open {
+  overflow: hidden;
+}
 
 /* ===== NAVBAR ===== */
 .top-nav {
@@ -33,161 +36,65 @@ body {
   z-index: 9999;
 }
 
+/* Hamburger + brand */
 .nav-left {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 14px;
+  min-width: 0;
 }
 
-/* Hamburger button */
-.hamburger {
-  display: inline-flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 4px;
-  width: 40px;
-  height: 40px;
-  border-radius: 8px;
+.hamburger-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
   border: 2px solid #0a3d62;
-  background: rgba(255,255,255,0.85);
+  background: rgba(255,255,255,0.75);
+  display: grid;
+  place-items: center;
   cursor: pointer;
-  padding: 6px;
-  transition: background 0.25s, transform 0.25s, box-shadow 0.25s;
+  box-shadow: 0 8px 18px rgba(0,0,0,0.12);
 }
-
-.hamburger span {
-  display: block;
-  height: 3px;
-  border-radius: 999px;
-  background: #0a3d62;
-  transition: transform 0.25s, opacity 0.25s;
-}
-
-.hamburger:hover {
-  background: #ffe0b8;
-  box-shadow: 0 3px 8px rgba(0,0,0,0.18);
-  transform: translateY(-1px);
-}
-
-.hamburger.open span:nth-child(1) {
-  transform: translateY(5px) rotate(45deg);
-}
-
-.hamburger.open span:nth-child(2) {
-  opacity: 0;
-}
-
-.hamburger.open span:nth-child(3) {
-  transform: translateY(-5px) rotate(-45deg);
-}
-
-/* Slide-out nav menu */
-.nav-menu {
-  position: fixed;
-  top: 78px;
-  left: 0;
-  width: 240px;
-  max-width: 70%;
-  background: #ffffff;
-  box-shadow: 4px 10px 22px rgba(0,0,0,0.25);
-  border-right: 3px solid #0a3d62;
-  border-bottom-right-radius: 16px;
-  padding: 10px 0;
-  transform: translateX(-100%);
-  opacity: 0;
-  visibility: hidden;
-  transition: transform 0.3s ease, opacity 0.3s ease, visibility 0.3s ease;
-  z-index: 9998;
-}
-
-.nav-menu.open {
-  transform: translateX(0);
-  opacity: 1;
-  visibility: visible;
-}
-
-.nav-menu a {
-  display: block;
-  padding: 12px 20px;
-  font-weight: 600;
-  color: #0a3d62;
-  text-decoration: none;
-  border-bottom: 1px solid #f0f0f0;
-  transition: background 0.2s, padding-left 0.2s;
-}
-
-.nav-menu a:last-child {
-  border-bottom: none;
-}
-
-.nav-menu a:hover {
-  background: #f6e2cc;
-  padding-left: 28px;
-}
-
-.nav-box {
-  background: #0a3d62;
-  color: white;
-  padding: 10px 20px;
-  border-radius: 10px;
-  font-weight: 600;
-  text-decoration: none;
-  transition: .25s;
-}
-
-.nav-box:hover {
-  background: linear-gradient(135deg,#ff9933,#ffd28a);
-  color: black;
-  transform: translateY(-3px);
-}
-
-/* Your Crops dropdown */
-.nav-dropdown {
+.hamburger-icon {
+  width: 20px;
+  height: 14px;
   position: relative;
-  display: inline-block;
 }
-.nav-dropdown-toggle {
-  background: #0a3d62;
-  color: white;
-  padding: 10px 20px;
-  border-radius: 10px;
-  font-weight: 600;
-  border: none;
-  cursor: pointer;
-  transition: .25s;
-  font-size: 1em;
-}
-.nav-dropdown-toggle:hover {
-  background: linear-gradient(135deg,#ff9933,#ffd28a);
-  color: black;
-  transform: translateY(-3px);
-}
-.nav-dropdown-menu {
-  display: none;
+.hamburger-icon span {
   position: absolute;
-  top: 100%;
   left: 0;
-  background: white;
-  min-width: 200px;
-  box-shadow: 0 8px 20px rgba(0,0,0,0.2);
-  border-radius: 10px;
-  z-index: 10000;
-  margin-top: 4px;
-  overflow: hidden;
-  border: 2px solid #0a3d62;
+  right: 0;
+  height: 2.5px;
+  background: #0a3d62;
+  border-radius: 999px;
 }
-.nav-dropdown:hover .nav-dropdown-menu {
-  display: block;
+.hamburger-icon span:nth-child(1) { top: 0; }
+.hamburger-icon span:nth-child(2) { top: 5.5px; }
+.hamburger-icon span:nth-child(3) { top: 11px; }
+
+.brand {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.05;
+  min-width: 0;
 }
-.nav-dropdown-menu a {
-  display: block;
-  padding: 12px 20px;
+.brand-title {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 800;
   color: #0a3d62;
-  text-decoration: none;
-  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
-.nav-dropdown-menu a:hover {
-  background: #f6e2cc;
+.brand-subtitle {
+  margin: 0;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: rgba(10,61,98,0.8);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .logout-btn {
@@ -200,16 +107,86 @@ body {
   cursor: pointer;
 }
 
-/* Responsive tweaks */
-@media (max-width: 600px) {
-  .top-nav {
-    padding: 0 16px;
-  }
+/* Drawer menu (matches screenshot style) */
+.nav-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.25);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .2s ease;
+  z-index: 9998;
+}
 
-  .logout-btn {
-    padding: 8px 16px;
-    font-size: 0.9em;
-  }
+.side-drawer {
+  position: fixed;
+  top: 84px;
+  left: 14px;
+  width: min(320px, calc(100vw - 28px));
+  max-height: calc(100vh - 98px);
+  overflow: auto;
+  background: white;
+  border: 3px solid #0a3d62;
+  border-radius: 18px;
+  box-shadow: 0 18px 40px rgba(0,0,0,0.22);
+  transform: translateX(-110%);
+  transition: transform .25s ease;
+  z-index: 9999;
+}
+
+.drawer-inner {
+  padding: 14px;
+}
+
+.menu-section {
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid rgba(10,61,98,0.18);
+  margin-bottom: 14px;
+  background: #ffffff;
+}
+.menu-section-title {
+  padding: 12px 14px;
+  background: #eef2ff;
+  color: #0a3d62;
+  font-weight: 800;
+  font-size: 0.95rem;
+}
+.menu-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.menu-list a {
+  display: block;
+  padding: 14px 14px;
+  text-decoration: none;
+  color: #0a3d62;
+  font-weight: 800;
+  background: #f1f5f9;
+}
+.menu-list li + li a {
+  border-top: 1px solid rgba(10,61,98,0.10);
+}
+.menu-list a:hover,
+.menu-list a:focus-visible {
+  background: #e2e8f0;
+  outline: none;
+}
+
+body.drawer-open .nav-overlay {
+  opacity: 1;
+  pointer-events: auto;
+}
+body.drawer-open .side-drawer {
+  transform: translateX(0);
+}
+
+@media (max-width: 520px) {
+  .top-nav { padding: 0 14px; }
+  .logout-btn { padding: 9px 14px; border-radius: 12px; }
+  .brand-subtitle { display: none; }
+  .side-drawer { top: 80px; left: 10px; width: calc(100vw - 20px); }
 }
 
 /* ===== CONTENT ===== */
@@ -281,21 +258,53 @@ input:focus, textarea:focus {
 <!-- NAVBAR -->
 <div class="top-nav">
   <div class="nav-left">
-    <button class="hamburger" id="hamburgerBtn" aria-label="Open navigation menu">
-      <span></span>
-      <span></span>
-      <span></span>
+    <button class="hamburger-btn" id="menuBtn" type="button" aria-label="Open menu" aria-controls="sideNav" aria-expanded="false">
+      <div class="hamburger-icon" aria-hidden="true">
+        <span></span><span></span><span></span>
+      </div>
     </button>
+    <div class="brand">
+      <p class="brand-title">Krishi Mitr</p>
+      <p class="brand-subtitle">Sell Your Crop</p>
+    </div>
   </div>
   <button class="logout-btn" id="logoutBtn">Logout</button>
 </div>
 
-<!-- Slide-out menu items -->
-<nav class="nav-menu" id="navMenu" aria-label="Main navigation">
-  <a href="Dashboard.html">Main</a>
-  <a href="Buy.html">Market</a>
-  <a href="krishimitr.html">Tools</a>
-  <a href="Notification.html">System</a>
+<!-- Drawer + overlay -->
+<div class="nav-overlay" id="navOverlay" hidden></div>
+<nav class="side-drawer" id="sideNav" aria-label="Main navigation" hidden>
+  <div class="drawer-inner">
+    <div class="menu-section">
+      <div class="menu-section-title">Main</div>
+      <ul class="menu-list">
+        <li><a href="Dashboard.html">Dashboard</a></li>
+      </ul>
+    </div>
+
+    <div class="menu-section">
+      <div class="menu-section-title">Market</div>
+      <ul class="menu-list">
+        <li><a href="Update_crops.html">Manage Your Crops</a></li>
+        <li><a href="Sell.html" aria-current="page">Sell Your Crop</a></li>
+        <li><a href="Buy.html">Buy Your Crop</a></li>
+      </ul>
+    </div>
+
+    <div class="menu-section">
+      <div class="menu-section-title">Tools</div>
+      <ul class="menu-list">
+        <li><a href="krishimitr.html">Crop Predictor</a></li>
+      </ul>
+    </div>
+
+    <div class="menu-section" style="margin-bottom:0;">
+      <div class="menu-section-title">System</div>
+      <ul class="menu-list">
+        <li><a href="Notification.html">Notification</a></li>
+      </ul>
+    </div>
+  </div>
 </nav>
 
 <div class="container">
@@ -433,21 +442,44 @@ document.getElementById("logoutBtn").onclick = () => {
   location.href = "login";
 };
 
-// Hamburger nav toggle
-const hamburgerBtn = document.getElementById("hamburgerBtn");
-const navMenu = document.getElementById("navMenu");
+// Hamburger drawer
+const menuBtn = document.getElementById("menuBtn");
+const sideNav = document.getElementById("sideNav");
+const navOverlay = document.getElementById("navOverlay");
 
-hamburgerBtn.addEventListener("click", () => {
-  hamburgerBtn.classList.toggle("open");
-  navMenu.classList.toggle("open");
+function openDrawer() {
+  document.body.classList.add("drawer-open");
+  sideNav.hidden = false;
+  navOverlay.hidden = false;
+  menuBtn.setAttribute("aria-expanded", "true");
+}
+
+function closeDrawer() {
+  document.body.classList.remove("drawer-open");
+  menuBtn.setAttribute("aria-expanded", "false");
+  // let the closing animation run, then hide
+  window.setTimeout(() => {
+    if (!document.body.classList.contains("drawer-open")) {
+      sideNav.hidden = true;
+      navOverlay.hidden = true;
+    }
+  }, 220);
+}
+
+menuBtn.addEventListener("click", () => {
+  if (document.body.classList.contains("drawer-open")) closeDrawer();
+  else openDrawer();
 });
 
-// Optional: close menu when a link is clicked (better UX on mobile)
-navMenu.querySelectorAll("a").forEach(link => {
-  link.addEventListener("click", () => {
-    hamburgerBtn.classList.remove("open");
-    navMenu.classList.remove("open");
-  });
+navOverlay.addEventListener("click", closeDrawer);
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") closeDrawer();
+});
+
+// Close drawer when a link is selected
+sideNav.addEventListener("click", (e) => {
+  const a = e.target.closest?.("a");
+  if (a) closeDrawer();
 });
 
 loadFarmer();
