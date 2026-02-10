@@ -554,6 +554,94 @@ h2, h4 {
 #mainApp {
   display: block;
 }
+.hamburger {
+  font-size: 26px;
+  background: none;
+  border: none;
+  font-weight: 900;
+  color: #000080;
+  cursor: pointer;
+}
+
+.hamburger-menu {
+  position: fixed;
+  top: 70px;
+  right: 20px;
+  width: 260px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+  padding: 15px;
+  display: none;
+  z-index: 2000;
+  border: 2px solid #000080;
+}
+
+.hamburger-menu.show {
+  display: block;
+}
+
+.menu-section {
+  margin-bottom: 14px;
+}
+
+.menu-title {
+  font-weight: 800;
+  color: #000080;
+  margin-bottom: 6px;
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 4px;
+}
+
+.hamburger-menu a,
+.menu-btn {
+  display: block;
+  padding: 8px 10px;
+  border-radius: 8px;
+  font-weight: 600;
+  text-decoration: none;
+  color: #000080;
+  background: none;
+  border: none;
+  width: 100%;
+  text-align: left;
+}
+
+.hamburger-menu a:hover,
+.menu-btn:hover {
+  background: rgba(0,0,128,0.1);
+}
+
+.menu-btn.logout {
+  background: #000080;
+  color: white;
+}
+
+.menu-btn.logout:hover {
+  background: #FF9933;
+  color: black;
+}
+
+body.dark .hamburger {
+  color: #4a9eff;
+}
+
+body.dark .hamburger-menu {
+  background: #2d2d2d;
+  border-color: #4a9eff;
+}
+
+body.dark .menu-title,
+body.dark .hamburger-menu a,
+body.dark .menu-btn {
+  color: #e0e0e0;
+}
+
+body.dark .hamburger-menu a:hover,
+body.dark .menu-btn:hover {
+  background: rgba(74,158,255,0.2);
+}
+
 </style>
 </head>
 
@@ -562,24 +650,36 @@ h2, h4 {
 <div class="top-navbar">
   <div class="brand">🌾 KrishiMitra AI</div>
 
-  <div class="nav-center" id="navCenter">
-    <a href="Dashboard.html" class="nav-link-custom">Main Page</a>
-    <a href="Notification.html" class="nav-link-custom farmer-only">Notification</a>
-    <div class="nav-dropdown farmer-only">
-      <button type="button" class="nav-dropdown-toggle">Your Crops ▼</button>
-      <div class="nav-dropdown-menu">
-        <a href="Sell.html">Sell your crops</a>
-        <a href="Update_crops.html">Manage your crops</a>
-      </div>
-    </div>
-    <a href="Buy.html" class="nav-link-custom">Buy Crops</a>
-  </div>
+  <button class="hamburger" id="hamburgerBtn">☰</button>
 
-  <div class="nav-right">
-    <button id="toggleDark" class="btn btn-light btn-sm">🌙 Dark Mode</button>
-    <a href="#" id="logoutBtn" class="logout-btn">Logout</a>
+  <div class="hamburger-menu" id="hamburgerMenu">
+    <div class="menu-section">
+      <div class="menu-title">Main</div>
+      <a href="Dashboard.html">Main Page</a>
+      <a href="Notification.html" class="farmer-only">Notification</a>
+    </div>
+
+    <div class="menu-section farmer-only">
+      <div class="menu-title">Market</div>
+      <a href="Buy.html">Buy Crops</a>
+      <a href="Sell.html">Sell Crops</a>
+      <a href="Update_crops.html">Manage Crops</a>
+    </div>
+
+    <div class="menu-section">
+      <div class="menu-title">Tools</div>
+      <a href="#predict">Price Predictor</a>
+      <a href="#advisor">Crop Advisor</a>
+    </div>
+
+    <div class="menu-section">
+      <div class="menu-title">System</div>
+      <button id="toggleDark" class="menu-btn">Dark Mode</button>
+      <a href="#" id="logoutBtn" class="menu-btn logout">Logout</a>
+    </div>
   </div>
 </div>
+
 
 <div id="mainApp">
   <div class="container">
@@ -705,6 +805,19 @@ h2, h4 {
 </div>
 
 <script>
+const hamburgerBtn = document.getElementById('hamburgerBtn');
+const hamburgerMenu = document.getElementById('hamburgerMenu');
+
+hamburgerBtn.addEventListener('click', () => {
+  hamburgerMenu.classList.toggle('show');
+});
+
+document.addEventListener('click', e => {
+  if (!hamburgerMenu.contains(e.target) && !hamburgerBtn.contains(e.target)) {
+    hamburgerMenu.classList.remove('show');
+  }
+});
+
 // Check authentication - anyone logged in (Farmer or Citizen) can access this page
 // Use retry mechanism to handle navbar navigation timing issues
 (function() {
