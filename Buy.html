@@ -218,29 +218,133 @@ body.dark .topbar .nav-dropdown-menu a {
 body.dark .topbar .nav-dropdown-menu a:hover {
     background: #3d3d3d;
 }
+  /* HAMBURGER BUTTON */
+.hamburger {
+    display: none;
+    font-size: 28px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #000080;
+    margin-left: 15px;
+}
+
+/* HAMBURGER MENU PANEL */
+.hamburger-menu {
+    position: fixed;
+    top: 78px;
+    right: -260px;
+    width: 250px;
+    height: calc(100% - 78px);
+    background: white;
+    box-shadow: -4px 0 20px rgba(0,0,0,0.25);
+    padding: 20px;
+    transition: right 0.3s ease;
+    z-index: 8999;
+    overflow-y: auto;
+    border-left: 3px solid #000080;
+}
+
+.hamburger-menu.active {
+    right: 0;
+}
+
+.menu-section {
+    margin-bottom: 25px;
+}
+
+.menu-section h5 {
+    font-weight: 800;
+    color: #000080;
+    margin-bottom: 10px;
+    border-bottom: 2px solid #000080;
+    padding-bottom: 5px;
+}
+
+.menu-section a {
+    display: block;
+    text-decoration: none;
+    color: #000080;
+    font-weight: 700;
+    padding: 6px 0;
+}
+
+.menu-section a:hover {
+    opacity: 0.7;
+}
+
+/* Dark mode support */
+body.dark .hamburger-menu {
+    background: #2d2d2d;
+    border-left: 3px solid #4a9eff;
+}
+
+body.dark .menu-section h5 {
+    color: #4a9eff;
+    border-color: #4a9eff;
+}
+
+body.dark .menu-section a {
+    color: #e0e0e0;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+    .topbar-menu {
+        display: none;
+    }
+
+    .hamburger {
+        display: block;
+    }
+}
+
 </style>
 </head>
 
 <body>
-
+ 
 <div class="topbar">
     <div class="topbar-logo">🌾 KrishiMitra</div>
     <div class="topbar-menu">
-        <a href="Dashboard.html">Main Page</a>
-        <a href="krishimitr.html">Crop Predictor</a>
         <div class="nav-dropdown">
-            <button type="button" class="nav-dropdown-toggle">Your Crops ▼</button>
-            <div class="nav-dropdown-menu">
-                <a href="Sell.html">Sell your crops</a>
-                <a href="Update_crops.html">Manage your crops</a>
+            
             </div>
         </div>
     </div>
+   <button class="hamburger" id="hamburgerBtn">☰</button>
     <div class="topbar-right" style="display: flex; gap: 10px; align-items: center;">
         <button id="toggleDark" class="btn-dark-toggle">🌙 Dark Mode</button>
         <a href="#" id="logout">Logout</a>
     </div>
 </div>
+  <!-- HAMBURGER MENU -->
+<div class="hamburger-menu" id="hamburgerMenu">
+    <div class="menu-section">
+        <h5>Main</h5>
+        <a href="Dashboard.html">Main Page</a>
+        <a href="krishimitr.html">Crop Predictor</a>
+    </div>
+
+    <div class="menu-section">
+        <h5>Market</h5>
+        <a href="Buy.html">Buy Crops</a>
+        <a href="Sell.html">Sell Crops</a>
+        <a href="Update_crops.html">Manage Crops</a>
+    </div>
+
+    <div class="menu-section">
+        <h5>Tools</h5>
+        <a href="Notification.html">Notifications</a>
+        <a href="#">Price Charts</a>
+    </div>
+
+    <div class="menu-section">
+        <h5>System</h5>
+        <a href="#" onclick="document.getElementById('toggleDark').click()">Toggle Dark Mode</a>
+    </div>
+</div>
+
 
 <div class="container">
     <h2 class="text-center mb-4" style="color:#000080;">Available Crops & Seeds</h2>
@@ -437,6 +541,19 @@ if (toggleBtn) {
         updateDarkModeButton();
     });
 }
+  const hamburgerBtn = document.getElementById("hamburgerBtn");
+const hamburgerMenu = document.getElementById("hamburgerMenu");
+
+hamburgerBtn.addEventListener("click", () => {
+    hamburgerMenu.classList.toggle("active");
+});
+
+window.addEventListener("click", (e) => {
+    if (!hamburgerMenu.contains(e.target) && !hamburgerBtn.contains(e.target)) {
+        hamburgerMenu.classList.remove("active");
+    }
+});
+
 
 // Initialize dark mode
 initDarkMode();
