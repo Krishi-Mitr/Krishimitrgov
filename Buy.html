@@ -302,23 +302,24 @@ body.dark .menu-section a {
 </style>
 </head>
 
+
 <body>
- 
+
 <div class="topbar">
     <div class="topbar-logo">🌾 KrishiMitra</div>
-    <div class="topbar-menu">
-        <div class="nav-dropdown">
-            
-            </div>
-        </div>
-    </div>
-   <button class="hamburger" id="hamburgerBtn">☰</button>
+
+    <!-- Fixed structure -->
+    <div class="topbar-menu"></div>
+
+    <button class="hamburger" id="hamburgerBtn">☰</button>
+
     <div class="topbar-right" style="display: flex; gap: 10px; align-items: center;">
         <button id="toggleDark" class="btn-dark-toggle">🌙 Dark Mode</button>
         <a href="#" id="logout">Logout</a>
     </div>
 </div>
-  <!-- HAMBURGER MENU -->
+
+<!-- HAMBURGER MENU -->
 <div class="hamburger-menu" id="hamburgerMenu">
     <div class="menu-section">
         <h5>Main</h5>
@@ -345,12 +346,12 @@ body.dark .menu-section a {
     </div>
 </div>
 
-
 <div class="container">
     <h2 class="text-center mb-4" style="color:#000080;">Available Crops & Seeds</h2>
     <div class="row g-4" id="cropList"></div>
 </div>
 
+</body>
 <script>
 // Check authentication FIRST, synchronously (like Dashboard.html and Sell.html)
 const loginid = sessionStorage.getItem("loginid");
