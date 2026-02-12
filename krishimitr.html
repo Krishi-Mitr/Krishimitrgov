@@ -1,13 +1,8 @@
-<!doctype html>
-<html lang="en">
+<!DOCTYPE html>
+<html>
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>KrishiMitra — Local Crop Market Predictor & Crop Advisor</title>
-
+<title>Buy Crops - KrishiMitra</title>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="supabase.js"></script>
 
@@ -15,1299 +10,296 @@
 body {
   background: linear-gradient(to bottom, #FF9933 0%, #FFFFFF 50%, #138808 100%);
   background-attachment: fixed;
-  font-family: Arial, sans-serif;
-  margin: 0;
-  padding-top: 80px;
+  font-family: Arial;
+  padding-top: 90px;
 }
-
-.top-navbar {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 12px 20px;
-  background: linear-gradient(90deg, #FF9933, #FFFFFF 50%, #138808);
-  border-bottom: 3px solid #000080;
-  z-index: 1000;
+.topbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 78px;
+    display: flex;
+    align-items: center;
+    padding: 0 18px;
+    background: linear-gradient(90deg, #FF9933, #FFFFFF 50%, #138808);
+    border-bottom: 3px solid #000080;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+    z-index: 9000;
 }
-
-.brand {
-  font-size: 24px;
-  font-weight: 900;
-  color: #000080;
+.topbar-logo {
+    font-size: 26px;
+    font-weight: 900;
+    color: #000080;
+    margin-right: 25px;
 }
-
-.nav-center {
-  display: flex;
-  gap: 15px;
+.topbar-menu {
+    display: flex;
+    gap: 14px;
 }
-
-.nav-link-custom {
-  text-decoration: none;
-  padding: 8px 16px;
-  border-radius: 8px;
-  font-weight: 700;
-  color: #000080;
-  transition: 0.2s;
+.topbar-right {
+    margin-left: auto;
 }
-
-.nav-link-custom:hover {
-  background: rgba(0,0,128,0.1);
+.topbar-right a {
+    padding: 8px 16px;
+    background: #000080;
+    color: white;
+    text-decoration: none;
+    border-radius: 8px;
+    font-weight: 700;
 }
-
-/* Your Crops dropdown */
-.nav-dropdown {
-  position: relative;
-  display: inline-block;
+.card-custom {
+    border: 3px solid #000080;
+    border-radius: 15px;
+    background: white;
+    padding: 18px;
+    box-shadow: 0 4px 18px rgba(0,0,0,0.22);
 }
-.nav-dropdown-toggle {
-  padding: 8px 16px;
-  border-radius: 8px;
-  font-weight: 700;
-  color: #000080;
-  background: none;
-  border: none;
-  cursor: pointer;
-  font-size: 1em;
+.buy-btn {
+    width: 100%;
+    padding: 10px;
+    font-weight: 700;
+    border-radius: 8px;
+    border: none;
+    background: #000080;
+    color: white;
 }
-.nav-dropdown-toggle:hover {
-  background: rgba(0,0,128,0.1);
+.btn-dark-toggle {
+    padding: 8px 16px;
+    background: rgba(255, 255, 255, 0.9);
+    color: #000080;
+    border-radius: 8px;
+    font-weight: 700;
+    border: 2px solid #000080;
+    cursor: pointer;
+    transition: 0.2s;
 }
-.nav-dropdown-menu {
-  display: none;
-  position: absolute;
-  top: 100%;
-  left: 0;
-  background: white;
-  min-width: 200px;
-  box-shadow: 0 8px 20px rgba(0,0,0,0.2);
-  border-radius: 8px;
-  z-index: 1001;
-  margin-top: 4px;
-  overflow: hidden;
-  border: 2px solid #000080;
+.btn-dark-toggle:hover {
+    background: #000080;
+    color: white;
 }
-.nav-dropdown:hover .nav-dropdown-menu {
-  display: block;
-}
-.nav-dropdown-menu a {
-  display: block;
-  padding: 12px 16px;
-  color: #000080;
-  text-decoration: none;
-  font-weight: 700;
-}
-.nav-dropdown-menu a:hover {
-  background: #f0f4ff;
-}
-body.dark .nav-dropdown-toggle {
-  color: #e0e0e0;
-}
-body.dark .nav-dropdown-toggle:hover {
-  background: rgba(74, 158, 255, 0.2);
-  color: #fff;
-}
-body.dark .nav-dropdown-menu {
-  background: #2d2d2d;
-  border-color: #4a9eff;
-}
-body.dark .nav-dropdown-menu a {
-  color: #e0e0e0;
-}
-body.dark .nav-dropdown-menu a:hover {
-  background: #3d3d3d;
-}
-
-.nav-right {
-  display: flex;
-  gap: 10px;
-  align-items: center;
-}
-
-.logout-btn {
-  padding: 8px 16px;
-  background: #000080;
-  color: white;
-  border-radius: 8px;
-  font-weight: 700;
-  text-decoration: none;
-  border: none;
-  cursor: pointer;
-}
-
-.logout-btn:hover {
-  background: #FF9933;
-  color: #000;
-}
-
-.container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 20px;
-}
-
-.card {
-  background: white;
-  padding: 20px;
-  border-radius: 15px;
-  margin-bottom: 20px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-  border: 2px solid #000080;
-}
-
-.form-group {
-  margin-bottom: 15px;
-}
-
-.form-group label {
-  display: block;
-  margin-bottom: 5px;
-  font-weight: 600;
-  color: #000080;
-}
-
-.form-control {
-  width: 100%;
-  padding: 10px;
-  border: 2px solid #000080;
-  border-radius: 8px;
-  font-size: 14px;
-}
-
-/* Smaller forecast horizon slider */
-#horizon {
-  width: 100%;
-  height: 6px;
-  padding: 0;
-  margin: 8px 0;
-  cursor: pointer;
-  -webkit-appearance: none;
-  appearance: none;
-  background: #e0e0e0;
-  border-radius: 3px;
-  outline: none;
-}
-
-#horizon::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 18px;
-  height: 18px;
-  background: #000080;
-  border-radius: 50%;
-  cursor: pointer;
-  transition: 0.2s;
-}
-
-#horizon::-webkit-slider-thumb:hover {
-  background: #FF9933;
-  transform: scale(1.1);
-}
-
-#horizon::-moz-range-thumb {
-  width: 18px;
-  height: 18px;
-  background: #000080;
-  border-radius: 50%;
-  cursor: pointer;
-  border: none;
-  transition: 0.2s;
-}
-
-#horizon::-moz-range-thumb:hover {
-  background: #FF9933;
-  transform: scale(1.1);
-}
-
-.horizon-label {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 5px;
-}
-
-.horizon-value {
-  font-weight: 700;
-  color: #000080;
-  font-size: 16px;
-  min-width: 50px;
-  text-align: right;
-}
-
-.help-text {
-  font-size: 12px;
-  color: #666;
-  margin-top: 4px;
-  font-style: italic;
-}
-
-.btn {
-  padding: 10px 20px;
-  border: none;
-  border-radius: 8px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: 0.2s;
-}
-
-.btn-primary {
-  background: #000080;
-  color: white;
-}
-
-.btn-primary:hover {
-  background: #FF9933;
-  color: #000;
-}
-
-.btn-success {
-  background: #138808;
-  color: white;
-}
-
-.btn-success:hover {
-  background: #0d6e05;
-}
-
-.btn-info {
-  background: #0dcaf0;
-  color: #000;
-}
-
-.btn-info:hover {
-  background: #0aa2c0;
-}
-
-.btn-warning {
-  background: #ffc107;
-  color: #000;
-}
-
-.btn-warning:hover {
-  background: #ffb300;
-}
-
-.chart-container {
-  position: relative;
-  height: 400px;
-  margin: 20px 0;
-}
-
-.recommend {
-  font-size: 18px;
-  font-weight: 700;
-  color: #000080;
-  margin-bottom: 10px;
-}
-
-#actionCard {
-  margin-top: 20px;
-}
-
-.row {
-  display: flex;
-  gap: 20px;
-  flex-wrap: wrap;
-}
-
-.col-md-6 {
-  flex: 1;
-  min-width: 300px;
-}
-
-.text-success {
-  color: #138808;
-}
-
-.text-danger {
-  color: #dc3545;
-}
-
-.text-warning {
-  color: #ffc107;
-}
-
-.text-info {
-  color: #0dcaf0;
-}
-
-.small-muted {
-  font-size: 12px;
-  color: #666;
-}
-
-.mt-2 {
-  margin-top: 10px;
-}
-
-.mt-3 {
-  margin-top: 15px;
-}
-
-.mb-3 {
-  margin-bottom: 15px;
-}
-
-#qrCanvas {
-  margin-top: 10px;
-  border: 2px solid #000080;
-  border-radius: 8px;
-}
-
 body.dark {
-  background: linear-gradient(to bottom, #1a1a1a 0%, #2d2d2d 50%, #1a1a1a 100%);
-  color: #e0e0e0;
+    background: linear-gradient(to bottom, #1a1a1a 0%, #2d2d2d 50%, #1a1a1a 100%);
+    color: #e0e0e0;
 }
-
-body.dark .top-navbar {
-  background: linear-gradient(90deg, #2d2d2d, #3d3d3d 50%, #2d2d2d);
-  border-bottom: 3px solid #4a9eff;
+body.dark .topbar {
+    background: linear-gradient(90deg, #2d2d2d, #3d3d3d 50%, #2d2d2d);
+    border-bottom: 3px solid #4a9eff;
 }
-
-body.dark .brand {
-  color: #4a9eff;
+body.dark .topbar-logo {
+    color: #4a9eff;
 }
-
-body.dark .nav-link-custom {
-  color: #e0e0e0;
+body.dark .topbar-right a {
+    background: #4a9eff;
+    color: white;
 }
-
-body.dark .nav-link-custom:hover {
-  background: rgba(74, 158, 255, 0.2);
-  color: #fff;
+body.dark .card-custom {
+    background: #2d2d2d;
+    border-color: #4a9eff;
+    color: #e0e0e0;
 }
-
-body.dark .logout-btn {
-  background: #4a9eff;
-  color: white;
+body.dark .buy-btn {
+    background: #4a9eff;
 }
-
-body.dark .logout-btn:hover {
-  background: #6bb0ff;
-  color: #fff;
-}
-
-body.dark .card {
-  background: #2d2d2d;
-  color: #e0e0e0;
-  border-color: #4a9eff;
-}
-
-body.dark .form-control {
-  background: #1e1e1e;
-  color: #e0e0e0;
-  border-color: #555;
-}
-
-body.dark .form-control:focus {
-  background: #1e1e1e;
-  color: #fff;
-  border-color: #4a9eff;
-  outline: none;
-}
-
-body.dark .form-group label {
-  color: #e0e0e0;
-}
-
-body.dark .help-text {
-  color: #999;
-}
-
-body.dark .horizon-value {
-  color: #e0e0e0;
-}
-
-body.dark #horizon {
-  background: #444;
-}
-
-body.dark #horizon::-webkit-slider-thumb {
-  background: #4a9eff;
-}
-
-body.dark #horizon::-webkit-slider-thumb:hover {
-  background: #6bb0ff;
-}
-
-body.dark #horizon::-moz-range-thumb {
-  background: #4a9eff;
-}
-
-body.dark #horizon::-moz-range-thumb:hover {
-  background: #6bb0ff;
-}
-
-body.dark .btn-primary {
-  background: #4a9eff;
-  color: white;
-}
-
-body.dark .btn-primary:hover {
-  background: #6bb0ff;
-  color: #fff;
-}
-
-body.dark .btn-success {
-  background: #28a745;
-  color: white;
-}
-
-body.dark .btn-success:hover {
-  background: #34ce57;
-}
-
-body.dark .btn-info {
-  background: #17a2b8;
-  color: #fff;
-}
-
-body.dark .btn-info:hover {
-  background: #1fc8e3;
-}
-
-body.dark .btn-warning {
-  background: #ffc107;
-  color: #000;
-}
-
-body.dark .btn-warning:hover {
-  background: #ffca2c;
-}
-
-body.dark .btn-light {
-  background: #3d3d3d;
-  color: #e0e0e0;
-  border: 1px solid #555;
-}
-
-body.dark .btn-light:hover {
-  background: #4d4d4d;
-  color: #fff;
-}
-
-body.dark .recommend {
-  color: #e0e0e0;
-}
-
-body.dark .text-success {
-  color: #6cff6c;
-}
-
-body.dark .text-danger {
-  color: #ff6c6c;
-}
-
-body.dark .text-warning {
-  color: #ffd93d;
-}
-
-body.dark .text-info {
-  color: #6bd4ff;
-}
-
 body.dark .text-muted {
-  color: #999;
-}
-
-body.dark .small-muted {
-  color: #aaa;
-}
-
-body.dark #qrCanvas {
-  border-color: #4a9eff;
-  background: #1e1e1e;
-}
-
-body.dark h2, body.dark h4 {
-  color: #e0e0e0;
-}
-
-body.dark select {
-  background-color: #1e1e1e;
-  color: #e0e0e0;
-}
-
-body.dark select option {
-  background: #2d2d2d;
-  color: #e0e0e0;
-}
-
-body.dark select:focus {
-  background-color: #1e1e1e;
-  color: #fff;
-  border-color: #4a9eff;
-}
-
-.w-100 {
-  width: 100%;
-}
-
-h2, h4 {
-  color: #000080;
-  margin-bottom: 15px;
-}
-
-#mainApp {
-  display: block;
+    color: #999 !important;
 }
 .hamburger {
-  font-size: 26px;
-  background: none;
-  border: none;
-  font-weight: 900;
-  color: #000080;
-  cursor: pointer;
+    display: none;
+    font-size: 28px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #000080;
+    margin-left: 15px;
 }
-
 .hamburger-menu {
-  position: fixed;
-  top: 70px;
-  right: 20px;
-  width: 260px;
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-  padding: 15px;
-  display: none;
-  z-index: 2000;
-  border: 2px solid #000080;
+    position: fixed;
+    top: 78px;
+    right: -260px;
+    width: 250px;
+    height: calc(100% - 78px);
+    background: white;
+    box-shadow: -4px 0 20px rgba(0,0,0,0.25);
+    padding: 20px;
+    transition: right 0.3s ease;
+    z-index: 8999;
+    overflow-y: auto;
+    border-left: 3px solid #000080;
 }
-
-.hamburger-menu.show {
-  display: block;
+.hamburger-menu.active {
+    right: 0;
 }
-
 .menu-section {
-  margin-bottom: 14px;
+    margin-bottom: 25px;
 }
-
-.menu-title {
-  font-weight: 800;
-  color: #000080;
-  margin-bottom: 6px;
-  border-bottom: 1px solid #ddd;
-  padding-bottom: 4px;
+.menu-section h5 {
+    font-weight: 800;
+    color: #000080;
+    margin-bottom: 10px;
+    border-bottom: 2px solid #000080;
+    padding-bottom: 5px;
 }
-
-.hamburger-menu a,
-.menu-btn {
-  display: block;
-  padding: 8px 10px;
-  border-radius: 8px;
-  font-weight: 600;
-  text-decoration: none;
-  color: #000080;
-  background: none;
-  border: none;
-  width: 100%;
-  text-align: left;
+.menu-section a {
+    display: block;
+    text-decoration: none;
+    color: #000080;
+    font-weight: 700;
+    padding: 6px 0;
 }
-
-.hamburger-menu a:hover,
-.menu-btn:hover {
-  background: rgba(0,0,128,0.1);
+@media (max-width: 900px) {
+    .topbar-menu {
+        display: none;
+    }
+    .hamburger {
+        display: block;
+    }
 }
-
-.menu-btn.logout {
-  background: #000080;
-  color: white;
-}
-
-.menu-btn.logout:hover {
-  background: #FF9933;
-  color: black;
-}
-
-body.dark .hamburger {
-  color: #4a9eff;
-}
-
-body.dark .hamburger-menu {
-  background: #2d2d2d;
-  border-color: #4a9eff;
-}
-
-body.dark .menu-title,
-body.dark .hamburger-menu a,
-body.dark .menu-btn {
-  color: #e0e0e0;
-}
-
-body.dark .hamburger-menu a:hover,
-body.dark .menu-btn:hover {
-  background: rgba(74,158,255,0.2);
-}
-
 </style>
 </head>
 
 <body>
 
-<div class="top-navbar">
-  <div class="brand">🌾 KrishiMitra AI</div>
+<div class="topbar">
+    <div class="topbar-logo">🌾 KrishiMitra</div>
 
-  <button class="hamburger" id="hamburgerBtn">☰</button>
+    <!-- FIXED STRUCTURE -->
+    <div class="topbar-menu"></div>
 
-  <div class="hamburger-menu" id="hamburgerMenu">
-    <div class="menu-section">
-      <div class="menu-title">Main</div>
-      <a href="Dashboard.html">Main Page</a>
-      <a href="Notification.html" class="farmer-only">Notification</a>
+    <button class="hamburger" id="hamburgerBtn">☰</button>
+
+    <div class="topbar-right" style="display: flex; gap: 10px; align-items: center;">
+        <button id="toggleDark" class="btn-dark-toggle">🌙 Dark Mode</button>
+        <a href="#" id="logout">Logout</a>
     </div>
-
-    <div class="menu-section farmer-only">
-      <div class="menu-title">Market</div>
-      <a href="Buy.html">Buy Crops</a>
-      <a href="Sell.html">Sell Crops</a>
-      <a href="Update_crops.html">Manage Crops</a>
-    </div>
-
-    <div class="menu-section">
-      <div class="menu-title">Tools</div>
-      <a href="#predict">Price Predictor</a>
-      <a href="#advisor">Crop Advisor</a>
-    </div>
-
-    <div class="menu-section">
-      <div class="menu-title">System</div>
-      <button id="toggleDark" class="menu-btn">Dark Mode</button>
-      <a href="#" id="logoutBtn" class="menu-btn logout">Logout</a>
-    </div>
-  </div>
 </div>
 
-
-<div id="mainApp">
-  <div class="container">
-    
-    <div class="card">
-      <h2> Crop Price Predictor & Advisor</h2>
-      <p style="margin-bottom: 0;">Get price forecasts and farming advice for your crops</p>
-      <p class="help-text" style="margin-top: 8px;">Select your crop and region, then click "Predict Prices" to see future price trends</p>
+<div class="hamburger-menu" id="hamburgerMenu">
+    <div class="menu-section">
+        <h5>Main</h5>
+        <a href="Dashboard.html">Main Page</a>
+        <a href="krishimitr.html">Crop Predictor</a>
     </div>
-
-    <div class="row">
-      <div class="col-md-6">
-        <div class="card">
-          <h4> Price Prediction</h4>
-          <p class="help-text" style="margin-top: -10px; margin-bottom: 15px;">Get price forecasts for your crops to make better selling decisions</p>
-          
-          <div class="form-group">
-            <label for="cropSelect"> Select Crop</label>
-            <select id="cropSelect" class="form-control">
-              <option value="Wheat">Wheat</option>
-              <option value="Rice">Rice</option>
-              <option value="Sugarcane">Sugarcane</option>
-              <option value="Cotton">Cotton</option>
-              <option value="Maize">Maize</option>
-              <option value="Sorghum">Sorghum</option>
-              <option value="Barley">Barley</option>
-              <option value="Millet">Millet</option>
-              <option value="Soybean">Soybean</option>
-              <option value="Groundnut">Groundnut</option>
-              <option value="Tomato">Tomato</option>
-              <option value="Potato">Potato</option>
-            </select>
-          </div>
-
-          <div class="form-group">
-            <label for="regionSelect">📍 Select Region</label>
-            <select id="regionSelect" class="form-control">
-              <option value="Punjab">Punjab</option>
-              <option value="Haryana">Haryana</option>
-              <option value="Uttar Pradesh">Uttar Pradesh</option>
-              <option value="Maharashtra">Maharashtra</option>
-              <option value="Karnataka">Karnataka</option>
-              <option value="Tamil Nadu">Tamil Nadu</option>
-              <option value="Gujarat">Gujarat</option>
-              <option value="Rajasthan">Rajasthan</option>
-            </select>
-          </div>
-
-          <div class="form-group">
-            <div class="horizon-label">
-              <label for="horizon" style="margin: 0;"> Forecast Period</label>
-              <span class="horizon-value"><span id="hval">30</span> days</span>
-            </div>
-            <input type="range" id="horizon" min="7" max="90" value="30" step="1">
-            <div class="help-text">Adjust to see prices for next 7-90 days</div>
-          </div>
-
-          <button id="predictBtn" class="btn btn-primary w-100"> Predict Prices</button>
-          <button id="combineBtn" class="btn btn-warning w-100 mt-2"> Predict + Get Advice</button>
-          <button id="exportBtn" class="btn btn-info w-100 mt-2">📥 Export CSV</button>
-        </div>
-
-        <div class="card">
-          <h4>💡 Crop Advisor</h4>
-          <p class="help-text" style="margin-top: -10px; margin-bottom: 15px;">Get personalized farming recommendations based on your conditions</p>
-          
-          <div class="form-group">
-            <label for="soilType"> Soil Type</label>
-            <select id="soilType" class="form-control">
-              <option value="Loamy">Loamy (Best for most crops)</option>
-              <option value="Clayey">Clayey</option>
-              <option value="Sandy">Sandy</option>
-              <option value="Silty">Silty</option>
-            </select>
-          </div>
-
-          <div class="form-group">
-            <label for="rainfall"> Expected Rainfall (mm)</label>
-            <input type="number" id="rainfall" class="form-control" value="200" min="0" max="1000">
-            <div class="help-text">Typical range: 100-400 mm</div>
-          </div>
-
-          <div class="form-group">
-            <label for="temp">🌡️ Expected Temperature (°C)</label>
-            <input type="number" id="temp" class="form-control" value="25" min="-10" max="50">
-            <div class="help-text">Average temperature during growing season</div>
-          </div>
-
-          <button id="adviseBtn" class="btn btn-success w-100">Get Farming Advice</button>
-        </div>
-      </div>
-
-      <div class="col-md-6">
-        <div class="card">
-          <h4>Price Chart</h4>
-          <div class="chart-container">
-            <canvas id="priceChart"></canvas>
-          </div>
-        </div>
-
-        <div class="card">
-          <h4> Recommendations</h4>
-          <div id="actionCard">
-            <p class="text-muted">Click "Predict Prices" to see buying/selling recommendations</p>
-          </div>
-        </div>
-
-        <div class="card">
-          <h4> Farming Advice</h4>
-          <div id="advisorOutput" class="text-muted">
-            Click "Get Farming Advice" to receive personalized recommendations for seeds and fertilizers
-          </div>
-        </div>
-
-        <div class="card">
-          <h4>Share App</h4>
-          <canvas id="qrCanvas"></canvas>
-        </div>
-      </div>
+    <div class="menu-section">
+        <h5>Market</h5>
+        <a href="Buy.html">Buy Crops</a>
+        <a href="Sell.html">Sell Crops</a>
+        <a href="Update_crops.html">Manage Crops</a>
     </div>
+    <div class="menu-section">
+        <h5>Tools</h5>
+        <a href="Notification.html">Notifications</a>
+        <a href="#">Price Charts</a>
+    </div>
+    <div class="menu-section">
+        <h5>System</h5>
+        <a href="#" onclick="document.getElementById('toggleDark').click()">Toggle Dark Mode</a>
+    </div>
+</div>
 
-  </div>
+<div class="container">
+    <h2 class="text-center mb-4" style="color:#000080;">Available Crops & Seeds</h2>
+    <div class="row g-4" id="cropList"></div>
 </div>
 
 <script>
-const hamburgerBtn = document.getElementById('hamburgerBtn');
-const hamburgerMenu = document.getElementById('hamburgerMenu');
+const loginid = sessionStorage.getItem("loginid");
+const usertype = sessionStorage.getItem("usertype");
 
-hamburgerBtn.addEventListener('click', () => {
-  hamburgerMenu.classList.toggle('show');
-});
+if (!loginid || !usertype) {
+    window.location.href = "login.html";
+}
 
-document.addEventListener('click', e => {
-  if (!hamburgerMenu.contains(e.target) && !hamburgerBtn.contains(e.target)) {
-    hamburgerMenu.classList.remove('show');
+async function waitForDB() {
+  let attempts = 0;
+  while (!window.db && attempts < 50) {
+    await new Promise(resolve => setTimeout(resolve, 100));
+    attempts++;
   }
-});
-
-// Check authentication - anyone logged in (Farmer or Citizen) can access this page
-// Use retry mechanism to handle navbar navigation timing issues
-(function() {
-    let retryCount = 0;
-    const MAX_RETRIES = 10;
-    
-    function checkAuth() {
-        try {
-            const loginid = sessionStorage.getItem("loginid");
-            const usertype = sessionStorage.getItem("usertype");
-            
-            if (loginid && usertype) {
-                console.log("✅ Authentication passed");
-                return; // Success, stop checking
-            }
-        } catch (e) {
-            console.log("SessionStorage access error, retrying...", e);
-        }
-        
-        // Retry if credentials not found yet (handles navbar navigation timing)
-        if (retryCount < MAX_RETRIES) {
-            retryCount++;
-            setTimeout(checkAuth, 50);
-        } else {
-            // After all retries, redirect if still no credentials
-            console.error("❌ Redirecting to login - no credentials found after retries");
-            window.location.href = "login.html";
-        }
-    }
-    
-    // Start check with a small initial delay to ensure sessionStorage is ready
-    setTimeout(checkAuth, 10);
-})();
-
-// Wait for DOM to be ready before manipulating elements
-function setupPage() {
-    // Get usertype from sessionStorage when needed
-    const currentUsertype = sessionStorage.getItem("usertype");
-    
-    // Hide farmer-only navigation links if user is not a farmer (but they can still use the page)
-    if (currentUsertype && currentUsertype !== "Farmer") {
-        try {
-            document.querySelectorAll('.farmer-only').forEach(el => el.remove());
-        } catch (e) {
-            // Elements might not exist yet, try again later
-            setTimeout(() => {
-                document.querySelectorAll('.farmer-only').forEach(el => el.remove());
-            }, 100);
-        }
-    }
-
-    // Setup logout button
-    const logoutBtn = document.getElementById('logoutBtn');
-    if (logoutBtn) {
-        logoutBtn.onclick = () => {
-            sessionStorage.clear();
-            location.href = "login.html";
-        };
-    } else {
-        // Retry if button doesn't exist yet
-        setTimeout(setupPage, 50);
-    }
+  if (!window.db) return false;
+  return true;
 }
 
-// Run setup when DOM is ready
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', setupPage);
-} else {
-    setupPage();
-}
-</script>
-
-<script>
-const backBtn = document.getElementById('backBtn');
-if (backBtn) {
-  backBtn.addEventListener('click', ()=> {
-    window.scrollTo({top: 0, behavior: 'smooth'});
-  });
-}
-
-// Dark mode persistence and initialization
-function initDarkMode() {
-  const savedDarkMode = localStorage.getItem('darkMode') === 'true';
-  if (savedDarkMode) {
-    document.body.classList.add('dark');
+async function init() {
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+    return;
   }
-  updateDarkModeButton();
+  const dbReady = await waitForDB();
+  if (!dbReady) {
+    alert("Database connection failed. Please refresh.");
+    return;
+  }
+  loadCrops();
 }
 
-function updateDarkModeButton() {
-  const toggleBtn = document.getElementById('toggleDark');
-  if (toggleBtn) {
-    toggleBtn.innerText = document.body.classList.contains('dark') ? '☀️ Light Mode' : '🌙 Dark Mode';
+async function loadCrops() {
+  const currentLoginId = sessionStorage.getItem("loginid");
+  const { data: crops, error } = await window.db
+    .from("crop_sales")
+    .select("*")
+    .neq("lid", currentLoginId)
+    .order("created_at", { ascending: false });
+
+  const container = document.getElementById("cropList");
+  container.innerHTML = "";
+
+  if (error) {
+    container.innerHTML = "<p class='text-danger'>Error loading crops</p>";
+    return;
+  }
+
+  if (!crops || crops.length === 0) {
+    container.innerHTML = "<p class='text-muted text-center'>No crops available.</p>";
+    return;
+  }
+
+  for (const row of crops) {
+    container.innerHTML += `
+      <div class="col-md-4">
+        <div class="card-custom">
+          <h4 style="color:#000080;font-weight:700;">${row.crop_name}</h4>
+          <p><strong>Farmer:</strong> ${row.farmer_name}</p>
+          <p><strong>Quantity:</strong> ${row.quantity} kg</p>
+          <p><strong>Price:</strong> ₹${row.price} per kg</p>
+          <p><strong>Location:</strong> ${row.location}</p>
+          <button class="buy-btn">Show Interest</button>
+        </div>
+      </div>
+    `;
   }
 }
 
-function refreshChartColors() {
-  if (priceChart && priceChart.data && priceChart.data.labels && priceChart.data.labels.length > 0) {
-    const isDark = document.body.classList.contains('dark');
-    const textColor = isDark ? '#e0e0e0' : '#333';
-    const gridColor = isDark ? '#444' : '#e0e0e0';
-    const histColor = isDark ? '#4a9eff' : '#0d6efd';
-    const predColor = isDark ? '#28a745' : '#198754';
-    const histBg = isDark ? 'rgba(74, 158, 255, 0.1)' : 'rgba(13,110,253,0.04)';
-    const predBg = isDark ? 'rgba(40, 167, 69, 0.1)' : 'rgba(25,135,84,0.03)';
-    
-    if (priceChart.data.datasets.length > 0) {
-      priceChart.data.datasets[0].borderColor = histColor;
-      priceChart.data.datasets[0].backgroundColor = histBg;
-      if (priceChart.data.datasets.length > 1) {
-        priceChart.data.datasets[1].borderColor = predColor;
-        priceChart.data.datasets[1].backgroundColor = predBg;
-      }
-    }
-    
-    priceChart.options.plugins.legend.labels.color = textColor;
-    priceChart.options.scales.x.ticks.color = textColor;
-    priceChart.options.scales.x.grid.color = gridColor;
-    priceChart.options.scales.y.ticks.color = textColor;
-    priceChart.options.scales.y.grid.color = gridColor;
-    priceChart.options.scales.y.title.color = textColor;
-    priceChart.update();
-  }
-}
-
-// Initialize dark mode on page load
-initDarkMode();
+document.getElementById("logout").onclick = () => {
+  sessionStorage.clear();
+  location.href = "login.html";
+};
 
 const toggleBtn = document.getElementById('toggleDark');
-if (toggleBtn) {
-  toggleBtn.addEventListener('click', () => {
+toggleBtn.addEventListener('click', () => {
     document.body.classList.toggle('dark');
-    const isDark = document.body.classList.contains('dark');
-    localStorage.setItem('darkMode', isDark);
-    updateDarkModeButton();
-    refreshChartColors();
-  });
-}
+    localStorage.setItem('darkMode', document.body.classList.contains('dark'));
+});
 
+const hamburgerBtn = document.getElementById("hamburgerBtn");
+const hamburgerMenu = document.getElementById("hamburgerMenu");
 
+hamburgerBtn.addEventListener("click", () => {
+    hamburgerMenu.classList.toggle("active");
+});
 
-
-const cropBase = {
-  Wheat:2000, Rice:2100, Sugarcane:1800, Cotton:2300,
-  Maize:1600, Sorghum:1500, Barley:1400, Millet:1300,
-  Soybean:1700, Groundnut:1600, Tomato:2000, Potato:1900
-};
-const volatility = {
-  Wheat:12, Rice:15, Sugarcane:10, Cotton:18,
-  Maize:14, Sorghum:13, Barley:11, Millet:10,
-  Soybean:15, Groundnut:12, Tomato:18, Potato:16
-};
-
-
-function genHistorical(crop, region){
-  const days = 90;
-  const base = cropBase[crop] || 2000;
-  const vol = volatility[crop] || 12;
-  const arr = [];
-
-  let p = base + (Math.random()-0.5)*40;
-  for(let i = days; i > 0; i--){
- 
-    const seasonal = Math.sin(i/7)*8;
-    const regionBias = (region ? (region.length % 5) - 2 : 0) * 0.6;
-    const noise = (Math.random()-0.5) * vol;
-    p = Math.max(50, p + seasonal + noise + regionBias);
-    const d = new Date();
-    d.setDate(d.getDate() - i);
-    arr.push({date: d.toISOString().slice(0,10), price: Math.round(p*10)/10});
-  }
-  return arr;
-}
-
-function forecastPrices(hist, days, crop, scenario = 0){
-  if(!hist || !hist.length) return [];
-  const vol = volatility[crop] || 12;
-  const last = hist[hist.length-1].price;
-  const first = hist[0].price;
-  const slope = (last - first) / Math.max(1, (hist.length-1)); // per-day slope
-  const preds = [];
-  let p = last;
-  for(let i=1;i<=days;i++){
-    // scenario can be -1,0,1 for bad/neutral/good (or a small multiplier)
-    const noise = (Math.random()-0.5) * vol;
-    const shock = scenario * (Math.random()-0.4) * vol * 1.8;
-    // small decaying seasonal influence
-    const seasonal = Math.sin((i+hist.length)/7) * 6;
-    p = Math.max(20, p + slope*0.6 + noise + shock + seasonal*0.3);
-    const d = new Date();
-    d.setDate(new Date().getDate() + i);
-    preds.push({date: d.toISOString().slice(0,10), price: Math.round(p*10)/10});
-  }
-  return preds;
-}
-
-let priceChart = null;
-
-function initChart() {
-  const chartEl = document.getElementById('priceChart');
-  if (!chartEl) {
-    setTimeout(initChart, 100);
-    return;
-  }
-  const chartCtx = chartEl.getContext('2d');
-  const isDark = document.body.classList.contains('dark');
-  const textColor = isDark ? '#e0e0e0' : '#333';
-  const gridColor = isDark ? '#444' : '#e0e0e0';
-  
-  priceChart = new Chart(chartCtx, {
-    type: 'line',
-    data: { labels: [], datasets: [] },
-    options: {
-      responsive: true,
-      interaction: { mode: 'index', intersect: false },
-      plugins: { 
-        legend: { 
-          position: 'top',
-          labels: { color: textColor }
-        } 
-      },
-      scales: {
-        x: { 
-          display: true,
-          ticks: { color: textColor },
-          grid: { color: gridColor }
-        },
-        y: { 
-          display: true, 
-          title: { 
-            display: true, 
-            text: 'Price (₹/qtl)',
-            color: textColor
-          },
-          ticks: { color: textColor },
-          grid: { color: gridColor }
-        }
-      }
+window.addEventListener("click", (e) => {
+    if (!hamburgerMenu.contains(e.target) && !hamburgerBtn.contains(e.target)) {
+        hamburgerMenu.classList.remove("active");
     }
-  });
+});
+
+if (localStorage.getItem('darkMode') === 'true') {
+    document.body.classList.add('dark');
 }
 
-function updateChart(hist, preds){
-  if (!priceChart) {
-    initChart();
-    setTimeout(() => updateChart(hist, preds), 200);
-    return;
-  }
-  const histDates = hist.map(h => h.date);
-  const predDates = preds.map(p => p.date);
-  const labels = histDates.concat(predDates);
-
-  const histData = hist.map(h => h.price).concat(new Array(preds.length).fill(null));
-  const predData = new Array(Math.max(0, hist.length-1)).fill(null)
-                     .concat([hist[hist.length-1].price])
-                     .concat(preds.map(p => p.price));
-
-  if(histData.length !== labels.length || predData.length !== labels.length){
-
-    const L = labels.length;
-    while(histData.length < L) histData.push(null);
-    while(predData.length < L) predData.unshift(null);
-    histData.length = predData.length = labels.length;
-  }
-
-  const isDark = document.body.classList.contains('dark');
-  const histColor = isDark ? '#4a9eff' : '#0d6efd';
-  const predColor = isDark ? '#28a745' : '#198754';
-  const histBg = isDark ? 'rgba(74, 158, 255, 0.1)' : 'rgba(13,110,253,0.04)';
-  const predBg = isDark ? 'rgba(40, 167, 69, 0.1)' : 'rgba(25,135,84,0.03)';
-  const textColor = isDark ? '#e0e0e0' : '#333';
-  const gridColor = isDark ? '#444' : '#e0e0e0';
-
-  priceChart.data.labels = labels;
-  priceChart.data.datasets = [
-    {
-      label: 'Historical',
-      data: histData,
-      borderWidth: 2,
-      tension: 0.2,
-      pointRadius: 2,
-      borderColor: histColor,
-      backgroundColor: histBg,
-      fill: true
-    },
-    {
-      label: 'Forecast',
-      data: predData,
-      borderDash: [6,4],
-      borderWidth: 2,
-      tension: 0.2,
-      pointRadius: 2,
-      borderColor: predColor,
-      backgroundColor: predBg,
-      fill: true
-    }
-  ];
-  
-  // Update chart colors for dark mode
-  priceChart.options.plugins.legend.labels.color = textColor;
-  priceChart.options.scales.x.ticks.color = textColor;
-  priceChart.options.scales.x.grid.color = gridColor;
-  priceChart.options.scales.y.ticks.color = textColor;
-  priceChart.options.scales.y.grid.color = gridColor;
-  priceChart.options.scales.y.title.color = textColor;
-  
-  priceChart.update();
-}
-
-function setupEventListeners() {
-  const hval = document.getElementById('hval');
-  const hor = document.getElementById('horizon');
-  if (hval && hor) {
-    hor.addEventListener('input', ()=> hval.innerText = hor.value);
-  }
-
-  const predictBtn = document.getElementById('predictBtn');
-  const adviseBtn = document.getElementById('adviseBtn');
-  const combineBtn = document.getElementById('combineBtn');
-  const exportBtn = document.getElementById('exportBtn');
-
-  if (predictBtn) predictBtn.addEventListener('click', ()=> { runPrediction(false); });
-  if (adviseBtn) adviseBtn.addEventListener('click', ()=> { runAdvisor(false); });
-  if (combineBtn) combineBtn.addEventListener('click', ()=> { runPrediction(true); });
-  if (exportBtn) exportBtn.addEventListener('click', exportCSV);
-}
-
-let lastForecast = [];
-let lastCrop = 'Wheat';
-let lastRegion = 'Punjab';
-
-function runPrediction(runAdvisorToo){
-  const crop = document.getElementById('cropSelect').value;
-  const region = document.getElementById('regionSelect').value;
-  const days = parseInt(document.getElementById('horizon').value, 10);
-  const hist = genHistorical(crop, region);
-  const scenario = 0; // neutral demo
-  const preds = forecastPrices(hist, days, crop, scenario);
-
-  updateChart(hist, preds);
-  lastForecast = preds;
-  lastCrop = crop;
-  lastRegion = region;
-
-  const now = hist[hist.length-1].price;
-  const futureAvg = preds.length ? preds.reduce((s,p)=>s+p.price,0)/preds.length : now;
-  const changePct = ((futureAvg - now)/Math.max(1, now))*100;
-
-  const actionCard = document.getElementById('actionCard');
-  let html = `<div><div class="recommend">Avg change: ${changePct.toFixed(1)}% over next ${days} days</div>`;
-  if(changePct > 4){
-    html += `<div class="mt-2 text-success"> Tip: Prices look like they will go <strong>up</strong>. Consider storing a bit and selling later.</div>`;
-  } else if(changePct < -4){
-    html += `<div class="mt-2 text-danger"> Tip: Prices may go <strong>down</strong>. Consider selling soon.</div>`;
-  } else {
-    html += `<div class="mt-2 text-warning">Tip: Prices should stay about the same. You can sell some now and keep some.</div>`;
-  }
-  html += `<div class="mt-2 small-muted"></div>`;
-  html += `<div id="advisorTipSlot"></div></div>`;
-  actionCard.innerHTML = html;
-
-  if(runAdvisorToo) runAdvisor(true);
-}
-
-
-function runAdvisor(showOnRight){
-  const soil = document.getElementById('soilType').value;
-  const rain = parseFloat(document.getElementById('rainfall').value);
-  const temp = parseFloat(document.getElementById('temp').value);
-  const crop = document.getElementById('cropSelect').value;
-
-  const seedOptions = {
-    Rice:['Local high-yield rice','Flood-tolerant rice','Short-duration rice'],
-    Wheat:['Drought-tolerant wheat','Early-maturity wheat','High-protein wheat'],
-    Cotton:['Bt cotton (local)','Organic cotton','Short-staple cotton'],
-    Maize:['Hybrid maize','Sweet corn variety','High-yield maize'],
-    Sorghum:['Local millets mix','Drought-resilient sorghum','Red sorghum'],
-    Barley:['Certified barley','Malting barley','Hull-less barley'],
-    Millet:['Millet seeds mix','Finger millet','Foxtail millet'],
-    Soybean:['Local soybean','Early-maturing soybean','High-protein soybean'],
-    Groundnut:['Groundnut seeds','Spanish variety','Virginia variety'],
-    Tomato:['Tomato seeds','Cherry tomato','Disease-resistant tomato'],
-    Potato:['Potato seeds','Early variety','High-starch variety'],
-    Sugarcane:['High-yield sugarcane','Disease-resistant cane','Early-maturity cane']
-  };
-  const fertOptions = {
-    Rice:['Urea + SSP','NPK 12-32-16','Compost-enriched'],
-    Wheat:['NPK 10-26-26','Urea top-dressing','Organic mix'],
-    Cotton:['Potash-rich','NPK 12-12-17','Biofertilizer'],
-    Maize:['Balanced NPK','Compost+urea','Liquid fertilizer mix'],
-    Sorghum:['NPK 12-24-12','Organic compost','Urea split'],
-    Barley:['NPK 10-10-10','Farmyard manure','Micronutrient mix'],
-    Millet:['Organic compost','NPK 8-20-10','Green manure'],
-    Soybean:['NPK 12-12-12','Rhizobium inoculant','Balanced compost'],
-    Groundnut:['Potash-rich','NPK 10-20-10','FYM+Biofertilizer'],
-    Tomato:['NPK 10-10-10','Organic mix','Liquid foliar fertilizer'],
-    Potato:['Balanced NPK','FYM + urea','Potassium-rich fertilizer'],
-    Sugarcane:['NPK 14-14-14','Compost enriched','Micronutrient mix']
-  };
-
-  function pickRandom(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
-  const seed = pickRandom(seedOptions[crop] || ['Local seeds']);
-  const fert = pickRandom(fertOptions[crop] || ['Balanced fertilizer']);
-
-  let weatherAdvice = '';
-  if(rain < 50) weatherAdvice += 'Low rainfall expected; consider drought-tolerant varieties and water-saving practices. ';
-  else if(rain > 400) weatherAdvice += 'High rainfall expected; ensure drainage and flood-tolerant varieties. ';
-
-  if(temp > 35) weatherAdvice += 'High temperatures — shade and irrigation recommended. ';
-  else if(temp < 10) weatherAdvice += 'Low temperature — consider frost protection and early maturing varieties. ';
-
-  const advice = ` Advisor Tip for ${crop}: Soil: ${soil}, Rainfall: ${rain}mm, Temp: ${temp}°C. ${weatherAdvice}Recommended Seed: ${seed}. Recommended Fertilizer: ${fert}. Monitor local weather and pest alerts.`;
-
-  const advisorOutput = document.getElementById('advisorOutput');
-  advisorOutput.innerText = advice;
-  if(showOnRight){
-    const slot = document.getElementById('advisorTipSlot');
-    if(slot){
-      slot.innerHTML = `<div class="mt-2 text-info small" id="advisorTip">${advice.replace(/\n/g,'<br>')}</div>`;
-    } else {
-      const actionCard = document.getElementById('actionCard');
-      const tipDiv = document.createElement('div');
-      tipDiv.id = 'advisorTip';
-      tipDiv.className = 'mt-2 text-info small';
-      tipDiv.innerHTML = advice.replace(/\n/g,'<br>');
-      actionCard.appendChild(tipDiv);
-    }
-  }
-}
-
-function exportCSV(){
-  if(!lastForecast || !lastForecast.length){
-    alert('Run a prediction first');
-    return;
-  }
-  let csv = 'Date,Price (₹/qtl)\n';
-  lastForecast.forEach(r => { csv += `${r.date},${r.price}\n`; });
-  const blob = new Blob([csv], {type: 'text/csv'});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-
-  const fname = `${(lastCrop||'crop')}_${(lastRegion||'region')}_forecast.csv`.replace(/\s+/g,'_');
-  a.download = fname;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
-}
-
-function generateQR(){
-  const canvas = document.getElementById('qrCanvas');
-
-  const url = 'https://krishimitr8c.netlify.app';
-
-  try{
-    QRCode.toCanvas(canvas, url, { width: 120 }, function (error) {
-      if (error) console.error('QR error', error);
-    });
-  } catch(e){
-    console.error('QRCode error', e);
-  }
-}
-
-function voiceInput(){
-  alert('Voice input not implemented in this demo.');
-}
-
-// Initialize when DOM is ready
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', function() {
-    setupEventListeners();
-    initChart();
-    generateQR();
-    const mainApp = document.getElementById('mainApp');
-    if (mainApp) mainApp.style.display = 'block';
-  });
-} else {
-  setupEventListeners();
-  initChart();
-  generateQR();
-  const mainApp = document.getElementById('mainApp');
-  if (mainApp) mainApp.style.display = 'block';
-}
-
-window.runPrediction = runPrediction;
-window.runAdvisor = runAdvisor;
-
+init();
 </script>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
