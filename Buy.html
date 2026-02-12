@@ -1,559 +1,333 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<title>Buy Crops - KrishiMitra</title>
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="supabase.js"></script>
-
-<style>
-body {
-  background: linear-gradient(to bottom, #FF9933 0%, #FFFFFF 50%, #138808 100%);
-  background-attachment: fixed;
-  font-family: Arial;
-  padding-top: 90px;
-}
-.topbar {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 78px;
-    display: flex;
-    align-items: center;
-    padding: 0 18px;
-    background: linear-gradient(90deg, #FF9933, #FFFFFF 50%, #138808);
-    border-bottom: 3px solid #000080;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.25);
-    z-index: 9000;
-}
-.topbar-logo {
-    font-size: 26px;
-    font-weight: 900;
-    color: #000080;
-    margin-right: 25px;
-}
-.topbar-menu {
-    display: flex;
-    gap: 14px;
-}
-.topbar-menu a {
-    text-decoration: none;
-    padding: 10px 16px;
-    border-radius: 8px;
-    font-weight: 700;
-    color: #000080;
-}
-.topbar-right {
-    margin-left: auto;
-}
-.topbar-right a {
-    padding: 8px 16px;
-    background: #000080;
-    color: white;
-    text-decoration: none;
-    border-radius: 8px;
-    font-weight: 700;
-}
-.card-custom {
-    border: 3px solid #000080;
-    border-radius: 15px;
-    background: white;
-    padding: 18px;
-    box-shadow: 0 4px 18px rgba(0,0,0,0.22);
-}
-.buy-btn {
-    width: 100%;
-    padding: 10px;
-    font-weight: 700;
-    border-radius: 8px;
-    border: none;
-    background: #000080;
-    color: white;
-}
-
-.btn-dark-toggle {
-    padding: 8px 16px;
-    background: rgba(255, 255, 255, 0.9);
-    color: #000080;
-    border-radius: 8px;
-    font-weight: 700;
-    border: 2px solid #000080;
-    cursor: pointer;
-    transition: 0.2s;
-}
-
-.btn-dark-toggle:hover {
-    background: #000080;
-    color: white;
-}
-
-/* Dark Mode Styles */
-body.dark {
-    background: linear-gradient(to bottom, #1a1a1a 0%, #2d2d2d 50%, #1a1a1a 100%);
-    color: #e0e0e0;
-}
-
-body.dark .topbar {
-    background: linear-gradient(90deg, #2d2d2d, #3d3d3d 50%, #2d2d2d);
-    border-bottom: 3px solid #4a9eff;
-}
-
-body.dark .topbar-logo {
-    color: #4a9eff;
-}
-
-body.dark .topbar-menu a {
-    color: #e0e0e0;
-}
-
-body.dark .topbar-menu a:hover {
-    background: rgba(74, 158, 255, 0.2);
-    color: #fff;
-}
-
-body.dark .topbar-right a {
-    background: #4a9eff;
-    color: white;
-}
-
-body.dark .topbar-right a:hover {
-    background: #6bb0ff;
-}
-
-body.dark .card-custom {
-    background: #2d2d2d;
-    border-color: #4a9eff;
-    color: #e0e0e0;
-}
-
-body.dark .buy-btn {
-    background: #4a9eff;
-    color: white;
-}
-
-body.dark .buy-btn:hover {
-    background: #6bb0ff;
-}
-
-body.dark h2 {
-    color: #e0e0e0;
-}
-
-body.dark .text-muted {
-    color: #999 !important;
-}
-
-body.dark .btn-dark-toggle {
-    background: #3d3d3d;
-    color: #e0e0e0;
-    border-color: #555;
-}
-
-body.dark .btn-dark-toggle:hover {
-    background: #4d4d4d;
-    color: #fff;
-}
-
-/* Your Crops dropdown */
-.topbar .nav-dropdown {
-    position: relative;
-    display: inline-block;
-}
-.topbar .nav-dropdown-toggle {
-    padding: 10px 16px;
-    border-radius: 8px;
-    font-weight: 700;
-    color: #000080;
-    background: none;
-    border: none;
-    cursor: pointer;
-    text-decoration: none;
-    font-size: 1em;
-}
-.topbar .nav-dropdown-toggle:hover {
-    background: rgba(0,0,128,0.1);
-}
-.topbar .nav-dropdown-menu {
-    display: none;
-    position: absolute;
-    top: 100%;
-    left: 0;
-    background: white;
-    min-width: 200px;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.2);
-    border-radius: 8px;
-    z-index: 9001;
-    margin-top: 4px;
-    overflow: hidden;
-    border: 2px solid #000080;
-}
-.topbar .nav-dropdown:hover .nav-dropdown-menu {
-    display: block;
-}
-.topbar .nav-dropdown-menu a {
-    display: block;
-    padding: 12px 16px;
-    color: #000080;
-    text-decoration: none;
-    font-weight: 700;
-}
-.topbar .nav-dropdown-menu a:hover {
-    background: #f0f4ff;
-}
-body.dark .topbar .nav-dropdown-toggle {
-    color: #e0e0e0;
-}
-body.dark .topbar .nav-dropdown-toggle:hover {
-    background: rgba(74, 158, 255, 0.2);
-    color: #fff;
-}
-body.dark .topbar .nav-dropdown-menu {
-    background: #2d2d2d;
-    border-color: #4a9eff;
-}
-body.dark .topbar .nav-dropdown-menu a {
-    color: #e0e0e0;
-}
-body.dark .topbar .nav-dropdown-menu a:hover {
-    background: #3d3d3d;
-}
-  /* HAMBURGER BUTTON */
-.hamburger {
-    display: none;
-    font-size: 28px;
-    background: none;
-    border: none;
-    cursor: pointer;
-    color: #000080;
-    margin-left: 15px;
-}
-
-/* HAMBURGER MENU PANEL */
-.hamburger-menu {
-    position: fixed;
-    top: 78px;
-    right: -260px;
-    width: 250px;
-    height: calc(100% - 78px);
-    background: white;
-    box-shadow: -4px 0 20px rgba(0,0,0,0.25);
-    padding: 20px;
-    transition: right 0.3s ease;
-    z-index: 8999;
-    overflow-y: auto;
-    border-left: 3px solid #000080;
-}
-
-.hamburger-menu.active {
-    right: 0;
-}
-
-.menu-section {
-    margin-bottom: 25px;
-}
-
-.menu-section h5 {
-    font-weight: 800;
-    color: #000080;
-    margin-bottom: 10px;
-    border-bottom: 2px solid #000080;
-    padding-bottom: 5px;
-}
-
-.menu-section a {
-    display: block;
-    text-decoration: none;
-    color: #000080;
-    font-weight: 700;
-    padding: 6px 0;
-}
-
-.menu-section a:hover {
-    opacity: 0.7;
-}
-
-/* Dark mode support */
-body.dark .hamburger-menu {
-    background: #2d2d2d;
-    border-left: 3px solid #4a9eff;
-}
-
-body.dark .menu-section h5 {
-    color: #4a9eff;
-    border-color: #4a9eff;
-}
-
-body.dark .menu-section a {
-    color: #e0e0e0;
-}
-
-/* Responsive */
-
-</style>
+    <meta charset="UTF-8">
+    <title>Buy Crops - KrishiMitra</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase.js"></script>
+    <style>
+        body {
+            background: linear-gradient(to bottom, #FF9933 0%, #FFFFFF 50%, #138808 100%);
+            background-attachment: fixed;
+            font-family: Arial, sans-serif;
+            padding-top: 100px;
+            margin: 0;
+        }
+        .topbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            padding: 0 25px;
+            background: linear-gradient(90deg, #FF9933, #FFFFFF 50%, #138808);
+            border-bottom: 4px solid #000080;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            z-index: 10001;
+        }
+        .topbar-logo {
+            font-size: 28px;
+            font-weight: 900;
+            color: #000080;
+            margin-right: auto;
+            white-space: nowrap;
+            text-shadow: 1px 1px 2px rgba(255,255,255,0.8);
+        }
+        .topbar-right {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+        .hamburger {
+            display: block; 
+            font-size: 32px;
+            background: none;
+            border: 2px solid #000080;
+            border-radius: 8px;
+            cursor: pointer;
+            color: #000080;
+            line-height: 1;
+            padding: 4px 10px;
+            transition: all 0.3s ease;
+        }
+        .hamburger:hover {
+            background: #000080;
+            color: white;
+        }
+        .hamburger-menu {
+            position: fixed;
+            top: 0;
+            right: -320px;
+            width: 300px;
+            height: 100vh;
+            background: white;
+            box-shadow: -10px 0 30px rgba(0,0,0,0.4);
+            padding: 100px 30px 30px 30px;
+            transition: right 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 10000;
+            overflow-y: auto;
+            border-left: 6px solid #000080;
+        }
+        .hamburger-menu.active {
+            right: 0;
+        }
+        .menu-section {
+            margin-bottom: 30px;
+        }
+        .menu-section h5 {
+            font-weight: 800;
+            color: #000080;
+            margin-bottom: 15px;
+            border-bottom: 3px solid #FF9933;
+            padding-bottom: 8px;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 1px;
+        }
+        .menu-section a {
+            display: block;
+            text-decoration: none;
+            color: #000080;
+            font-weight: 700;
+            padding: 12px 0;
+            border-bottom: 1px solid #eee;
+            transition: padding-left 0.2s;
+        }
+        .menu-section a:hover {
+            padding-left: 10px;
+            color: #138808;
+        }
+        .btn-dark-toggle {
+            padding: 8px 16px;
+            background: white;
+            color: #000080;
+            border-radius: 8px;
+            font-weight: 700;
+            border: 2px solid #000080;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .btn-dark-toggle:hover {
+            background: #f0f0f0;
+        }
+        .card-custom {
+            border: 3px solid #000080;
+            border-radius: 20px;
+            background: white;
+            padding: 20px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+            height: 100%;
+            transition: transform 0.3s;
+        }
+        .card-custom:hover {
+            transform: translateY(-5px);
+        }
+        .buy-btn {
+            width: 100%;
+            padding: 14px;
+            font-weight: 800;
+            border-radius: 10px;
+            border: none;
+            background: #000080;
+            color: white;
+            margin-top: 15px;
+            cursor: pointer;
+        }
+        body.dark {
+            background: #121212;
+            color: #f5f5f5;
+        }
+        body.dark .topbar {
+            background: linear-gradient(90deg, #1a1a1a, #333 50%, #1a1a1a);
+            border-bottom-color: #4a9eff;
+        }
+        body.dark .topbar-logo { color: #4a9eff; text-shadow: none; }
+        body.dark .hamburger { color: #4a9eff; border-color: #4a9eff; }
+        body.dark .hamburger-menu {
+            background: #1e1e1e;
+            border-left-color: #4a9eff;
+        }
+        body.dark .menu-section h5 { color: #4a9eff; border-color: #4a9eff; }
+        body.dark .menu-section a { color: #ccc; border-color: #333; }
+        body.dark .card-custom { background: #252525; border-color: #4a9eff; color: white; }
+        body.dark .buy-btn { background: #4a9eff; }
+        body.dark .btn-dark-toggle { background: #333; color: white; border-color: #4a9eff; }
+    </style>
 </head>
-
-
 <body>
 
 <div class="topbar">
     <div class="topbar-logo">🌾 KrishiMitra</div>
-
-    <!-- Fixed structure -->
-    <div class="topbar-menu"></div>
-
-
-
-    <div class="topbar-right" style="display: flex; gap: 10px; align-items: center;">
-          <button class="hamburger" id="hamburgerBtn">☰</button>
+    <div class="topbar-right">
         <button id="toggleDark" class="btn-dark-toggle">🌙 Dark Mode</button>
-        <a href="logout.html" id="logout">Logout</a>
+        <button class="hamburger" id="hamburgerBtn">☰</button>
     </div>
 </div>
 
-<!-- HAMBURGER MENU -->
 <div class="hamburger-menu" id="hamburgerMenu">
     <div class="menu-section">
-        <h5>Main</h5>
-        <a href="Dashboard.html">Main Page</a>
-        <a href="krishimitr.html">Crop Predictor</a>
+        <h5>Navigation</h5>
+        <a href="Dashboard.html">Dashboard</a>
+        <a href="krishimitr.html">Crop Analysis</a>
     </div>
-
     <div class="menu-section">
-        <h5>Market</h5>
-        <a href="Buy.html">Buy Crops</a>
-        <a href="Sell.html">Sell Crops</a>
-        <a href="Update_crops.html">Manage Crops</a>
+        <h5>Marketplace</h5>
+        <a href="Buy.html">Marketplace</a>
+        <a href="Sell.html">Post Listing</a>
+        <a href="Update_crops.html">My Inventory</a>
     </div>
-
-    <div class="menu-section">
-        <h5>Tools</h5>
-        <a href="Notification.html">Notifications</a>
-        <a href="krishimitr.html">Price Charts</a>
-    </div>
-
     <div class="menu-section">
         <h5>System</h5>
-        <a href="#" onclick="document.getElementById('toggleDark').click()">Toggle Dark Mode</a>
+        <a href="Notification.html">Recent Alerts</a>
+        <a href="#" id="sideLogout">Sign Out</a>
     </div>
 </div>
 
 <div class="container">
-    <h2 class="text-center mb-4" style="color:#000080;">Available Crops & Seeds</h2>
+    <h2 class="text-center mb-5" style="color:#000080; font-weight: 900; text-transform: uppercase;">Agricultural Marketplace</h2>
     <div class="row g-4" id="cropList"></div>
 </div>
 
-</body>
 <script>
-// Check authentication FIRST, synchronously (like Dashboard.html and Sell.html)
 const loginid = sessionStorage.getItem("loginid");
-const usertype = sessionStorage.getItem("usertype");
+if (!loginid) window.location.href = "login.html";
 
-// Kick out if not logged in
-if (!loginid || !usertype) {
-    window.location.href = "login.html";
+async function verifyConnection() {
+    let timer = 0;
+    while (!window.db && timer < 50) {
+        await new Promise(res => setTimeout(res, 100));
+        timer++;
+    }
+    return !!window.db;
 }
 
-// Wait for DOM and database to be ready, then load data
-async function waitForDB() {
-  let attempts = 0;
-  while (!window.db && attempts < 50) {
-    await new Promise(resolve => setTimeout(resolve, 100));
-    attempts++;
-  }
-  if (!window.db) {
-    console.error("Database client not available after waiting");
-    return false;
-  }
-  return true;
+async function fetchCrops() {
+    const display = document.getElementById("cropList");
+    const { data: crops, error } = await window.db
+        .from("crop_sales")
+        .select("*")
+        .neq("lid", loginid)
+        .order("created_at", { ascending: false });
+
+    if (error) return;
+
+    const { data: myInterests } = await window.db
+        .from("buy_table")
+        .select("fid")
+        .eq("cid", loginid)
+        .eq("yn", "yes");
+
+    const interestMap = new Set(myInterests?.map(i => i.fid));
+
+    let cardContent = "";
+    crops.forEach(crop => {
+        const isInterested = interestMap.has(crop.jid);
+        cardContent += `
+            <div class="col-lg-4 col-md-6">
+                <div class="card-custom">
+                    <h3 style="color:#000080; font-weight:800;">${crop.crop_name}</h3>
+                    <hr>
+                    <p><strong>Producer:</strong> ${crop.farmer_name}</p>
+                    <p><strong>Stock:</strong> ${crop.quantity} kg</p>
+                    <p><strong>Price:</strong> ₹${crop.price} /kg</p>
+                    <p><strong>Origin:</strong> ${crop.location}</p>
+                    <button class="buy-btn" onclick="toggleInterest('${crop.jid}','${crop.farmer_name}',this)">
+                        ${isInterested ? "Interested ✓" : "Express Interest"}
+                    </button>
+                </div>
+            </div>
+        `;
+    });
+    display.innerHTML = cardContent;
 }
 
-async function init() {
-  // Wait for DOM to be ready
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', init);
-    return;
-  }
+async function toggleInterest(fid, fname, btn) {
+    const { data: check } = await window.db
+        .from("buy_table")
+        .select("*")
+        .eq("fid", fid)
+        .eq("cid", loginid)
+        .maybeSingle();
 
-  // Wait for database to be ready
-  const dbReady = await waitForDB();
-  if (!dbReady) {
-    alert("Database connection failed. Please refresh the page.");
-    return;
-  }
+    if (check) {
+        const status = check.yn === "yes" ? "no" : "yes";
+        await window.db
+            .from("buy_table")
+            .update({ yn: status, created_at: new Date().toISOString() })
+            .eq("fid", fid)
+            .eq("cid", loginid);
+        
+        btn.innerText = status === "yes" ? "Interested ✓" : "Express Interest";
+    } else {
+        const { data: source } = await window.db
+            .from("crop_sales")
+            .select("lid")
+            .eq("jid", fid)
+            .maybeSingle();
 
-  loadCrops();
+        const { data: profile } = await window.db
+            .from("logindata")
+            .select("username")
+            .eq("loginid", loginid)
+            .maybeSingle();
+
+        await window.db.from("buy_table").insert({
+            fid: fid,
+            cid: loginid,
+            lid: source.lid,
+            fname: fname,
+            cname: profile?.username || loginid,
+            yn: "yes",
+            created_at: new Date().toISOString()
+        });
+
+        btn.innerText = "Interested ✓";
+    }
 }
 
-async function loadCrops() {
-  const currentLoginId = sessionStorage.getItem("loginid");
-  
-  if (!currentLoginId) {
-    window.location.href = "login.html";
-    return;
-  }
-
-  const { data: crops, error } = await window.db
-    .from("crop_sales")
-    .select("*")
-    .neq("lid", currentLoginId)  // Filter out crops posted by the current user
-    .order("created_at", { ascending: false });
-
-  if (error) {
-    console.error("Error loading crops:", error);
-    document.getElementById("cropList").innerHTML = 
-      "<p class='text-danger'>Error loading crops: " + error.message + "</p>";
-    return;
-  }
-
-  const container = document.getElementById("cropList");
-  container.innerHTML = "";
-
-  if (!crops || crops.length === 0) {
-    container.innerHTML = "<p class='text-muted text-center'>No crops available at the moment.</p>";
-    return;
-  }
-
-  for (const row of crops) {
-    const { data: buy } = await window.db
-      .from("buy_table")
-      .select("yn")
-      .eq("fid", row.jid)
-      .eq("cid", currentLoginId)
-      .maybeSingle();
-
-    const yn = buy?.yn || "no";
-
-    container.innerHTML += `
-      <div class="col-md-4">
-        <div class="card-custom">
-          <h4 style="color:#000080;font-weight:700;">${row.crop_name}</h4>
-          <p><strong>Farmer:</strong> ${row.farmer_name}</p>
-          <p><strong>Quantity:</strong> ${row.quantity} kg</p>
-          <p><strong>Price:</strong> ₹${row.price} per kg</p>
-          <p><strong>Location:</strong> ${row.location}</p>
-          <p class="text-muted" style="font-size:12px;">Posted on: ${new Date(row.created_at).toLocaleString()}</p>
-          <button class="buy-btn" onclick="toggleBuy('${row.jid}','${row.farmer_name}',this)">
-            ${yn === "yes" ? "Interested ✓" : "Show Interest"}
-          </button>
-        </div>
-      </div>
-    `;
-  }
+function handleDarkMode() {
+    const active = localStorage.getItem('darkTheme') === 'true';
+    if (active) document.body.classList.add('dark');
+    const toggle = document.getElementById('toggleDark');
+    toggle.innerText = document.body.classList.contains('dark') ? '☀️ Light Mode' : '🌙 Dark Mode';
 }
 
-async function toggleBuy(fid, fname, btn) {
-  const currentLoginId = sessionStorage.getItem("loginid");
-  
-  if (!currentLoginId) {
-    alert("Please login again");
+document.getElementById('toggleDark').addEventListener('click', () => {
+    document.body.classList.toggle('dark');
+    localStorage.setItem('darkTheme', document.body.classList.contains('dark'));
+    handleDarkMode();
+});
+
+document.getElementById('sideLogout').addEventListener('click', (e) => {
+    e.preventDefault();
+    sessionStorage.clear();
     location.href = "login.html";
-    return;
-  }
-
-  const { data: existing } = await window.db
-    .from("buy_table")
-    .select("*")
-    .eq("fid", fid)
-    .eq("cid", currentLoginId)
-    .maybeSingle();
-
-  if (existing) {
-    const newVal = existing.yn === "yes" ? "no" : "yes";
-    // Update with timestamp when showing interest (yes), keep existing timestamp when removing interest
-    const updateData = { yn: newVal };
-    if (newVal === "yes") {
-      updateData.created_at = new Date().toISOString();
-    }
-    await window.db
-      .from("buy_table")
-      .update(updateData)
-      .eq("fid", fid)
-      .eq("cid", currentLoginId);
-    btn.innerText = newVal === "yes" ? "Interested ✓" : "Show Interest";
-  } else {
-    const { data: crop } = await window.db
-      .from("crop_sales")
-      .select("lid, crop_name")
-      .eq("jid", fid)
-      .maybeSingle();
-
-    if (!crop) {
-      alert("Crop not found. Please refresh the page.");
-      return;
-    }
-
-    // Get user's email/name from logindata
-    const { data: userData } = await window.db
-      .from("logindata")
-      .select("username")
-      .eq("loginid", currentLoginId)
-      .maybeSingle();
-
-    await window.db.from("buy_table").insert({
-      fid: fid,
-      cid: currentLoginId,
-      lid: crop.lid,
-      fname: fname,
-      cname: userData?.username || currentLoginId,
-      yn: "yes",
-      created_at: new Date().toISOString()
-    });
-
-    btn.innerText = "Interested ✓";
-  }
-}
-
-document.getElementById("logout").onclick = () => {
-  sessionStorage.clear();
-  location.href = "login.html";
-};
-
-// Dark mode functionality
-function initDarkMode() {
-    const savedDarkMode = localStorage.getItem('darkMode') === 'true';
-    if (savedDarkMode) {
-        document.body.classList.add('dark');
-    }
-    updateDarkModeButton();
-}
-
-function updateDarkModeButton() {
-    const toggleBtn = document.getElementById('toggleDark');
-    if (toggleBtn) {
-        toggleBtn.innerText = document.body.classList.contains('dark') ? '☀️ Light Mode' : '🌙 Dark Mode';
-    }
-}
-
-const toggleBtn = document.getElementById('toggleDark');
-if (toggleBtn) {
-    toggleBtn.addEventListener('click', () => {
-        document.body.classList.toggle('dark');
-        const isDark = document.body.classList.contains('dark');
-        localStorage.setItem('darkMode', isDark);
-        updateDarkModeButton();
-    });
-}
-  const hamburgerBtn = document.getElementById("hamburgerBtn");
-const hamburgerMenu = document.getElementById("hamburgerMenu");
-
-hamburgerBtn.addEventListener("click", () => {
-    hamburgerMenu.classList.toggle("active");
 });
 
-window.addEventListener("click", (e) => {
-    if (!hamburgerMenu.contains(e.target) && !hamburgerBtn.contains(e.target)) {
-        hamburgerMenu.classList.remove("active");
+const hamBtn = document.getElementById("hamburgerBtn");
+const hamMenu = document.getElementById("hamburgerMenu");
+
+hamBtn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    hamMenu.classList.toggle("active");
+});
+
+document.addEventListener("click", (e) => {
+    if (!hamMenu.contains(e.target) && !hamBtn.contains(e.target)) {
+        hamMenu.classList.remove("active");
     }
 });
 
+async function start() {
+    handleDarkMode();
+    const ready = await verifyConnection();
+    if (ready) fetchCrops();
+}
 
-// Initialize dark mode
-initDarkMode();
-
-// Start initialization
-init();
+start();
 </script>
-
 </body>
 </html>
