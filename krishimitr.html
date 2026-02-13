@@ -34,21 +34,10 @@ body {
   z-index: 1000;
 }
 
-.nav-left-group {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-}
-
 .brand {
   font-size: 24px;
   font-weight: 900;
   color: #000080;
-}
-
-.nav-right-group {
-  display: flex;
-  align-items: center;
 }
 
 .logout-btn-nav {
@@ -68,62 +57,179 @@ body {
   color: #000;
 }
 
-.hamburger {
-  font-size: 26px;
-  background: none;
-  border: none;
-  font-weight: 900;
-  color: #000080;
+body.drawer-open {
+  overflow: hidden;
+}
+
+.top-nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 78px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 32px;
+  background: linear-gradient(90deg,#ff9933,#ffffff,#138808);
+  border-bottom: 3px solid #0a3d62;
+  box-shadow: 0 6px 14px rgba(0,0,0,0.15);
+  z-index: 9999;
+}
+
+.nav-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-width: 0;
+}
+
+.hamburger-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  border: 2px solid #0a3d62;
+  background: rgba(255,255,255,0.75);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  box-shadow: 0 8px 18px rgba(0,0,0,0.12);
+}
+
+.hamburger-icon {
+  width: 20px;
+  height: 14px;
+  position: relative;
+}
+
+.hamburger-icon span {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 2.5px;
+  background: #0a3d62;
+  border-radius: 999px;
+}
+
+.hamburger-icon span:nth-child(1) { top: 0; }
+.hamburger-icon span:nth-child(2) { top: 5.5px; }
+.hamburger-icon span:nth-child(3) { top: 11px; }
+
+.brand-title {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #0a3d62;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.brand-subtitle {
+  margin: 0;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: rgba(10,61,98,0.8);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.logout-btn {
+  background: white;
+  color: #0a3d62;
+  border: 2px solid #0a3d62;
+  padding: 10px 22px;
+  border-radius: 10px;
+  font-weight: 700;
   cursor: pointer;
 }
 
-.hamburger-menu {
+.nav-overlay {
   position: fixed;
-  top: 70px;
-  left: 20px;
-  width: 260px;
+  inset: 0;
+  background: rgba(0,0,0,0.25);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .2s ease;
+  z-index: 9998;
+}
+
+.side-drawer {
+  position: fixed;
+  top: 84px;
+  left: 14px;
+  width: min(320px, calc(100vw - 28px));
+  max-height: calc(100vh - 98px);
+  overflow: auto;
   background: white;
-  border-radius: 12px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-  padding: 15px;
-  display: none;
-  z-index: 2000;
-  border: 2px solid #000080;
+  border: 3px solid #0a3d62;
+  border-radius: 18px;
+  box-shadow: 0 18px 40px rgba(0,0,0,0.22);
+  transform: translateX(-110%);
+  transition: transform .25s ease;
+  z-index: 9999;
 }
 
-.hamburger-menu.show {
-  display: block;
+.drawer-inner {
+  padding: 14px;
 }
 
-.menu-section {
+.menu-section-drawer {
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid rgba(10,61,98,0.18);
   margin-bottom: 14px;
+  background: #ffffff;
 }
 
-.menu-title {
+.menu-section-title {
+  padding: 12px 14px;
+  background: #eef2ff;
+  color: #0a3d62;
   font-weight: 800;
-  color: #000080;
-  margin-bottom: 6px;
-  border-bottom: 1px solid #ddd;
-  padding-bottom: 4px;
+  font-size: 0.95rem;
 }
 
-.hamburger-menu a,
-.menu-btn {
+.menu-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.menu-list a {
   display: block;
-  padding: 8px 10px;
-  border-radius: 8px;
-  font-weight: 600;
+  padding: 14px 14px;
   text-decoration: none;
-  color: #000080;
-  background: none;
-  border: none;
-  width: 100%;
-  text-align: left;
+  color: #0a3d62;
+  font-weight: 800;
+  background: #f1f5f9;
 }
 
-.hamburger-menu a:hover,
-.menu-btn:hover {
-  background: rgba(0,0,128,0.1);
+.menu-list li + li a {
+  border-top: 1px solid rgba(10,61,98,0.10);
+}
+
+.menu-list a:hover,
+.menu-list a:focus-visible {
+  background: #e2e8f0;
+  outline: none;
+}
+
+body.drawer-open .nav-overlay {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+body.drawer-open .side-drawer {
+  transform: translateX(0);
+}
+
+@media (max-width: 520px) {
+  .top-nav { padding: 0 14px; }
+  .logout-btn { padding: 9px 14px; border-radius: 12px; }
+  .brand-subtitle { display: none; }
+  .side-drawer { top: 80px; left: 10px; width: calc(100vw - 20px); }
 }
 
 .container {
@@ -579,40 +685,56 @@ body.dark .menu-btn:hover {
 
 <body>
 
-<div class="top-navbar">
-  <div class="nav-left-group">
-    <button class="hamburger" id="hamburgerBtn">☰</button>
-    <div class="brand">🌾 KrishiMitra AI</div>
-  </div>
-
-  <div class="nav-right-group">
-    <button id="navLogoutBtn" class="logout-btn-nav">Logout</button>
-  </div>
-
-  <div class="hamburger-menu" id="hamburgerMenu">
-    <div class="menu-section">
-      <div class="menu-title">Main</div>
-      <a href="Dashboard">Main Page</a>
-      <a href="Notification.html" class="farmer-only">Notification</a>
-    </div>
-
-    <div class="menu-section farmer-only">
-      <div class="menu-title">Market</div>
-      <a href="Buy">Buy Crops</a>
-      <a href="Sell">Sell Crops</a>
-      <a href="Update_crops">Manage Crops</a>
-    </div>
-
-    <div class="menu-section">
-      <div class="menu-title">Tools</div>
-    </div>
-
-    <div class="menu-section">
-      <div class="menu-title">System</div>
-      <button id="toggleDark" class="menu-btn">Dark Mode</button>
+<div class="top-nav">
+  <div class="nav-left">
+    <button class="hamburger-btn" id="menuBtn" type="button" aria-label="Open menu" aria-controls="sideNav" aria-expanded="false">
+      <div class="hamburger-icon" aria-hidden="true">
+        <span></span><span></span><span></span>
+      </div>
+    </button>
+    <div>
+      <p class="brand-title">Krishi Mitr</p>
+      <p class="brand-subtitle">Crop Predictor</p>
     </div>
   </div>
+  <button class="logout-btn" id="logoutBtn">Logout</button>
 </div>
+
+<div class="nav-overlay" id="navOverlay" hidden></div>
+<nav class="side-drawer" id="sideNav" aria-label="Main navigation" hidden>
+  <div class="drawer-inner">
+    <div class="menu-section-drawer">
+      <div class="menu-section-title">Main</div>
+      <ul class="menu-list">
+        <li><a href="Dashboard.html">Dashboard</a></li>
+        <li><a href="Notification.html" class="farmer-only">Notification</a></li>
+      </ul>
+    </div>
+
+    <div class="menu-section-drawer farmer-only">
+      <div class="menu-section-title">Market</div>
+      <ul class="menu-list">
+        <li><a href="Buy.html">Buy Crops</a></li>
+        <li><a href="Sell.html">Sell Crops</a></li>
+        <li><a href="Update_crops.html">Manage Crops</a></li>
+      </ul>
+    </div>
+
+    <div class="menu-section-drawer">
+      <div class="menu-section-title">Tools</div>
+      <ul class="menu-list">
+        <li><a href="krishimitr.html" aria-current="page">Crop Predictor</a></li>
+      </ul>
+    </div>
+
+    <div class="menu-section-drawer" style="margin-bottom:0;">
+      <div class="menu-section-title">System</div>
+      <ul class="menu-list">
+        <li><a href="#" id="toggleDarkLink">Toggle Dark Mode</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
 
 <div id="mainApp">
   <div class="container">
@@ -738,19 +860,6 @@ body.dark .menu-btn:hover {
 </div>
 
 <script>
-const hamburgerBtn = document.getElementById('hamburgerBtn');
-const hamburgerMenu = document.getElementById('hamburgerMenu');
-
-hamburgerBtn.addEventListener('click', () => {
-  hamburgerMenu.classList.toggle('show');
-});
-
-document.addEventListener('click', e => {
-  if (!hamburgerMenu.contains(e.target) && !hamburgerBtn.contains(e.target)) {
-    hamburgerMenu.classList.remove('show');
-  }
-});
-
 (function() {
     let retryCount = 0;
     const MAX_RETRIES = 10;
@@ -790,7 +899,7 @@ function setupPage() {
         }
     }
 
-    const navLogoutBtn = document.getElementById('navLogoutBtn');
+    const navLogoutBtn = document.getElementById('logoutBtn');
     if (navLogoutBtn) {
         navLogoutBtn.onclick = () => {
             sessionStorage.clear();
@@ -862,14 +971,54 @@ function refreshChartColors() {
 
 initDarkMode();
 
-const toggleBtn = document.getElementById('toggleDark');
+const toggleBtn = document.getElementById('toggleDarkLink');
 if (toggleBtn) {
-  toggleBtn.addEventListener('click', () => {
+  toggleBtn.addEventListener('click', (e) => {
+    e.preventDefault();
     document.body.classList.toggle('dark');
     const isDark = document.body.classList.contains('dark');
     localStorage.setItem('darkMode', isDark);
     updateDarkModeButton();
     refreshChartColors();
+  });
+}
+
+const menuBtn = document.getElementById("menuBtn");
+const sideNav = document.getElementById("sideNav");
+const navOverlay = document.getElementById("navOverlay");
+
+function openDrawer() {
+  document.body.classList.add("drawer-open");
+  sideNav.hidden = false;
+  navOverlay.hidden = false;
+  menuBtn.setAttribute("aria-expanded", "true");
+}
+
+function closeDrawer() {
+  document.body.classList.remove("drawer-open");
+  menuBtn.setAttribute("aria-expanded", "false");
+  window.setTimeout(() => {
+    if (!document.body.classList.contains("drawer-open")) {
+      sideNav.hidden = true;
+      navOverlay.hidden = true;
+    }
+  }, 220);
+}
+
+if (menuBtn && sideNav && navOverlay) {
+  menuBtn.addEventListener("click", () => {
+    if (document.body.classList.contains("drawer-open")) closeDrawer();
+    else openDrawer();
+  });
+
+  navOverlay.addEventListener("click", closeDrawer);
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") closeDrawer();
+  });
+
+  sideNav.addEventListener("click", (e) => {
+    const a = e.target.closest?.("a");
+    if (a) closeDrawer();
   });
 }
 
