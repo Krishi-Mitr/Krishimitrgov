@@ -42,7 +42,6 @@ body.drawer-open { overflow: hidden; }
   gap: 14px;
 }
 
-/* Hamburger */
 .hamburger-btn {
   width: 44px;
   height: 44px;
@@ -54,9 +53,7 @@ body.drawer-open { overflow: hidden; }
   cursor: pointer;
   transition: 0.3s;
 }
-.hamburger-btn:hover {
-  transform: scale(1.05);
-}
+.hamburger-btn:hover { transform: scale(1.05); }
 
 .hamburger-icon {
   width: 20px;
@@ -128,19 +125,23 @@ body.drawer-open { overflow: hidden; }
   transition: opacity .2s ease;
   z-index: 9998;
 }
+
 .side-drawer {
   position: fixed;
   top: 84px;
   left: 14px;
-  width: 300px;
-  background: white;
-  border: 3px solid #0a3d62;
+  width: min(320px, calc(100vw - 28px));
+  max-height: calc(100vh - 98px);
+  overflow: auto;
+  background: linear-gradient(180deg,#0a3d62,#082032);
+  border: 3px solid #ffffff;
   border-radius: 18px;
-  box-shadow: 0 18px 40px rgba(0,0,0,0.22);
+  box-shadow: 0 18px 40px rgba(0,0,0,0.35);
   transform: translateX(-110%);
   transition: transform .25s ease;
   z-index: 9999;
 }
+
 .drawer-inner { padding: 14px; }
 
 body.drawer-open .nav-overlay {
@@ -151,6 +152,48 @@ body.drawer-open .side-drawer {
   transform: translateX(0);
 }
 
+/* ===== MENU STYLING ===== */
+.menu-section {
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.15);
+  margin-bottom: 14px;
+  background: rgba(255,255,255,0.05);
+}
+
+.menu-section-title {
+  padding: 12px 14px;
+  background: rgba(255,255,255,0.1);
+  color: white;
+  font-weight: 800;
+  font-size: 0.95rem;
+}
+
+.menu-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.menu-list a {
+  display: block;
+  padding: 14px;
+  text-decoration: none;
+  color: white;
+  font-weight: 600;
+  background: rgba(255,255,255,0.08);
+  transition: 0.2s ease;
+}
+
+.menu-list li + li a {
+  border-top: 1px solid rgba(255,255,255,0.1);
+}
+
+.menu-list a:hover {
+  background: #1e3a8a;
+  padding-left: 20px;
+}
+
 /* ===== DASHBOARD CONTENT ===== */
 .container {
   margin-top: 170px;
@@ -158,7 +201,6 @@ body.drawer-open .side-drawer {
   justify-content: center;
 }
 
-/* ===== PROFESSIONAL WELCOME BOX ===== */
 .welcome-card {
   background: rgba(255,255,255,0.85);
   backdrop-filter: blur(10px);
@@ -170,7 +212,6 @@ body.drawer-open .side-drawer {
   animation: fadeIn 0.9s ease forwards;
   transition: 0.4s;
 }
-
 .welcome-card:hover {
   transform: translateY(-6px);
   box-shadow: 0 30px 60px rgba(0,0,0,0.2);
@@ -187,7 +228,6 @@ body.drawer-open .side-drawer {
   background: linear-gradient(90deg,#ff9933,#138808);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  animation: floatName 3s ease-in-out infinite;
 }
 
 #roleText {
@@ -196,16 +236,9 @@ body.drawer-open .side-drawer {
   color: #555;
 }
 
-/* Animations */
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(20px); }
   to { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes floatName {
-  0% { transform: translateY(0px); }
-  50% { transform: translateY(-3px); }
-  100% { transform: translateY(0px); }
 }
 
 </style>
@@ -213,7 +246,6 @@ body.drawer-open .side-drawer {
 
 <body>
 
-<!-- NAVBAR -->
 <div class="top-nav">
   <div class="nav-left">
     <button class="hamburger-btn" id="menuBtn">
@@ -232,17 +264,16 @@ body.drawer-open .side-drawer {
   </div>
 </div>
 
-<!-- Drawer -->
 <div class="nav-overlay" id="navOverlay" hidden></div>
-<nav class="side-drawer" id="sideNav" aria-label="Main navigation" hidden>
+
+<nav class="side-drawer" id="sideNav" hidden>
   <div class="drawer-inner">
-    
 
     <div class="menu-section">
       <div class="menu-section-title">Market</div>
       <ul class="menu-list">
         <li><a href="Update_crops.html">Manage Your Crops</a></li>
-        <li><a href="Sell.html" aria-current="page">Sell Your Crop</a></li>
+        <li><a href="Sell.html">Sell Your Crop</a></li>
         <li><a href="Buy.html">Buy Your Crop</a></li>
       </ul>
     </div>
@@ -260,11 +291,10 @@ body.drawer-open .side-drawer {
         <li><a href="Notification.html">Notification</a></li>
       </ul>
     </div>
+
   </div>
 </nav>
 
-
-<!-- DASHBOARD CONTENT -->
 <div class="container">
   <div class="welcome-card">
     <h1 id="welcomeText">Welcome</h1>
@@ -306,7 +336,6 @@ document.getElementById("logoutBtn").onclick = () => {
   location.href = "login";
 };
 
-/* Drawer */
 const menuBtn = document.getElementById("menuBtn");
 const sideNav = document.getElementById("sideNav");
 const navOverlay = document.getElementById("navOverlay");
@@ -325,10 +354,12 @@ function closeDrawer(){
     }
   },220);
 }
+
 menuBtn.onclick=()=>{
   document.body.classList.contains("drawer-open")
   ? closeDrawer() : openDrawer();
 };
+
 navOverlay.onclick=closeDrawer;
 
 initDashboard();
