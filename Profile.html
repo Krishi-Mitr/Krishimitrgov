@@ -311,38 +311,51 @@ window.togglePassword = function(){
 };
 
 /* UPDATE PROFILE */
-let editing=false;
+let editing = false;
+
 editBtn.onclick = async function(){
 
+  const usernameInput = document.getElementById("username");
+  const nameInput = document.getElementById("name");
+  const passwordInput = document.getElementById("password");
+
   if(!editing){
-    username.disabled=false;
-    name.disabled=false;
-    password.disabled=false;
-    this.innerText="Save Changes";
-    editing=true;
+    usernameInput.disabled = false;
+    nameInput.disabled = false;
+    passwordInput.disabled = false;
+    this.innerText = "Save Changes";
+    editing = true;
   } else {
 
-    const { error } = await db
+    const { data, error } = await db
       .from("logindata")
       .update({
-        username: username.value,
-        name: name.value,
-        password: password.value
+        username: usernameInput.value,
+        name: nameInput.value,
+        password: passwordInput.value
       })
-      .eq("loginid", loginid);
+      .eq("loginid", loginid)
+      .select();
 
-    if(error) return alert("Update failed");
+    console.log("UPDATED DATA:", data);
+    console.log("ERROR:", error);
 
-    username.disabled=true;
-    name.disabled=true;
-    password.disabled=true;
-    this.innerText="Update Profile";
-    editing=false;
+    if(error){
+      alert("Update failed");
+      return;
+    }
+
+    usernameInput.disabled = true;
+    nameInput.disabled = true;
+    passwordInput.disabled = true;
+    this.innerText = "Update Profile";
+    editing = false;
 
     successPopup.classList.add("show");
     setTimeout(()=> successPopup.classList.remove("show"),3000);
   }
 };
+
 
 /* LOGOUT */
 logoutBtn.onclick = ()=>{
