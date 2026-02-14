@@ -8,8 +8,6 @@
 <script src="supabase.js"></script>
 
 <style>
-
-/* ===== BODY ===== */
 body {
   margin: 0;
   font-family: "Poppins", Arial, sans-serif;
@@ -19,7 +17,7 @@ body {
 }
 body.drawer-open { overflow: hidden; }
 
-/* ===== NAVBAR ===== */
+/* NAVBAR */
 .top-nav {
   position: fixed;
   top: 0;
@@ -64,15 +62,12 @@ body.drawer-open { overflow: hidden; }
   right: 0;
   height: 2.5px;
   background: #0a3d62;
-  border-radius: 999px;
 }
 .hamburger-icon span:nth-child(1){ top:0; }
 .hamburger-icon span:nth-child(2){ top:5.5px; }
 .hamburger-icon span:nth-child(3){ top:11px; }
 
 .brand-title {
-  margin: 0;
-  font-size: 1.15rem;
   font-weight: 800;
   color: #0a3d62;
 }
@@ -87,58 +82,80 @@ body.drawer-open { overflow: hidden; }
   cursor: pointer;
 }
 
-/* ===== PROFILE CARD ===== */
+/* DRAWER */
+.nav-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.25);
+  opacity: 0;
+  pointer-events: none;
+  transition: 0.2s;
+  z-index: 9998;
+}
+.side-drawer {
+  position: fixed;
+  top: 90px;
+  left: 15px;
+  width: 280px;
+  background: #082032;
+  border-radius: 18px;
+  padding: 15px;
+  transform: translateX(-120%);
+  transition: 0.3s;
+  z-index: 9999;
+}
+body.drawer-open .nav-overlay {
+  opacity: 1;
+  pointer-events: auto;
+}
+body.drawer-open .side-drawer {
+  transform: translateX(0);
+}
+.menu-list {
+  list-style: none;
+  padding: 0;
+}
+.menu-list a {
+  color: white;
+  text-decoration: none;
+  display: block;
+  padding: 12px;
+}
+.menu-list a:hover {
+  background: #1e3a8a;
+}
+
+/* PROFILE */
 .container {
   margin-top: 170px;
   display: flex;
   justify-content: center;
 }
-
 .profile-card {
-  background: rgba(255,255,255,0.95);
-  padding: 50px 60px;
+  background: white;
+  padding: 50px;
   border-radius: 25px;
-  box-shadow: 0 20px 45px rgba(0,0,0,0.15);
   width: 420px;
-  transition: transform 0.3s ease;
+  box-shadow: 0 20px 45px rgba(0,0,0,0.15);
 }
-.profile-card:hover {
-  transform: translateY(-5px);
-}
-
-.profile-card h2 {
-  margin-top: 0;
-  text-align: center;
-  color: #0a3d62;
-}
-
 .field {
   margin-bottom: 20px;
 }
-
-.field label {
-  font-weight: 600;
-}
-
 .field input {
   width: 100%;
   padding: 10px;
   border-radius: 10px;
   border: 2px solid #0a3d62;
 }
-
 .password-wrapper {
   position: relative;
 }
-
 .eye-btn {
   position: absolute;
   right: 10px;
   top: 35px;
   cursor: pointer;
-  font-size: 18px;
 }
-
 .update-btn {
   width: 100%;
   padding: 14px;
@@ -148,157 +165,32 @@ body.drawer-open { overflow: hidden; }
   background: linear-gradient(135deg,#138808,#2ecc71);
   color: white;
   cursor: pointer;
-  transition: 0.3s;
-}
-.update-btn:hover {
-  transform: scale(1.03);
 }
 
-/* ===== GREEN SUCCESS POPUP ===== */
+/* SUCCESS POPUP */
 .success-popup {
   position: fixed;
   top: 100px;
   right: 30px;
-  background: linear-gradient(135deg,#2ecc71,#27ae60);
+  background: #27ae60;
   color: white;
-  padding: 16px 22px;
+  padding: 14px 20px;
   border-radius: 12px;
-  font-weight: 600;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
   opacity: 0;
-  transform: translateY(-20px);
-  transition: all 0.4s ease;
-  z-index: 99999;
+  transition: 0.3s;
 }
 .success-popup.show {
   opacity: 1;
-  transform: translateY(0);
 }
-
 </style>
 </head>
 
 <body>
-  <script>
-const db = window.db;
-const loginid = sessionStorage.getItem("loginid");
 
-/* ================= PROFILE LOAD ================= */
-async function loadProfile(){
-  const { data, error } = await db
-    .from("logindata")
-    .select("username,name,password")
-    .eq("loginid", loginid)
-    .single();
-
-  if(error || !data){
-    console.error("Profile load error:", error);
-    return;
-  }
-
-  document.getElementById("username").value = data.username || "";
-  document.getElementById("name").value = data.name || "";
-  document.getElementById("password").value = data.password || "";
-}
-
-/* ================= PASSWORD TOGGLE ================= */
-function togglePassword(){
-  const pass = document.getElementById("password");
-  pass.type = pass.type === "password" ? "text" : "password";
-}
-
-/* ================= UPDATE PROFILE ================= */
-let editing=false;
-
-document.getElementById("editBtn").onclick = async function(){
-
-  const username = document.getElementById("username");
-  const nameField = document.getElementById("name");
-  const password = document.getElementById("password");
-
-  if(!editing){
-    username.disabled=false;
-    nameField.disabled=false;
-    password.disabled=false;
-    this.innerText="Save Changes";
-    editing=true;
-  }else{
-
-    const { error } = await db
-      .from("logindata")
-      .update({
-        username: username.value,
-        name: nameField.value,
-        password: password.value
-      })
-      .eq("loginid", loginid);
-
-    if(error){
-      alert("Error updating profile");
-      return;
-    }
-
-    username.disabled=true;
-    nameField.disabled=true;
-    password.disabled=true;
-    this.innerText="Update Profile";
-    editing=false;
-
-    showSuccessPopup();
-  }
-};
-
-/* ================= SUCCESS POPUP ================= */
-function showSuccessPopup(){
-  const popup = document.getElementById("successPopup");
-  popup.classList.add("show");
-  setTimeout(()=>{
-    popup.classList.remove("show");
-  },3000);
-}
-
-/* ================= LOGOUT ================= */
-document.getElementById("logoutBtn").onclick=()=>{
-  sessionStorage.clear();
-  location.href="login";
-};
-
-/* ================= HAMBURGER DRAWER ================= */
-
-const menuBtn = document.getElementById("menuBtn");
-const sideNav = document.getElementById("sideNav");
-const navOverlay = document.getElementById("navOverlay");
-
-function openDrawer(){
-  document.body.classList.add("drawer-open");
-  sideNav.hidden = false;
-  navOverlay.hidden = false;
-}
-
-function closeDrawer(){
-  document.body.classList.remove("drawer-open");
-  setTimeout(()=>{
-    sideNav.hidden = true;
-    navOverlay.hidden = true;
-  },250);
-}
-
-menuBtn.addEventListener("click", () => {
-  document.body.classList.contains("drawer-open")
-    ? closeDrawer()
-    : openDrawer();
-});
-
-navOverlay.addEventListener("click", closeDrawer);
-
-/* ================= INIT ================= */
-loadProfile();
-</script>
-
-
+<!-- NAVBAR -->
 <div class="top-nav">
   <div class="nav-left">
-    <button class="hamburger-btn">
+    <button class="hamburger-btn" id="menuBtn">
       <div class="hamburger-icon">
         <span></span><span></span><span></span>
       </div>
@@ -308,6 +200,18 @@ loadProfile();
   <button class="logout-btn" id="logoutBtn">Logout</button>
 </div>
 
+<!-- DRAWER -->
+<div class="nav-overlay" id="navOverlay"></div>
+<nav class="side-drawer" id="sideNav">
+  <ul class="menu-list">
+    <li><a href="Dashboard">Dashboard</a></li>
+    <li><a href="Update_crops">Manage Crops</a></li>
+    <li><a href="Sell">Sell Crop</a></li>
+    <li><a href="Buy">Buy Crop</a></li>
+  </ul>
+</nav>
+
+<!-- PROFILE -->
 <div class="container">
   <div class="profile-card">
     <h2>Your Profile</h2>
@@ -337,9 +241,12 @@ loadProfile();
 </div>
 
 <script>
+document.addEventListener("DOMContentLoaded", function(){
+
 const db = window.db;
 const loginid = sessionStorage.getItem("loginid");
 
+/* LOAD PROFILE */
 async function loadProfile(){
   const { data, error } = await db
     .from("logindata")
@@ -347,76 +254,70 @@ async function loadProfile(){
     .eq("loginid", loginid)
     .single();
 
-  if(error || !data){
-    console.error("Profile load error:", error);
-    return;
-  }
+  if(error) return console.error(error);
 
-  document.getElementById("username").value = data.username || "";
-  document.getElementById("name").value = data.name || "";
-  document.getElementById("password").value = data.password || "";
+  username.value = data.username || "";
+  name.value = data.name || "";
+  password.value = data.password || "";
 }
 
-function togglePassword(){
-  const pass = document.getElementById("password");
-  pass.type = pass.type === "password" ? "text" : "password";
-}
+/* PASSWORD TOGGLE */
+window.togglePassword = function(){
+  password.type = password.type === "password" ? "text" : "password";
+};
 
+/* UPDATE PROFILE */
 let editing=false;
-
-document.getElementById("editBtn").onclick = async function(){
-
-  const username = document.getElementById("username");
-  const nameField = document.getElementById("name");
-  const password = document.getElementById("password");
+editBtn.onclick = async function(){
 
   if(!editing){
     username.disabled=false;
-    nameField.disabled=false;
+    name.disabled=false;
     password.disabled=false;
     this.innerText="Save Changes";
     editing=true;
-  }else{
+  } else {
 
     const { error } = await db
       .from("logindata")
       .update({
         username: username.value,
-        name: nameField.value,
+        name: name.value,
         password: password.value
       })
       .eq("loginid", loginid);
 
-    if(error){
-      alert("Error updating profile");
-      return;
-    }
+    if(error) return alert("Update failed");
 
     username.disabled=true;
-    nameField.disabled=true;
+    name.disabled=true;
     password.disabled=true;
     this.innerText="Update Profile";
     editing=false;
 
-    showSuccessPopup();
+    successPopup.classList.add("show");
+    setTimeout(()=> successPopup.classList.remove("show"),3000);
   }
 };
 
-function showSuccessPopup(){
-  const popup = document.getElementById("successPopup");
-  popup.classList.add("show");
-
-  setTimeout(()=>{
-    popup.classList.remove("show");
-  },3000);
-}
-
-document.getElementById("logoutBtn").onclick=()=>{
+/* LOGOUT */
+logoutBtn.onclick = ()=>{
   sessionStorage.clear();
   location.href="login";
 };
 
+/* HAMBURGER */
+menuBtn.onclick = ()=>{
+  document.body.classList.toggle("drawer-open");
+};
+
+navOverlay.onclick = ()=>{
+  document.body.classList.remove("drawer-open");
+};
+
 loadProfile();
+
+});
 </script>
 
 </body>
