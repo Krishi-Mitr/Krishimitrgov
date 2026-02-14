@@ -8,6 +8,7 @@
 <script src="supabase.js"></script>
 
 <style>
+
 /* ===== SELL PAGE BACKGROUND ===== */
 body {
   margin: 0;
@@ -51,7 +52,12 @@ body.drawer-open { overflow: hidden; }
   display: grid;
   place-items: center;
   cursor: pointer;
+  transition: 0.3s;
 }
+.hamburger-btn:hover {
+  transform: scale(1.05);
+}
+
 .hamburger-icon {
   width: 20px;
   height: 14px;
@@ -89,6 +95,11 @@ body.drawer-open { overflow: hidden; }
   border-radius: 50%;
   border: 2px solid #0a3d62;
   cursor: pointer;
+  transition: 0.3s;
+}
+.profile-btn img:hover {
+  transform: scale(1.1);
+  box-shadow: 0 0 15px rgba(10,61,98,0.4);
 }
 
 .logout-btn {
@@ -99,6 +110,12 @@ body.drawer-open { overflow: hidden; }
   border-radius: 10px;
   font-weight: 700;
   cursor: pointer;
+  transition: 0.3s;
+}
+.logout-btn:hover {
+  background: #0a3d62;
+  color: white;
+  transform: translateY(-2px);
 }
 
 /* ===== DRAWER ===== */
@@ -126,39 +143,6 @@ body.drawer-open { overflow: hidden; }
 }
 .drawer-inner { padding: 14px; }
 
-.menu-section {
-  border-radius: 14px;
-  overflow: hidden;
-  border: 1px solid rgba(10,61,98,0.18);
-  margin-bottom: 14px;
-  background: white;
-}
-.menu-section-title {
-  padding: 12px 14px;
-  background: #eef2ff;
-  color: #0a3d62;
-  font-weight: 800;
-}
-.menu-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-.menu-list a {
-  display: block;
-  padding: 14px;
-  text-decoration: none;
-  color: #0a3d62;
-  font-weight: 800;
-  background: #f1f5f9;
-}
-.menu-list li + li a {
-  border-top: 1px solid rgba(10,61,98,0.10);
-}
-.menu-list a:hover {
-  background: #e2e8f0;
-}
-
 body.drawer-open .nav-overlay {
   opacity: 1;
   pointer-events: auto;
@@ -169,21 +153,61 @@ body.drawer-open .side-drawer {
 
 /* ===== DASHBOARD CONTENT ===== */
 .container {
-  margin-top: 150px;
+  margin-top: 170px;
+  display: flex;
+  justify-content: center;
+}
+
+/* ===== PROFESSIONAL WELCOME BOX ===== */
+.welcome-card {
+  background: rgba(255,255,255,0.85);
+  backdrop-filter: blur(10px);
+  padding: 50px 80px;
+  border-radius: 25px;
+  border: 2px solid rgba(10,61,98,0.15);
+  box-shadow: 0 20px 45px rgba(0,0,0,0.15);
   text-align: center;
+  animation: fadeIn 0.9s ease forwards;
+  transition: 0.4s;
+}
+
+.welcome-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 30px 60px rgba(0,0,0,0.2);
 }
 
 #welcomeText {
-  font-size: 2rem;
+  font-size: 2.2rem;
   font-weight: 800;
   color: #0a3d62;
+  margin: 0;
+}
+
+.user-name {
+  background: linear-gradient(90deg,#ff9933,#138808);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: floatName 3s ease-in-out infinite;
 }
 
 #roleText {
-  margin-top: 10px;
+  margin-top: 15px;
   font-size: 1rem;
   color: #555;
 }
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes floatName {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-3px); }
+  100% { transform: translateY(0px); }
+}
+
 </style>
 </head>
 
@@ -210,16 +234,13 @@ body.drawer-open .side-drawer {
 
 <!-- Drawer -->
 <div class="nav-overlay" id="navOverlay" hidden></div>
-<div class="nav-overlay" id="navOverlay" hidden></div>
-<nav class="side-drawer" id="sideNav" aria-label="Main navigation" hidden>
+<nav class="side-drawer" id="sideNav" hidden>
   <div class="drawer-inner">
-    
-
     <div class="menu-section">
       <div class="menu-section-title">Market</div>
       <ul class="menu-list">
         <li><a href="Update_crops.html">Manage Your Crops</a></li>
-        <li><a href="Sell.html" aria-current="page">Sell Your Crop</a></li>
+        <li><a href="Sell.html">Sell Your Crop</a></li>
         <li><a href="Buy.html">Buy Your Crop</a></li>
       </ul>
     </div>
@@ -240,11 +261,12 @@ body.drawer-open .side-drawer {
   </div>
 </nav>
 
-
 <!-- DASHBOARD CONTENT -->
 <div class="container">
-  <h1 id="welcomeText">Welcome</h1>
-  <p id="roleText"></p>
+  <div class="welcome-card">
+    <h1 id="welcomeText">Welcome</h1>
+    <p id="roleText"></p>
+  </div>
 </div>
 
 <script>
@@ -265,8 +287,10 @@ async function initDashboard() {
     .eq("loginid", loginid)
     .maybeSingle();
 
-  document.getElementById("welcomeText").innerText =
-    "Welcome, " + (data?.name || "User");
+  const name = data?.name || "User";
+
+  document.getElementById("welcomeText").innerHTML =
+    `Welcome, <span class="user-name">${name}</span>`;
 
   document.getElementById("roleText").innerText =
     usertype === "Farmer"
