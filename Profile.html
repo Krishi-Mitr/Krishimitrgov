@@ -9,7 +9,7 @@
 
 <style>
 
-/* ===== SAME DASHBOARD UI ===== */
+/* ===== BODY ===== */
 body {
   margin: 0;
   font-family: "Poppins", Arial, sans-serif;
@@ -87,60 +87,6 @@ body.drawer-open { overflow: hidden; }
   cursor: pointer;
 }
 
-/* ===== DRAWER ===== */
-.nav-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.25);
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity .2s ease;
-  z-index: 9998;
-}
-.side-drawer {
-  position: fixed;
-  top: 84px;
-  left: 14px;
-  width: min(320px, calc(100vw - 28px));
-  max-height: calc(100vh - 98px);
-  overflow: auto;
-  background: linear-gradient(180deg,#0a3d62,#082032);
-  border: 3px solid #ffffff;
-  border-radius: 18px;
-  box-shadow: 0 18px 40px rgba(0,0,0,0.35);
-  transform: translateX(-110%);
-  transition: transform .25s ease;
-  z-index: 9999;
-}
-.drawer-inner { padding: 14px; }
-body.drawer-open .nav-overlay { opacity:1; pointer-events:auto; }
-body.drawer-open .side-drawer { transform:translateX(0); }
-
-/* Menu */
-.menu-section {
-  border-radius: 14px;
-  overflow: hidden;
-  border: 1px solid rgba(255,255,255,0.15);
-  margin-bottom: 14px;
-  background: rgba(255,255,255,0.05);
-}
-.menu-section-title {
-  padding: 12px 14px;
-  background: rgba(255,255,255,0.1);
-  color: white;
-  font-weight: 800;
-}
-.menu-list { list-style:none; padding:0; margin:0; }
-.menu-list a {
-  display:block;
-  padding:14px;
-  text-decoration:none;
-  color:white;
-  font-weight:600;
-  background:rgba(255,255,255,0.08);
-}
-.menu-list a:hover { background:#1e3a8a; padding-left:20px; }
-
 /* ===== PROFILE CARD ===== */
 .container {
   margin-top: 170px;
@@ -149,11 +95,15 @@ body.drawer-open .side-drawer { transform:translateX(0); }
 }
 
 .profile-card {
-  background: rgba(255,255,255,0.9);
+  background: rgba(255,255,255,0.95);
   padding: 50px 60px;
   border-radius: 25px;
   box-shadow: 0 20px 45px rgba(0,0,0,0.15);
   width: 420px;
+  transition: transform 0.3s ease;
+}
+.profile-card:hover {
+  transform: translateY(-5px);
 }
 
 .profile-card h2 {
@@ -198,6 +148,31 @@ body.drawer-open .side-drawer { transform:translateX(0); }
   background: linear-gradient(135deg,#138808,#2ecc71);
   color: white;
   cursor: pointer;
+  transition: 0.3s;
+}
+.update-btn:hover {
+  transform: scale(1.03);
+}
+
+/* ===== GREEN SUCCESS POPUP ===== */
+.success-popup {
+  position: fixed;
+  top: 100px;
+  right: 30px;
+  background: linear-gradient(135deg,#2ecc71,#27ae60);
+  color: white;
+  padding: 16px 22px;
+  border-radius: 12px;
+  font-weight: 600;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+  opacity: 0;
+  transform: translateY(-20px);
+  transition: all 0.4s ease;
+  z-index: 99999;
+}
+.success-popup.show {
+  opacity: 1;
+  transform: translateY(0);
 }
 
 </style>
@@ -205,57 +180,18 @@ body.drawer-open .side-drawer { transform:translateX(0); }
 
 <body>
 
-<!-- NAVBAR -->
 <div class="top-nav">
   <div class="nav-left">
-    <button class="hamburger-btn" id="menuBtn">
+    <button class="hamburger-btn">
       <div class="hamburger-icon">
         <span></span><span></span><span></span>
       </div>
     </button>
     <p class="brand-title">Krishi Mitr</p>
   </div>
-
   <button class="logout-btn" id="logoutBtn">Logout</button>
 </div>
 
-<!-- Drawer -->
-<div class="nav-overlay" id="navOverlay" hidden></div>
-<nav class="side-drawer" id="sideNav" hidden>
-  <div class="drawer-inner">
-    <div class="menu-section">
-      <div class="menu-section-title">Main</div>
-      <ul class="menu-list">
-        <li><a href="Dashboard">Dashboard</a></li>
-      </ul>
-    </div>
-
-    <div class="menu-section">
-      <div class="menu-section-title">Market</div>
-      <ul class="menu-list">
-        <li><a href="Update_crops">Manage Your Crops</a></li>
-        <li><a href="Sell">Sell Your Crop</a></li>
-        <li><a href="Buy">Buy Your Crop</a></li>
-      </ul>
-    </div>
-
-    <div class="menu-section">
-      <div class="menu-section-title">Tools</div>
-      <ul class="menu-list">
-        <li><a href="krishimitr">Crop Predictor</a></li>
-      </ul>
-    </div>
-
-    <div class="menu-section">
-      <div class="menu-section-title">System</div>
-      <ul class="menu-list">
-        <li><a href="Notification">Notification</a></li>
-      </ul>
-    </div>
-  </div>
-</nav>
-
-<!-- PROFILE CONTENT -->
 <div class="container">
   <div class="profile-card">
     <h2>Your Profile</h2>
@@ -280,79 +216,89 @@ body.drawer-open .side-drawer { transform:translateX(0); }
   </div>
 </div>
 
+<div class="success-popup" id="successPopup">
+  ✔ Profile Updated Successfully
+</div>
+
 <script>
 const db = window.db;
 const loginid = sessionStorage.getItem("loginid");
 
 async function loadProfile(){
-  const { data } = await db
+  const { data, error } = await db
     .from("logindata")
     .select("username,name,password")
     .eq("loginid", loginid)
-    .maybeSingle();
+    .single();
 
-  username.value = data.username;
-  name.value = data.name;
-  password.value = data.password;
+  if(error || !data){
+    console.error("Profile load error:", error);
+    return;
+  }
+
+  document.getElementById("username").value = data.username || "";
+  document.getElementById("name").value = data.name || "";
+  document.getElementById("password").value = data.password || "";
 }
 
 function togglePassword(){
-  password.type = password.type === "password" ? "text" : "password";
+  const pass = document.getElementById("password");
+  pass.type = pass.type === "password" ? "text" : "password";
 }
 
 let editing=false;
+
 document.getElementById("editBtn").onclick = async function(){
+
+  const username = document.getElementById("username");
+  const nameField = document.getElementById("name");
+  const password = document.getElementById("password");
+
   if(!editing){
     username.disabled=false;
-    name.disabled=false;
+    nameField.disabled=false;
     password.disabled=false;
     this.innerText="Save Changes";
     editing=true;
   }else{
-    await db.from("logindata")
+
+    const { error } = await db
+      .from("logindata")
       .update({
         username: username.value,
-        name: name.value,
+        name: nameField.value,
         password: password.value
       })
       .eq("loginid", loginid);
 
-    alert("Profile Updated Successfully");
+    if(error){
+      alert("Error updating profile");
+      return;
+    }
+
     username.disabled=true;
-    name.disabled=true;
+    nameField.disabled=true;
     password.disabled=true;
     this.innerText="Update Profile";
     editing=false;
+
+    showSuccessPopup();
   }
 };
+
+function showSuccessPopup(){
+  const popup = document.getElementById("successPopup");
+  popup.classList.add("show");
+
+  setTimeout(()=>{
+    popup.classList.remove("show");
+  },3000);
+}
 
 document.getElementById("logoutBtn").onclick=()=>{
   sessionStorage.clear();
   location.href="login";
 };
-
-/* Drawer */
-const menuBtn=document.getElementById("menuBtn");
-const sideNav=document.getElementById("sideNav");
-const navOverlay=document.getElementById("navOverlay");
-
-function openDrawer(){
-  document.body.classList.add("drawer-open");
-  sideNav.hidden=false;
-  navOverlay.hidden=false;
-}
-function closeDrawer(){
-  document.body.classList.remove("drawer-open");
-  setTimeout(()=>{
-    sideNav.hidden=true;
-    navOverlay.hidden=true;
-  },220);
-}
-menuBtn.onclick=()=>{
-  document.body.classList.contains("drawer-open")
-  ? closeDrawer():openDrawer();
-};
-navOverlay.onclick=closeDrawer;
 
 loadProfile();
 </script>
