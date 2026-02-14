@@ -465,29 +465,32 @@ body.drawer-open .side-drawer {
 </div>
 
 <script>
+const db = window.supabase;   // ✅ use same method as Sell page
+
+const loginid = sessionStorage.getItem("loginid");
+const usertype = sessionStorage.getItem("usertype");
+
+if (!loginid || !usertype) {
+    location.href = "login.html";
+}
+
+// Load dashboard
 async function initDashboard() {
-    const loginid = sessionStorage.getItem("loginid");
-    const usertype = sessionStorage.getItem("usertype");
-
-    if (!loginid || !usertype) {
-        location.href = "login";
-        return;
-    }
-
     try {
-        const { data, error } = await supabase
+        const { data, error } = await db
             .from("logindata")
             .select("name")
             .eq("loginid", loginid)
-            .single();
+            .maybeSingle();   // safer than .single()
 
-        if (error || !data) {
+        if (error) {
+            console.error(error);
             document.getElementById("welcomeText").innerText = "Welcome";
             return;
         }
 
         document.getElementById("welcomeText").innerText =
-            "Welcome, " + data.name;
+            "Welcome, " + (data?.name || "User");
 
         document.getElementById("roleText").innerText =
             usertype === "Farmer"
@@ -495,60 +498,61 @@ async function initDashboard() {
                 : "Buy fresh produce directly from farmers.";
 
     } catch (err) {
+        console.error(err);
         document.getElementById("welcomeText").innerText = "Welcome";
     }
 }
 
-    
-const logoutBtn = document.getElementById("logoutBtn");
-if (logoutBtn) {
-  logoutBtn.onclick = () => {
+// Logout
+document.getElementById("logoutBtn").onclick = () => {
     sessionStorage.clear();
-    location.href = "login";
-  };
-}
+    location.href = "login.html";
+};
 
+// Drawer controls
 const menuBtn = document.getElementById("menuBtn");
 const sideNav = document.getElementById("sideNav");
 const navOverlay = document.getElementById("navOverlay");
 
 function openDrawer() {
-  document.body.classList.add("drawer-open");
-  sideNav.hidden = false;
-  navOverlay.hidden = false;
-  menuBtn.setAttribute("aria-expanded", "true");
+    document.body.classList.add("drawer-open");
+    sideNav.hidden = false;
+    navOverlay.hidden = false;
+    menuBtn.setAttribute("aria-expanded", "true");
 }
 
 function closeDrawer() {
-  document.body.classList.remove("drawer-open");
-  menuBtn.setAttribute("aria-expanded", "false");
-  window.setTimeout(() => {
-    if (!document.body.classList.contains("drawer-open")) {
-      sideNav.hidden = true;
-      navOverlay.hidden = true;
-    }
-  }, 220);
+    document.body.classList.remove("drawer-open");
+    menuBtn.setAttribute("aria-expanded", "false");
+    setTimeout(() => {
+        if (!document.body.classList.contains("drawer-open")) {
+            sideNav.hidden = true;
+            navOverlay.hidden = true;
+        }
+    }, 220);
 }
 
 if (menuBtn && sideNav && navOverlay) {
-  menuBtn.addEventListener("click", () => {
-    if (document.body.classList.contains("drawer-open")) closeDrawer();
-    else openDrawer();
-  });
+    menuBtn.addEventListener("click", () => {
+        document.body.classList.contains("drawer-open")
+            ? closeDrawer()
+            : openDrawer();
+    });
 
-  navOverlay.addEventListener("click", closeDrawer);
-  document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape") closeDrawer();
-  });
+    navOverlay.addEventListener("click", closeDrawer);
 
-  sideNav.addEventListener("click", (e) => {
-    const a = e.target.closest?.("a");
-    if (a) closeDrawer();
-  });
+    document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") closeDrawer();
+    });
+
+    sideNav.addEventListener("click", (e) => {
+        if (e.target.closest("a")) closeDrawer();
+    });
 }
 
 initDashboard();
 </script>
+
 
 </body>
 </html>
