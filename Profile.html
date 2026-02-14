@@ -179,6 +179,122 @@ body.drawer-open { overflow: hidden; }
 </head>
 
 <body>
+  <script>
+const db = window.db;
+const loginid = sessionStorage.getItem("loginid");
+
+/* ================= PROFILE LOAD ================= */
+async function loadProfile(){
+  const { data, error } = await db
+    .from("logindata")
+    .select("username,name,password")
+    .eq("loginid", loginid)
+    .single();
+
+  if(error || !data){
+    console.error("Profile load error:", error);
+    return;
+  }
+
+  document.getElementById("username").value = data.username || "";
+  document.getElementById("name").value = data.name || "";
+  document.getElementById("password").value = data.password || "";
+}
+
+/* ================= PASSWORD TOGGLE ================= */
+function togglePassword(){
+  const pass = document.getElementById("password");
+  pass.type = pass.type === "password" ? "text" : "password";
+}
+
+/* ================= UPDATE PROFILE ================= */
+let editing=false;
+
+document.getElementById("editBtn").onclick = async function(){
+
+  const username = document.getElementById("username");
+  const nameField = document.getElementById("name");
+  const password = document.getElementById("password");
+
+  if(!editing){
+    username.disabled=false;
+    nameField.disabled=false;
+    password.disabled=false;
+    this.innerText="Save Changes";
+    editing=true;
+  }else{
+
+    const { error } = await db
+      .from("logindata")
+      .update({
+        username: username.value,
+        name: nameField.value,
+        password: password.value
+      })
+      .eq("loginid", loginid);
+
+    if(error){
+      alert("Error updating profile");
+      return;
+    }
+
+    username.disabled=true;
+    nameField.disabled=true;
+    password.disabled=true;
+    this.innerText="Update Profile";
+    editing=false;
+
+    showSuccessPopup();
+  }
+};
+
+/* ================= SUCCESS POPUP ================= */
+function showSuccessPopup(){
+  const popup = document.getElementById("successPopup");
+  popup.classList.add("show");
+  setTimeout(()=>{
+    popup.classList.remove("show");
+  },3000);
+}
+
+/* ================= LOGOUT ================= */
+document.getElementById("logoutBtn").onclick=()=>{
+  sessionStorage.clear();
+  location.href="login";
+};
+
+/* ================= HAMBURGER DRAWER ================= */
+
+const menuBtn = document.getElementById("menuBtn");
+const sideNav = document.getElementById("sideNav");
+const navOverlay = document.getElementById("navOverlay");
+
+function openDrawer(){
+  document.body.classList.add("drawer-open");
+  sideNav.hidden = false;
+  navOverlay.hidden = false;
+}
+
+function closeDrawer(){
+  document.body.classList.remove("drawer-open");
+  setTimeout(()=>{
+    sideNav.hidden = true;
+    navOverlay.hidden = true;
+  },250);
+}
+
+menuBtn.addEventListener("click", () => {
+  document.body.classList.contains("drawer-open")
+    ? closeDrawer()
+    : openDrawer();
+});
+
+navOverlay.addEventListener("click", closeDrawer);
+
+/* ================= INIT ================= */
+loadProfile();
+</script>
+
 
 <div class="top-nav">
   <div class="nav-left">
