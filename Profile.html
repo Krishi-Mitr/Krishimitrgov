@@ -289,18 +289,21 @@ const loginid = sessionStorage.getItem("loginid");
 
 /* LOAD PROFILE */
 async function loadProfile(){
+
   const { data, error } = await db
     .from("logindata")
-    .select("username,name,password")
+    .select("*")
     .eq("loginid", loginid)
     .single();
 
-  if(error) return console.error(error);
+  console.log("DATA:", data);
+  console.log("KEYS:", Object.keys(data));
 
-  username.value = data.username || "";
-  name.value = data.name || "";
-  password.value = data.password || "";
+  document.getElementById("username").value = data.username ?? "";
+  document.getElementById("name").value = data.name ?? "";
+  document.getElementById("password").value = data.password ?? "";
 }
+
 
 /* PASSWORD TOGGLE */
 window.togglePassword = function(){
