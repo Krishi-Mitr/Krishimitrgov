@@ -433,23 +433,23 @@ body.drawer-open .side-drawer {
     <div class="menu-section-drawer">
       <div class="menu-section-title">Market</div>
       <ul class="menu-list">
-        <li><a href="Update_crops.html">Manage Your Crops</a></li>
-        <li><a href="Sell.html">Sell Your Crop</a></li>
-        <li><a href="Buy.html">Buy Your Crop</a></li>
+        <li><a href="Update_crops">Manage Your Crops</a></li>
+        <li><a href="Sell">Sell Your Crop</a></li>
+        <li><a href="Buy">Buy Your Crop</a></li>
       </ul>
     </div>
 
     <div class="menu-section-drawer">
       <div class="menu-section-title">Tools</div>
       <ul class="menu-list">
-        <li><a href="krishimitr.html">Crop Predictor</a></li>
+        <li><a href="krishimitr">Crop Predictor</a></li>
       </ul>
     </div>
 
     <div class="menu-section-drawer" style="margin-bottom:0;">
       <div class="menu-section-title">System</div>
       <ul class="menu-list">
-        <li><a href="Notification.html">Notification</a></li>
+        <li><a href="Notification">Notification</a></li>
       </ul>
     </div>
   </div>
@@ -461,22 +461,47 @@ body.drawer-open .side-drawer {
 </div>
 
 <script>
-function initDashboard() {
+async function initDashboard() {
     const loginid = sessionStorage.getItem("loginid");
     const usertype = sessionStorage.getItem("usertype");
-    if (!loginid || !usertype) location.href = "login.html";
 
-    welcomeText.innerText = "Welcome, " + usertype;
-    roleText.innerText = usertype === "Farmer"
-        ? "Manage crops, sell produce, and access smart tools."
-        : "Buy fresh produce directly from farmers.";
+    if (!loginid || !usertype) {
+        location.href = "login";
+        return;
+    }
+
+    try {
+        const { data, error } = await supabase
+            .from("logindata")
+            .select("name")
+            .eq("loginid", loginid)
+            .single();
+
+        if (error || !data) {
+            document.getElementById("welcomeText").innerText = "Welcome";
+            return;
+        }
+
+        document.getElementById("welcomeText").innerText =
+            "Welcome, " + data.name;
+
+        document.getElementById("roleText").innerText =
+            usertype === "Farmer"
+                ? "Manage crops, sell produce, and access smart tools."
+                : "Buy fresh produce directly from farmers.";
+
+    } catch (err) {
+        document.getElementById("welcomeText").innerText = "Welcome";
+    }
 }
 
+initDashboard();
+    
 const logoutBtn = document.getElementById("logoutBtn");
 if (logoutBtn) {
   logoutBtn.onclick = () => {
     sessionStorage.clear();
-    location.href = "login.html";
+    location.href = "login";
   };
 }
 
