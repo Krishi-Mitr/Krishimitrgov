@@ -271,31 +271,47 @@ body.drawer-open .side-drawer{
 <div class="top-nav">
   <div class="nav-left">
     <button class="hamburger-btn" id="menuBtn">
-      <div class="hamburger-icon">
-        <span></span><span></span><span></span>
-      </div>
+      <div class="hamburger-icon"><span></span><span></span><span></span></div>
     </button>
     <p class="brand-title">Krishi Mitr</p>
   </div>
-
   <div class="nav-right">
     <div class="profile-btn" onclick="location.href='Profile'">
-      <img src="profile_pic.png">
+      <img src="profile_pic.png" alt="Profile">
     </div>
     <button class="logout-btn" id="logoutBtn">Logout</button>
   </div>
 </div>
 
-<div class="nav-overlay" id="navOverlay"></div>
-
-<nav class="side-drawer" id="sideNav">
+<!-- Drawer + overlay -->
+<div class="nav-overlay" id="navOverlay" hidden></div>
+<nav class="side-drawer" id="sideNav" hidden>
   <div class="drawer-inner">
-    <div class="menu-section-title">Market</div>
-    <ul class="menu-list">
-      <li><a href="Dashboard">Dashboard</a></li>
-      <li><a href="Sell">Sell Your Crop</a></li>
-      <li><a href="Buy">Buy Your Crop</a></li>
-    </ul>
+        <div class="menu-section">
+      <div class="menu-section-title">Main</div>
+      <ul class="menu-list">
+        <li><a href="Dashboard">Dashboard</a></li>
+      </ul>
+    </div>
+    <div class="menu-section">
+      <div class="menu-section-title">Market</div>
+      <ul class="menu-list">
+        <li><a href="Update_crops">Manage Your Crops</a></li>
+        <li><a href="Buy">Sell your Crop</a></li>
+      </ul>
+    </div>
+    <div class="menu-section">
+      <div class="menu-section-title">Tools</div>
+      <ul class="menu-list">
+        <li><a href="krishimitr">Crop Predictor</a></li>
+      </ul>
+    </div>
+    <div class="menu-section" style="margin-bottom:0;">
+      <div class="menu-section-title">System</div>
+      <ul class="menu-list">
+        <li><a href="Notification">Notification</a></li>
+      </ul>
+    </div>
   </div>
 </nav>
 
