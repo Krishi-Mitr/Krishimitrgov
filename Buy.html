@@ -9,123 +9,15 @@
 
 <style>
 body {
-  margin: 0;
-  font-family: "Poppins", Arial, sans-serif;
-  min-height: 100vh;
-  background: linear-gradient(180deg,#f6e2cc 0%,#f7f9f8 45%,#dceee3 100%);
-  color: #1f2937;
+  margin:0;
+  font-family:"Poppins",Arial,sans-serif;
+  background:linear-gradient(180deg,#f6e2cc 0%,#f7f9f8 45%,#dceee3 100%);
 }
-body.drawer-open { overflow: hidden; }
-
-/* ===== NAVBAR ===== */
-.top-nav {
-  position: fixed;
-  top: 0; left: 0; right: 0;
-  height: 78px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0 32px;
-  background: linear-gradient(90deg,#ff9933,#ffffff,#138808);
-  border-bottom: 3px solid #0a3d62;
-  box-shadow: 0 6px 14px rgba(0,0,0,0.15);
-  z-index: 9999;
-}
-.nav-left { display:flex; align-items:center; gap:14px; }
-
-.hamburger-btn {
-  width:44px; height:44px;
-  border-radius:12px;
-  border:2px solid #0a3d62;
-  background:rgba(255,255,255,0.75);
-  display:grid; place-items:center;
-  cursor:pointer;
-}
-.hamburger-icon {
-  width:20px; height:14px;
-  position:relative;
-}
-.hamburger-icon span {
-  position:absolute;
-  left:0; right:0;
-  height:2.5px;
-  background:#0a3d62;
-  border-radius:999px;
-}
-.hamburger-icon span:nth-child(1){top:0;}
-.hamburger-icon span:nth-child(2){top:5.5px;}
-.hamburger-icon span:nth-child(3){top:11px;}
-
-.brand-title { font-weight:800; color:#0a3d62; }
-
-.nav-right { display:flex; align-items:center; gap:15px; }
-
-.profile-btn img {
-  width:42px; height:42px;
-  border-radius:50%;
-  border:2px solid #0a3d62;
-  cursor:pointer;
-}
-
-.logout-btn {
-  background:white;
-  color:#0a3d62;
-  border:2px solid #0a3d62;
-  padding:10px 18px;
-  border-radius:10px;
-  font-weight:700;
-  cursor:pointer;
-}
-
-/* ===== DRAWER ===== */
-.nav-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.25);
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity .2s ease;
-  z-index: 9998;
-}
-.side-drawer {
-  position: fixed;
-  top: 84px;
-  left: 14px;
-  width: min(320px, calc(100vw - 28px));
-  max-height: calc(100vh - 98px);
-  overflow: auto;
-  background: linear-gradient(180deg,#0a3d62,#082032);
-  border: 3px solid #ffffff;
-  border-radius: 18px;
-  transform: translateX(-110%);
-  transition: transform .25s ease;
-  z-index: 9999;
-}
-.drawer-inner { padding:14px; }
-
-body.drawer-open .nav-overlay { opacity:1; pointer-events:auto; }
-body.drawer-open .side-drawer { transform:translateX(0); }
-
-.menu-section-title {
-  padding:12px;
-  background:rgba(255,255,255,0.1);
-  color:white;
-  font-weight:800;
-}
-.menu-list { list-style:none; padding:0; margin:0; }
-.menu-list a {
-  display:block;
-  padding:14px;
-  text-decoration:none;
-  color:white;
-  font-weight:600;
-}
-.menu-list a:hover { background:#1e3a8a; }
 
 /* ===== GRID ===== */
 .container {
   max-width:1200px;
-  margin:150px auto 60px;
+  margin:120px auto 60px;
   padding:0 20px;
 }
 .crop-grid {
@@ -150,113 +42,94 @@ body.drawer-open .side-drawer { transform:translateX(0); }
   font-weight:700;
   cursor:pointer;
 }
-.buy-btn:hover { opacity:0.9; }
 
-.details-box {
-  margin-top:15px;
-  background:#f9fafb;
-  padding:15px;
-  border-radius:12px;
-  display:none;
-}
-input {
-  width:100%;
-  padding:10px;
-  margin-top:10px;
-  border-radius:8px;
-  border:2px solid #0a3d62;
-}
-
-/* ===== POPUP FIXED ===== */
+/* ===== MAIN POPUP ===== */
 .popup-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.4);
-  display: none;   /* IMPORTANT FIX */
-  justify-content: center;
-  align-items: center;
-  z-index: 10000;
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.5);
+  display:none;
+  justify-content:center;
+  align-items:center;
+  z-index:10000;
 }
 .popup-box {
-  background: white;
-  padding: 35px;
-  border-radius: 18px;
-  width: 400px;
-  text-align: center;
+  background:white;
+  padding:30px;
+  width:420px;
+  border-radius:18px;
   border-top:6px solid #138808;
+}
+.popup-box h2 {
+  margin-top:0;
+}
+.popup-box input {
+  width:100%;
+  padding:10px;
+  margin-top:12px;
+  border-radius:8px;
+  border:2px solid #0a3d62;
 }
 .popup-buttons {
   margin-top:20px;
   display:flex;
   justify-content:space-between;
 }
-.cancel-btn {
-  padding:10px 20px;
+.popup-btn {
+  padding:10px 18px;
   border:none;
   border-radius:8px;
-  background:#ccc;
   cursor:pointer;
+  font-weight:bold;
 }
-.confirm-btn-popup {
-  padding:10px 20px;
+.cancel { background:#ccc; }
+.confirm { background:#138808; color:white; }
+
+/* ===== MESSAGE POPUP ===== */
+.message-box {
+  background:white;
+  padding:25px;
+  width:350px;
+  border-radius:15px;
+  text-align:center;
+  border-top:5px solid #dc2626;
+}
+.message-box button {
+  margin-top:15px;
+  padding:8px 15px;
   border:none;
-  border-radius:8px;
+  border-radius:6px;
   background:#138808;
   color:white;
-  font-weight:bold;
   cursor:pointer;
-}
-.success-msg {
-  margin-top:15px;
-  color:#138808;
-  font-weight:bold;
 }
 </style>
 </head>
 
 <body>
 
-<div class="top-nav">
-  <div class="nav-left">
-    <button class="hamburger-btn" id="menuBtn">
-      <div class="hamburger-icon"><span></span><span></span><span></span></div>
-    </button>
-    <p class="brand-title">Krishi Mitr</p>
-  </div>
-  <div class="nav-right">
-    <div class="profile-btn" onclick="location.href='Profile'">
-      <img src="profile_pic.png">
-    </div>
-    <button class="logout-btn" id="logoutBtn">Logout</button>
-  </div>
-</div>
-
-<div class="nav-overlay" id="navOverlay" hidden></div>
-<nav class="side-drawer" id="sideNav" hidden>
-  <div class="drawer-inner">
-    <div class="menu-section-title">Market</div>
-    <ul class="menu-list">
-      <li><a href="Dashboard">Dashboard</a></li>
-      <li><a href="Update_crops">Manage Your Crops</a></li>
-      <li><a href="Buy">Buy Your Crop</a></li>
-      <li><a href="Notification">Notification</a></li>
-    </ul>
-  </div>
-</nav>
-
 <div class="container">
   <div class="crop-grid" id="cropGrid"></div>
 </div>
 
-<div id="buyPopupOverlay" class="popup-overlay">
+<!-- BUY DETAILS POPUP -->
+<div id="buyPopup" class="popup-overlay">
   <div class="popup-box">
-    <h2>Confirm Purchase</h2>
-    <p id="popupDetails"></p>
+    <h2>Buy Crop</h2>
+    <div id="cropDetails"></div>
+    <input type="number" id="buyQuantity" placeholder="Enter quantity">
     <div class="popup-buttons">
-      <button class="cancel-btn" id="cancelBuy">Cancel</button>
-      <button class="confirm-btn-popup" id="finalConfirm">Confirm</button>
+      <button class="popup-btn cancel" onclick="closeBuyPopup()">Cancel</button>
+      <button class="popup-btn confirm" onclick="confirmBuy()">Confirm</button>
     </div>
-    <div id="successMessage" class="success-msg"></div>
+  </div>
+</div>
+
+<!-- MESSAGE POPUP -->
+<div id="messagePopup" class="popup-overlay">
+  <div class="message-box">
+    <p id="messageText"></p>
+    <button onclick="closeMessage()">OK</button>
   </div>
 </div>
 
@@ -266,7 +139,6 @@ const loginid = sessionStorage.getItem("loginid");
 if(!loginid){ location.href="login"; }
 
 let selectedCrop=null;
-let selectedQty=0;
 
 async function loadCrops(){
   const { data } = await db.from("crop_sales").select("*").neq("lid", loginid);
@@ -276,72 +148,81 @@ async function loadCrops(){
   data.forEach(crop=>{
     const card=document.createElement("div");
     card.className="crop-card";
-
     card.innerHTML=`
       <h3>${crop.crop_name}</h3>
       <p><b>Farmer:</b> ${crop.farmer_name}</p>
       <p><b>Price:</b> ₹${crop.price}/kg</p>
-      <p><b>Available:</b> ${crop.quantity} kg</p>
       <button class="buy-btn">Buy</button>
-      <div class="details-box">
-        <p><b>Category:</b> ${crop.crop_category}</p>
-        <p><b>Quality:</b> ${crop.quality}</p>
-        <p><b>Delivery:</b> ${crop.delivery_type}</p>
-        <p><b>Location:</b> ${crop.location}</p>
-        <p><b>Description:</b> ${crop.description || "N/A"}</p>
-        <input type="number" min="${crop.min_quantity}" placeholder="Enter quantity (min ${crop.min_quantity})">
-        <button class="buy-btn confirm-btn">Proceed</button>
-      </div>
     `;
-
-    const buyBtn=card.querySelector(".buy-btn");
-    const details=card.querySelector(".details-box");
-    buyBtn.onclick=()=>{ details.style.display="block"; buyBtn.style.display="none"; };
-
-    const confirmBtn=card.querySelector(".confirm-btn");
-    const qtyInput=card.querySelector("input");
-
-    confirmBtn.onclick=()=>{
-      const qty=parseInt(qtyInput.value);
-      if(!qty || qty<crop.min_quantity || qty>crop.quantity){
-        return;
-      }
-      selectedCrop=crop;
-      selectedQty=qty;
-      const total=qty*crop.price;
-
-      document.getElementById("popupDetails").innerHTML=
-        `Crop: <b>${crop.crop_name}</b><br>
-         Quantity: <b>${qty} kg</b><br>
-         Total Cost: <b>₹${total}</b>`;
-
-      document.getElementById("buyPopupOverlay").style.display="flex";
-    };
-
+    card.querySelector("button").onclick=()=>openBuyPopup(crop);
     grid.appendChild(card);
   });
 }
 
-document.getElementById("cancelBuy").onclick=()=>{
-  document.getElementById("buyPopupOverlay").style.display="none";
-};
+function openBuyPopup(crop){
+  selectedCrop=crop;
+  document.getElementById("cropDetails").innerHTML=`
+    <p><b>Farmer:</b> ${crop.farmer_name}</p>
+    <p><b>Category:</b> ${crop.crop_category}</p>
+    <p><b>Quality:</b> ${crop.quality}</p>
+    <p><b>Delivery:</b> ${crop.delivery_type}</p>
+    <p><b>Location:</b> ${crop.location}</p>
+    <p><b>Available:</b> ${crop.quantity} kg</p>
+    <p><b>Minimum:</b> ${crop.min_quantity} kg</p>
+    <p><b>Price:</b> ₹${crop.price}/kg</p>
+  `;
+  document.getElementById("buyQuantity").value="";
+  document.getElementById("buyPopup").style.display="flex";
+}
 
-document.getElementById("finalConfirm").onclick=async()=>{
-  const { error } = await db.from("buy_table").insert({
-    fname: selectedCrop.farmer_name,
-    fid: selectedCrop.jid,
-    cname: selectedCrop.crop_name,
-    cid: selectedCrop.id,
+function closeBuyPopup(){
+  document.getElementById("buyPopup").style.display="none";
+}
+
+function showMessage(msg){
+  document.getElementById("messageText").innerText=msg;
+  document.getElementById("messagePopup").style.display="flex";
+}
+
+function closeMessage(){
+  document.getElementById("messagePopup").style.display="none";
+}
+
+async function confirmBuy(){
+  const qty=parseInt(document.getElementById("buyQuantity").value);
+
+  if(!qty){
+    showMessage("Please enter quantity");
+    return;
+  }
+
+  if(qty < selectedCrop.min_quantity){
+    showMessage("Please enter more than minimum quantity");
+    return;
+  }
+
+  if(qty > selectedCrop.quantity){
+    showMessage("Please enter less than available quantity");
+    return;
+  }
+
+  const total=qty*selectedCrop.price;
+
+  showMessage(`Total cost: ₹${total}. Purchase successful!`);
+
+  await db.from("buy_table").insert({
+    fname:selectedCrop.farmer_name,
+    fid:selectedCrop.jid,
+    cname:selectedCrop.crop_name,
+    cid:selectedCrop.id,
     status:"Pending",
     lid:loginid,
-    quantity:selectedQty
+    quantity:qty
   });
 
-  if(!error){
-    document.getElementById("successMessage").innerText="Purchase request sent!";
-    setTimeout(()=>{ location.reload(); },1200);
-  }
-};
+  closeBuyPopup();
+  loadCrops();
+}
 
 loadCrops();
 </script>
