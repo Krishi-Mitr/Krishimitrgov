@@ -1,200 +1,151 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Buy Crops - Krishi Mitr</title>
-
+<title>Buy Crops - KrishiMitra</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="supabase.js"></script>
-
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-
-<style>
-body{
-    background: linear-gradient(180deg,#f6e2cc 0%,#f7f9f8 45%,#dceee3 100%);
-    font-family: Arial;
-    padding-top:100px;
-}
-
-.card-custom{
-    border-radius:18px;
-    padding:20px;
-    box-shadow:0 15px 35px rgba(0,0,0,0.15);
-    background:white;
-}
-
-.buy-btn{
-    width:100%;
-    background:#0a3d62;
-    color:white;
-    border:none;
-    padding:10px;
-    border-radius:10px;
-    font-weight:700;
-}
-
-.details-box{
-    background:#f1f5f9;
-    padding:12px;
-    border-radius:10px;
-    margin-top:10px;
-    display:none;
-}
-
-.qty-input{
-    width:100%;
-    padding:8px;
-    border-radius:8px;
-    border:1px solid #ccc;
-}
-</style>
 </head>
 
 <body>
 
-<div class="container">
-<h2 class="text-center mb-4">Available Crops</h2>
-<div class="row g-4" id="cropList"></div>
+<div class="container" style="padding-top:100px;">
+    <h2 class="text-center mb-4" style="color:#000080;">Available Crops & Seeds</h2>
+    <div class="row g-4" id="cropList"></div>
 </div>
 
 <script>
-
 const loginid = sessionStorage.getItem("loginid");
 const usertype = sessionStorage.getItem("usertype");
 
-if(!loginid || usertype !== "Customer"){
-    window.location.href="login";
+if (!loginid || !usertype) {
+    window.location.href = "login";
 }
 
-async function loadCrops(){
+async function waitForDB() {
+  let attempts = 0;
+  while (!window.db && attempts < 50) {
+    await new Promise(resolve => setTimeout(resolve, 100));
+    attempts++;
+  }
+  return !!window.db;
+}
 
-    const { data:crops, error } = await window.db
-        .from("crop_sales")
-        .select("*")
-        .gt("quantity",0)
-        .order("created_at",{ascending:false});
+async function init() {
+  const dbReady = await waitForDB();
+  if (!dbReady) {
+    alert("Database not ready.");
+    return;
+  }
+  loadCrops();
+}
 
-    if(error){
-        alert(error.message);
-        return;
-    }
+async function loadCrops() {
 
-    const container=document.getElementById("cropList");
-    container.innerHTML="";
+  const currentLoginId = parseInt(sessionStorage.getItem("loginid"));
 
-    if(!crops.length){
-        container.innerHTML="<p class='text-center text-muted'>No crops available</p>";
-        return;
-    }
+  const { data: crops, error } = await window.db
+    .from("crop_sales")
+    .select("*")
+    .neq("lid", currentLoginId) // 🔥 Farmer can't see own crop
+    .order("created_at", { ascending: false });
 
-    crops.forEach(row=>{
+  const container = document.getElementById("cropList");
+  container.innerHTML = "";
 
-        container.innerHTML+=`
-        <div class="col-md-4">
-            <div class="card-custom">
-                <h4>${row.crop_name}</h4>
-                <p><b>Price:</b> ₹${row.price}/kg</p>
-                <p><b>Available:</b> ${row.quantity} kg</p>
-                <p><b>Min Order:</b> ${row.min_quantity || 1} kg</p>
-                <p><b>Location:</b> ${row.location}</p>
+  if (error) {
+    container.innerHTML = "<p class='text-danger'>Error loading crops</p>";
+    return;
+  }
 
-                <button class="buy-btn" onclick="toggleDetails('${row.jid}')">Buy Now</button>
+  if (!crops || crops.length === 0) {
+    container.innerHTML = "<p class='text-muted text-center'>No crops available.</p>";
+    return;
+  }
 
-                <div class="details-box" id="details-${row.jid}">
-                    <p><b>Farmer:</b> ${row.farmer_name}</p>
-                    <p><b>Quality:</b> ${row.quality || '-'}</p>
-                    <p><b>Harvest Date:</b> ${row.harvest_date || '-'}</p>
-                    <p><b>Delivery:</b> ${row.delivery_type || '-'}</p>
-                    <p><b>Contact:</b> ${row.contact_info || '-'}</p>
-                    <p><b>Description:</b> ${row.description || '-'}</p>
+  for (const row of crops) {
 
-                    <input type="number" min="${row.min_quantity || 1}" 
-                           max="${row.quantity}" 
-                           id="qty-${row.jid}"
-                           class="qty-input mt-2"
-                           placeholder="Enter quantity in kg">
+    const { data: existing } = await window.db
+      .from("buy_table")
+      .select("yn")
+      .eq("fid", row.jid)
+      .eq("cid", currentLoginId)
+      .maybeSingle();
 
-                    <button class="buy-btn mt-2"
-                        onclick="confirmBuy('${row.jid}','${row.crop_name}',
-                        '${row.farmer_name}',${row.price},
-                        ${row.quantity},${row.min_quantity || 1},
-                        ${row.lid})">
-                        Confirm Purchase
-                    </button>
-                </div>
-            </div>
+    const isInterested = existing?.yn === "yes";
+
+    container.innerHTML += `
+      <div class="col-md-4">
+        <div class="card border-3 border-primary shadow p-3">
+          <h4 style="color:#000080;font-weight:700;">${row.crop_name}</h4>
+          <p><strong>Farmer:</strong> ${row.farmer_name}</p>
+          <p><strong>Quantity:</strong> ${row.quantity} kg</p>
+          <p><strong>Price:</strong> ₹${row.price} per kg</p>
+          <p><strong>Location:</strong> ${row.location}</p>
+          <button class="btn btn-primary w-100"
+            onclick="toggleBuy('${row.jid}','${row.farmer_name}',this)">
+            ${isInterested ? "Interested ✓" : "Show Interest"}
+          </button>
         </div>
-        `;
-    });
+      </div>
+    `;
+  }
 }
 
-function toggleDetails(id){
-    const box=document.getElementById("details-"+id);
-    box.style.display = box.style.display==="block" ? "none":"block";
-}
+async function toggleBuy(fid, fname, btn) {
 
-async function confirmBuy(jid,cropName,farmerName,price,availableQty,minQty,lid){
+  const currentLoginId = parseInt(sessionStorage.getItem("loginid"));
 
-    const qty=document.getElementById("qty-"+jid).value;
+  const { data: existing } = await window.db
+    .from("buy_table")
+    .select("*")
+    .eq("fid", fid)
+    .eq("cid", currentLoginId)
+    .maybeSingle();
 
-    if(!qty || qty<=0){
-        alert("Enter valid quantity");
-        return;
-    }
+  if (existing) {
 
-    if(qty < minQty){
-        alert("Minimum order is "+minQty+" kg");
-        return;
-    }
-
-    if(qty > availableQty){
-        alert("Not enough stock available");
-        return;
-    }
-
-    const total = qty * price;
-
-    if(!confirm(`Confirm buying ${qty} kg of ${cropName} for ₹${total}?`)){
-        return;
-    }
-
-    const { data:userData } = await window.db
-        .from("logindata")
-        .select("username")
-        .eq("loginid",loginid)
-        .maybeSingle();
-
-    const { error:buyError } = await window.db
-        .from("buy_table")
-        .insert({
-            fname: farmerName,
-            fid: jid,
-            cname: userData?.username || loginid,
-            cid: loginid,
-            status: "pending",
-            lid: lid,
-            quantity: qty,
-            is_confirmed: false
-        });
-
-    if(buyError){
-        alert(buyError.message);
-        return;
-    }
-
-    const newQty = availableQty - qty;
+    const newStatus = existing.yn === "yes" ? "no" : "yes";
 
     await window.db
-        .from("crop_sales")
-        .update({ quantity:newQty })
-        .eq("jid",jid);
+      .from("buy_table")
+      .update({ yn: newStatus })
+      .eq("fid", fid)
+      .eq("cid", currentLoginId);
 
-    alert("Purchase Successful!");
+    btn.innerText = newStatus === "yes" ? "Interested ✓" : "Show Interest";
 
-    loadCrops();
+  } else {
+
+    const { data: crop } = await window.db
+      .from("crop_sales")
+      .select("lid, crop_name")
+      .eq("jid", fid)
+      .maybeSingle();
+
+    const { data: user } = await window.db
+      .from("logindata")
+      .select("username")
+      .eq("loginid", currentLoginId)
+      .maybeSingle();
+
+    await window.db
+      .from("buy_table")
+      .insert({
+        fid: fid,
+        cid: currentLoginId,
+        lid: crop.lid,
+        fname: fname,
+        cname: user?.username || "Buyer",
+        yn: "yes",
+        created_at: new Date().toISOString()
+      });
+
+    btn.innerText = "Interested ✓";
+  }
 }
 
-loadCrops();
-
+init();
 </script>
 
 </body>
