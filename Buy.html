@@ -167,12 +167,12 @@ input {
   border:2px solid #0a3d62;
 }
 
-/* ===== POPUP ===== */
+/* ===== POPUP FIXED ===== */
 .popup-overlay {
   position: fixed;
   inset: 0;
   background: rgba(0,0,0,0.4);
-  display: flex;
+  display: none;   /* IMPORTANT FIX */
   justify-content: center;
   align-items: center;
   z-index: 10000;
@@ -216,7 +216,6 @@ input {
 
 <body>
 
-<!-- NAVBAR -->
 <div class="top-nav">
   <div class="nav-left">
     <button class="hamburger-btn" id="menuBtn">
@@ -249,8 +248,7 @@ input {
   <div class="crop-grid" id="cropGrid"></div>
 </div>
 
-<!-- POPUP -->
-<div id="buyPopupOverlay" class="popup-overlay" hidden>
+<div id="buyPopupOverlay" class="popup-overlay">
   <div class="popup-box">
     <h2>Confirm Purchase</h2>
     <p id="popupDetails"></p>
@@ -267,16 +265,16 @@ const db = window.db;
 const loginid = sessionStorage.getItem("loginid");
 if(!loginid){ location.href="login"; }
 
-let selectedCrop = null;
-let selectedQty = 0;
+let selectedCrop=null;
+let selectedQty=0;
 
 async function loadCrops(){
   const { data } = await db.from("crop_sales").select("*").neq("lid", loginid);
-  const grid = document.getElementById("cropGrid");
+  const grid=document.getElementById("cropGrid");
   grid.innerHTML="";
 
   data.forEach(crop=>{
-    const card = document.createElement("div");
+    const card=document.createElement("div");
     card.className="crop-card";
 
     card.innerHTML=`
@@ -296,29 +294,28 @@ async function loadCrops(){
       </div>
     `;
 
-    const buyBtn = card.querySelector(".buy-btn");
-    const details = card.querySelector(".details-box");
+    const buyBtn=card.querySelector(".buy-btn");
+    const details=card.querySelector(".details-box");
     buyBtn.onclick=()=>{ details.style.display="block"; buyBtn.style.display="none"; };
 
-    const confirmBtn = card.querySelector(".confirm-btn");
-    const qtyInput = card.querySelector("input");
+    const confirmBtn=card.querySelector(".confirm-btn");
+    const qtyInput=card.querySelector("input");
 
     confirmBtn.onclick=()=>{
-      const qty = parseInt(qtyInput.value);
-      if(!qty || qty < crop.min_quantity || qty > crop.quantity){
-        alert("Invalid quantity");
+      const qty=parseInt(qtyInput.value);
+      if(!qty || qty<crop.min_quantity || qty>crop.quantity){
         return;
       }
-      selectedCrop = crop;
-      selectedQty = qty;
-      const total = qty * crop.price;
+      selectedCrop=crop;
+      selectedQty=qty;
+      const total=qty*crop.price;
 
-      document.getElementById("popupDetails").innerHTML =
+      document.getElementById("popupDetails").innerHTML=
         `Crop: <b>${crop.crop_name}</b><br>
          Quantity: <b>${qty} kg</b><br>
          Total Cost: <b>₹${total}</b>`;
 
-      document.getElementById("buyPopupOverlay").hidden = false;
+      document.getElementById("buyPopupOverlay").style.display="flex";
     };
 
     grid.appendChild(card);
@@ -326,53 +323,25 @@ async function loadCrops(){
 }
 
 document.getElementById("cancelBuy").onclick=()=>{
-  document.getElementById("buyPopupOverlay").hidden=true;
+  document.getElementById("buyPopupOverlay").style.display="none";
 };
 
 document.getElementById("finalConfirm").onclick=async()=>{
-  const total = selectedQty * selectedCrop.price;
-
   const { error } = await db.from("buy_table").insert({
     fname: selectedCrop.farmer_name,
     fid: selectedCrop.jid,
     cname: selectedCrop.crop_name,
     cid: selectedCrop.id,
-    status: "Pending",
-    lid: loginid,
-    quantity: selectedQty
+    status:"Pending",
+    lid:loginid,
+    quantity:selectedQty
   });
 
-  if(error){
-    document.getElementById("successMessage").innerText="Error: "+error.message;
-  } else {
-    document.getElementById("successMessage").innerText="Purchase request sent successfully!";
-    setTimeout(()=>{ location.reload(); },1500);
+  if(!error){
+    document.getElementById("successMessage").innerText="Purchase request sent!";
+    setTimeout(()=>{ location.reload(); },1200);
   }
 };
-
-document.getElementById("logoutBtn").onclick=()=>{
-  sessionStorage.clear();
-  location.href="login";
-};
-
-const menuBtn=document.getElementById("menuBtn");
-const sideNav=document.getElementById("sideNav");
-const navOverlay=document.getElementById("navOverlay");
-
-function openDrawer(){
-  document.body.classList.add("drawer-open");
-  sideNav.hidden=false;
-  navOverlay.hidden=false;
-}
-function closeDrawer(){
-  document.body.classList.remove("drawer-open");
-  sideNav.hidden=true;
-  navOverlay.hidden=true;
-}
-menuBtn.onclick=()=>{
-  document.body.classList.contains("drawer-open") ? closeDrawer() : openDrawer();
-};
-navOverlay.onclick=closeDrawer;
 
 loadCrops();
 </script>
