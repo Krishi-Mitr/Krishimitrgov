@@ -9,7 +9,7 @@
 
 <style>
 
-/* ===== BACKGROUND SAME AS SELL ===== */
+/* ===== BACKGROUND ===== */
 body{
   margin:0;
   font-family:"Poppins", Arial, sans-serif;
@@ -49,6 +49,15 @@ body.drawer-open{overflow:hidden}
   cursor:pointer;
   display:grid;
   place-items:center;
+  transition:.3s;
+}
+
+.hamburger-btn:hover{
+  background:#0a3d62;
+}
+
+.hamburger-btn:hover span{
+  background:white;
 }
 
 .hamburger-icon span{
@@ -57,6 +66,7 @@ body.drawer-open{overflow:hidden}
   height:2.5px;
   background:#0a3d62;
   margin:4px 0;
+  transition:.3s;
 }
 
 .brand-title{
@@ -76,18 +86,82 @@ body.drawer-open{overflow:hidden}
   border-radius:50%;
   border:2px solid #0a3d62;
   cursor:pointer;
+  transition:.3s;
 }
 
+.profile-btn img:hover{
+  transform:scale(1.1);
+}
+
+/* ===== BUTTON EFFECTS ===== */
+
+.buy-btn,
+.logout-btn{
+  position:relative;
+  overflow:hidden;
+  transition:all .3s ease;
+  cursor:pointer;
+}
+
+/* BUY BUTTON */
+.buy-btn{
+  margin-top:18px;
+  padding:12px;
+  width:100%;
+  border:none;
+  border-radius:12px;
+  background:linear-gradient(135deg,#138808,#2ecc71);
+  color:white;
+  font-weight:700;
+  letter-spacing:.5px;
+}
+
+.buy-btn:hover{
+  transform:translateY(-3px);
+  box-shadow:0 12px 25px rgba(19,136,8,0.4);
+}
+
+.buy-btn:active{
+  transform:scale(.95);
+}
+
+/* Shine animation */
+.buy-btn::before{
+  content:"";
+  position:absolute;
+  top:0;
+  left:-100%;
+  width:100%;
+  height:100%;
+  background:linear-gradient(120deg,transparent,rgba(255,255,255,.6),transparent);
+  transition:.6s;
+}
+
+.buy-btn:hover::before{
+  left:100%;
+}
+
+/* LOGOUT */
 .logout-btn{
   background:white;
   border:2px solid #0a3d62;
   padding:10px 18px;
   border-radius:10px;
   font-weight:700;
-  cursor:pointer;
+}
+
+.logout-btn:hover{
+  background:#0a3d62;
+  color:white;
+  box-shadow:0 8px 20px rgba(0,0,0,.2);
+}
+
+.logout-btn:active{
+  transform:scale(.95);
 }
 
 /* ===== DRAWER ===== */
+
 .nav-overlay{
   position:fixed;
   inset:0;
@@ -113,10 +187,19 @@ body.drawer-open{overflow:hidden}
 
 .drawer-inner{padding:14px}
 
+/* BOX STYLE MENU */
+
+.menu-section{
+  margin-bottom:20px;
+}
+
 .menu-section-title{
-  color:white;
+  color:#ffffff;
   font-weight:800;
-  margin-top:10px;
+  margin:15px 0 8px;
+  padding-left:8px;
+  font-size:14px;
+  letter-spacing:1px;
 }
 
 .menu-list{
@@ -124,16 +207,34 @@ body.drawer-open{overflow:hidden}
   padding:0;
 }
 
+.menu-list li{
+  margin-bottom:8px;
+}
+
 .menu-list a{
   display:block;
-  padding:12px;
+  padding:12px 16px;
+  border-radius:12px;
+  background:rgba(255,255,255,0.1);
   color:white;
   text-decoration:none;
+  transition:.25s;
+  font-weight:500;
+  border:1px solid rgba(255,255,255,0.1);
 }
 
 .menu-list a:hover{
-  background:#1e3a8a;
-  padding-left:18px;
+  background:linear-gradient(135deg,#ff9933,#138808);
+  transform:translateX(6px);
+  box-shadow:0 6px 15px rgba(0,0,0,.3);
+}
+
+/* ACTIVE PAGE */
+.menu-list a.active{
+  background:linear-gradient(135deg,#ffffff,#d1ffe1);
+  color:#0a3d62;
+  font-weight:700;
+  box-shadow:0 8px 20px rgba(0,0,0,.3);
 }
 
 body.drawer-open .nav-overlay{
@@ -145,6 +246,7 @@ body.drawer-open .side-drawer{
 }
 
 /* ===== GRID ===== */
+
 .container{
   max-width:1200px;
   margin:150px auto 60px;
@@ -158,6 +260,7 @@ body.drawer-open .side-drawer{
 }
 
 /* ===== CARD ===== */
+
 .crop-card{
   background:white;
   border-radius:25px;
@@ -170,6 +273,7 @@ body.drawer-open .side-drawer{
 
 .crop-card:hover{
   transform:translateY(-6px);
+  box-shadow:0 25px 55px rgba(0,0,0,.2);
 }
 
 .crop-card h3{
@@ -183,19 +287,8 @@ body.drawer-open .side-drawer{
   color:#ff6b00;
 }
 
-.buy-btn{
-  margin-top:18px;
-  padding:12px;
-  width:100%;
-  border:none;
-  border-radius:12px;
-  background:linear-gradient(135deg,#138808,#2ecc71);
-  color:white;
-  font-weight:700;
-  cursor:pointer;
-}
+/* ===== POPUPS (unchanged logic) ===== */
 
-/* ===== POPUP ===== */
 .popup-overlay{
   position:fixed;
   inset:0;
@@ -217,24 +310,11 @@ body.drawer-open .side-drawer{
   box-shadow:0 25px 60px rgba(0,0,0,0.35);
 }
 
-.popup-box h2{
-  text-align:center;
-  color:#0a3d62;
-}
-
 .detail{
   background:#f4f6f8;
   padding:12px;
   border-radius:10px;
   margin-bottom:10px;
-}
-
-.popup-box input{
-  width:100%;
-  padding:12px;
-  border-radius:10px;
-  border:2px solid #0a3d62;
-  margin-top:15px;
 }
 
 .popup-buttons{
@@ -283,11 +363,11 @@ body.drawer-open .side-drawer{
   </div>
 </div>
 
-<!-- Drawer + overlay -->
-<div class="nav-overlay" id="navOverlay" hidden></div>
-<nav class="side-drawer" id="sideNav" hidden>
+<div class="nav-overlay" id="navOverlay"></div>
+
+<nav class="side-drawer" id="sideNav">
   <div class="drawer-inner">
-        <div class="menu-section">
+    <div class="menu-section">
       <div class="menu-section-title">Main</div>
       <ul class="menu-list">
         <li><a href="Dashboard">Dashboard</a></li>
@@ -297,7 +377,7 @@ body.drawer-open .side-drawer{
       <div class="menu-section-title">Market</div>
       <ul class="menu-list">
         <li><a href="Update_crops">Manage Your Crops</a></li>
-        <li><a href="Buy">Sell your Crop</a></li>
+        <li><a href="Buy" class="active">Buy</a></li>
       </ul>
     </div>
     <div class="menu-section">
@@ -454,6 +534,7 @@ document.getElementById("logoutBtn").onclick=()=>{
 loadCrops();
 
 </script>
+
 
 </body>
 </html>
