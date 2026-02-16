@@ -1,762 +1,201 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Buy Crops - KrishiMitra</title>
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<title>Buy Crops - Krishi Mitr</title>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="supabase.js"></script>
 
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
 <style>
-body {
-  background: linear-gradient(to bottom, hsl(37, 91%, 91%) 50%, hsl(37, 91%, 91%) 50%, #ffffff 100%);
-  background-attachment: fixed;
-  font-family: Arial;
-  padding-top: 90px;
-}
-.topbar {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 78px;
-    display: flex;
-    align-items: center;
-    padding: 0 18px;
-    background: linear-gradient(90deg, #FF9933, #FFFFFF 50%, #138808);
-    border-bottom: 3px solid #000080;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.25);
-    z-index: 9000;
-}
-.topbar-logo {
-    font-size: 26px;
-    font-weight: 900;
-    color: #000080;
-    margin-right: 25px;
-}
-.topbar-menu {
-    display: flex;
-    gap: 14px;
-}
-.topbar-menu a {
-    text-decoration: none;
-    padding: 10px 16px;
-    border-radius: 8px;
-    font-weight: 700;
-    color: #000080;
-}
-.topbar-right {
-    margin-left: auto;
-}
-.topbar-right a {
-    padding: 8px 16px;
-    background: #000080;
-    color: white;
-    text-decoration: none;
-    border-radius: 8px;
-    font-weight: 700;
-}
-.card-custom {
-    border: 3px solid #000080;
-    border-radius: 15px;
-    background: white;
-    padding: 18px;
-    box-shadow: 0 4px 18px rgba(0,0,0,0.22);
-}
-.buy-btn {
-    width: 100%;
-    padding: 10px;
-    font-weight: 700;
-    border-radius: 8px;
-    border: none;
-    background: #000080;
-    color: white;
+body{
+    background: linear-gradient(180deg,#f6e2cc 0%,#f7f9f8 45%,#dceee3 100%);
+    font-family: Arial;
+    padding-top:100px;
 }
 
-.btn-dark-toggle {
-    padding: 8px 16px;
-    background: rgba(255, 255, 255, 0.9);
-    color: #000080;
-    border-radius: 8px;
-    font-weight: 700;
-    border: 2px solid #000080;
-    cursor: pointer;
-    transition: 0.2s;
+.card-custom{
+    border-radius:18px;
+    padding:20px;
+    box-shadow:0 15px 35px rgba(0,0,0,0.15);
+    background:white;
 }
 
-.btn-dark-toggle:hover {
-    background: #000080;
-    color: white;
+.buy-btn{
+    width:100%;
+    background:#0a3d62;
+    color:white;
+    border:none;
+    padding:10px;
+    border-radius:10px;
+    font-weight:700;
 }
 
-body.dark {
-    background: linear-gradient(to bottom, #1a1a1a 0%, #2d2d2d 50%, #1a1a1a 100%);
-    color: #e0e0e0;
+.details-box{
+    background:#f1f5f9;
+    padding:12px;
+    border-radius:10px;
+    margin-top:10px;
+    display:none;
 }
 
-body.dark .topbar {
-    background: linear-gradient(90deg, #2d2d2d, #3d3d3d 50%, #2d2d2d);
-    border-bottom: 3px solid #4a9eff;
+.qty-input{
+    width:100%;
+    padding:8px;
+    border-radius:8px;
+    border:1px solid #ccc;
 }
-
-body.dark .topbar-logo {
-    color: #4a9eff;
-}
-
-body.dark .topbar-menu a {
-    color: #e0e0e0;
-}
-
-body.dark .topbar-menu a:hover {
-    background: rgba(74, 158, 255, 0.2);
-    color: #fff;
-}
-
-body.dark .topbar-right a {
-    background: #4a9eff;
-    color: white;
-}
-
-body.dark .topbar-right a:hover {
-    background: #6bb0ff;
-}
-
-body.dark .card-custom {
-    background: #2d2d2d;
-    border-color: #4a9eff;
-    color: #e0e0e0;
-}
-
-body.dark .buy-btn {
-    background: #4a9eff;
-    color: white;
-}
-
-body.dark .buy-btn:hover {
-    background: #6bb0ff;
-}
-
-body.dark h2 {
-    color: #e0e0e0;
-}
-
-body.dark .text-muted {
-    color: #999 !important;
-}
-
-body.dark .btn-dark-toggle {
-    background: #3d3d3d;
-    color: #e0e0e0;
-    border-color: #555;
-}
-
-body.dark .btn-dark-toggle:hover {
-    background: #4d4d4d;
-    color: #fff;
-}
-
-.topbar .nav-dropdown {
-    position: relative;
-    display: inline-block;
-}
-.topbar .nav-dropdown-toggle {
-    padding: 10px 16px;
-    border-radius: 8px;
-    font-weight: 700;
-    color: #000080;
-    background: none;
-    border: none;
-    cursor: pointer;
-    text-decoration: none;
-    font-size: 1em;
-}
-.topbar .nav-dropdown-toggle:hover {
-    background: rgba(0,0,128,0.1);
-}
-.topbar .nav-dropdown-menu {
-    display: none;
-    position: absolute;
-    top: 100%;
-    left: 0;
-    background: white;
-    min-width: 200px;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.2);
-    border-radius: 8px;
-    z-index: 9001;
-    margin-top: 4px;
-    overflow: hidden;
-    border: 2px solid #000080;
-}
-.topbar .nav-dropdown:hover .nav-dropdown-menu {
-    display: block;
-}
-.topbar .nav-dropdown-menu a {
-    display: block;
-    padding: 12px 16px;
-    color: #000080;
-    text-decoration: none;
-    font-weight: 700;
-}
-.topbar .nav-dropdown-menu a:hover {
-    background: #f0f4ff;
-}
-body.dark .topbar .nav-dropdown-toggle {
-    color: #e0e0e0;
-}
-body.dark .topbar .nav-dropdown-toggle:hover {
-    background: rgba(74, 158, 255, 0.2);
-    color: #fff;
-}
-body.dark .topbar .nav-dropdown-menu {
-    background: #2d2d2d;
-    border-color: #4a9eff;
-}
-body.dark .topbar .nav-dropdown-menu a {
-    color: #e0e0e0;
-}
-body.dark .topbar .nav-dropdown-menu a:hover {
-    background: #3d3d3d;
-}
-
-.hamburger {
-    display: block;
-    font-size: 28px;
-    background: none;
-    border: none;
-    cursor: pointer;
-    color: #000080;
-    margin-left: 15px;
-}
-
-.hamburger-menu {
-    position: fixed;
-    top: 78px;
-    left: -260px;
-    width: 250px;
-    height: calc(100% - 78px);
-    background: white;
-    box-shadow: 4px 0 20px rgba(0,0,0,0.25);
-    padding: 20px;
-    transition: left 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.4s ease-in-out;
-    z-index: 8999;
-    overflow-y: auto;
-    border-right: 3px solid #000080;
-    opacity: 0;
-}
-
-.hamburger-menu.active {
-    left: 0;
-    opacity: 1;
-}
-
-.menu-section {
-    margin-bottom: 25px;
-}
-
-.menu-section h5 {
-    font-weight: 800;
-    color: #000080;
-    margin-bottom: 10px;
-    border-bottom: 2px solid #000080;
-    padding-bottom: 5px;
-}
-
-.menu-section a {
-    display: block;
-    text-decoration: none;
-    color: #000080;
-    font-weight: 700;
-    padding: 6px 0;
-}
-
-.menu-section a:hover {
-    opacity: 0.7;
-}
-
-body.dark .hamburger-menu {
-    background: #2d2d2d;
-    border-right: 3px solid #4a9eff;
-}
-
-body.dark .menu-section h5 {
-    color: #4a9eff;
-    border-color: #4a9eff;
-}
-
-body.dark .menu-section a {
-    color: #e0e0e0;
-}
-
-body.drawer-open {
-  overflow: hidden;
-}
-
-.top-nav {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 78px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0 32px;
-  background: linear-gradient(90deg,#ff9933,#ffffff,#138808);
-  border-bottom: 3px solid #0a3d62;
-  box-shadow: 0 6px 14px rgba(0,0,0,0.15);
-  z-index: 9999;
-}
-
-.nav-left {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  min-width: 0;
-}
-
-.hamburger-btn {
-  width: 44px;
-  height: 44px;
-  border-radius: 12px;
-  border: 2px solid #0a3d62;
-  background: rgba(255,255,255,0.75);
-  display: grid;
-  place-items: center;
-  cursor: pointer;
-  box-shadow: 0 8px 18px rgba(0,0,0,0.12);
-}
-
-.hamburger-icon {
-  width: 20px;
-  height: 14px;
-  position: relative;
-}
-
-.hamburger-icon span {
-  position: absolute;
-  left: 0;
-  right: 0;
-  height: 2.5px;
-  background: #0a3d62;
-  border-radius: 999px;
-}
-
-.hamburger-icon span:nth-child(1) { top: 0; }
-.hamburger-icon span:nth-child(2) { top: 5.5px; }
-.hamburger-icon span:nth-child(3) { top: 11px; }
-
-.brand {
-  display: flex;
-  flex-direction: column;
-  line-height: 1.05;
-  min-width: 0;
-}
-
-.brand-title {
-  margin: 0;
-  font-size: 1.15rem;
-  font-weight: 800;
-  color: #0a3d62;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.brand-subtitle {
-  margin: 0;
-  font-size: 0.9rem;
-  font-weight: 700;
-  color: rgba(10,61,98,0.8);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.logout-btn {
-  background: white;
-  color: #0a3d62;
-  border: 2px solid #0a3d62;
-  padding: 10px 22px;
-  border-radius: 10px;
-  font-weight: 700;
-  cursor: pointer;
-}
-
-.nav-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.25);
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity .2s ease;
-  z-index: 9998;
-}
-
-.side-drawer {
-  position: fixed;
-  top: 84px;
-  left: 14px;
-  width: min(320px, calc(100vw - 28px));
-  max-height: calc(100vh - 98px);
-  overflow: auto;
-  background: white;
-  border: 3px solid #0a3d62;
-  border-radius: 18px;
-  box-shadow: 0 18px 40px rgba(0,0,0,0.22);
-  transform: translateX(-110%);
-  transition: transform .25s ease;
-  z-index: 9999;
-}
-
-.drawer-inner {
-  padding: 14px;
-}
-
-.menu-section-drawer {
-  border-radius: 14px;
-  overflow: hidden;
-  border: 1px solid rgba(10,61,98,0.18);
-  margin-bottom: 14px;
-  background: #ffffff;
-}
-
-.menu-section-title {
-  padding: 12px 14px;
-  background: #eef2ff;
-  color: #0a3d62;
-  font-weight: 800;
-  font-size: 0.95rem;
-}
-
-.menu-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.menu-list a {
-  display: block;
-  padding: 14px 14px;
-  text-decoration: none;
-  color: #0a3d62;
-  font-weight: 800;
-  background: #f1f5f9;
-}
-
-.menu-list li + li a {
-  border-top: 1px solid rgba(10,61,98,0.10);
-}
-
-.menu-list a:hover,
-.menu-list a:focus-visible {
-  background: #e2e8f0;
-  outline: none;
-}
-
-body.drawer-open .nav-overlay {
-  opacity: 1;
-  pointer-events: auto;
-}
-
-body.drawer-open .side-drawer {
-  transform: translateX(0);
-}
-
-@media (max-width: 520px) {
-  .top-nav { padding: 0 14px; }
-  .logout-btn { padding: 9px 14px; border-radius: 12px; }
-  .brand-subtitle { display: none; }
-  .side-drawer { top: 80px; left: 10px; width: calc(100vw - 20px); }
-}
-
 </style>
 </head>
 
-
 <body>
 
-<div class="top-nav">
-  <div class="nav-left">
-    <button class="hamburger-btn" id="menuBtn" type="button" aria-label="Open menu" aria-controls="sideNav" aria-expanded="false">
-      <div class="hamburger-icon" aria-hidden="true">
-        <span></span><span></span><span></span>
-      </div>
-    </button>
-    <div class="brand">
-      <p class="brand-title">Krishi Mitr</p>
-      <p class="brand-subtitle">Buy Your Crop</p>
-    </div>
-  </div>
-  <button class="logout-btn" id="logoutBtn">Logout</button>
-</div>
-
-<div class="nav-overlay" id="navOverlay" hidden></div>
-<nav class="side-drawer" id="sideNav" aria-label="Main navigation" hidden>
-  <div class="drawer-inner">
-    <div class="menu-section-drawer">
-      <div class="menu-section-title">Main</div>
-      <ul class="menu-list">
-        <li><a href="Dashboard.html">Dashboard</a></li>
-      </ul>
-    </div>
-
-    <div class="menu-section-drawer">
-      <div class="menu-section-title">Market</div>
-      <ul class="menu-list">
-        <li><a href="Update_crops.html">Manage Your Crops</a></li>
-        <li><a href="Sell.html">Sell Your Crop</a></li>
-        <li><a href="Buy.html" aria-current="page">Buy Your Crop</a></li>
-      </ul>
-    </div>
-
-    <div class="menu-section-drawer">
-      <div class="menu-section-title">Tools</div>
-      <ul class="menu-list">
-        <li><a href="krishimitr.html">Crop Predictor</a></li>
-      </ul>
-    </div>
-
-    <div class="menu-section-drawer" style="margin-bottom:0;">
-      <div class="menu-section-title">System</div>
-      <ul class="menu-list">
-        <li><a href="Notification.html">Notification</a></li>
-      </ul>
-    </div>
-  </div>
-</nav>
-
 <div class="container">
-    <h2 class="text-center mb-4" style="color:#000080;">Available Crops & Seeds</h2>
-    <div class="row g-4" id="cropList"></div>
+<h2 class="text-center mb-4">Available Crops</h2>
+<div class="row g-4" id="cropList"></div>
 </div>
 
-</body>
 <script>
+
 const loginid = sessionStorage.getItem("loginid");
 const usertype = sessionStorage.getItem("usertype");
 
-if (!loginid || !usertype) {
-    window.location.href = "login.html";
+if(!loginid || usertype !== "Customer"){
+    window.location.href="login";
 }
 
-async function waitForDB() {
-  let attempts = 0;
-  while (!window.db && attempts < 50) {
-    await new Promise(resolve => setTimeout(resolve, 100));
-    attempts++;
-  }
-  if (!window.db) {
-    console.error("Database client not available after waiting");
-    return false;
-  }
-  return true;
-}
+async function loadCrops(){
 
-async function init() {
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', init);
-    return;
-  }
+    const { data:crops, error } = await window.db
+        .from("crop_sales")
+        .select("*")
+        .gt("quantity",0)
+        .order("created_at",{ascending:false});
 
-  const dbReady = await waitForDB();
-  if (!dbReady) {
-    alert("Database connection failed. Please refresh the page.");
-    return;
-  }
+    if(error){
+        alert(error.message);
+        return;
+    }
 
-  loadCrops();
-}
+    const container=document.getElementById("cropList");
+    container.innerHTML="";
 
-async function loadCrops() {
-  const currentLoginId = sessionStorage.getItem("loginid");
-  
-  if (!currentLoginId) {
-    window.location.href = "login.html";
-    return;
-  }
+    if(!crops.length){
+        container.innerHTML="<p class='text-center text-muted'>No crops available</p>";
+        return;
+    }
 
-  const { data: crops, error } = await window.db
-    .from("crop_sales")
-    .select("*")
-    .neq("lid", currentLoginId)
-    .order("created_at", { ascending: false });
+    crops.forEach(row=>{
 
-  if (error) {
-    console.error("Error loading crops:", error);
-    document.getElementById("cropList").innerHTML = 
-      "<p class='text-danger'>Error loading crops: " + error.message + "</p>";
-    return;
-  }
+        container.innerHTML+=`
+        <div class="col-md-4">
+            <div class="card-custom">
+                <h4>${row.crop_name}</h4>
+                <p><b>Price:</b> ₹${row.price}/kg</p>
+                <p><b>Available:</b> ${row.quantity} kg</p>
+                <p><b>Min Order:</b> ${row.min_quantity || 1} kg</p>
+                <p><b>Location:</b> ${row.location}</p>
 
-  const container = document.getElementById("cropList");
-  container.innerHTML = "";
+                <button class="buy-btn" onclick="toggleDetails('${row.jid}')">Buy Now</button>
 
-  if (!crops || crops.length === 0) {
-    container.innerHTML = "<p class='text-muted text-center'>No crops available at the moment.</p>";
-    return;
-  }
+                <div class="details-box" id="details-${row.jid}">
+                    <p><b>Farmer:</b> ${row.farmer_name}</p>
+                    <p><b>Quality:</b> ${row.quality || '-'}</p>
+                    <p><b>Harvest Date:</b> ${row.harvest_date || '-'}</p>
+                    <p><b>Delivery:</b> ${row.delivery_type || '-'}</p>
+                    <p><b>Contact:</b> ${row.contact_info || '-'}</p>
+                    <p><b>Description:</b> ${row.description || '-'}</p>
 
-  for (const row of crops) {
-    const { data: buy } = await window.db
-      .from("buy_table")
-      .select("yn")
-      .eq("fid", row.jid)
-      .eq("cid", currentLoginId)
-      .maybeSingle();
+                    <input type="number" min="${row.min_quantity || 1}" 
+                           max="${row.quantity}" 
+                           id="qty-${row.jid}"
+                           class="qty-input mt-2"
+                           placeholder="Enter quantity in kg">
 
-    const yn = buy?.yn || "no";
-
-    container.innerHTML += `
-      <div class="col-md-4">
-        <div class="card-custom">
-          <h4 style="color:#000080;font-weight:700;">${row.crop_name}</h4>
-          <p><strong>Farmer:</strong> ${row.farmer_name}</p>
-          <p><strong>Quantity:</strong> ${row.quantity} kg</p>
-          <p><strong>Price:</strong> ₹${row.price} per kg</p>
-          <p><strong>Location:</strong> ${row.location}</p>
-          <p class="text-muted" style="font-size:12px;">Posted on: ${new Date(row.created_at).toLocaleString()}</p>
-          <button class="buy-btn" onclick="toggleBuy('${row.jid}','${row.farmer_name}',this)">
-            ${yn === "yes" ? "Interested ✓" : "Show Interest"}
-          </button>
+                    <button class="buy-btn mt-2"
+                        onclick="confirmBuy('${row.jid}','${row.crop_name}',
+                        '${row.farmer_name}',${row.price},
+                        ${row.quantity},${row.min_quantity || 1},
+                        ${row.lid})">
+                        Confirm Purchase
+                    </button>
+                </div>
+            </div>
         </div>
-      </div>
-    `;
-  }
+        `;
+    });
 }
 
-async function toggleBuy(fid, fname, btn) {
-  const currentLoginId = sessionStorage.getItem("loginid");
-  
-  if (!currentLoginId) {
-    alert("Please login again");
-    location.href = "login.html";
-    return;
-  }
+function toggleDetails(id){
+    const box=document.getElementById("details-"+id);
+    box.style.display = box.style.display==="block" ? "none":"block";
+}
 
-  const { data: existing } = await window.db
-    .from("buy_table")
-    .select("*")
-    .eq("fid", fid)
-    .eq("cid", currentLoginId)
-    .maybeSingle();
+async function confirmBuy(jid,cropName,farmerName,price,availableQty,minQty,lid){
 
-  if (existing) {
-    const newVal = existing.yn === "yes" ? "no" : "yes";
-    const updateData = { yn: newVal };
-    if (newVal === "yes") {
-      updateData.created_at = new Date().toISOString();
+    const qty=document.getElementById("qty-"+jid).value;
+
+    if(!qty || qty<=0){
+        alert("Enter valid quantity");
+        return;
     }
+
+    if(qty < minQty){
+        alert("Minimum order is "+minQty+" kg");
+        return;
+    }
+
+    if(qty > availableQty){
+        alert("Not enough stock available");
+        return;
+    }
+
+    const total = qty * price;
+
+    if(!confirm(`Confirm buying ${qty} kg of ${cropName} for ₹${total}?`)){
+        return;
+    }
+
+    const { data:userData } = await window.db
+        .from("logindata")
+        .select("username")
+        .eq("loginid",loginid)
+        .maybeSingle();
+
+    const { error:buyError } = await window.db
+        .from("buy_table")
+        .insert({
+            fname: farmerName,
+            fid: jid,
+            cname: userData?.username || loginid,
+            cid: loginid,
+            status: "pending",
+            lid: lid,
+            quantity: qty,
+            is_confirmed: false
+        });
+
+    if(buyError){
+        alert(buyError.message);
+        return;
+    }
+
+    const newQty = availableQty - qty;
+
     await window.db
-      .from("buy_table")
-      .update(updateData)
-      .eq("fid", fid)
-      .eq("cid", currentLoginId);
-    btn.innerText = newVal === "yes" ? "Interested ✓" : "Show Interest";
-  } else {
-    const { data: crop } = await window.db
-      .from("crop_sales")
-      .select("lid, crop_name")
-      .eq("jid", fid)
-      .maybeSingle();
+        .from("crop_sales")
+        .update({ quantity:newQty })
+        .eq("jid",jid);
 
-    if (!crop) {
-      alert("Crop not found. Please refresh the page.");
-      return;
-    }
+    alert("Purchase Successful!");
 
-    const { data: userData } = await window.db
-      .from("logindata")
-      .select("username")
-      .eq("loginid", currentLoginId)
-      .maybeSingle();
-
-    await window.db.from("buy_table").insert({
-      fid: fid,
-      cid: currentLoginId,
-      lid: crop.lid,
-      fname: fname,
-      cname: userData?.username || currentLoginId,
-      yn: "yes",
-      created_at: new Date().toISOString()
-    });
-
-    btn.innerText = "Interested ✓";
-  }
+    loadCrops();
 }
 
-const logoutBtn = document.getElementById("logoutBtn");
-if (logoutBtn) {
-  logoutBtn.onclick = () => {
-    sessionStorage.clear();
-    location.href = "login.html";
-  };
-}
+loadCrops();
 
-function initDarkMode() {
-    const savedDarkMode = localStorage.getItem('darkMode') === 'true';
-    if (savedDarkMode) {
-        document.body.classList.add('dark');
-    }
-    updateDarkModeButton();
-}
-
-function updateDarkModeButton() {
-    const toggleBtn = document.getElementById('toggleDark');
-    if (toggleBtn) {
-        toggleBtn.innerText = document.body.classList.contains('dark') ? '☀️ Light Mode' : '🌙 Dark Mode';
-    }
-}
-
-const toggleBtn = document.getElementById('toggleDark');
-if (toggleBtn) {
-    toggleBtn.addEventListener('click', () => {
-        document.body.classList.toggle('dark');
-        const isDark = document.body.classList.contains('dark');
-        localStorage.setItem('darkMode', isDark);
-        updateDarkModeButton();
-    });
-}
-
-const menuBtn = document.getElementById("menuBtn");
-const sideNav = document.getElementById("sideNav");
-const navOverlay = document.getElementById("navOverlay");
-
-function openDrawer() {
-  document.body.classList.add("drawer-open");
-  sideNav.hidden = false;
-  navOverlay.hidden = false;
-  menuBtn.setAttribute("aria-expanded", "true");
-}
-
-function closeDrawer() {
-  document.body.classList.remove("drawer-open");
-  menuBtn.setAttribute("aria-expanded", "false");
-  window.setTimeout(() => {
-    if (!document.body.classList.contains("drawer-open")) {
-      sideNav.hidden = true;
-      navOverlay.hidden = true;
-    }
-  }, 220);
-}
-
-if (menuBtn && sideNav && navOverlay) {
-  menuBtn.addEventListener("click", () => {
-    if (document.body.classList.contains("drawer-open")) closeDrawer();
-    else openDrawer();
-  });
-
-  navOverlay.addEventListener("click", closeDrawer);
-  document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape") closeDrawer();
-  });
-
-  sideNav.addEventListener("click", (e) => {
-    const a = e.target.closest?.("a");
-    if (a) closeDrawer();
-  });
-}
-
-initDarkMode();
-init();
 </script>
 
+</body>
 </html>
