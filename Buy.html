@@ -8,7 +8,6 @@
 <script src="supabase.js"></script>
 
 <style>
-/* ===== SAME UI AS SELL PAGE ===== */
 body {
   margin: 0;
   font-family: "Poppins", Arial, sans-serif;
@@ -16,14 +15,11 @@ body {
   background: linear-gradient(180deg,#f6e2cc 0%,#f7f9f8 45%,#dceee3 100%);
   color: #1f2937;
 }
-body.drawer-open { overflow: hidden; }
 
 /* ===== NAVBAR ===== */
 .top-nav {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
+  top: 0; left: 0; right: 0;
   height: 78px;
   display: flex;
   justify-content: space-between;
@@ -35,24 +31,9 @@ body.drawer-open { overflow: hidden; }
   z-index: 9999;
 }
 .nav-left { display:flex; align-items:center; gap:14px; }
-.hamburger-btn {
-  width:44px;height:44px;border-radius:12px;
-  border:2px solid #0a3d62;background:rgba(255,255,255,0.75);
-  display:grid;place-items:center;cursor:pointer;
-}
-.hamburger-icon { width:20px;height:14px;position:relative; }
-.hamburger-icon span {
-  position:absolute;left:0;right:0;height:2.5px;
-  background:#0a3d62;border-radius:999px;
-}
-.hamburger-icon span:nth-child(1){top:0;}
-.hamburger-icon span:nth-child(2){top:5.5px;}
-.hamburger-icon span:nth-child(3){top:11px;}
+.brand-title { font-weight:800; color:#0a3d62; }
 
-.brand-title { font-weight:800;color:#0a3d62; }
-
-/* RIGHT SIDE */
-.nav-right { display:flex;align-items:center;gap:15px; }
+.nav-right { display:flex; align-items:center; gap:15px; }
 .profile-btn img {
   width:42px;height:42px;border-radius:50%;
   border:2px solid #0a3d62;cursor:pointer;
@@ -65,78 +46,125 @@ body.drawer-open { overflow: hidden; }
 }
 .logout-btn:hover { background:#0a3d62;color:white; }
 
-/* DRAWER */
-.nav-overlay {
-  position:fixed;inset:0;background:rgba(0,0,0,0.25);
-  opacity:0;pointer-events:none;transition:.2s;z-index:9998;
+/* ===== CONTENT ===== */
+.container {
+  max-width: 1200px;
+  margin: 150px auto 60px;
+  padding: 0 20px;
 }
-.side-drawer {
-  position:fixed;top:84px;left:14px;
-  width:min(320px,calc(100vw - 28px));
-  max-height:calc(100vh - 98px);
-  background:linear-gradient(180deg,#0a3d62,#082032);
-  border:3px solid #ffffff;border-radius:18px;
-  transform:translateX(-110%);
-  transition:.25s;z-index:9999;
-}
-.drawer-inner{padding:14px;}
-body.drawer-open .nav-overlay{opacity:1;pointer-events:auto;}
-body.drawer-open .side-drawer{transform:translateX(0);}
 
-/* MENU */
-.menu-section{margin-bottom:14px;}
-.menu-section-title{
-  padding:12px;color:white;font-weight:800;
+/* GRID */
+.crop-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 25px;
 }
-.menu-list{list-style:none;padding:0;margin:0;}
-.menu-list a{
-  display:block;padding:14px;text-decoration:none;
-  color:white;font-weight:600;
-}
-.menu-list a:hover{background:#1e3a8a;}
 
-/* ===== BUY CONTENT ===== */
-.container{
-  max-width:1000px;
-  margin:150px auto 60px;
+.crop-box {
+  background: white;
+  border-radius: 20px;
+  padding: 25px;
+  box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+  border-top: 5px solid #ff9933;
+  border-bottom: 5px solid #138808;
+  transition: 0.3s ease;
 }
-.crop-card{
-  background:white;
-  border-radius:20px;
-  padding:25px;
-  box-shadow:0 18px 40px rgba(0,0,0,0.15);
-  margin-bottom:25px;
+.crop-box:hover {
+  transform: translateY(-5px);
 }
-.buy-btn{
-  background:linear-gradient(135deg,#138808,#2ecc71);
-  border:none;
-  padding:12px 20px;
-  border-radius:12px;
-  color:white;
-  font-weight:700;
-  cursor:pointer;
+
+.crop-box h3 {
+  margin: 0 0 10px 0;
+  color: #0a3d62;
 }
-.buy-btn:hover{opacity:0.9;}
-.success-popup{
-  position:fixed;
-  top:100px;right:20px;
-  background:#16a34a;
-  color:white;
-  padding:16px 25px;
-  border-radius:12px;
-  display:none;
-  z-index:99999;
+
+.buy-btn {
+  margin-top: 15px;
+  width: 100%;
+  padding: 12px;
+  border: none;
+  border-radius: 12px;
+  font-weight: 700;
+  background: linear-gradient(135deg,#138808,#2ecc71);
+  color: white;
+  cursor: pointer;
+}
+
+/* ===== MODAL ===== */
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 99999;
+}
+
+.modal-content {
+  background: white;
+  width: 90%;
+  max-width: 600px;
+  padding: 40px;
+  border-radius: 20px;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.modal-content h2 {
+  margin-top: 0;
+  color: #0a3d62;
+}
+
+.modal-content input {
+  width: 100%;
+  padding: 12px;
+  border-radius: 10px;
+  border: 2px solid #0a3d62;
+  margin-top: 10px;
+}
+
+.confirm-btn {
+  margin-top: 20px;
+  width: 100%;
+  padding: 14px;
+  border: none;
+  border-radius: 12px;
+  background: linear-gradient(135deg,#138808,#2ecc71);
+  color: white;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.close-btn {
+  margin-top: 10px;
+  width: 100%;
+  padding: 10px;
+  border: none;
+  border-radius: 10px;
+  background: #dc2626;
+  color: white;
+  cursor: pointer;
+}
+
+/* SUCCESS POPUP */
+.success-popup {
+  position: fixed;
+  top: 100px;
+  right: 20px;
+  background: #16a34a;
+  color: white;
+  padding: 16px 25px;
+  border-radius: 12px;
+  display: none;
+  z-index: 999999;
 }
 </style>
 </head>
 <body>
 
-<!-- NAVBAR -->
 <div class="top-nav">
   <div class="nav-left">
-    <button class="hamburger-btn" id="menuBtn">
-      <div class="hamburger-icon"><span></span><span></span><span></span></div>
-    </button>
     <p class="brand-title">Krishi Mitr</p>
   </div>
   <div class="nav-right">
@@ -147,120 +175,116 @@ body.drawer-open .side-drawer{transform:translateX(0);}
   </div>
 </div>
 
-<div class="nav-overlay" id="navOverlay" hidden></div>
-<nav class="side-drawer" id="sideNav" hidden>
-<div class="drawer-inner">
-
-<div class="menu-section">
-<div class="menu-section-title">Main</div>
-<ul class="menu-list">
-<li><a href="Dashboard">Dashboard</a></li>
-</ul>
+<div class="container">
+  <div class="crop-grid" id="cropGrid"></div>
 </div>
 
-<div class="menu-section">
-<div class="menu-section-title">Market</div>
-<ul class="menu-list">
-<li><a href="Update_crops">Manage Your Crops</a></li>
-<li><a href="Sell">Sell Your Crop</a></li>
-<li><a href="Buy">Buy Your Crop</a></li>
-</ul>
+<!-- MODAL -->
+<div class="modal" id="detailModal">
+  <div class="modal-content" id="modalContent"></div>
 </div>
-
-<div class="menu-section">
-<div class="menu-section-title">System</div>
-<ul class="menu-list">
-<li><a href="Notification">Notification</a></li>
-</ul>
-</div>
-
-</div>
-</nav>
-
-<div class="container" id="cropContainer"></div>
 
 <div class="success-popup" id="successPopup">
-✅ Crop purchased successfully!
+  Purchase request sent successfully!
 </div>
 
 <script>
 const db = window.db;
 const loginid = sessionStorage.getItem("loginid");
+
 if(!loginid){ location.href="login"; }
 
+let selectedCrop = null;
+
 async function loadCrops(){
-  const { data:crops } = await db
+  const { data } = await db
   .from("crop_sales")
   .select("*")
   .neq("lid", loginid);
 
-  const container = document.getElementById("cropContainer");
-  container.innerHTML="";
+  const grid = document.getElementById("cropGrid");
+  grid.innerHTML = "";
 
-  crops.forEach(crop=>{
-    container.innerHTML+=`
-    <div class="crop-card">
-      <h3>${crop.crop_name}</h3>
-      <p><strong>Farmer:</strong> ${crop.farmer_name}</p>
-      <p><strong>Price:</strong> ₹${crop.price}/kg</p>
-      <button class="buy-btn" onclick="openBuy('${crop.jid}')">Buy</button>
-    </div>`;
+  data.forEach(crop=>{
+    grid.innerHTML += `
+      <div class="crop-box">
+        <h3>${crop.crop_name}</h3>
+        <p><strong>Farmer:</strong> ${crop.farmer_name}</p>
+        <p><strong>Price:</strong> ₹${crop.price}/kg</p>
+        <p><strong>Available:</strong> ${crop.quantity} kg</p>
+        <button class="buy-btn" onclick='openModal(${JSON.stringify(crop)})'>
+          View & Buy
+        </button>
+      </div>
+    `;
   });
 }
 
-async function openBuy(jid){
-  const { data:crop } = await db.from("crop_sales").select("*").eq("jid",jid).single();
+function openModal(crop){
+  selectedCrop = crop;
 
-  const qty = prompt(
-`Crop: ${crop.crop_name}
-Available: ${crop.quantity} kg
-Price: ₹${crop.price}/kg
+  document.getElementById("modalContent").innerHTML = `
+    <h2>${crop.crop_name}</h2>
+    <p><strong>Farmer:</strong> ${crop.farmer_name}</p>
+    <p><strong>Category:</strong> ${crop.crop_category}</p>
+    <p><strong>Quality:</strong> ${crop.quality}</p>
+    <p><strong>Harvest Date:</strong> ${crop.harvest_date}</p>
+    <p><strong>Available Until:</strong> ${crop.available_until}</p>
+    <p><strong>Delivery:</strong> ${crop.delivery_type}</p>
+    <p><strong>Location:</strong> ${crop.location}</p>
+    <p><strong>Contact:</strong> ${crop.contact_info}</p>
+    <p><strong>Description:</strong> ${crop.description}</p>
+    <p><strong>Minimum Order:</strong> ${crop.min_quantity} kg</p>
+    <p><strong>Available:</strong> ${crop.quantity} kg</p>
+    <p><strong>Price:</strong> ₹${crop.price}/kg</p>
 
-Enter quantity:`);
+    <label>Enter Quantity</label>
+    <input type="number" id="buyQty" min="${crop.min_quantity}" placeholder="Minimum ${crop.min_quantity} kg">
 
-  if(!qty || qty<=0 || qty>crop.quantity){
-    alert("Invalid quantity");
+    <button class="confirm-btn" onclick="confirmBuy()">Confirm Purchase</button>
+    <button class="close-btn" onclick="closeModal()">Cancel</button>
+  `;
+
+  document.getElementById("detailModal").style.display="flex";
+}
+
+function closeModal(){
+  document.getElementById("detailModal").style.display="none";
+}
+
+async function confirmBuy(){
+  const qty = parseInt(document.getElementById("buyQty").value);
+
+  if(!qty || qty < selectedCrop.min_quantity || qty > selectedCrop.quantity){
+    document.getElementById("buyQty").style.border="2px solid red";
     return;
   }
 
-  const confirmBuy = confirm(`Confirm purchase of ${qty} kg?`);
-  if(!confirmBuy) return;
-
   await db.from("buy_table").insert({
-    fname: crop.farmer_name,
-    fid: crop.jid,
+    fname: selectedCrop.farmer_name,
+    fid: selectedCrop.jid,
     cname: loginid,
     cid: loginid,
     status: "pending",
-    lid: crop.lid,
+    lid: selectedCrop.lid,
     quantity: qty,
     is_confirmed: false
   });
 
+  closeModal();
   showSuccess();
 }
 
 function showSuccess(){
-  const popup=document.getElementById("successPopup");
+  const popup = document.getElementById("successPopup");
   popup.style.display="block";
-  setTimeout(()=>popup.style.display="none",3000);
+  setTimeout(()=> popup.style.display="none",3000);
 }
 
-document.getElementById("logoutBtn").onclick=()=>{
+document.getElementById("logoutBtn").onclick = ()=>{
   sessionStorage.clear();
   location.href="login";
 };
-
-const menuBtn=document.getElementById("menuBtn");
-const sideNav=document.getElementById("sideNav");
-const navOverlay=document.getElementById("navOverlay");
-
-menuBtn.onclick=()=>{
-document.body.classList.toggle("drawer-open");
-sideNav.hidden=!sideNav.hidden;
-navOverlay.hidden=!navOverlay.hidden;
-};
-navOverlay.onclick=menuBtn.onclick;
 
 loadCrops();
 </script>
