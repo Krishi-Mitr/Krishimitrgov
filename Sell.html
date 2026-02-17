@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Buy Crops - Krishi Mitr</title>
+<title>Sell Crops - Krishi Mitr</title>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="supabase.js"></script>
@@ -38,7 +38,6 @@ body.drawer-open { overflow: hidden; }
   align-items: center;
   gap: 14px;
 }
-/* ===== HAMBURGER (MATCH SELL PAGE) ===== */
 .hamburger-btn {
   width: 44px;
   height: 44px;
@@ -139,7 +138,7 @@ body.drawer-open .side-drawer {
   transform: translateX(0);
 }
 
-/* ===== MENU STYLING (MATCH SELL PAGE) ===== */
+/* ===== MENU STYLING ===== */
 .menu-section {
   border-radius: 14px;
   overflow: hidden;
@@ -167,29 +166,49 @@ body.drawer-open .side-drawer {
 .menu-list li + li a { border-top: 1px solid rgba(255,255,255,0.1); }
 .menu-list a:hover { background: #1e3a8a; padding-left: 20px; }
 
-/* ===== GRID & CARDS ===== */
-.container{max-width:1200px;margin:150px auto 60px;padding:0 20px}
-.crop-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:30px}
-.crop-card{background:white;border-radius:25px;padding:25px;box-shadow:0 18px 40px rgba(0,0,0,0.15);border-top:6px solid #ff9933;border-bottom:6px solid #138808;transition:.3s}
-.crop-card:hover{transform:translateY(-6px);box-shadow:0 25px 55px rgba(0,0,0,.2)}
-.crop-card h3{margin:0;color:#0a3d62}
-.price{font-size:18px;font-weight:700;color:#ff6b00}
-
-/* POPUPS */
-.popup-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.6);display:none;justify-content:center;align-items:center;z-index:10000}
-.popup-box{background:white;width:650px;max-width:95%;max-height:90vh;overflow-y:auto;border-radius:25px;padding:35px;box-shadow:0 25px 60px rgba(0,0,0,0.35);position:relative}
-.popup-close{position:absolute;top:15px;right:20px;font-size:28px;font-weight:bold;color:#555;cursor:pointer;transition:0.2s}
-.popup-close:hover{color:#e53935}
-.detail{background:#f4f6f8;padding:12px;border-radius:10px;margin-bottom:10px}
-.popup-buttons{display:flex;justify-content:space-between;margin-top:20px}
-.popup-btn{padding:12px 22px;border:none;border-radius:10px;font-weight:bold;cursor:pointer}
-.cancel{background:#e53935;color:white}
-.cancel:hover{background:#d32f2f}
-.confirm{background:#138808;color:white}
-.message-box{background:white;padding:30px;width:400px;border-radius:20px;text-align:center}
+/* ===== CONTENT ===== */
+.container {
+  max-width: 900px;
+  margin: 150px auto 60px;
+}
+.sell-card {
+  background: white;
+  border-radius: 26px;
+  padding: 8px;
+  box-shadow: 0 18px 40px rgba(0,0,0,0.18);
+}
+.sell-inner {
+  background: white;
+  border-radius: 20px;
+  padding: 50px;
+  border-top: 6px solid #ff9933;
+  border-bottom: 6px solid #138808;
+}
+label { font-weight: 600; margin-top: 14px; display: block; }
+input, textarea {
+  width: 100%;
+  padding: 12px;
+  border-radius: 12px;
+  border: 2px solid #0a3d62;
+  font-size: 1em;
+}
+textarea { resize: vertical; }
+input:focus, textarea:focus { outline: none; border-color: #ff9933; }
+.input-error { border: 2px solid #dc2626 !important; background: #fff5f5; }
+.submit-btn {
+  margin-top: 30px;
+  width: 100%;
+  padding: 16px;
+  border: none;
+  border-radius: 14px;
+  font-size: 1.1em;
+  font-weight: 700;
+  background: linear-gradient(135deg,#138808,#2ecc71);
+  color: white;
+  cursor: pointer;
+}
 </style>
 </head>
-
 <body>
 
 <!-- NAVBAR -->
@@ -212,7 +231,7 @@ body.drawer-open .side-drawer {
 <div class="nav-overlay" id="navOverlay" hidden></div>
 <nav class="side-drawer" id="sideNav" hidden>
   <div class="drawer-inner">
-    <div class="menu-section">
+        <div class="menu-section">
       <div class="menu-section-title">Main</div>
       <ul class="menu-list">
         <li><a href="Dashboard">Dashboard</a></li>
@@ -222,7 +241,7 @@ body.drawer-open .side-drawer {
       <div class="menu-section-title">Market</div>
       <ul class="menu-list">
         <li><a href="Update_crops">Manage Your Crops</a></li>
-        <li><a href="Buy" class="active">Buy</a></li>
+        <li><a href="Buy">Buy Your Crop</a></li>
       </ul>
     </div>
     <div class="menu-section">
@@ -240,126 +259,102 @@ body.drawer-open .side-drawer {
   </div>
 </nav>
 
-<!-- BUY CARDS -->
+<!-- SELL FORM -->
 <div class="container">
-  <div class="crop-grid" id="cropGrid"></div>
-</div>
-
-<!-- BUY POPUP -->
-<div id="buyPopup" class="popup-overlay">
-  <div class="popup-box">
-    <span class="popup-close" onclick="closeBuyPopup()">&times;</span>
-    <h2>Crop Details</h2>
-    <div id="cropDetails"></div>
-    <input type="number" id="buyQuantity" placeholder="Enter quantity (kg)">
-    <div class="popup-buttons">
-      <button class="popup-btn cancel" onclick="closeBuyPopup()">Cancel</button>
-      <button class="popup-btn confirm" onclick="confirmBuy()">Confirm Purchase</button>
+  <div class="sell-card">
+    <div class="sell-inner">
+      <h1>Sell Your Crops</h1>
+      <form id="sellForm">
+        <label>Farmer Name</label>
+        <input type="text" id="farmerName" readonly>
+        <label>Crop Name</label>
+        <input type="text" id="cropName" placeholder="Example: Wheat">
+        <label>Crop Category</label>
+        <input type="text" id="cropCategory" placeholder="Example: Grains">
+        <label>Total Quantity (kg)</label>
+        <input type="number" id="quantity" placeholder="Example: 500">
+        <label>Minimum Order Quantity (kg)</label>
+        <input type="number" id="minQuantity" placeholder="Example: 50">
+        <label>Price per kg (₹)</label>
+        <input type="number" id="price" placeholder="Example: 25">
+        <label>Quality</label>
+        <input type="text" id="quality" placeholder="Example: A Grade">
+        <label>Harvest Date</label>
+        <input type="date" id="harvestDate">
+        <label>Available Until</label>
+        <input type="date" id="availableUntil">
+        <label>Delivery Type</label>
+        <input type="text" id="deliveryType" placeholder="Example: Pickup / Transport">
+        <label>Location / Address</label>
+        <input type="text" id="cropLocation" placeholder="Example: Nashik, Maharashtra">
+        <label>Contact Number</label>
+        <input type="tel" id="contactInfo" placeholder="Example: 9876543210">
+        <label>Description (optional)</label>
+        <textarea id="description" placeholder="Any additional details"></textarea>
+        <button class="submit-btn">Submit Crop</button>
+      </form>
     </div>
   </div>
 </div>
 
-<!-- MESSAGE POPUP -->
-<div id="messagePopup" class="popup-overlay">
-  <div class="message-box">
-    <p id="messageText"></p>
-    <button onclick="closeMessage()">OK</button>
-  </div>
-</div>
-
 <script>
-const db=window.db;
-const loginid=sessionStorage.getItem("loginid");
-if(!loginid){location.href="login"}
+const db = window.db;
+const loginid = sessionStorage.getItem("loginid");
+const usertype = sessionStorage.getItem("usertype");
 
-let selectedCrop=null;
+if(!loginid || usertype !== "Farmer"){ location.href="login"; }
 
-async function loadCrops(){
-  const {data}=await db.from("crop_sales").select("*").neq("lid",loginid);
-  const grid=document.getElementById("cropGrid");
-  grid.innerHTML="";
-  data.forEach(crop=>{
-    const card=document.createElement("div");
-    card.className="crop-card";
-    card.innerHTML=`
-      <h3>${crop.crop_name}</h3>
-      <p><b>Farmer:</b> ${crop.farmer_name}</p>
-      <p><b>Total Quantity:</b> ${crop.quantity} kg</p>
-      <p><b>Quality:</b> ${crop.quality}</p>
-      <div class="price">₹${crop.price}/kg</div>
-      <button class="buy-btn">Buy Now</button>
-    `;
-    card.querySelector("button").onclick=()=>openBuyPopup(crop);
-    grid.appendChild(card);
+async function loadFarmer(){
+  const { data } = await db.from("logindata").select("name").eq("loginid", loginid).maybeSingle();
+  farmerName.value = data?.name || "";
+}
+
+document.getElementById("sellForm").addEventListener("submit", async e=>{
+  e.preventDefault();
+  let valid = true;
+  const fields = [cropName, cropCategory, quantity, minQuantity, price, quality, harvestDate, availableUntil, deliveryType, cropLocation, contactInfo];
+  fields.forEach(f=>{
+    f.classList.remove("input-error");
+    if(!f.value.trim()){ f.classList.add("input-error"); f.placeholder="This field is required"; valid=false; }
   });
-}
+  if(!/^\d{10}$/.test(contactInfo.value)){ contactInfo.classList.add("input-error"); contactInfo.value=""; contactInfo.placeholder="Enter valid 10 digit mobile number"; valid=false; }
+  if(!valid) return;
 
-function openBuyPopup(crop){
-  selectedCrop=crop;
-  document.getElementById("cropDetails").innerHTML=`
-    <div class="detail"><b>Farmer:</b> ${crop.farmer_name}</div>
-    <div class="detail"><b>Crop:</b> ${crop.crop_name}</div>
-    <div class="detail"><b>Category:</b> ${crop.crop_category}</div>
-    <div class="detail"><b>Total Quantity:</b> ${crop.quantity} kg</div>
-    <div class="detail"><b>Minimum Order:</b> ${crop.min_quantity} kg</div>
-    <div class="detail"><b>Price:</b> ₹${crop.price}/kg</div>
-    <div class="detail"><b>Location:</b> ${crop.location}</div>
-    <div class="detail"><b>Contact:</b> ${crop.contact_info}</div>
-  `;
-  document.getElementById("buyPopup").style.display="flex";
-}
-
-function closeBuyPopup(){document.getElementById("buyPopup").style.display="none"}
-function showMessage(msg){document.getElementById("messageText").innerText=msg;document.getElementById("messagePopup").style.display="flex"}
-function closeMessage(){document.getElementById("messagePopup").style.display="none"}
-
-async function confirmBuy(){
-  const qty=parseInt(document.getElementById("buyQuantity").value);
-  if(!qty){showMessage("Please enter quantity");return;}
-  if(qty<selectedCrop.min_quantity){showMessage("Enter more than minimum quantity");return;}
-  if(qty>selectedCrop.quantity){showMessage("Enter less than available quantity");return;}
-  const total=qty*selectedCrop.price;
-  await db.from("buy_table").insert({
-    fname:selectedCrop.farmer_name,
-    fid:selectedCrop.jid,
-    cname:selectedCrop.crop_name,
-    cid:selectedCrop.id,
-    status:"Pending",
-    lid:loginid,
-    quantity:qty,
-    is_confirmed:false
+  const { error } = await db.from("crop_sales").insert({
+    farmer_name: farmerName.value,
+    crop_name: cropName.value,
+    crop_category: cropCategory.value,
+    quantity: quantity.value,
+    min_quantity: minQuantity.value,
+    price: price.value,
+    quality: quality.value,
+    harvest_date: harvestDate.value,
+    available_until: availableUntil.value,
+    delivery_type: deliveryType.value,
+    location: cropLocation.value,
+    contact_info: contactInfo.value,
+    description: description.value,
+    jid: crypto.randomUUID(),
+    lid: loginid
   });
-  showMessage(`Purchase Request Sent!\nTotal Cost: ₹${total}\nWaiting for Farmer Confirmation.`);
-  closeBuyPopup();
-  loadCrops();
-}
+  if(error){ alert(error.message); } else { alert("Crop listed successfully"); e.target.reset(); loadFarmer(); }
+});
 
-/* ===== NAVIGATION (MATCH SELL PAGE) ===== */
-const menuBtn=document.getElementById("menuBtn");
-const sideNav=document.getElementById("sideNav");
-const navOverlay=document.getElementById("navOverlay");
+// LOGOUT
+document.getElementById("logoutBtn").onclick = ()=>{ sessionStorage.clear(); location.href="login"; };
 
-function openDrawer(){ 
-  document.body.classList.add("drawer-open"); 
-  sideNav.hidden=false; 
-  navOverlay.hidden=false; 
-  menuBtn.setAttribute("aria-expanded","true"); 
-}
-function closeDrawer(){ 
-  document.body.classList.remove("drawer-open"); 
-  menuBtn.setAttribute("aria-expanded","false"); 
-  setTimeout(()=>{ 
-    if(!document.body.classList.contains("drawer-open")){ 
-      sideNav.hidden=true; 
-      navOverlay.hidden=true; 
-    } 
-  },220); 
-}
+// HAMBURGER
+const menuBtn = document.getElementById("menuBtn");
+const sideNav = document.getElementById("sideNav");
+const navOverlay = document.getElementById("navOverlay");
+
+function openDrawer(){ document.body.classList.add("drawer-open"); sideNav.hidden=false; navOverlay.hidden=false; menuBtn.setAttribute("aria-expanded","true"); }
+function closeDrawer(){ document.body.classList.remove("drawer-open"); menuBtn.setAttribute("aria-expanded","false"); setTimeout(()=>{ if(!document.body.classList.contains("drawer-open")){ sideNav.hidden=true; navOverlay.hidden=true; }},220); }
 
 menuBtn.onclick = ()=>{ document.body.classList.contains("drawer-open") ? closeDrawer() : openDrawer(); };
 navOverlay.onclick = closeDrawer;
 
-loadCrops();
+loadFarmer();
 </script>
 
 </body>
