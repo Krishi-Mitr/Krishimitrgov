@@ -19,7 +19,7 @@ body{
 }
 body.drawer-open{overflow:hidden}
 
-/* ===== NAVBAR ===== */
+/* ===== NAVBAR (exactly like Dashboard/Sell) ===== */
 .top-nav{
   position:fixed;
   top:0; left:0; right:0;
@@ -40,43 +40,40 @@ body.drawer-open{overflow:hidden}
   gap:14px;
 }
 
-/* ===== HAMBURGER MATCHING DASHBOARD/SELL ===== */
 .hamburger-btn{
   width:44px;
   height:44px;
   border-radius:12px;
   border:2px solid #0a3d62;
-  background: rgba(255,255,255,0.75);
+  background:linear-gradient(135deg,#fff,#eee);
+  cursor:pointer;
   display:grid;
   place-items:center;
-  cursor:pointer;
-  transition:0.3s;
+  transition:.3s;
 }
-.hamburger-btn:hover{ transform:scale(1.05); }
 
-.hamburger-icon{
-  width:20px;
-  height:14px;
-  position:relative;
+.hamburger-btn:hover{
+  background:#0a3d62;
 }
+
+.hamburger-btn:hover span{
+  background:white;
+}
+
 .hamburger-icon span{
-  position:absolute;
-  left:0; right:0;
+  display:block;
+  width:20px;
   height:2.5px;
   background:#0a3d62;
-  border-radius:999px;
-  transition:0.3s;
+  margin:4px 0;
+  transition:.3s;
 }
-.hamburger-icon span:nth-child(1){ top:0; }
-.hamburger-icon span:nth-child(2){ top:5.5px; }
-.hamburger-icon span:nth-child(3){ top:11px; }
 
 .brand-title{
   font-weight:800;
   color:#0a3d62;
 }
 
-/* Right side */
 .nav-right{
   display:flex;
   align-items:center;
@@ -89,14 +86,15 @@ body.drawer-open{overflow:hidden}
   border-radius:50%;
   border:2px solid #0a3d62;
   cursor:pointer;
-  transition:0.3s;
+  transition:.3s;
 }
+
 .profile-btn img:hover{
   transform:scale(1.1);
-  box-shadow:0 0 15px rgba(10,61,98,0.4);
 }
 
 /* ===== BUTTON EFFECTS ===== */
+
 .buy-btn,
 .logout-btn{
   position:relative;
@@ -108,7 +106,7 @@ body.drawer-open{overflow:hidden}
 /* BUY BUTTON */
 .buy-btn{
   margin-top:18px;
-  padding:12px;
+  padding:14px;
   width:100%;
   border:none;
   border-radius:12px;
@@ -116,31 +114,13 @@ body.drawer-open{overflow:hidden}
   color:white;
   font-weight:700;
   letter-spacing:.5px;
+  font-size:16px;
 }
-
 .buy-btn:hover{
   transform:translateY(-3px);
   box-shadow:0 12px 25px rgba(19,136,8,0.4);
 }
-
-.buy-btn:active{
-  transform:scale(.95);
-}
-
-.buy-btn::before{
-  content:"";
-  position:absolute;
-  top:0;
-  left:-100%;
-  width:100%;
-  height:100%;
-  background:linear-gradient(120deg,transparent,rgba(255,255,255,.6),transparent);
-  transition:.6s;
-}
-
-.buy-btn:hover::before{
-  left:100%;
-}
+.buy-btn:active{ transform:scale(.95); }
 
 /* LOGOUT */
 .logout-btn{
@@ -153,11 +133,14 @@ body.drawer-open{overflow:hidden}
 .logout-btn:hover{
   background:#0a3d62;
   color:white;
-  transform:translateY(-2px);
   box-shadow:0 8px 20px rgba(0,0,0,.2);
 }
+.logout-btn:active{
+  transform:scale(.95);
+}
 
-/* ===== DRAWER MATCHING DASHBOARD/SELL ===== */
+/* ===== DRAWER ===== */
+
 .nav-overlay{
   position:fixed;
   inset:0;
@@ -172,68 +155,57 @@ body.drawer-open{overflow:hidden}
   position:fixed;
   top:84px;
   left:14px;
-  width:min(320px, calc(100vw - 28px));
-  max-height:calc(100vh - 98px);
-  overflow:auto;
+  width:300px;
   background:linear-gradient(180deg,#0a3d62,#082032);
-  border:3px solid #ffffff;
   border-radius:18px;
-  box-shadow:0 18px 40px rgba(0,0,0,0.35);
+  border:3px solid white;
   transform:translateX(-110%);
   transition:.25s;
   z-index:9999;
 }
 
-.drawer-inner{ padding:14px; }
+.drawer-inner{padding:14px}
 
-body.drawer-open .nav-overlay{
-  opacity:1;
-  pointer-events:auto;
-}
-body.drawer-open .side-drawer{
-  transform:translateX(0);
-}
+/* BOX STYLE MENU */
 
-/* ===== MENU STYLING MATCH DASHBOARD ===== */
 .menu-section{
-  border-radius:14px;
-  overflow:hidden;
-  border:1px solid rgba(255,255,255,0.15);
-  margin-bottom:14px;
-  background:rgba(255,255,255,0.05);
+  margin-bottom:20px;
 }
 
 .menu-section-title{
-  padding:12px 14px;
-  background:rgba(255,255,255,0.1);
-  color:white;
+  color:#ffffff;
   font-weight:800;
-  font-size:0.95rem;
+  margin:15px 0 8px;
+  padding-left:8px;
+  font-size:14px;
+  letter-spacing:1px;
 }
 
 .menu-list{
   list-style:none;
   padding:0;
-  margin:0;
+}
+
+.menu-list li{
+  margin-bottom:8px;
 }
 
 .menu-list a{
   display:block;
-  padding:14px;
-  text-decoration:none;
+  padding:12px 16px;
+  border-radius:12px;
+  background:rgba(255,255,255,0.1);
   color:white;
-  font-weight:600;
-  background:rgba(255,255,255,0.08);
-  transition:0.2s ease;
-}
-
-.menu-list li + li a{
-  border-top:1px solid rgba(255,255,255,0.1);
+  text-decoration:none;
+  transition:.25s;
+  font-weight:500;
+  border:1px solid rgba(255,255,255,0.1);
 }
 
 .menu-list a:hover{
-  background:#1e3a8a;
-  padding-left:20px;
+  background:linear-gradient(135deg,#ff9933,#138808);
+  transform:translateX(6px);
+  box-shadow:0 6px 15px rgba(0,0,0,.3);
 }
 
 /* ACTIVE PAGE */
@@ -244,7 +216,16 @@ body.drawer-open .side-drawer{
   box-shadow:0 8px 20px rgba(0,0,0,.3);
 }
 
-/* ===== GRID & CARDS (Buy Page) ===== */
+body.drawer-open .nav-overlay{
+  opacity:1;
+  pointer-events:auto;
+}
+body.drawer-open .side-drawer{
+  transform:translateX(0);
+}
+
+/* ===== GRID ===== */
+
 .container{
   max-width:1200px;
   margin:150px auto 60px;
@@ -256,6 +237,8 @@ body.drawer-open .side-drawer{
   grid-template-columns:repeat(auto-fit,minmax(320px,1fr));
   gap:30px;
 }
+
+/* ===== CARD ===== */
 
 .crop-card{
   background:white;
@@ -283,7 +266,8 @@ body.drawer-open .side-drawer{
   color:#ff6b00;
 }
 
-/* ===== POPUPS (unchanged) ===== */
+/* ===== POPUPS ===== */
+
 .popup-overlay{
   position:fixed;
   inset:0;
@@ -295,21 +279,50 @@ body.drawer-open .side-drawer{
 }
 
 .popup-box{
-  background:white;
+  position:relative;
+  background:linear-gradient(180deg,#ffffff,#e6fff2);
   width:650px;
   max-width:95%;
   max-height:90vh;
   overflow-y:auto;
   border-radius:25px;
-  padding:35px;
+  padding:25px 35px 35px 35px;
   box-shadow:0 25px 60px rgba(0,0,0,0.35);
+  border-top:8px solid #138808;
+  border-bottom:8px solid #ff9933;
+}
+
+.popup-close{
+  position:absolute;
+  top:15px;
+  right:20px;
+  font-size:28px;
+  font-weight:bold;
+  color:#555;
+  cursor:pointer;
+  transition:0.2s;
+}
+.popup-close:hover{
+  color:#e53935;
+}
+
+.popup-box h2{
+  text-align:center;
+  color:#0a3d62;
+  font-size:24px;
+  margin-bottom:20px;
 }
 
 .detail{
   background:#f4f6f8;
-  padding:12px;
-  border-radius:10px;
-  margin-bottom:10px;
+  padding:14px;
+  border-radius:12px;
+  margin-bottom:12px;
+  box-shadow:0 3px 10px rgba(0,0,0,0.1);
+  transition:.3s;
+}
+.detail:hover{
+  background:#e0f7fa;
 }
 
 .popup-buttons{
@@ -319,15 +332,20 @@ body.drawer-open .side-drawer{
 }
 
 .popup-btn{
-  padding:12px 22px;
+  padding:14px 24px;
   border:none;
-  border-radius:10px;
+  border-radius:12px;
   font-weight:bold;
   cursor:pointer;
+  font-size:15px;
+  transition:.25s;
 }
 
-.cancel{background:#ccc;}
+.cancel{background:#e53935;color:white;}
+.cancel:hover{background:#d32f2f;}
+
 .confirm{background:#138808;color:white;}
+.confirm:hover{background:#0f7a05;}
 
 .message-box{
   background:white;
@@ -335,6 +353,7 @@ body.drawer-open .side-drawer{
   width:400px;
   border-radius:20px;
   text-align:center;
+  box-shadow:0 8px 25px rgba(0,0,0,0.25);
 }
 
 </style>
@@ -390,14 +409,14 @@ body.drawer-open .side-drawer{
   </div>
 </nav>
 
-<!-- BUY CARDS -->
 <div class="container">
   <div class="crop-grid" id="cropGrid"></div>
 </div>
 
-<!-- POPUPS -->
+<!-- BUY POPUP -->
 <div id="buyPopup" class="popup-overlay">
   <div class="popup-box">
+    <span class="popup-close" onclick="closeBuyPopup()">&times;</span>
     <h2>Crop Details</h2>
     <div id="cropDetails"></div>
     <input type="number" id="buyQuantity" placeholder="Enter quantity (kg)">
@@ -408,6 +427,7 @@ body.drawer-open .side-drawer{
   </div>
 </div>
 
+<!-- MESSAGE POPUP -->
 <div id="messagePopup" class="popup-overlay">
   <div class="message-box">
     <p id="messageText"></p>
@@ -416,17 +436,17 @@ body.drawer-open .side-drawer{
 </div>
 
 <script>
-const db=window.db;
-const loginid=sessionStorage.getItem("loginid");
+const db = window.db;
+const loginid = sessionStorage.getItem("loginid");
 if(!loginid){ location.href="login"; }
 
 let selectedCrop=null;
 
-/* ===== LOAD CROPS ===== */
 async function loadCrops(){
-  const {data} = await db.from("crop_sales").select("*").neq("lid", loginid);
+  const { data } = await db.from("crop_sales").select("*").neq("lid", loginid);
   const grid=document.getElementById("cropGrid");
   grid.innerHTML="";
+
   data.forEach(crop=>{
     const card=document.createElement("div");
     card.className="crop-card";
@@ -443,7 +463,6 @@ async function loadCrops(){
   });
 }
 
-/* ===== OPEN POPUP ===== */
 function openBuyPopup(crop){
   selectedCrop=crop;
   document.getElementById("cropDetails").innerHTML=`
@@ -465,14 +484,15 @@ function showMessage(msg){
   document.getElementById("messageText").innerText=msg;
   document.getElementById("messagePopup").style.display="flex";
 }
+
 function closeMessage(){ document.getElementById("messagePopup").style.display="none"; }
 
-/* ===== CONFIRM BUY ===== */
 async function confirmBuy(){
   const qty=parseInt(document.getElementById("buyQuantity").value);
   if(!qty){ showMessage("Please enter quantity"); return; }
-  if(qty<selectedCrop.min_quantity){ showMessage("Enter more than minimum quantity"); return; }
-  if(qty>selectedCrop.quantity){ showMessage("Enter less than available quantity"); return; }
+  if(qty < selectedCrop.min_quantity){ showMessage("Please enter more than minimum quantity"); return; }
+  if(qty > selectedCrop.quantity){ showMessage("Please enter less than available quantity"); return; }
+
   const total=qty*selectedCrop.price;
   await db.from("buy_table").insert({
     fname:selectedCrop.farmer_name,
@@ -494,26 +514,15 @@ const menuBtn=document.getElementById("menuBtn");
 const sideNav=document.getElementById("sideNav");
 const navOverlay=document.getElementById("navOverlay");
 
-function openDrawer(){
-  document.body.classList.add("drawer-open");
-  sideNav.hidden=false;
-  navOverlay.hidden=false;
-}
-function closeDrawer(){
-  document.body.classList.remove("drawer-open");
-  setTimeout(()=>{if(!document.body.classList.contains("drawer-open")){
-    sideNav.hidden=true;
-    navOverlay.hidden=true;
-  }},220);
-}
+menuBtn.onclick=()=>{ document.body.classList.toggle("drawer-open"); };
+navOverlay.onclick=()=>{ document.body.classList.remove("drawer-open"); };
 
-menuBtn.onclick=()=>{ document.body.classList.contains("drawer-open") ? closeDrawer() : openDrawer(); };
-navOverlay.onclick=closeDrawer;
-
-document.getElementById("logoutBtn").onclick=()=>{ sessionStorage.clear(); location.href="login"; };
+document.getElementById("logoutBtn").onclick=()=>{
+  sessionStorage.clear();
+  location.href="login";
+};
 
 loadCrops();
-
 </script>
 
 </body>
