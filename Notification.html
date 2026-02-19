@@ -17,7 +17,7 @@ body{
 }
 body.drawer-open{overflow:hidden}
 
-/* ===== NAVBAR (SAME AS SELL) ===== */
+/* ===== NAVBAR ===== */
 .top-nav{
   position:fixed;
   top:0; left:0; right:0;
@@ -47,14 +47,15 @@ body.drawer-open{overflow:hidden}
 .hamburger-icon span:nth-child(2){top:5.5px;}
 .hamburger-icon span:nth-child(3){top:11px;}
 .brand-title{font-weight:800;color:#0a3d62;}
-.logout-btn{
+.nav-buttons{display:flex;gap:10px;}
+.nav-btn{
   background:white;color:#0a3d62;
   border:2px solid #0a3d62;
   padding:10px 18px;border-radius:10px;
   font-weight:700;cursor:pointer;
 }
 
-/* ===== DRAWER (SAME AS SELL) ===== */
+/* ===== DRAWER ===== */
 .nav-overlay{
   position:fixed;inset:0;
   background:rgba(0,0,0,0.25);
@@ -145,10 +146,15 @@ body.drawer-open .side-drawer{transform:translateX(0);}
     </button>
     <p class="brand-title">Krishi Mitr</p>
   </div>
-  <button class="logout-btn" id="logoutBtn">Logout</button>
+
+  <div class="nav-buttons">
+    <button onclick="location.href='Profile'" class="nav-btn">Profile</button>
+    <button class="nav-btn" id="logoutBtn">Logout</button>
+  </div>
 </div>
 
 <div class="nav-overlay" id="navOverlay" hidden></div>
+
 <nav class="side-drawer" id="sideNav" hidden>
   <div class="drawer-inner">
     <div class="menu-section">
@@ -165,6 +171,12 @@ body.drawer-open .side-drawer{transform:translateX(0);}
         <li><a href="Buy">Buy Your Crop</a></li>
       </ul>
     </div>
+        <div class="menu-section">
+      <div class="menu-section-title">Tools</div>
+      <ul class="menu-list">
+        <li><a href="Dashboard">Crop Predictor</a></li>
+      </ul>
+    </div>
   </div>
 </nav>
 
@@ -175,11 +187,12 @@ const db = window.db;
 const loginid = sessionStorage.getItem("loginid");
 const usertype = sessionStorage.getItem("usertype");
 
-if(!loginid || usertype!=="Farmer"){location.href="login";}
+if(!loginid || usertype!=="Farmer"){
+  location.href="login";
+}
 
 async function loadNotifications(){
 
-  // STEP 1: Get all crops of this farmer
   const { data:crops } = await db
     .from("crop_sales")
     .select("jid")
@@ -192,19 +205,13 @@ async function loadNotifications(){
 
   const cropIds = crops.map(c=>c.jid);
 
-  // STEP 2: Find all buy requests for those crops
   const { data:requests,error } = await db
     .from("buy_table")
     .select("*")
     .in("fid",cropIds)
     .order("created_at",{ascending:false});
 
-  if(error){
-    notificationList.innerHTML="Error loading notifications";
-    return;
-  }
-
-  if(!requests || requests.length===0){
+  if(error || !requests || requests.length===0){
     notificationList.innerHTML="<h3>No notifications yet.</h3>";
     return;
   }
@@ -213,7 +220,6 @@ async function loadNotifications(){
 
   for(const item of requests){
 
-    // STEP 3: Get buyer name
     const { data:buyer } = await db
       .from("logindata")
       .select("name")
@@ -249,9 +255,42 @@ async function loadNotifications(){
 }
 
 async function updateStatus(id,status){
-  await db.from("buy_table")
-    .update({is_confirmed:true,status:status})
+
+  if(status==="Accepted"){
+
+    const { data:request } = await db
+      .from("buy_table")
+      .select("*")
+      .eq("id",id)
+      .single();
+
+    const { data:crop } = await db
+      .from("crop_sales")
+      .select("quantity")
+      .eq("jid",request.fid)
+      .single();
+
+    const remaining = crop.quantity - request.quantity;
+
+    if(remaining < 0){
+      alert("Not enough quantity available!");
+      return;
+    }
+
+    await db
+      .from("crop_sales")
+      .update({ quantity: remaining })
+      .eq("jid",request.fid);
+  }
+
+  await db
+    .from("buy_table")
+    .update({
+      is_confirmed:true,
+      status:status
+    })
     .eq("id",id);
+
   loadNotifications();
 }
 
@@ -260,7 +299,7 @@ document.getElementById("logoutBtn").onclick=()=>{
   location.href="login";
 };
 
-// drawer logic
+/* Drawer Logic */
 const menuBtn=document.getElementById("menuBtn");
 const sideNav=document.getElementById("sideNav");
 const navOverlay=document.getElementById("navOverlay");
@@ -279,7 +318,10 @@ function closeDrawer(){
     }
   },220);
 }
-menuBtn.onclick=()=>document.body.classList.contains("drawer-open")?closeDrawer():openDrawer();
+
+menuBtn.onclick=()=>{
+  document.body.classList.contains("drawer-open") ? closeDrawer() : openDrawer();
+};
 navOverlay.onclick=closeDrawer;
 
 loadNotifications();
