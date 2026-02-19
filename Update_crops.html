@@ -357,18 +357,12 @@ async function submitChanges() {
         const { error: marketError } = await db.from("buy_table").update({
             cname: name,
             cid: cat,
-            price: pr,
-            quantity: qt,
-            min_quantity: mqt,
-            quality: ql,
-            harvest_date: hv,
-            location: lc,
-            description: ds
+            quantity: qt
         }).eq("fid", activeJid);
 
         if (marketError) throw marketError;
 
-        alert("Success: Inventory and Marketplace are updated!");
+        alert("Success: Inventory updated!");
         closeModal();
         fetchFarmerCrops();
     } catch (err) {
