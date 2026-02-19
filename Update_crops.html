@@ -16,11 +16,7 @@ body {
   min-height: 100vh;
   background: linear-gradient(180deg, #f6e2cc 0%, #f7f9f8 45%, #dceee3 100%);
   color: #1f2937;
-  transition: background 0.3s ease, color 0.3s ease;
-}
-
-body.drawer-open {
-  overflow: hidden;
+  transition: background 0.3s ease;
 }
 
 .top-nav {
@@ -45,188 +41,152 @@ body.drawer-open {
   gap: 14px;
 }
 
-.hamburger-btn {
-  width: 44px;
-  height: 44px;
-  border-radius: 12px;
-  border: 2px solid #0a3d62;
-  background: rgba(255,255,255,0.75);
-  display: grid;
-  place-items: center;
-  cursor: pointer;
-}
-
-.hamburger-icon {
-  width: 20px;
-  height: 14px;
-  position: relative;
-}
-
-.hamburger-icon span {
-  position: absolute;
-  left: 0;
-  right: 0;
-  height: 2.5px;
-  background: #0a3d62;
-  border-radius: 999px;
-}
-
-.hamburger-icon span:nth-child(1) { top: 0; }
-.hamburger-icon span:nth-child(2) { top: 5.5px; }
-.hamburger-icon span:nth-child(3) { top: 11px; }
-
 .brand-title {
   margin: 0;
-  font-size: 1.15rem;
+  font-size: 1.2rem;
   font-weight: 800;
   color: #0a3d62;
 }
 
-.logout-btn {
-  background: white;
-  color: #0a3d62;
-  border: 2px solid #0a3d62;
-  padding: 10px 22px;
-  border-radius: 10px;
-  font-weight: 700;
-  cursor: pointer;
-}
-
 .container {
-  max-width: 900px;
-  margin: 130px auto 60px;
+  max-width: 1000px;
+  margin: 120px auto 60px;
   padding: 0 20px;
 }
 
 .page-title {
   text-align: center;
-  font-size: 2.4em;
+  font-size: 2.2em;
   font-weight: 800;
   color: #0a3d62;
-  margin-bottom: 40px;
+  margin-bottom: 30px;
+}
+
+.crop-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
 }
 
 .crop-card {
   background: white;
-  border-radius: 20px;
-  padding: 22px;
-  margin-bottom: 15px;
-  box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+  border-radius: 18px;
+  padding: 20px;
+  box-shadow: 0 10px 20px rgba(0,0,0,0.05);
   cursor: pointer;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-left: 6px solid #ff9933;
+  border-left: 5px solid #ff9933;
   transition: 0.3s;
 }
 
 .crop-card:hover {
-  transform: scale(1.01);
-  box-shadow: 0 12px 25px rgba(0,0,0,0.12);
+  transform: translateY(-5px);
+  box-shadow: 0 15px 30px rgba(0,0,0,0.1);
 }
 
 .modal {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.5);
-  backdrop-filter: blur(5px);
+  background: rgba(0,0,0,0.6);
+  backdrop-filter: blur(8px);
   display: none;
   align-items: center;
   justify-content: center;
   z-index: 2000;
+  padding: 20px;
 }
 
 .modal-box {
-  width: 95%;
-  max-width: 480px;
+  width: 100%;
+  max-width: 700px;
+  max-height: 90vh;
   background: white;
   padding: 30px;
   border-radius: 24px;
-  box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+  overflow-y: auto;
+  box-shadow: 0 25px 50px rgba(0,0,0,0.2);
 }
 
-.modal-box h3 {
-  margin: 0 0 20px 0;
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+  border-bottom: 2px solid #f1f5f9;
+  padding-bottom: 10px;
+}
+
+.modal-header h3 {
+  margin: 0;
   color: #0a3d62;
-  font-size: 1.6rem;
+  font-size: 1.5rem;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
 }
 
 .form-group {
   margin-bottom: 15px;
 }
 
-.form-group label {
-  display: block;
-  font-weight: 700;
-  margin-bottom: 5px;
-  color: #4b5563;
-  font-size: 0.9rem;
-}
-
-.form-group input {
-  width: 100%;
-  padding: 12px;
-  border: 2px solid #e5e7eb;
-  border-radius: 10px;
-  font-family: inherit;
-  font-size: 1rem;
-}
-
-.form-group input:focus {
-  outline: none;
-  border-color: #0a3d62;
-}
-
-.modal-actions {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-  margin-top: 25px;
-}
-
-.btn {
-  padding: 14px;
-  border: none;
-  border-radius: 12px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: 0.2s;
-  text-align: center;
-}
-
-.btn-update { background: #138808; color: white; }
-.btn-update:hover { background: #0e6606; }
-
-.btn-delete { background: #ef4444; color: white; }
-.btn-delete:hover { background: #dc2626; }
-
-.btn-close { 
-  background: #f3f4f6; 
-  color: #1f2937; 
+.form-group.full {
   grid-column: span 2;
 }
 
-.btn-dark-toggle {
-  background: white;
-  color: #0a3d62;
-  border: 2px solid #0a3d62;
-  padding: 10px 18px;
-  border-radius: 10px;
+.form-group label {
+  display: block;
   font-weight: 700;
+  font-size: 0.85rem;
+  color: #64748b;
+  margin-bottom: 6px;
+}
+
+.form-group input, .form-group select, .form-group textarea {
+  width: 100%;
+  padding: 12px;
+  border: 2px solid #e2e8f0;
+  border-radius: 10px;
+  font-family: inherit;
+  font-size: 0.95rem;
+}
+
+.form-group input:focus {
+  border-color: #0a3d62;
+  outline: none;
+}
+
+.modal-footer {
+  display: flex;
+  gap: 10px;
+  margin-top: 30px;
+}
+
+.btn {
+  flex: 1;
+  padding: 15px;
+  border: none;
+  border-radius: 12px;
+  font-weight: 800;
   cursor: pointer;
+  transition: 0.2s;
 }
 
-body.dark {
-  background: #0f172a;
-  color: #f1f5f9;
-}
+.btn-save { background: #138808; color: white; }
+.btn-save:hover { background: #0e6606; }
 
-body.dark .top-nav { background: #1e293b; border-bottom-color: #334155; }
-body.dark .brand-title { color: #f1f5f9; }
+.btn-delete { background: #fee2e2; color: #dc2626; }
+.btn-delete:hover { background: #fecaca; }
+
+.btn-cancel { background: #f1f5f9; color: #475569; }
+
+body.dark { background: #0f172a; color: #f1f5f9; }
+body.dark .modal-box { background: #1e293b; }
+body.dark .form-group input, body.dark .form-group select, body.dark .form-group textarea { 
+  background: #334155; border-color: #475569; color: white; 
+}
 body.dark .crop-card { background: #1e293b; color: #f1f5f9; }
-body.dark .modal-box { background: #1e293b; color: #f1f5f9; }
-body.dark .form-group input { background: #334155; border-color: #475569; color: white; }
-body.dark .btn-close { background: #334155; color: white; }
 </style>
 </head>
 
@@ -234,95 +194,105 @@ body.dark .btn-close { background: #334155; color: white; }
 
 <div class="top-nav">
   <div class="nav-left">
-    <button class="hamburger-btn" id="menuBtn">
-      <div class="hamburger-icon">
-        <span></span><span></span><span></span>
-      </div>
-    </button>
-    <div class="brand">
-      <p class="brand-title">Krishi Mitr</p>
-    </div>
+    <div class="brand"><p class="brand-title">Krishi Mitr</p></div>
   </div>
-  <div style="display: flex; gap: 10px; align-items: center;">
-    <button id="toggleDark" class="btn-dark-toggle">🌙 Dark Mode</button>
-    <button class="logout-btn" id="logoutBtn">Logout</button>
+  <div style="display: flex; gap: 10px;">
+    <button id="toggleDark" class="btn" style="background:white; border:2px solid #0a3d62; padding:8px 15px;">🌙 Mode</button>
+    <button id="logoutBtn" class="btn" style="background:white; border:2px solid #0a3d62; padding:8px 15px;">Logout</button>
   </div>
 </div>
 
 <div class="container">
   <div class="page-title">Manage Your Crops</div>
-  <div id="cropList"></div>
+  <div id="cropList" class="crop-grid"></div>
 </div>
 
 <div class="modal" id="modal">
   <div class="modal-box">
-    <h3>Update Crop Listing</h3>
+    <div class="modal-header">
+      <h3>Edit Crop Details</h3>
+      <span style="font-size: 0.8rem; color: #64748b;" id="displayId"></span>
+    </div>
     
-    <div class="form-group">
-      <label>Crop Name</label>
-      <input type="text" id="editCropName">
+    <div class="form-grid">
+      <div class="form-group">
+        <label>Crop Name</label>
+        <input type="text" id="upd_cname">
+      </div>
+      <div class="form-group">
+        <label>Price (per kg)</label>
+        <input type="number" id="upd_price">
+      </div>
+      <div class="form-group">
+        <label>Total Quantity (kg)</label>
+        <input type="number" id="upd_qty">
+      </div>
+      <div class="form-group">
+        <label>Min. Order Quantity (kg)</label>
+        <input type="number" id="upd_min_qty">
+      </div>
+      <div class="form-group">
+        <label>Quality Grade</label>
+        <select id="upd_quality">
+          <option value="Premium">Premium</option>
+          <option value="Good">Good</option>
+          <option value="Average">Average</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Delivery Type</label>
+        <select id="upd_delivery">
+          <option value="Pickup">Pickup</option>
+          <option value="Delivery">Delivery</option>
+          <option value="Negotiable">Negotiable</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Harvest Date</label>
+        <input type="date" id="upd_harvest">
+      </div>
+      <div class="form-group">
+        <label>Available Until</label>
+        <input type="date" id="upd_expiry">
+      </div>
+      <div class="form-group">
+        <label>Location</label>
+        <input type="text" id="upd_loc">
+      </div>
+      <div class="form-group">
+        <label>Contact Info</label>
+        <input type="text" id="upd_contact">
+      </div>
+      <div class="form-group full">
+        <label>Description</label>
+        <textarea id="upd_desc" rows="3"></textarea>
+      </div>
     </div>
 
-    <div class="form-group">
-      <label>Quantity (kg)</label>
-      <input type="number" id="editQty">
-    </div>
-
-    <div class="form-group">
-      <label>Price (per kg)</label>
-      <input type="number" id="editPrice">
-    </div>
-
-    <div class="form-group">
-      <label>Location</label>
-      <input type="text" id="editLoc">
-    </div>
-
-    <div class="modal-actions">
-      <button class="btn btn-update" onclick="updateCrop()">Save Changes</button>
+    <div class="modal-footer">
+      <button class="btn btn-save" onclick="processUpdate()">Update Marketplace</button>
       <button class="btn btn-delete" onclick="deleteCrop()">Delete</button>
-      <button class="btn btn-close" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-cancel" onclick="closeModal()">Close</button>
     </div>
   </div>
 </div>
 
 <script>
 const loginid = sessionStorage.getItem("loginid");
-const usertype = sessionStorage.getItem("usertype");
-
-if (!loginid || usertype !== "Farmer") {
-  location.href = "login";
-}
-
 let currentCropId = null;
-let currentCropJid = null;
+let currentJid = null;
 
 async function loadCrops() {
   const box = document.getElementById("cropList");
-  box.innerHTML = "<p style='text-align:center;'>Fetching your crops...</p>";
+  const { data, error } = await db.from("crop_sales").select("*").eq("lid", loginid);
 
-  const { data, error } = await db
-    .from("crop_sales")
-    .select("*")
-    .eq("lid", loginid)
-    .order("created_at", { ascending: false });
-
-  if (error) {
-    box.innerHTML = "Error loading data.";
-    return;
-  }
-
-  if (data.length === 0) {
-    box.innerHTML = "No crops listed.";
-    return;
-  }
-
+  if (error) return;
   box.innerHTML = data.map(c => `
     <div class="crop-card" onclick='openModal(${JSON.stringify(c)})'>
-      <div style="font-weight:800; font-size:1.1rem;">${c.crop_name}</div>
-      <div style="text-align:right;">
-        <span style="display:block; font-weight:700;">₹${c.price}/kg</span>
-        <span style="font-size:0.85rem; opacity:0.7;">${c.quantity} kg</span>
+      <h4 style="margin:0 0 10px 0; color:#0a3d62;">${c.crop_name}</h4>
+      <div style="font-size:0.9rem; display:flex; justify-content:space-between;">
+        <span>Qty: ${c.quantity}kg</span>
+        <span style="font-weight:bold;">₹${c.price}/kg</span>
       </div>
     </div>
   `).join("");
@@ -330,96 +300,83 @@ async function loadCrops() {
 
 function openModal(c) {
   currentCropId = c.id;
-  currentCropJid = c.jid;
+  currentJid = c.jid;
   
-  document.getElementById("editCropName").value = c.crop_name;
-  document.getElementById("editQty").value = c.quantity;
-  document.getElementById("editPrice").value = c.price;
-  document.getElementById("editLoc").value = c.location;
+  document.getElementById("displayId").innerText = "Ref: " + currentJid;
+  document.getElementById("upd_cname").value = c.crop_name || "";
+  document.getElementById("upd_price").value = c.price || 0;
+  document.getElementById("upd_qty").value = c.quantity || 0;
+  document.getElementById("upd_min_qty").value = c.min_quantity || 0;
+  document.getElementById("upd_quality").value = c.quality || "Good";
+  document.getElementById("upd_delivery").value = c.delivery_type || "Pickup";
+  document.getElementById("upd_harvest").value = c.harvest_date || "";
+  document.getElementById("upd_expiry").value = c.available_until || "";
+  document.getElementById("upd_loc").value = c.location || "";
+  document.getElementById("upd_contact").value = c.contact_info || "";
+  document.getElementById("upd_desc").value = c.description || "";
   
   document.getElementById("modal").style.display = "flex";
 }
 
 function closeModal() {
   document.getElementById("modal").style.display = "none";
-  currentCropId = null;
-  currentCropJid = null;
 }
 
-async function updateCrop() {
-  if (!currentCropId) return;
+async function processUpdate() {
+  const updateData = {
+    crop_name: document.getElementById("upd_cname").value,
+    price: document.getElementById("upd_price").value,
+    quantity: document.getElementById("upd_qty").value,
+    min_quantity: document.getElementById("upd_min_qty").value,
+    quality: document.getElementById("upd_quality").value,
+    delivery_type: document.getElementById("upd_delivery").value,
+    harvest_date: document.getElementById("upd_harvest").value,
+    available_until: document.getElementById("upd_expiry").value,
+    location: document.getElementById("upd_loc").value,
+    contact_info: document.getElementById("upd_contact").value,
+    description: document.getElementById("upd_desc").value
+  };
 
-  const newName = document.getElementById("editCropName").value;
-  const newQty = document.getElementById("editQty").value;
-  const newPrice = document.getElementById("editPrice").value;
-  const newLoc = document.getElementById("editLoc").value;
+  const buyTableData = {
+    cname: updateData.crop_name,
+    price: updateData.price,
+    quantity: updateData.quantity,
+    min_quantity: updateData.min_quantity,
+    quality: updateData.quality,
+    delivery_type: updateData.delivery_type,
+    harvest_date: updateData.harvest_date,
+    available_until: updateData.available_until,
+    location: updateData.location,
+    contact_info: updateData.contact_info,
+    description: updateData.description
+  };
 
   try {
-    const { error: saleError } = await db
-      .from("crop_sales")
-      .update({
-        crop_name: newName,
-        quantity: newQty,
-        price: newPrice,
-        location: newLoc
-      })
-      .eq("id", currentCropId);
+    const { error: err1 } = await db.from("crop_sales").update(updateData).eq("id", currentCropId);
+    if (err1) throw err1;
 
-    if (saleError) throw saleError;
+    const { error: err2 } = await db.from("buy_table").update(buyTableData).eq("fid", currentJid);
+    if (err2) throw err2;
 
-    const { error: buyError } = await db
-      .from("buy_table")
-      .update({
-        crop_name: newName,
-        quantity: newQty,
-        price: newPrice,
-        location: newLoc
-      })
-      .eq("fid", currentCropJid);
-
-    if (buyError) throw buyError;
-
-    alert("Details updated successfully!");
+    alert("Crop details synchronized across tables!");
     closeModal();
     loadCrops();
-  } catch (err) {
-    alert("Update failed: " + err.message);
+  } catch (e) {
+    alert("Error: " + e.message);
   }
 }
 
 async function deleteCrop() {
-  if (!confirm("Are you sure you want to delete this listing?")) return;
-
-  try {
-    await db.from("buy_table").delete().eq("fid", currentCropJid);
-    await db.from("crop_sales").delete().eq("id", currentCropId);
-    
-    alert("Listing deleted.");
-    closeModal();
-    loadCrops();
-  } catch (err) {
-    alert("Delete failed.");
-  }
+  if (!confirm("Delete this listing permanently?")) return;
+  await db.from("buy_table").delete().eq("fid", currentJid);
+  await db.from("crop_sales").delete().eq("id", currentCropId);
+  closeModal();
+  loadCrops();
 }
 
-document.getElementById("toggleDark").onclick = () => {
-  document.body.classList.toggle("dark");
-  const isDark = document.body.classList.contains("dark");
-  localStorage.setItem("darkMode", isDark);
-  document.getElementById("toggleDark").innerText = isDark ? "☀️ Light Mode" : "🌙 Dark Mode";
-};
-
-if (localStorage.getItem("darkMode") === "true") {
-  document.body.classList.add("dark");
-  document.getElementById("toggleDark").innerText = "☀️ Light Mode";
-}
-
-document.getElementById("logoutBtn").onclick = () => {
-  sessionStorage.clear();
-  location.href = "login";
-};
-
+document.getElementById("logoutBtn").onclick = () => { sessionStorage.clear(); location.href = "login"; };
 loadCrops();
 </script>
+
 </body>
 </html>
