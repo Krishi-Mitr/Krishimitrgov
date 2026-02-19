@@ -289,69 +289,65 @@ async function fetchFarmerCrops() {
   `).join("");
 }
 
-function triggerEditModal(crop) {
-  activeCropId = crop.id;
-  activeJid = crop.jid;
-  
-  document.getElementById("upd_name").value = crop.crop_name || "";
-  document.getElementById("upd_category").value = crop.crop_category || "Grains";
-  document.getElementById("upd_price").value = crop.price || 0;
-  document.getElementById("upd_qty").value = crop.quantity || 0;
-  document.getElementById("upd_min_qty").value = crop.min_quantity || 0;
-  document.getElementById("upd_quality").value = crop.quality || "Grade B";
-  document.getElementById("upd_harvest").value = crop.harvest_date || "";
-  document.getElementById("upd_expiry").value = crop.available_until || "";
-  document.getElementById("upd_delivery").value = crop.delivery_type || "Pickup Only";
-  document.getElementById("upd_location").value = crop.location || "";
-  document.getElementById("upd_contact").value = crop.contact_info || "";
-  document.getElementById("upd_description").value = crop.description || "";
-  
-  document.getElementById("modal").style.display = "flex";
-}
-
-function closeModal() {
-  document.getElementById("modal").style.display = "none";
-}
-
 async function submitChanges() {
-  const sharedFields = {
-    price: document.getElementById("upd_price").value,
-    quantity: document.getElementById("upd_qty").value,
-    min_quantity: document.getElementById("upd_min_qty").value,
-    quality: document.getElementById("upd_quality").value,
-    delivery_type: document.getElementById("upd_delivery").value,
-    harvest_date: document.getElementById("upd_harvest").value,
-    location: document.getElementById("upd_location").value,
-    contact_info: document.getElementById("upd_contact").value,
-    description: document.getElementById("upd_description").value
-  };
+    const name = document.getElementById("upd_name").value;
+    const category = document.getElementById("upd_category").value;
+    const price = parseFloat(document.getElementById("upd_price").value);
+    const qty = parseInt(document.getElementById("upd_qty").value);
+    const minQty = parseInt(document.getElementById("upd_min_qty").value);
+    const quality = document.getElementById("upd_quality").value;
+    const harvest = document.getElementById("upd_harvest").value;
+    const expiry = document.getElementById("upd_expiry").value;
+    const delivery = document.getElementById("upd_delivery").value;
+    const location = document.getElementById("upd_location").value;
+    const contact = document.getElementById("upd_contact").value;
+    const description = document.getElementById("upd_description").value;
 
-  const salesUpdate = {
-    ...sharedFields,
-    crop_name: document.getElementById("upd_name").value,
-    crop_category: document.getElementById("upd_category").value,
-    available_until: document.getElementById("upd_expiry").value
-  };
+    if (!activeCropId || !activeJid) {
+        alert("Error: No active crop selected for update.");
+        return;
+    }
 
-  const marketUpdate = {
-    ...sharedFields,
-    cname: document.getElementById("upd_name").value,
-    cid: document.getElementById("upd_category").value
-  };
+    try {
+        const { error: salesError } = await db
+            .from("crop_sales")
+            .update({
+                crop_name: name,
+                crop_category: category,
+                price: price,
+                quantity: qty,
+                min_quantity: minQty,
+                quality: quality,
+                harvest_date: harvest,
+                available_until: expiry,
+                delivery_type: delivery,
+                location: location,
+                contact_info: contact,
+                description: description
+            })
+            .eq("id", activeCropId);
 
-  try {
-    const { error: salesError } = await db.from("crop_sales").update(salesUpdate).eq("id", activeCropId);
-    if (salesError) throw salesError;
+        if (salesError) throw salesError;
 
-    const { error: marketError } = await db.from("buy_table").update(marketUpdate).eq("fid", activeJid);
-    if (marketError) throw marketError;
+        const { error: marketError } = await db
+            .from("buy_table")
+            .update({
+                cname: name,
+                cid: category,
+                price: price,
+                quantity: qty
+            })
+            .eq("fid", activeJid);
 
-    alert("Success: Inventory and Marketplace are now in sync!");
-    closeModal();
-    fetchFarmerCrops();
-  } catch (err) {
-    alert("Update Error: " + err.message);
-  }
+        if (marketError) throw marketError;
+
+        alert("Inventory and Marketplace synced successfully!");
+        closeModal();
+        fetchFarmerCrops();
+    } catch (err) {
+        console.error("Update failed:", err);
+        alert("Update Error: " + err.message);
+    }
 }
 
 async function handleDeletion() {
