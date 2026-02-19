@@ -217,7 +217,7 @@ body.dark .crop-card { background: #1e293b; color: #f1f5f9; }
     <div class="form-grid">
       <div class="form-group">
         <label>Crop Name</label>
-        <input type="text" id="upd_cname">
+        <input type="text" id="upd_crop_name">
       </div>
       <div class="form-group">
         <label>Price (per kg)</label>
@@ -289,7 +289,7 @@ async function loadCrops() {
   if (error) return;
   box.innerHTML = data.map(c => `
     <div class="crop-card" onclick='openModal(${JSON.stringify(c)})'>
-      <h4 style="margin:0 0 10px 0; color:#0a3d62;">${c.cname}</h4>
+      <h4 style="margin:0 0 10px 0; color:#0a3d62;">${c.crop_name}</h4>
       <div style="font-size:0.9rem; display:flex; justify-content:space-between;">
         <span>Qty: ${c.quantity}kg</span>
         <span style="font-weight:bold;">₹${c.price}/kg</span>
@@ -303,7 +303,7 @@ function openModal(c) {
   currentJid = c.jid;
   
   document.getElementById("displayId").innerText = "Ref: " + currentJid;
-  document.getElementById("upd_cname").value = c.cname || "";
+  document.getElementById("upd_crop_name").value = c.crop_name || "";
   document.getElementById("upd_price").value = c.price || 0;
   document.getElementById("upd_qty").value = c.quantity || 0;
   document.getElementById("upd_min_qty").value = c.min_quantity || 0;
@@ -324,7 +324,7 @@ function closeModal() {
 
 async function processUpdate() {
   const updateData = {
-    cname: document.getElementById("upd_cname").value,
+    crop_name: document.getElementById("upd_crop_name").value,
     price: document.getElementById("upd_price").value,
     quantity: document.getElementById("upd_qty").value,
     min_quantity: document.getElementById("upd_min_qty").value,
@@ -338,7 +338,7 @@ async function processUpdate() {
   };
 
   const buyTableData = {
-    cname: updateData.cname,
+    crop_name: updateData.crop_name,
     price: updateData.price,
     quantity: updateData.quantity,
     min_quantity: updateData.min_quantity,
