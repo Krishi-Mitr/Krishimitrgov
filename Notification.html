@@ -16,7 +16,10 @@
     color: #1f2937;
   }
 
-  /* NAVBAR */
+  body.drawer-open {
+    overflow: hidden;
+  }
+
   .top-nav {
     position: fixed;
     top: 0; left: 0; right: 0;
@@ -30,73 +33,72 @@
     box-shadow: 0 6px 14px rgba(0,0,0,0.15);
     z-index: 9999;
   }
+
   .nav-left {
     display: flex;
-    gap: 16px;
+    align-items: center;
+    gap: 14px;
+    min-width: 0;
   }
-  .nav-box {
-    background: #0a3d62;
-    color: white;
-    padding: 10px 20px;
-    border-radius: 10px;
-    font-weight: 600;
-    text-decoration: none;
-    transition: .25s;
-    cursor: pointer;
-  }
-  .nav-box:hover {
-    background: linear-gradient(135deg,#ff9933,#ffd28a);
-    color: black;
-    transform: translateY(-3px);
-  }
-  /* Your Crops dropdown */
-  .nav-dropdown {
-    position: relative;
-    display: inline-block;
-  }
-  .nav-dropdown-toggle {
-    background: #0a3d62;
-    color: white;
-    padding: 10px 20px;
-    border-radius: 10px;
-    font-weight: 600;
-    border: none;
-    cursor: pointer;
-    transition: .25s;
-    font-size: 1em;
-  }
-  .nav-dropdown-toggle:hover {
-    background: linear-gradient(135deg,#ff9933,#ffd28a);
-    color: black;
-    transform: translateY(-3px);
-  }
-  .nav-dropdown-menu {
-    display: none;
-    position: absolute;
-    top: 100%;
-    left: 0;
-    background: white;
-    min-width: 200px;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.2);
-    border-radius: 10px;
-    z-index: 10000;
-    margin-top: 4px;
-    overflow: hidden;
+
+  .hamburger-btn {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
     border: 2px solid #0a3d62;
+    background: rgba(255,255,255,0.75);
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+    box-shadow: 0 8px 18px rgba(0,0,0,0.12);
   }
-  .nav-dropdown:hover .nav-dropdown-menu {
-    display: block;
+
+  .hamburger-icon {
+    width: 20px;
+    height: 14px;
+    position: relative;
   }
-  .nav-dropdown-menu a {
-    display: block;
-    padding: 12px 20px;
+
+  .hamburger-icon span {
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 2.5px;
+    background: #0a3d62;
+    border-radius: 999px;
+  }
+
+  .hamburger-icon span:nth-child(1) { top: 0; }
+  .hamburger-icon span:nth-child(2) { top: 5.5px; }
+  .hamburger-icon span:nth-child(3) { top: 11px; }
+
+  .brand {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.05;
+    min-width: 0;
+  }
+
+  .brand-title {
+    margin: 0;
+    font-size: 1.15rem;
+    font-weight: 800;
     color: #0a3d62;
-    text-decoration: none;
-    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
-  .nav-dropdown-menu a:hover {
-    background: #f6e2cc;
+
+  .brand-subtitle {
+    margin: 0;
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: rgba(10,61,98,0.8);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
+
   .logout-btn {
     background: white;
     color: #0a3d62;
@@ -105,6 +107,93 @@
     border-radius: 10px;
     font-weight: 700;
     cursor: pointer;
+  }
+
+  .nav-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.25);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .2s ease;
+    z-index: 9998;
+  }
+
+  .side-drawer {
+    position: fixed;
+    top: 84px;
+    left: 14px;
+    width: min(320px, calc(100vw - 28px));
+    max-height: calc(100vh - 98px);
+    overflow: auto;
+    background: white;
+    border: 3px solid #0a3d62;
+    border-radius: 18px;
+    box-shadow: 0 18px 40px rgba(0,0,0,0.22);
+    transform: translateX(-110%);
+    transition: transform .25s ease;
+    z-index: 9999;
+  }
+
+  .drawer-inner {
+    padding: 14px;
+  }
+
+  .menu-section-drawer {
+    border-radius: 14px;
+    overflow: hidden;
+    border: 1px solid rgba(10,61,98,0.18);
+    margin-bottom: 14px;
+    background: #ffffff;
+  }
+
+  .menu-section-title {
+    padding: 12px 14px;
+    background: #eef2ff;
+    color: #0a3d62;
+    font-weight: 800;
+    font-size: 0.95rem;
+  }
+
+  .menu-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .menu-list a {
+    display: block;
+    padding: 14px 14px;
+    text-decoration: none;
+    color: #0a3d62;
+    font-weight: 800;
+    background: #f1f5f9;
+  }
+
+  .menu-list li + li a {
+    border-top: 1px solid rgba(10,61,98,0.10);
+  }
+
+  .menu-list a:hover,
+  .menu-list a:focus-visible {
+    background: #e2e8f0;
+    outline: none;
+  }
+
+  body.drawer-open .nav-overlay {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  body.drawer-open .side-drawer {
+    transform: translateX(0);
+  }
+
+  @media (max-width: 520px) {
+    .top-nav { padding: 0 14px; }
+    .logout-btn { padding: 9px 14px; border-radius: 12px; }
+    .brand-subtitle { display: none; }
+    .side-drawer { top: 80px; left: 10px; width: calc(100vw - 20px); }
   }
 
   /* CONTAINER */
@@ -235,19 +324,53 @@
 
 <div class="top-nav">
   <div class="nav-left">
-    <a class="nav-box" href="Dashboard.html">Dashboard</a>
-    <a class="nav-box" href="krishimitr.html">Crop Price Predictor</a>
-    <a class="nav-box" href="Buy.html">Buy Crops</a>
-    <div class="nav-dropdown">
-      <button type="button" class="nav-dropdown-toggle">Your Crops ▼</button>
-      <div class="nav-dropdown-menu">
-        <a href="Sell.html">Sell your crops</a>
-        <a href="Update_crops.html">Manage your crops</a>
+    <button class="hamburger-btn" id="menuBtn" type="button" aria-label="Open menu" aria-controls="sideNav" aria-expanded="false">
+      <div class="hamburger-icon" aria-hidden="true">
+        <span></span><span></span><span></span>
       </div>
+    </button>
+    <div class="brand">
+      <p class="brand-title">Krishi Mitr</p>
+      <p class="brand-subtitle">Notifications</p>
     </div>
   </div>
   <button id="logoutBtn" class="logout-btn">Logout</button>
 </div>
+
+<div class="nav-overlay" id="navOverlay" hidden></div>
+<nav class="side-drawer" id="sideNav" aria-label="Main navigation" hidden>
+  <div class="drawer-inner">
+    <div class="menu-section-drawer">
+      <div class="menu-section-title">Main</div>
+      <ul class="menu-list">
+        <li><a href="Dashboard.html">Dashboard</a></li>
+      </ul>
+    </div>
+
+    <div class="menu-section-drawer">
+      <div class="menu-section-title">Market</div>
+      <ul class="menu-list">
+        <li><a href="Update_crops.html">Manage Your Crops</a></li>
+        <li><a href="Sell.html">Sell Your Crop</a></li>
+        <li><a href="Buy.html">Buy Your Crop</a></li>
+      </ul>
+    </div>
+
+    <div class="menu-section-drawer">
+      <div class="menu-section-title">Tools</div>
+      <ul class="menu-list">
+        <li><a href="krishimitr.html">Crop Predictor</a></li>
+      </ul>
+    </div>
+
+    <div class="menu-section-drawer" style="margin-bottom:0;">
+      <div class="menu-section-title">System</div>
+      <ul class="menu-list">
+        <li><a href="Notification.html" aria-current="page">Notification</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
 
 <div class="container" id="notificationList">
   <!-- Notifications will be shown here -->
@@ -395,6 +518,45 @@ async function loadNotifications() {
     sessionStorage.clear();
     location.href = "login";
   };
+
+  const menuBtn = document.getElementById("menuBtn");
+  const sideNav = document.getElementById("sideNav");
+  const navOverlay = document.getElementById("navOverlay");
+
+  function openDrawer() {
+    document.body.classList.add("drawer-open");
+    sideNav.hidden = false;
+    navOverlay.hidden = false;
+    menuBtn.setAttribute("aria-expanded", "true");
+  }
+
+  function closeDrawer() {
+    document.body.classList.remove("drawer-open");
+    menuBtn.setAttribute("aria-expanded", "false");
+    window.setTimeout(() => {
+      if (!document.body.classList.contains("drawer-open")) {
+        sideNav.hidden = true;
+        navOverlay.hidden = true;
+      }
+    }, 220);
+  }
+
+  if (menuBtn && sideNav && navOverlay) {
+    menuBtn.addEventListener("click", () => {
+      if (document.body.classList.contains("drawer-open")) closeDrawer();
+      else openDrawer();
+    });
+
+    navOverlay.addEventListener("click", closeDrawer);
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") closeDrawer();
+    });
+
+    sideNav.addEventListener("click", (e) => {
+      const a = e.target.closest?.("a");
+      if (a) closeDrawer();
+    });
+  }
 
   loadNotifications();
 </script>
