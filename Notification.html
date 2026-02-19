@@ -1,160 +1,402 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
+<meta charset="UTF-8" />
 <title>Notifications - Krishi Mitr</title>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="supabase.js"></script>
 
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-
 <style>
-body{
-  margin:0;
-  font-family:"Poppins", Arial;
-  background: linear-gradient(180deg,#f6e2cc 0%,#f7f9f8 45%,#dceee3 100%);
-  padding-top:100px;
-}
+  body {
+    margin: 0;
+    font-family: "Poppins", Arial, sans-serif;
+    min-height: 100vh;
+    background: linear-gradient(180deg,#f6e2cc 0%,#f7f9f8 45%,#dceee3 100%);
+    color: #1f2937;
+  }
 
-.container{
-  max-width:900px;
-}
+  /* NAVBAR */
+  .top-nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    height: 78px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 32px;
+    background: linear-gradient(90deg,#ff9933,#ffffff,#138808);
+    border-bottom: 3px solid #0a3d62;
+    box-shadow: 0 6px 14px rgba(0,0,0,0.15);
+    z-index: 9999;
+  }
+  .nav-left {
+    display: flex;
+    gap: 16px;
+  }
+  .nav-box {
+    background: #0a3d62;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 10px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: .25s;
+    cursor: pointer;
+  }
+  .nav-box:hover {
+    background: linear-gradient(135deg,#ff9933,#ffd28a);
+    color: black;
+    transform: translateY(-3px);
+  }
+  /* Your Crops dropdown */
+  .nav-dropdown {
+    position: relative;
+    display: inline-block;
+  }
+  .nav-dropdown-toggle {
+    background: #0a3d62;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 10px;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: .25s;
+    font-size: 1em;
+  }
+  .nav-dropdown-toggle:hover {
+    background: linear-gradient(135deg,#ff9933,#ffd28a);
+    color: black;
+    transform: translateY(-3px);
+  }
+  .nav-dropdown-menu {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background: white;
+    min-width: 200px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+    border-radius: 10px;
+    z-index: 10000;
+    margin-top: 4px;
+    overflow: hidden;
+    border: 2px solid #0a3d62;
+  }
+  .nav-dropdown:hover .nav-dropdown-menu {
+    display: block;
+  }
+  .nav-dropdown-menu a {
+    display: block;
+    padding: 12px 20px;
+    color: #0a3d62;
+    text-decoration: none;
+    font-weight: 600;
+  }
+  .nav-dropdown-menu a:hover {
+    background: #f6e2cc;
+  }
+  .logout-btn {
+    background: white;
+    color: #0a3d62;
+    border: 2px solid #0a3d62;
+    padding: 10px 22px;
+    border-radius: 10px;
+    font-weight: 700;
+    cursor: pointer;
+  }
 
-.notify-card{
-  background:white;
-  border-radius:18px;
-  padding:20px;
-  box-shadow:0 15px 35px rgba(0,0,0,0.15);
-}
+  /* CONTAINER */
+  .container {
+    max-width: 960px;
+    margin: 110px auto 60px;
+    padding: 0 20px;
+  }
 
-.accept-btn{
-  background:#138808;
-  color:white;
-  border:none;
-  padding:8px 16px;
-  border-radius:8px;
-  font-weight:600;
-}
+  /* Notification Card */
+  .notification-card {
+    background: white;
+    border-radius: 20px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
 
-.reject-btn{
-  background:#dc2626;
-  color:white;
-  border:none;
-  padding:8px 16px;
-  border-radius:8px;
-  font-weight:600;
-}
+  .notification-text {
+    font-size: 1.1em;
+    color: #0a3d62;
+    font-weight: 600;
+  }
 
-.status-badge{
-  padding:6px 12px;
-  border-radius:20px;
-  font-weight:600;
-}
-.pending{ background:#facc15; color:black;}
-.completed{ background:#16a34a; color:white;}
-.rejected{ background:#ef4444; color:white;}
+  .actions {
+    display: flex;
+    gap: 12px;
+  }
+
+  .btn-accept {
+    background: #138808;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.25s ease;
+  }
+  .btn-accept:hover {
+    background: #0a6600;
+  }
+
+  .btn-decline {
+    background: #b30000;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.25s ease;
+  }
+  .btn-decline:hover {
+    background: #7f0000;
+  }
+
+  /* Status badge */
+  .status-accepted {
+    color: white;
+    background-color: #138808;
+    padding: 6px 12px;
+    border-radius: 14px;
+    font-weight: 700;
+    width: fit-content;
+  }
+  .status-declined {
+    color: white;
+    background-color: #b30000;
+    padding: 6px 12px;
+    border-radius: 14px;
+    font-weight: 700;
+    width: fit-content;
+  }
+
+  /* Popup modal */
+  #popup {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.5);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 10000;
+  }
+  #popup-content {
+    background: white;
+    padding: 25px 30px;
+    border-radius: 18px;
+    width: 90%;
+    max-width: 480px;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.25);
+    position: relative;
+  }
+  #popup-content h2 {
+    margin-top: 0;
+    color: #0a3d62;
+  }
+  #popup-content p {
+    margin: 15px 0;
+    font-size: 1.1em;
+  }
+  #popup-close {
+    position: absolute;
+    top: 12px; right: 16px;
+    background: #0a3d62;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  #popup-actions {
+    margin-top: 20px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+  }
 </style>
-</head>
 
+</head>
 <body>
 
-<div class="container">
-<h2 class="text-center mb-4">Buyer Notifications</h2>
-<div id="notificationList"></div>
+<div class="top-nav">
+  <div class="nav-left">
+    <a class="nav-box" href="Dashboard.html">Dashboard</a>
+    <a class="nav-box" href="krishimitr.html">Crop Price Predictor</a>
+    <a class="nav-box" href="Buy.html">Buy Crops</a>
+    <div class="nav-dropdown">
+      <button type="button" class="nav-dropdown-toggle">Your Crops ▼</button>
+      <div class="nav-dropdown-menu">
+        <a href="Sell.html">Sell your crops</a>
+        <a href="Update_crops.html">Manage your crops</a>
+      </div>
+    </div>
+  </div>
+  <button id="logoutBtn" class="logout-btn">Logout</button>
+</div>
+
+<div class="container" id="notificationList">
+  <!-- Notifications will be shown here -->
+</div>
+
+<!-- Confirmation Popup -->
+<div id="popup">
+  <div id="popup-content">
+    <button id="popup-close">&times;</button>
+    <h2>Confirm Action</h2>
+    <p id="popup-message">Do you want to sell your crop to this person? This action cannot be undone.</p>
+    <div id="popup-actions">
+      <button id="popup-accept" class="btn-accept">Accept</button>
+      <button id="popup-decline" class="btn-decline">Decline</button>
+    </div>
+  </div>
 </div>
 
 <script>
+  const db = window.db;
+  const loginid = sessionStorage.getItem("loginid");
+  const usertype = sessionStorage.getItem("usertype");
 
-const loginid = sessionStorage.getItem("loginid");
-const usertype = sessionStorage.getItem("usertype");
+  if (!loginid || usertype !== "Farmer") {
+    location.href = "login";
+  }
 
-if(!loginid || usertype !== "Farmer"){
-    window.location.href="login";
+  const notificationList = document.getElementById("notificationList");
+  const popup = document.getElementById("popup");
+  const popupClose = document.getElementById("popup-close");
+  const popupMessage = document.getElementById("popup-message");
+  const popupAccept = document.getElementById("popup-accept");
+  const popupDecline = document.getElementById("popup-decline");
+
+  let selectedNotification = null;
+  let selectedAction = null;
+async function loadNotifications() {
+  const { data, error } = await db
+    .from('buy_table')
+    .select('id, fname, fid, cname, cid, status, lid, is_confirmed, quantity')
+    .eq('fid', loginid)
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    notificationList.innerHTML = `<p style="color:red;">Error loading notifications: ${error.message}</p>`;
+    return;
+  }
+
+  if (!data || data.length === 0) {
+    notificationList.innerHTML = `<h3>No notifications found.</h3>`;
+    return;
+  }
+
+  notificationList.innerHTML = "";
+
+  for (const item of data) {
+    // Fetch buyer name from logindata where loginid = lid
+    const { data: buyerData, error: buyerError } = await db
+      .from('logindata')
+      .select('name')
+      .eq('loginid', item.lid.toString())
+      .single();
+
+    let buyerName = item.fname; // fallback farmer name if buyer name not found
+    if (!buyerError && buyerData && buyerData.name) {
+      buyerName = buyerData.name;
+    }
+
+    const card = document.createElement("div");
+    card.className = "notification-card";
+
+    let statusHtml = "";
+    if (item.is_confirmed === true && item.status === "Accepted") {
+      statusHtml = `<div class="status-accepted">Accepted</div>`;
+    } else if (item.is_confirmed === true && item.status === "Declined") {
+      statusHtml = `<div class="status-declined">Declined</div>`;
+    } else {
+      statusHtml = `
+        <div class="actions">
+          <button class="btn-accept">Accept</button>
+          <button class="btn-decline">Decline</button>
+        </div>`;
+    }
+
+    card.innerHTML = `
+      <div class="notification-text">
+        <strong>${buyerName}</strong> wants to buy <strong>${item.quantity} kg</strong> of your <strong>${item.cname}</strong> crop.
+      </div>
+      ${statusHtml}
+    `;
+
+    notificationList.appendChild(card);
+
+    // If not confirmed, enable buttons
+    if (!item.is_confirmed) {
+      const btnAccept = card.querySelector('.btn-accept');
+      const btnDecline = card.querySelector('.btn-decline');
+
+      btnAccept.onclick = () => openPopup(item, "Accepted");
+      btnDecline.onclick = () => openPopup(item, "Declined");
+    }
+  }
 }
 
-async function loadNotifications(){
 
-    const { data, error } = await window.db
-        .from("buy_table")
-        .select("*")
-        .eq("lid", loginid)
-        .order("created_at",{ascending:false});
+  function openPopup(notification, action) {
+    selectedNotification = notification;
+    selectedAction = action;
+    popupMessage.textContent = `Do you want to ${action.toLowerCase()} selling your crop to ${notification.fname}? This action cannot be undone.`;
+    popup.style.display = "flex";
+  }
 
-    if(error){
-        alert(error.message);
-        return;
+  popupClose.onclick = () => {
+    popup.style.display = "none";
+    selectedNotification = null;
+    selectedAction = null;
+  };
+
+  popupAccept.onclick = () => updateNotification(true);
+  popupDecline.onclick = () => updateNotification(false);
+
+  async function updateNotification(isAccept) {
+    if (!selectedNotification) return;
+
+    const newStatus = isAccept ? "Accepted" : "Declined";
+
+    // Update the buy_table record with is_confirmed=true and status=Accepted/Declined
+    const { error } = await db
+      .from('buy_table')
+      .update({ is_confirmed: true, status: newStatus })
+      .eq('id', selectedNotification.id);
+
+    if (error) {
+      alert("Failed to update notification: " + error.message);
+      return;
     }
 
-    const container=document.getElementById("notificationList");
-    container.innerHTML="";
-
-    if(!data.length){
-        container.innerHTML="<p class='text-center text-muted'>No notifications yet</p>";
-        return;
-    }
-
-    for(const row of data){
-
-        const { data:crop } = await window.db
-            .from("crop_sales")
-            .select("crop_name")
-            .eq("jid",row.fid)
-            .maybeSingle();
-
-        const cropName = crop?.crop_name || "Crop";
-
-        container.innerHTML+=`
-        <div class="notify-card mb-4">
-            <h5>${cropName}</h5>
-            <p><b>Buyer:</b> ${row.cname}</p>
-            <p><b>Quantity:</b> ${row.quantity} kg</p>
-            <p><b>Date:</b> ${new Date(row.created_at).toLocaleString()}</p>
-            <p><b>Status:</b> 
-              <span class="status-badge ${row.status}">
-                ${row.status}
-              </span>
-            </p>
-
-            ${row.status === "pending" ? `
-            <button class="accept-btn me-2"
-              onclick="updateStatus(${row.id},'completed')">
-              Accept
-            </button>
-
-            <button class="reject-btn"
-              onclick="updateStatus(${row.id},'rejected')">
-              Reject
-            </button>
-            ` : ""}
-        </div>
-        `;
-    }
-}
-
-async function updateStatus(id,newStatus){
-
-    if(!confirm("Are you sure?")) return;
-
-    const { error } = await window.db
-        .from("buy_table")
-        .update({
-            status:newStatus,
-            is_confirmed: newStatus === "completed"
-        })
-        .eq("id",id);
-
-    if(error){
-        alert(error.message);
-        return;
-    }
-
-    alert("Status updated successfully");
+    popup.style.display = "none";
+    selectedNotification = null;
+    selectedAction = null;
     loadNotifications();
-}
+  }
 
-loadNotifications();
+  document.getElementById("logoutBtn").onclick = () => {
+    sessionStorage.clear();
+    location.href = "login";
+  };
 
+  loadNotifications();
 </script>
 
 </body>
