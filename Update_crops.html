@@ -21,9 +21,9 @@ body {
     #dceee3 100%
   );
   color: #1f2937;
+  transition: background 0.3s ease, color 0.3s ease;
 }
 
-/* NAVBAR - Sell.html style */
 body.drawer-open {
   overflow: hidden;
 }
@@ -206,13 +206,12 @@ body.drawer-open .side-drawer {
   .side-drawer { top: 80px; left: 10px; width: calc(100vw - 20px); }
 }
 
-/* CONTENT */
 .container {
   max-width: 900px;
   margin: 130px auto 60px;
+  padding: 0 20px;
 }
 
-/* PAGE TITLE */
 .page-title {
   text-align: center;
   font-size: 2.4em;
@@ -221,21 +220,24 @@ body.drawer-open .side-drawer {
   margin-bottom: 40px;
 }
 
-/* CROP CARD */
 .crop-card {
   background: white;
   border-radius: 22px;
   padding: 26px;
   margin-bottom: 18px;
-  box-shadow: 0 16px 36px rgba(0,0,0,0.18);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
   cursor: pointer;
-  transition: .25s;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   border-top: 5px solid #ff9933;
   border-bottom: 5px solid #138808;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .crop-card:hover {
-  transform: translateY(-4px);
+  transform: translateY(-5px) scale(1.02);
+  box-shadow: 0 15px 35px rgba(0,0,0,0.15);
 }
 
 .crop-card span {
@@ -244,11 +246,11 @@ body.drawer-open .side-drawer {
   color: #0a3d62;
 }
 
-/* MODAL */
 .modal {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.55);
+  background: rgba(0,0,0,0.6);
+  backdrop-filter: blur(4px);
   display: none;
   align-items: center;
   justify-content: center;
@@ -256,51 +258,66 @@ body.drawer-open .side-drawer {
 }
 
 .modal-box {
-  width: 420px;
+  width: 90%;
+  max-width: 450px;
   background: white;
   padding: 34px;
   border-radius: 26px;
-  box-shadow: 0 20px 40px rgba(0,0,0,0.35);
+  box-shadow: 0 25px 50px rgba(0,0,0,0.4);
+  animation: modalPop 0.3s ease-out;
+}
+
+@keyframes modalPop {
+  from { transform: scale(0.8); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
 }
 
 .modal-box h3 {
   color: #0a3d62;
+  margin-top: 0;
   margin-bottom: 20px;
+  font-size: 1.5rem;
+  border-bottom: 2px solid #f1f5f9;
+  padding-bottom: 10px;
 }
 
 .modal-box p {
   font-size: 1.05em;
-  margin: 8px 0;
+  margin: 12px 0;
+  color: #4b5563;
 }
 
 .close-btn {
   margin-top: 20px;
   text-align: center;
-  padding: 12px;
-  background: #0a3d62;
+  padding: 14px;
+  background: #64748b;
   color: white;
   font-weight: 700;
   border-radius: 12px;
   cursor: pointer;
+  transition: 0.2s;
+}
+
+.close-btn:hover {
+  background: #475569;
 }
 
 .delete-btn-modal {
   margin-top: 12px;
   text-align: center;
-  padding: 12px;
-  background: #dc3545;
+  padding: 14px;
+  background: #ef4444;
   color: white;
   font-weight: 700;
   border-radius: 12px;
   cursor: pointer;
   transition: .25s;
-  box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
 }
 
 .delete-btn-modal:hover {
-  background: #c82333;
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(220, 53, 69, 0.4);
+  background: #dc2626;
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
 }
 
 .btn-dark-toggle {
@@ -314,117 +331,86 @@ body.drawer-open .side-drawer {
   transition: .25s;
 }
 
-.btn-dark-toggle:hover {
-  background: #0a3d62;
-  color: white;
-}
-
-/* Dark Mode Styles */
 body.dark {
-  background: linear-gradient(180deg, #1a1a1a 0%, #2d2d2d 45%, #1a1a1a 100%);
-  color: #e0e0e0;
+  background: #111827;
+  color: #f3f4f6;
 }
 
 body.dark .top-nav {
-  background: linear-gradient(90deg, #2d2d2d, #3d3d3d, #2d2d2d);
-  border-bottom: 3px solid #4a9eff;
+  background: #1f2937;
+  border-bottom-color: #374151;
 }
 
-body.dark .nav-box {
-  background: #4a9eff;
-  color: white;
+body.dark .brand-title, body.dark .brand-subtitle {
+  color: #f3f4f6;
 }
 
-body.dark .nav-box:hover {
-  background: #6bb0ff;
-  color: #fff;
+body.dark .side-drawer {
+  background: #1f2937;
+  border-color: #374151;
 }
 
-body.dark .nav-dropdown-toggle {
-  background: #4a9eff;
-  color: white;
-}
-body.dark .nav-dropdown-toggle:hover {
-  background: #6bb0ff;
-  color: #fff;
-}
-body.dark .nav-dropdown-menu {
-  background: #2d2d2d;
-  border-color: #4a9eff;
-}
-body.dark .nav-dropdown-menu a {
-  color: #e0e0e0;
-}
-body.dark .nav-dropdown-menu a:hover {
-  background: #3d3d3d;
+body.dark .menu-section-drawer {
+  background: #111827;
+  border-color: #374151;
 }
 
-body.dark .logout-btn {
-  background: #4a9eff;
-  color: white;
-  border-color: #4a9eff;
+body.dark .menu-section-title {
+  background: #374151;
+  color: #f3f4f6;
 }
 
-body.dark .logout-btn:hover {
-  background: #6bb0ff;
+body.dark .menu-list a {
+  background: #1f2937;
+  color: #e5e7eb;
+}
+
+body.dark .menu-list a:hover {
+  background: #374151;
 }
 
 body.dark .page-title {
-  color: #e0e0e0;
+  color: #ffffff;
 }
 
 body.dark .crop-card {
-  background: #2d2d2d;
-  border-top-color: #4a9eff;
-  border-bottom-color: #4a9eff;
-  color: #e0e0e0;
+  background: #1f2937;
+  border-top-color: #ff9933;
+  border-bottom-color: #138808;
 }
 
 body.dark .crop-card span {
-  color: #e0e0e0;
-}
-
-body.dark .modal {
-  background: rgba(0, 0, 0, 0.8);
+  color: #f3f4f6;
 }
 
 body.dark .modal-box {
-  background: #2d2d2d;
-  color: #e0e0e0;
+  background: #1f2937;
+  color: #f3f4f6;
 }
 
 body.dark .modal-box h3 {
-  color: #e0e0e0;
+  color: #ffffff;
+  border-bottom-color: #374151;
 }
 
-body.dark .close-btn {
-  background: #4a9eff;
+body.dark .modal-box p {
+  color: #d1d5db;
 }
 
-body.dark .close-btn:hover {
-  background: #6bb0ff;
-}
-
-body.dark .btn-dark-toggle {
-  background: #3d3d3d;
-  color: #e0e0e0;
-  border-color: #555;
-}
-
-body.dark .btn-dark-toggle:hover {
-  background: #4d4d4d;
-  color: #fff;
+body.dark .btn-dark-toggle, body.dark .logout-btn {
+  background: #374151;
+  color: white;
+  border-color: #4b5563;
 }
 </style>
 </head>
 
 <body>
 
-<!-- NAVBAR -->
 <div class="top-nav">
   <div class="nav-left">
-    <button class="hamburger-btn" id="menuBtn" type="button" aria-label="Open menu" aria-controls="sideNav" aria-expanded="false">
-      <div class="hamburger-icon" aria-hidden="true">
+    <button class="hamburger-btn" id="menuBtn" type="button" aria-label="Open menu">
+      <div class="hamburger-icon">
         <span></span><span></span><span></span>
       </div>
     </button>
@@ -440,7 +426,7 @@ body.dark .btn-dark-toggle:hover {
 </div>
 
 <div class="nav-overlay" id="navOverlay" hidden></div>
-<nav class="side-drawer" id="sideNav" aria-label="Main navigation" hidden>
+<nav class="side-drawer" id="sideNav" hidden>
   <div class="drawer-inner">
     <div class="menu-section-drawer">
       <div class="menu-section-title">Main</div>
@@ -452,7 +438,7 @@ body.dark .btn-dark-toggle:hover {
     <div class="menu-section-drawer">
       <div class="menu-section-title">Market</div>
       <ul class="menu-list">
-        <li><a href="Update_crops.html" aria-current="page">Manage Your Crops</a></li>
+        <li><a href="Update_crops.html">Manage Your Crops</a></li>
         <li><a href="Sell.html">Sell Your Crop</a></li>
         <li><a href="Buy.html">Buy Your Crop</a></li>
       </ul>
@@ -474,21 +460,19 @@ body.dark .btn-dark-toggle:hover {
   </div>
 </nav>
 
-<!-- CONTENT -->
 <div class="container">
   <div class="page-title">Manage Your Crops</div>
   <div id="cropList"></div>
 </div>
 
-<!-- MODAL -->
 <div class="modal" id="modal">
   <div class="modal-box">
     <h3 id="mCrop"></h3>
-    <p><b>Quantity:</b> <span id="mQty"></span> kg</p>
-    <p><b>Price:</b> ₹<span id="mPrice"></span>/kg</p>
-    <p><b>Location:</b> <span id="mLoc"></span></p>
-    <p><b>Listed On:</b> <span id="mTime"></span></p>
-    <div class="delete-btn-modal" id="deleteBtnModal" onclick="deleteCropFromBuyTable()">Delete</div>
+    <p><strong>Quantity:</strong> <span id="mQty"></span> kg</p>
+    <p><strong>Price:</strong> ₹<span id="mPrice"></span>/kg</p>
+    <p><strong>Location:</strong> <span id="mLoc"></span></p>
+    <p><strong>Listed On:</strong> <span id="mTime"></span></p>
+    <div class="delete-btn-modal" onclick="deleteCrop()">Delete Record</div>
     <div class="close-btn" onclick="closeModal()">Close</div>
   </div>
 </div>
@@ -502,27 +486,29 @@ if (!loginid || usertype !== "Farmer") {
 }
 
 async function loadCrops() {
+  const box = document.getElementById("cropList");
+  box.innerHTML = "<p style='text-align:center;'>Loading your listings...</p>";
+
   const { data, error } = await db
     .from("crop_sales")
     .select("*")
     .eq("lid", loginid)
     .order("created_at", { ascending: false });
 
-  const box = document.getElementById("cropList");
-
   if (error) {
-    box.innerHTML = "Failed to load crops.";
+    box.innerHTML = "<p style='color:red;'>Failed to load crops.</p>";
     return;
   }
 
   if (!data.length) {
-    box.innerHTML = "No crops listed yet.";
+    box.innerHTML = "<p style='text-align:center; opacity:0.7;'>No crops listed yet.</p>";
     return;
   }
 
   box.innerHTML = data.map(c => `
     <div class="crop-card" onclick='openModal(${JSON.stringify(c)})'>
-      <span>You sold: ${c.crop_name}</span>
+      <span>${c.crop_name}</span>
+      <span style="font-size: 0.9em; opacity: 0.7;">${c.quantity} kg</span>
     </div>
   `).join("");
 }
@@ -537,8 +523,7 @@ function openModal(c) {
   document.getElementById("mQty").innerText = c.quantity;
   document.getElementById("mPrice").innerText = c.price;
   document.getElementById("mLoc").innerText = c.location;
-  document.getElementById("mTime").innerText =
-    new Date(c.created_at).toLocaleString();
+  document.getElementById("mTime").innerText = new Date(c.created_at).toLocaleString();
   document.getElementById("modal").style.display = "flex";
 }
 
@@ -548,48 +533,32 @@ function closeModal() {
   currentCropJid = null;
 }
 
-async function deleteCropFromBuyTable() {
-  if (!currentCropId || !currentCropJid) {
-    alert('No crop selected.');
-    return;
-  }
+async function deleteCrop() {
+  if (!currentCropId || !currentCropJid) return;
   
-  if (!confirm('Are you sure you want to delete this crop? This will permanently delete it .')) {
-    return;
-  }
+  const confirmDelete = confirm('Are you sure? This will remove the listing from the marketplace.');
+  if (!confirmDelete) return;
   
   try {
-    // First, delete all entries from buy_table where fid matches the crop's jid
-    const { error: buyTableError } = await db
+    const { error: buyError } = await db
       .from('buy_table')
       .delete()
       .eq('fid', currentCropJid);
     
-    if (buyTableError) {
-      console.error('Error deleting from buy_table:', buyTableError);
-      alert('An error occurred while deleting from buy_table: ' + buyTableError.message);
-      return;
-    }
-    
-    // Then, delete the crop from crop_sales using its id
-    const { error: cropSalesError } = await db
+    if (buyError) throw buyError;
+
+    const { error: saleError } = await db
       .from('crop_sales')
       .delete()
       .eq('id', currentCropId);
     
-    if (cropSalesError) {
-      console.error('Error deleting from crop_sales:', cropSalesError);
-      alert('An error occurred while deleting from crop_sales: ' + cropSalesError.message);
-      return;
-    }
+    if (saleError) throw saleError;
     
-    alert('Crop has been successfully deleted from both buy_table and crop_sales!');
+    alert('Listing removed successfully.');
     closeModal();
-    // Reload crops to refresh the list
     loadCrops();
-  } catch (error) {
-    console.error('Error deleting crop:', error);
-    alert('An error occurred while deleting crop. Please try again.');
+  } catch (err) {
+    alert('Error deleting listing: ' + err.message);
   }
 }
 
@@ -598,31 +567,22 @@ document.getElementById("logoutBtn").onclick = () => {
   location.href = "login";
 };
 
-// Dark mode functionality
 function initDarkMode() {
-    const savedDarkMode = localStorage.getItem('darkMode') === 'true';
-    if (savedDarkMode) {
-        document.body.classList.add('dark');
-    }
-    updateDarkModeButton();
+    const isDark = localStorage.getItem('darkMode') === 'true';
+    if (isDark) document.body.classList.add('dark');
+    updateBtnLabel();
 }
 
-function updateDarkModeButton() {
-    const toggleBtn = document.getElementById('toggleDark');
-    if (toggleBtn) {
-        toggleBtn.innerText = document.body.classList.contains('dark') ? '☀️ Light Mode' : '🌙 Dark Mode';
-    }
+function updateBtnLabel() {
+    const btn = document.getElementById('toggleDark');
+    btn.innerText = document.body.classList.contains('dark') ? '☀️ Light Mode' : '🌙 Dark Mode';
 }
 
-const toggleBtn = document.getElementById('toggleDark');
-if (toggleBtn) {
-    toggleBtn.addEventListener('click', () => {
-        document.body.classList.toggle('dark');
-        const isDark = document.body.classList.contains('dark');
-        localStorage.setItem('darkMode', isDark);
-        updateDarkModeButton();
-    });
-}
+document.getElementById('toggleDark').addEventListener('click', () => {
+    document.body.classList.toggle('dark');
+    localStorage.setItem('darkMode', document.body.classList.contains('dark'));
+    updateBtnLabel();
+});
 
 const menuBtn = document.getElementById("menuBtn");
 const sideNav = document.getElementById("sideNav");
@@ -632,40 +592,22 @@ function openDrawer() {
   document.body.classList.add("drawer-open");
   sideNav.hidden = false;
   navOverlay.hidden = false;
-  menuBtn.setAttribute("aria-expanded", "true");
 }
 
 function closeDrawer() {
   document.body.classList.remove("drawer-open");
-  menuBtn.setAttribute("aria-expanded", "false");
-  window.setTimeout(() => {
+  setTimeout(() => {
     if (!document.body.classList.contains("drawer-open")) {
       sideNav.hidden = true;
       navOverlay.hidden = true;
     }
-  }, 220);
+  }, 250);
 }
 
-if (menuBtn && sideNav && navOverlay) {
-  menuBtn.addEventListener("click", () => {
-    if (document.body.classList.contains("drawer-open")) closeDrawer();
-    else openDrawer();
-  });
+menuBtn.onclick = () => document.body.classList.contains("drawer-open") ? closeDrawer() : openDrawer();
+navOverlay.onclick = closeDrawer;
 
-  navOverlay.addEventListener("click", closeDrawer);
-  document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape") closeDrawer();
-  });
-
-  sideNav.addEventListener("click", (e) => {
-    const a = e.target.closest?.("a");
-    if (a) closeDrawer();
-  });
-}
-
-// Initialize dark mode
 initDarkMode();
-
 loadCrops();
 </script>
 
