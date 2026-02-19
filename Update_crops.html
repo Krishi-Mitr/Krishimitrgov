@@ -217,7 +217,7 @@ body.dark .crop-card { background: #1e293b; color: #f1f5f9; }
     <div class="form-grid">
       <div class="form-group">
         <label>Crop Name</label>
-        <input type="text" id="upd_crop_name">
+        <input type="text" id="upd_cname">
       </div>
       <div class="form-group">
         <label>Price (per kg)</label>
@@ -252,7 +252,7 @@ body.dark .crop-card { background: #1e293b; color: #f1f5f9; }
         <input type="date" id="upd_harvest">
       </div>
       <div class="form-group">
-        <label>Available Until</label>
+        <label>Available Until (Internal Only)</label>
         <input type="date" id="upd_expiry">
       </div>
       <div class="form-group">
@@ -303,7 +303,7 @@ function openModal(c) {
   currentJid = c.jid;
   
   document.getElementById("displayId").innerText = "Ref: " + currentJid;
-  document.getElementById("upd_crop_name").value = c.crop_name || "";
+  document.getElementById("upd_cname").value = c.crop_name || "";
   document.getElementById("upd_price").value = c.price || 0;
   document.getElementById("upd_qty").value = c.quantity || 0;
   document.getElementById("upd_min_qty").value = c.min_quantity || 0;
@@ -323,42 +323,37 @@ function closeModal() {
 }
 
 async function processUpdate() {
-  const updateData = {
-    crop_name: document.getElementById("upd_crop_name").value,
+  const commonData = {
     price: document.getElementById("upd_price").value,
     quantity: document.getElementById("upd_qty").value,
     min_quantity: document.getElementById("upd_min_qty").value,
     quality: document.getElementById("upd_quality").value,
     delivery_type: document.getElementById("upd_delivery").value,
     harvest_date: document.getElementById("upd_harvest").value,
-    available_until: document.getElementById("upd_expiry").value,
     location: document.getElementById("upd_loc").value,
     contact_info: document.getElementById("upd_contact").value,
     description: document.getElementById("upd_desc").value
   };
 
-  const buyTableData = {
-    crop_name: updateData.crop_name,
-    price: updateData.price,
-    quantity: updateData.quantity,
-    min_quantity: updateData.min_quantity,
-    quality: updateData.quality,
-    delivery_type: updateData.delivery_type,
-    harvest_date: updateData.harvest_date,
-    available_until: updateData.available_until,
-    location: updateData.location,
-    contact_info: updateData.contact_info,
-    description: updateData.description
+  const cropSalesUpdate = {
+    ...commonData,
+    crop_name: document.getElementById("upd_cname").value,
+    available_until: document.getElementById("upd_expiry").value
+  };
+
+  const buyTableUpdate = {
+    ...commonData,
+    cname: document.getElementById("upd_cname").value
   };
 
   try {
-    const { error: err1 } = await db.from("crop_sales").update(updateData).eq("id", currentCropId);
+    const { error: err1 } = await db.from("crop_sales").update(cropSalesUpdate).eq("id", currentCropId);
     if (err1) throw err1;
 
-    const { error: err2 } = await db.from("buy_table").update(buyTableData).eq("fid", currentJid);
+    const { error: err2 } = await db.from("buy_table").update(buyTableUpdate).eq("fid", currentJid);
     if (err2) throw err2;
 
-    alert("Crop details synchronized across tables!");
+    alert("Crop details synchronized successfully!");
     closeModal();
     loadCrops();
   } catch (e) {
