@@ -171,50 +171,56 @@ const toInput=document.getElementById("to");
 const suggestions=document.getElementById("suggestions");
 const errorBox=document.getElementById("error");
 
+let searchCounter = 0; // 🔥 prevents duplicate async results
+
 toInput.addEventListener("input", async()=>{
 
-  const val=toInput.value.trim();
-  suggestions.innerHTML="";
-  errorBox.textContent="";
+  const val = toInput.value.trim();
+  suggestions.innerHTML = "";
+  errorBox.textContent = "";
   toInput.classList.remove("error");
-  receiverId=null;
-  receiverName=null;
+  receiverId = null;
+  receiverName = null;
 
-  if(val.length<2) return;
+  if(val.length < 2) return;
+
+  const currentSearch = ++searchCounter; // unique id for this search
 
   const { data } = await window.db
     .from("logindata")
     .select("id, username")
-    .ilike("username", val+"%")
+    .ilike("username", val + "%")
     .limit(5);
 
-  if(!data || data.length===0){
+  // ❌ If this response is old, ignore it
+  if(currentSearch !== searchCounter) return;
+
+  if(!data || data.length === 0){
     toInput.classList.add("error");
-    errorBox.textContent="No username matches";
+    errorBox.textContent = "No username matches";
     return;
   }
 
-  const seen=new Set();
+  const seen = new Set();
 
-  data.forEach(u=>{
-    if(u.id===myId) return;
+  data.forEach(u => {
+    if(u.id === myId) return;
     if(seen.has(u.username)) return;
     seen.add(u.username);
 
-    const div=document.createElement("div");
-    div.textContent=u.username;
+    const div = document.createElement("div");
+    div.textContent = u.username;
 
-    div.onclick=()=>{
-      toInput.value=u.username;
-      receiverId=u.id;
-      receiverName=u.username;
-      suggestions.innerHTML="";
+    div.onclick = () => {
+      toInput.value = u.username;
+      receiverId = u.id;
+      receiverName = u.username;
+      suggestions.innerHTML = "";
     };
 
     suggestions.appendChild(div);
   });
 });
-
 /* SEND MESSAGE */
 /* ALWAYS CREATES NEW CONVERSATION */
 async function sendMessage(){
