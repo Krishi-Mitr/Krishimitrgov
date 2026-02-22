@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -104,6 +103,10 @@ button{
 button:hover{
   background:#0f6b06;
 }
+button:disabled{
+  background:gray;
+  cursor:not-allowed;
+}
 </style>
 </head>
 
@@ -118,7 +121,7 @@ button:hover{
 
 <div class="reply-box">
   <textarea id="reply" placeholder="Type a reply..."></textarea>
-  <button onclick="sendReply()">Send</button>
+  <button id="sendBtn">Send</button>
 </div>
 
 <script>
@@ -135,9 +138,11 @@ document.getElementById("title").textContent = otherName || "Chat";
 
 const box = document.getElementById("chat");
 const replyInput = document.getElementById("reply");
+const sendBtn = document.getElementById("sendBtn");
 
 let loadedMessageIds = new Set();
 let lastMessageTime = null;
+let isSending = false;
 
 /* ADD MESSAGE */
 function addMessage(m){
@@ -145,23 +150,19 @@ function addMessage(m){
   loadedMessageIds.add(m.id);
 
   const div = document.createElement("div");
-  div.className = "msg " + 
-    (String(m.senderid) === myId ? "right" : "left");
+  div.className = "msg " + (String(m.senderid) === myId ? "right" : "left");
 
   div.innerHTML = `
     ${m.message}
-    <div class="time">
-      ${new Date(m.time).toLocaleTimeString()}
-    </div>
+    <div class="time">${new Date(m.time).toLocaleTimeString()}</div>
   `;
 
   box.appendChild(div);
   box.scrollTop = box.scrollHeight;
-
   lastMessageTime = m.time;
 }
 
-/* FIRST LOAD */
+/* LOAD ALL MESSAGES */
 async function loadMessages(){
   const { data, error } = await window.db
     .from("chat_messages")
@@ -175,22 +176,18 @@ async function loadMessages(){
   loadedMessageIds.clear();
   lastMessageTime = null;
 
-  if(data){
-    data.forEach(m => addMessage(m));
-  }
+  if(data) data.forEach(m => addMessage(m));
 
   markRead();
 }
 
 /* CHECK NEW MESSAGES */
 async function checkNewMessages(){
-  if(!lastMessageTime) return;
-
   const { data } = await window.db
     .from("chat_messages")
     .select("*")
     .eq("chatid", chatid)
-    .gt("time", lastMessageTime)
+    .gt("time", lastMessageTime || 0)
     .order("time", { ascending: true });
 
   if(data && data.length > 0){
@@ -208,42 +205,58 @@ async function markRead(){
     .eq("unread_for", myId);
 }
 
-/* SEND MESSAGE (FIXED) */
+/* SEND MESSAGE */
 async function sendReply(){
   const text = replyInput.value.trim();
-  if(!text) return;
+  if(!text || isSending) return;
 
-  const { data: me } = await window.db
-    .from("logininfo")
-    .select("username")
-    .eq("loginid", myId)
-    .single();
+  isSending = true;
+  sendBtn.disabled = true;
 
-  const { data: inserted, error } = await window.db
-    .from("chat_messages")
-    .insert({
-      chatid: chatid,
-      senderid: myId,
-      sendername: me.username,
-      message: text
-    })
-    .select()
-    .single();
+  try{
+    // Get sender username
+    const { data: me, error: meErr } = await window.db
+      .from("logindata")
+      .select("username")
+      .eq("id", myId)
+      .single();
 
-  if(error) return;
+    if(meErr || !me) throw new Error("Failed to get username");
 
-  await window.db
-    .from("chat_conversations")
-    .update({
-      last_message: text,
-      unread_for: otherId
-    })
-    .eq("chatid", chatid);
+    // Insert message
+    const { data: inserted, error } = await window.db
+      .from("chat_messages")
+      .insert({
+        chatid: chatid,
+        senderid: myId,
+        sendername: me.username,
+        message: text
+      })
+      .select()
+      .single();
 
-  replyInput.value = "";
+    if(error) throw new Error("Failed to insert message");
 
-  /* Display using SERVER timestamp */
-  addMessage(inserted);
+    // Update last message and unread for other user
+    await window.db
+      .from("chat_conversations")
+      .update({
+        last_message: text,
+        unread_for: otherId
+      })
+      .eq("chatid", chatid);
+
+    // Display locally
+    addMessage(inserted);
+    replyInput.value = "";
+
+  }catch(err){
+    console.error(err);
+    alert("Failed to send message");
+  }
+
+  isSending = false;
+  sendBtn.disabled = false;
 }
 
 /* ENTER TO SEND */
