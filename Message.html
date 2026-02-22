@@ -73,6 +73,10 @@ textarea{min-height:160px}
   font-weight:bold;
   cursor:pointer;
 }
+.send-btn:disabled{
+  background:gray;
+  cursor:not-allowed;
+}
 .toast {
   position: fixed;
   bottom: 30px;
@@ -125,10 +129,11 @@ if(!loginString){
   location.replace("login");
 }
 
-let myId = null;          // bigint
+let myId = null;
 let myUsername = null;
-let receiverId = null;    // bigint
+let receiverId = null;
 let receiverName = null;
+let isSending = false; // 🔥 prevents duplicate sending
 
 /* LOAD CURRENT USER */
 async function loadUser(){
@@ -158,7 +163,7 @@ function showToast(){
   setTimeout(()=>toast.classList.remove("show"),2500);
 }
 
-/* SEARCH USER */
+/* SEARCH USER (no duplicates) */
 const toInput=document.getElementById("to");
 const suggestions=document.getElementById("suggestions");
 const errorBox=document.getElementById("error");
@@ -204,67 +209,84 @@ toInput.addEventListener("input", async()=>{
   });
 });
 
-/* SEND MESSAGE */
+/* SEND MESSAGE (fully protected) */
 async function sendMessage(){
+
+  if(isSending) return;
+  isSending = true;
+
+  const sendBtn=document.querySelector(".send-btn");
+  sendBtn.disabled=true;
 
   const subject=document.getElementById("subject").value.trim();
   const msg=document.getElementById("message").value.trim();
 
   if(!receiverId || !msg){
     alert("Receiver and message are required");
+    isSending=false;
+    sendBtn.disabled=false;
     return;
   }
 
-  // CHECK IF CHAT EXISTS
-  const { data: existing } = await window.db
-    .from("chat_conversations")
-    .select("*")
-    .or(`and(user1id.eq.${myId},user2id.eq.${receiverId}),and(user1id.eq.${receiverId},user2id.eq.${myId})`)
-    .maybeSingle();
+  try{
 
-  let chatId;
+    const { data: existing } = await window.db
+      .from("chat_conversations")
+      .select("*")
+      .or(`and(user1id.eq.${myId},user2id.eq.${receiverId}),and(user1id.eq.${receiverId},user2id.eq.${myId})`)
+      .maybeSingle();
 
-  if(existing){
-    chatId=existing.chatid;
+    let chatId;
+
+    if(existing){
+      chatId=existing.chatid;
+
+      await window.db
+        .from("chat_conversations")
+        .update({
+          last_message:subject || msg,
+          last_time:new Date(),
+          unread_for:receiverId
+        })
+        .eq("chatid",chatId);
+
+    }else{
+      const { data } = await window.db
+        .from("chat_conversations")
+        .insert({
+          user1id:myId,
+          user2id:receiverId,
+          user1name:myUsername,
+          user2name:receiverName,
+          last_message:subject || msg,
+          unread_for:receiverId
+        })
+        .select()
+        .single();
+
+      chatId=data.chatid;
+    }
 
     await window.db
-      .from("chat_conversations")
-      .update({
-        last_message: subject || msg,
-        last_time:new Date(),
-        unread_for:receiverId
-      })
-      .eq("chatid",chatId);
-
-  }else{
-    const { data } = await window.db
-      .from("chat_conversations")
+      .from("chat_messages")
       .insert({
-        user1id:myId,
-        user2id:receiverId,
-        user1name:myUsername,
-        user2name:receiverName,
-        last_message:subject || msg,
-        unread_for:receiverId
-      })
-      .select()
-      .single();
+        chatid:chatId,
+        senderid:myId,
+        sendername:myUsername,
+        message:msg
+      });
 
-    chatId=data.chatid;
+    showToast();
+    document.getElementById("message").value="";
+    document.getElementById("subject").value="";
+
+  }catch(err){
+    console.error(err);
+    alert("Error sending message");
   }
 
-  await window.db
-    .from("chat_messages")
-    .insert({
-      chatid:chatId,
-      senderid:myId,
-      sendername:myUsername,
-      message:msg
-    });
-
-  showToast();
-  document.getElementById("message").value="";
-  document.getElementById("subject").value="";
+  isSending=false;
+  sendBtn.disabled=false;
 }
 
 </script>
