@@ -1,39 +1,136 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>New Message</title>
+<title>New Message | Saathi</title>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="supabase.js"></script>
+
+<style>
+body{
+  font-family:'Segoe UI',Tahoma,Verdana,sans-serif;
+  margin:0;
+  background:#fff;
+}
+.top-nav{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  background:#FF9933;
+  padding:15px 40px;
+  position:fixed;
+  top:0;left:0;right:0;
+}
+.nav-box{
+  background:#138808;
+  color:#fff;
+  padding:10px 22px;
+  border-radius:12px;
+  text-decoration:none;
+  font-weight:bold;
+}
+.logout-btn{
+  font-weight:bold;
+  cursor:pointer;
+}
+.container{
+  max-width:900px;
+  margin:120px auto;
+  padding:40px;
+  border-radius:20px;
+  box-shadow:0 8px 30px rgba(0,0,0,.15);
+}
+input, textarea{
+  width:100%;
+  padding:14px;
+  margin-top:15px;
+  border-radius:10px;
+  border:1px solid #ccc;
+  font-size:16px;
+}
+textarea{min-height:160px}
+.error{ border:2px solid red; }
+.error-text{ color:red; margin-top:6px; }
+.dropdown{
+  border:1px solid #ccc;
+  border-radius:10px;
+  margin-top:5px;
+  overflow:hidden;
+}
+.dropdown div{
+  padding:10px;
+  cursor:pointer;
+}
+.dropdown div:hover{ background:#f0f0f0; }
+.send-btn{
+  margin-top:25px;
+  background:#138808;
+  color:#fff;
+  padding:14px 30px;
+  border:none;
+  border-radius:12px;
+  font-weight:bold;
+  cursor:pointer;
+}
+.toast {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  background: #2e7d32;
+  color: white;
+  padding: 12px 18px;
+  border-radius: 6px;
+  font-size: 14px;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(10px);
+  transition: all 0.3s ease;
+  z-index: 9999;
+}
+.toast.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+</style>
 </head>
+
 <body>
 
-<h2>New Message</h2>
+<div class="top-nav">
+  <a href="Chat" class="nav-box">← Back to Chat</a>
+  <span class="logout-btn" onclick="logout()">Logout</span>
+</div>
 
-<input id="to" placeholder="To (username)">
-<div id="suggestions"></div>
+<div class="container">
+  <h2>New Message</h2>
 
-<br><br>
+  <input id="to" placeholder="To (username)">
+  <div id="suggestions" class="dropdown"></div>
+  <div id="error" class="error-text"></div>
 
-<textarea id="message" placeholder="Type message"></textarea>
-<br><br>
+  <input id="subject" placeholder="Subject">
+  <textarea id="message" placeholder="Type your message..."></textarea>
 
-<button id="sendBtn">Send</button>
+  <button class="send-btn" onclick="sendMessage()">Send</button>
+</div>
+
+<div id="toast" class="toast">Message sent successfully</div>
 
 <script>
 
-// loginid is STRING in your DB
+/* AUTH */
 const loginString = sessionStorage.getItem("loginid");
-if(!loginString) location.replace("login");
+if(!loginString){
+  location.replace("login");
+}
 
-let myId = null;         // bigint id
+let myId = null;          // bigint
 let myUsername = null;
-let receiverId = null;
+let receiverId = null;    // bigint
 let receiverName = null;
-let sending = false;
 
-/* LOAD MY USER */
+/* LOAD CURRENT USER */
 async function loadUser(){
   const { data } = await window.db
     .from("logindata")
@@ -48,67 +145,77 @@ async function loadUser(){
 }
 loadUser();
 
-/* USER SEARCH (NO DUPLICATES) */
-const toInput = document.getElementById("to");
-const suggestions = document.getElementById("suggestions");
+/* LOGOUT */
+function logout(){
+  sessionStorage.clear();
+  location.replace("login");
+}
 
-toInput.addEventListener("input", async () => {
+/* TOAST */
+function showToast(){
+  const toast=document.getElementById("toast");
+  toast.classList.add("show");
+  setTimeout(()=>toast.classList.remove("show"),2500);
+}
 
-  const val = toInput.value.trim();
-  suggestions.innerHTML = "";
-  receiverId = null;
+/* SEARCH USER */
+const toInput=document.getElementById("to");
+const suggestions=document.getElementById("suggestions");
+const errorBox=document.getElementById("error");
 
-  if(val.length < 2) return;
+toInput.addEventListener("input", async()=>{
+  const val=toInput.value.trim();
+  suggestions.innerHTML="";
+  errorBox.textContent="";
+  toInput.classList.remove("error");
+  receiverId=null;
+  receiverName=null;
+
+  if(val.length<2) return;
 
   const { data } = await window.db
     .from("logindata")
     .select("id, username")
-    .ilike("username", val + "%")
-    .limit(10);
+    .ilike("username", val+"%")
+    .limit(5);
 
-  if(!data) return;
-
-  const seen = new Set();
-
-  data.forEach(user => {
-
-    if(user.id === myId) return;
-    if(seen.has(user.username)) return;
-
-    seen.add(user.username);
-
-    const div = document.createElement("div");
-    div.textContent = user.username;
-    div.style.cursor = "pointer";
-
-    div.onclick = () => {
-      receiverId = user.id;
-      receiverName = user.username;
-      toInput.value = user.username;
-      suggestions.innerHTML = "";
-    };
-
-    suggestions.appendChild(div);
-  });
-
-});
-
-/* SEND MESSAGE */
-document.getElementById("sendBtn").addEventListener("click", sendMessage);
-
-async function sendMessage(){
-
-  if(sending) return;
-  sending = true;
-
-  const text = document.getElementById("message").value.trim();
-  if(!receiverId || !text){
-    alert("Fill all fields");
-    sending = false;
+  if(!data || data.length===0){
+    toInput.classList.add("error");
+    errorBox.textContent="No username matches";
     return;
   }
 
-  // CHECK EXISTING CHAT
+  const seen=new Set();
+
+  data.forEach(u=>{
+    if(u.id===myId) return;
+    if(seen.has(u.username)) return;
+    seen.add(u.username);
+
+    const div=document.createElement("div");
+    div.textContent=u.username;
+    div.onclick=()=>{
+      toInput.value=u.username;
+      receiverId=u.id;
+      receiverName=u.username;
+      suggestions.innerHTML="";
+    };
+    suggestions.appendChild(div);
+  });
+});
+
+/* SEND MESSAGE */
+async function sendMessage(){
+
+  const subject=document.getElementById("subject").value.trim();
+  const msg=document.getElementById("message").value.trim();
+
+  if(!receiverId || !msg){
+    alert("Receiver and message are required");
+    return;
+  }
+
+  // CHECK IF CHAT EXISTS
   const { data: existing } = await window.db
     .from("chat_conversations")
     .select("*")
@@ -118,49 +225,49 @@ async function sendMessage(){
   let chatId;
 
   if(existing){
-
-    chatId = existing.chatid;
+    chatId=existing.chatid;
 
     await window.db
       .from("chat_conversations")
       .update({
-        last_message: text,
-        last_time: new Date(),
-        unread_for: receiverId
+        last_message: subject || msg,
+        last_time:new Date(),
+        unread_for:receiverId
       })
-      .eq("chatid", chatId);
+      .eq("chatid",chatId);
 
-  } else {
-
+  }else{
     const { data } = await window.db
       .from("chat_conversations")
-      .insert([{
-        user1id: myId,
-        user2id: receiverId,
-        user1name: myUsername,
-        user2name: receiverName,
-        last_message: text,
-        unread_for: receiverId
-      }])
+      .insert({
+        user1id:myId,
+        user2id:receiverId,
+        user1name:myUsername,
+        user2name:receiverName,
+        last_message:subject || msg,
+        unread_for:receiverId
+      })
       .select()
       .single();
 
-    chatId = data.chatid;
+    chatId=data.chatid;
   }
 
-  // INSERT MESSAGE
   await window.db
     .from("chat_messages")
-    .insert([{
-      chatid: chatId,
-      senderid: myId,
-      sendername: myUsername,
-      message: text
-    }]);
+    .insert({
+      chatid:chatId,
+      senderid:myId,
+      sendername:myUsername,
+      message:msg
+    });
 
-  location.href = "chat?chatid=" + chatId;
+  showToast();
+  document.getElementById("message").value="";
+  document.getElementById("subject").value="";
 }
 
 </script>
+
 </body>
 </html>
