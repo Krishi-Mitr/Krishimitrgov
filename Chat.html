@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>New Message | Saathi</title>
+<title>Chat | Saathi</title>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="supabase.js"></script>
@@ -11,17 +11,17 @@
 body{
   font-family:'Segoe UI',Tahoma,Verdana,sans-serif;
   margin:0;
-  background:#fff;
+  background:#f5f5f5;
 }
+
 .top-nav{
   display:flex;
   justify-content:space-between;
   align-items:center;
   background:#FF9933;
   padding:15px 40px;
-  position:fixed;
-  top:0;left:0;right:0;
 }
+
 .nav-box{
   background:#138808;
   color:#fff;
@@ -30,74 +30,49 @@ body{
   text-decoration:none;
   font-weight:bold;
 }
+
 .logout-btn{
   font-weight:bold;
   cursor:pointer;
 }
+
 .container{
   max-width:900px;
-  margin:120px auto;
-  padding:40px;
-  border-radius:20px;
-  box-shadow:0 8px 30px rgba(0,0,0,.15);
+  margin:40px auto;
+  padding:20px;
 }
-input, textarea{
-  width:100%;
-  padding:14px;
-  margin-top:15px;
-  border-radius:10px;
-  border:1px solid #ccc;
-  font-size:16px;
-}
-textarea{min-height:160px}
-.error{
-  border:2px solid red;
-}
-.error-text{
-  color:red;
-  margin-top:6px;
-}
-.dropdown{
-  border:1px solid #ccc;
-  border-radius:10px;
-  margin-top:5px;
-  overflow:hidden;
-}
-.dropdown div{
-  padding:10px;
+
+.chat-item{
+  background:#fff;
+  padding:18px;
+  margin-bottom:12px;
+  border-radius:12px;
+  box-shadow:0 4px 10px rgba(0,0,0,.1);
   cursor:pointer;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
 }
-.dropdown div:hover{
+
+.chat-item:hover{
   background:#f0f0f0;
 }
-.send-btn{
-  margin-top:25px;
-  background:#138808;
-  color:#fff;
-  padding:14px 30px;
-  border:none;
-  border-radius:12px;
+
+.chat-name{
   font-weight:bold;
-  cursor:pointer;
 }
-.toast {
-  position: fixed;
-  bottom: 30px;
-  right: 30px;
-  background: #2e7d32;
-  color: white;
-  padding: 12px 18px;
-  border-radius: 6px;
-  font-size: 14px;
-  opacity: 0;
-  pointer-events: none;
-  transform: translateY(10px);
-  transition: all 0.3s ease;
-  z-index: 9999;
+
+.chat-last{
+  color:#666;
+  margin-top:4px;
 }
-.toast.show {
-  opacity: 1;
-  transform: translateY(0);
+
+.unread{
+  background:red;
+  color:white;
+  font-size:12px;
+  padding:4px 8px;
+  border-radius:10px;
 }
 </style>
 </head>
@@ -105,31 +80,18 @@ textarea{min-height:160px}
 <body>
 
 <div class="top-nav">
-  <a href="Chat" class="nav-box">← Back to Chat</a>
+  <a href="NewMessage" class="nav-box">+ New Message</a>
   <span class="logout-btn" onclick="logout()">Logout</span>
 </div>
 
-<div class="container">
-  <h2>New Message</h2>
-
-  <input id="to" placeholder="To (username)">
-  <div id="suggestions" class="dropdown"></div>
-  <div id="error" class="error-text"></div>
-
-  <input id="subject" placeholder="Subject">
-  <textarea id="message" placeholder="Type your message..."></textarea>
-
-  <button class="send-btn" onclick="sendMessage()">Send</button>
+<div class="container" id="chatList">
+  Loading chats...
 </div>
-
-<div id="toast" class="toast">Message sent successfully</div>
 
 <script>
 
-/* AUTH — MATCHES YOUR LOGIN PAGE */
+/* AUTH */
 const myLoginId = Number(sessionStorage.getItem("loginid"));
-const myUsertype = sessionStorage.getItem("usertype");
-
 if(!myLoginId){
   location.replace("login");
 }
@@ -139,111 +101,71 @@ function logout(){
   location.replace("login");
 }
 
-function showToast(){
-  const toast = document.getElementById("toast");
-  toast.classList.add("show");
-  setTimeout(() => {
-    toast.classList.remove("show");
-  }, 2500);
-}
+const chatList = document.getElementById("chatList");
 
-const toInput = document.getElementById("to");
-const suggestions = document.getElementById("suggestions");
-const errorBox = document.getElementById("error");
+/* LOAD CONVERSATIONS */
+async function loadChats(){
 
-let receiverId = null;
-let receiverName = null;
+  const { data, error } = await window.db
+    .from("chat_conversations")
+    .select("*")
+    .or(`user1id.eq.${myLoginId},user2id.eq.${myLoginId}`)
+    .order("chatid", { ascending:false });
 
-/* USER SEARCH */
-toInput.addEventListener("input", async () => {
-
-  const val = toInput.value.trim();
-  suggestions.innerHTML="";
-  errorBox.textContent="";
-  toInput.classList.remove("error");
-  receiverId=null;
-  receiverName=null;
-
-  if(val.length < 2) return;
-
-  const { data } = await window.db
-    .from("logindata")
-    .select("loginid, username")
-    .ilike("username", val + "%")
-    .limit(5);
-
-  if(!data || data.length === 0){
-    toInput.classList.add("error");
-    errorBox.textContent="No username matches";
+  if(error || !data){
+    chatList.innerHTML = "Failed to load chats.";
     return;
   }
 
-  data.forEach(u=>{
-    const div=document.createElement("div");
-    div.textContent=u.username;
+  if(data.length === 0){
+    chatList.innerHTML = "No conversations yet.";
+    return;
+  }
 
-    div.onclick=()=>{
-      if(Number(u.loginid) === myLoginId){
-        errorBox.textContent="You cannot message yourself";
-        return;
+  chatList.innerHTML = "";
+
+  data.forEach(chat => {
+
+    const otherId = chat.user1id === myLoginId 
+        ? chat.user2id 
+        : chat.user1id;
+
+    const otherName = chat.user1id === myLoginId 
+        ? chat.user2name 
+        : chat.user1name;
+
+    const div = document.createElement("div");
+    div.className = "chat-item";
+
+    div.innerHTML = `
+      <div>
+        <div class="chat-name">${otherName}</div>
+        <div class="chat-last">${chat.last_message || ""}</div>
+      </div>
+      ${chat.unread_for === myLoginId ? '<div class="unread">New</div>' : ''}
+    `;
+
+    div.onclick = async () => {
+
+      // Clear unread flag
+      if(chat.unread_for === myLoginId){
+        await window.db
+          .from("chat_conversations")
+          .update({ unread_for: null })
+          .eq("chatid", chat.chatid);
       }
 
-      toInput.value=u.username;
-      receiverId=Number(u.loginid);
-      receiverName=u.username;
-      suggestions.innerHTML="";
+      // Store chatid for message page
+      sessionStorage.setItem("activeChatId", chat.chatid);
+      location.href = "Messages";
     };
 
-    suggestions.appendChild(div);
+    chatList.appendChild(div);
   });
-});
 
-
-/* SEND MESSAGE */
-async function sendMessage(){
-
-  const subject=document.getElementById("subject").value.trim();
-  const msg=document.getElementById("message").value.trim();
-
-  if(!receiverId || !msg){
-    alert("Receiver and message are required");
-    return;
-  }
-
-  /* CREATE CONVERSATION */
-  const { data: convo, error } = await window.db
-    .from("chat_conversations")
-    .insert({
-      user1id: myLoginId,
-      user2id: receiverId,
-      user1name: "User " + myLoginId,
-      user2name: receiverName,
-      last_message: subject || msg,
-      unread_for: receiverId
-    })
-    .select()
-    .single();
-
-  if(error){
-    alert("Failed to create chat");
-    return;
-  }
-
-  /* INSERT MESSAGE */
-  await window.db
-    .from("chat_messages")
-    .insert({
-      chatid: convo.chatid,
-      senderid: myLoginId,
-      sendername: "User " + myLoginId,
-      message: msg
-    });
-
-  showToast();
-
-  document.getElementById("message").value="";
-  document.getElementById("subject").value="";
 }
+
+loadChats();
 
 </script>
 
