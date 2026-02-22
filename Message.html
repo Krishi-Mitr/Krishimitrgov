@@ -125,11 +125,10 @@ textarea{min-height:160px}
 <div id="toast" class="toast">Message sent successfully</div>
 
 <script>
-/* AUTH */
-const myLoginId = Number(sessionStorage.getItem("loginid")); // convert to number
-const myUsername = sessionStorage.getItem("username");
 
-if(!myLoginId || !myUsername){
+/* AUTH */
+const myLoginId = Number(sessionStorage.getItem("loginid"));
+if(!myLoginId){
   location.replace("login");
 }
 
@@ -141,9 +140,7 @@ function logout(){
 function showToast(){
   const toast = document.getElementById("toast");
   toast.classList.add("show");
-  setTimeout(() => {
-    toast.classList.remove("show");
-  }, 2500);
+  setTimeout(() => toast.classList.remove("show"), 2500);
 }
 
 const toInput = document.getElementById("to");
@@ -153,8 +150,9 @@ const errorBox = document.getElementById("error");
 let receiverId = null;
 let receiverName = null;
 
-/* USERNAME SEARCH */
+/* USER SEARCH (DUPLICATE SAFE) */
 toInput.addEventListener("input", async () => {
+
   const val = toInput.value.trim();
   suggestions.innerHTML="";
   errorBox.textContent="";
@@ -165,10 +163,10 @@ toInput.addEventListener("input", async () => {
   if(val.length < 2) return;
 
   const { data } = await window.db
-    .from("logindata")   // ✅ FIXED TABLE NAME
+    .from("logindata")
     .select("loginid, username")
     .ilike("username", val + "%")
-    .limit(5);
+    .limit(10);
 
   if(!data || data.length===0){
     toInput.classList.add("error");
@@ -176,25 +174,36 @@ toInput.addEventListener("input", async () => {
     return;
   }
 
+  const seen = new Set();
+
   data.forEach(u=>{
+    if(seen.has(u.username)) return;
+    seen.add(u.username);
+
     const div=document.createElement("div");
     div.textContent=u.username;
+
     div.onclick=()=>{
       if(Number(u.loginid) === myLoginId){
         errorBox.textContent="You cannot message yourself";
         return;
       }
+
       toInput.value=u.username;
-      receiverId=Number(u.loginid); // convert to number
+      receiverId=Number(u.loginid);
       receiverName=u.username;
       suggestions.innerHTML="";
     };
+
     suggestions.appendChild(div);
   });
+
 });
 
-/* SEND MESSAGE */
+
+/* SEND MESSAGE (NO DUPLICATE CONVERSATION) */
 async function sendMessage(){
+
   const subject=document.getElementById("subject").value.trim();
   const msg=document.getElementById("message").value.trim();
 
@@ -203,32 +212,58 @@ async function sendMessage(){
     return;
   }
 
-  const senderName = myUsername;
-
-  const { data: convo, error } = await window.db
+  // 🔎 Check if conversation already exists
+  const { data: existing } = await window.db
     .from("chat_conversations")
-    .insert({
-      user1id: myLoginId,
-      user2id: receiverId,
-      user1name: senderName,
-      user2name: receiverName,
-      last_message: subject || msg,
-      unread_for: receiverId
-    })
-    .select()
-    .single();
+    .select("*")
+    .or(`and(user1id.eq.${myLoginId},user2id.eq.${receiverId}),
+         and(user1id.eq.${receiverId},user2id.eq.${myLoginId})`)
+    .maybeSingle();
 
-  if(error){
-    alert("Failed to create chat");
-    return;
+  let chatId;
+
+  if(existing){
+    chatId = existing.chatid;
+
+    // update last message
+    await window.db
+      .from("chat_conversations")
+      .update({
+        last_message: subject || msg,
+        unread_for: receiverId
+      })
+      .eq("chatid", chatId);
+
+  } else {
+
+    const { data: convo, error } = await window.db
+      .from("chat_conversations")
+      .insert({
+        user1id: myLoginId,
+        user2id: receiverId,
+        user1name: "User " + myLoginId,
+        user2name: receiverName,
+        last_message: subject || msg,
+        unread_for: receiverId
+      })
+      .select()
+      .single();
+
+    if(error){
+      alert("Failed to create chat");
+      return;
+    }
+
+    chatId = convo.chatid;
   }
 
+  // insert message
   await window.db
     .from("chat_messages")
     .insert({
-      chatid: convo.chatid,
+      chatid: chatId,
       senderid: myLoginId,
-      sendername: senderName,
+      sendername: "User " + myLoginId,
       message: msg
     });
 
@@ -237,6 +272,7 @@ async function sendMessage(){
   document.getElementById("message").value="";
   document.getElementById("subject").value="";
 }
+
 </script>
 
 </body>
