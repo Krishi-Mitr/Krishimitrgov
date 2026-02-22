@@ -1,0 +1,267 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Reply | Saathi</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase.js"></script>
+
+<style>
+body{
+  font-family:'Segoe UI',Tahoma,Verdana,sans-serif;
+  margin:0;
+  background:#eef2f7;
+}
+
+.top{
+  position:fixed;
+  top:0;left:0;right:0;
+  background:#FF9933;
+  padding:16px 30px;
+  color:#fff;
+  font-weight:bold;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  z-index:10;
+  box-shadow:0 2px 10px rgba(0,0,0,.1);
+}
+
+.chat-box{
+  max-width:900px;
+  margin:90px auto 90px;
+  padding:20px;
+  height:calc(100vh - 180px);
+  overflow-y:auto;
+  scroll-behavior:smooth;
+}
+
+.msg{
+  max-width:65%;
+  padding:12px 16px;
+  border-radius:18px;
+  margin-bottom:12px;
+  line-height:1.4;
+  font-size:15px;
+  word-wrap:break-word;
+  animation:fadeIn .2s ease-in;
+}
+
+@keyframes fadeIn{
+  from{opacity:0; transform:translateY(5px);}
+  to{opacity:1; transform:translateY(0);}
+}
+
+.left{
+  background:#ffffff;
+  border:1px solid #ddd;
+}
+
+.right{
+  background:#dcf8c6;
+  margin-left:auto;
+}
+
+.time{
+  font-size:11px;
+  opacity:.6;
+  margin-top:4px;
+  text-align:right;
+}
+
+.reply-box{
+  position:fixed;
+  bottom:0;left:0;right:0;
+  background:#fff;
+  padding:15px;
+  display:flex;
+  gap:10px;
+  border-top:1px solid #ddd;
+}
+
+textarea{
+  flex:1;
+  resize:none;
+  padding:12px;
+  border-radius:12px;
+  border:1px solid #ccc;
+  font-size:14px;
+  height:45px;
+}
+
+button{
+  background:#138808;
+  color:#fff;
+  border:none;
+  border-radius:12px;
+  padding:0 24px;
+  font-weight:bold;
+  cursor:pointer;
+  transition:.2s;
+}
+button:hover{
+  background:#0f6b06;
+}
+</style>
+</head>
+
+<body>
+
+<div class="top">
+  <span id="title">Chat</span>
+  <span onclick="back()" style="cursor:pointer">← Back</span>
+</div>
+
+<div class="chat-box" id="chat"></div>
+
+<div class="reply-box">
+  <textarea id="reply" placeholder="Type a reply..."></textarea>
+  <button onclick="sendReply()">Send</button>
+</div>
+
+<script>
+const myId = String(sessionStorage.getItem("loginid"));
+const chatid = sessionStorage.getItem("chatid");
+const otherId = String(sessionStorage.getItem("otherid"));
+const otherName = sessionStorage.getItem("othername");
+
+if(!myId || !chatid){
+  location.replace("Chat");
+}
+
+document.getElementById("title").textContent = otherName || "Chat";
+
+const box = document.getElementById("chat");
+const replyInput = document.getElementById("reply");
+
+let loadedMessageIds = new Set();
+let lastMessageTime = null;
+
+/* ADD MESSAGE */
+function addMessage(m){
+  if(loadedMessageIds.has(m.id)) return;
+  loadedMessageIds.add(m.id);
+
+  const div = document.createElement("div");
+  div.className = "msg " + 
+    (String(m.senderid) === myId ? "right" : "left");
+
+  div.innerHTML = `
+    ${m.message}
+    <div class="time">
+      ${new Date(m.time).toLocaleTimeString()}
+    </div>
+  `;
+
+  box.appendChild(div);
+  box.scrollTop = box.scrollHeight;
+
+  lastMessageTime = m.time;
+}
+
+/* FIRST LOAD */
+async function loadMessages(){
+  const { data, error } = await window.db
+    .from("chat_messages")
+    .select("*")
+    .eq("chatid", chatid)
+    .order("time", { ascending: true });
+
+  if(error) return;
+
+  box.innerHTML = "";
+  loadedMessageIds.clear();
+  lastMessageTime = null;
+
+  if(data){
+    data.forEach(m => addMessage(m));
+  }
+
+  markRead();
+}
+
+/* CHECK NEW MESSAGES */
+async function checkNewMessages(){
+  if(!lastMessageTime) return;
+
+  const { data } = await window.db
+    .from("chat_messages")
+    .select("*")
+    .eq("chatid", chatid)
+    .gt("time", lastMessageTime)
+    .order("time", { ascending: true });
+
+  if(data && data.length > 0){
+    data.forEach(m => addMessage(m));
+    markRead();
+  }
+}
+
+/* MARK AS READ */
+async function markRead(){
+  await window.db
+    .from("chat_conversations")
+    .update({ unread_for: null })
+    .eq("chatid", chatid)
+    .eq("unread_for", myId);
+}
+
+/* SEND MESSAGE (FIXED) */
+async function sendReply(){
+  const text = replyInput.value.trim();
+  if(!text) return;
+
+  const { data: me } = await window.db
+    .from("logininfo")
+    .select("username")
+    .eq("loginid", myId)
+    .single();
+
+  const { data: inserted, error } = await window.db
+    .from("chat_messages")
+    .insert({
+      chatid: chatid,
+      senderid: myId,
+      sendername: me.username,
+      message: text
+    })
+    .select()
+    .single();
+
+  if(error) return;
+
+  await window.db
+    .from("chat_conversations")
+    .update({
+      last_message: text,
+      unread_for: otherId
+    })
+    .eq("chatid", chatid);
+
+  replyInput.value = "";
+
+  /* Display using SERVER timestamp */
+  addMessage(inserted);
+}
+
+/* ENTER TO SEND */
+replyInput.addEventListener("keydown", e=>{
+  if(e.key === "Enter" && !e.shiftKey){
+    e.preventDefault();
+    sendReply();
+  }
+});
+
+/* START */
+loadMessages();
+setInterval(checkNewMessages, 2000);
+
+function back(){
+  location.href = "Chat";
+}
+</script>
+
+</body>
+</html>
