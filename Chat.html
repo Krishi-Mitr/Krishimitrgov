@@ -1,125 +1,103 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title> Chats | Saathi</title>
+<title>New Message | Saathi</title>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="supabase.js"></script>
 
 <style>
 body{
+  font-family:'Segoe UI',Tahoma,Verdana,sans-serif;
   margin:0;
-  font-family:'Segoe UI',Tahoma;
-  background:#f4f6f9;
+  background:#fff;
 }
-
 .top-nav{
   display:flex;
   justify-content:space-between;
   align-items:center;
-  background:linear-gradient(90deg,#FF9933,#138808);
-  padding:16px 40px;
-  color:#fff;
+  background:#FF9933;
+  padding:15px 40px;
+  position:fixed;
+  top:0;left:0;right:0;
 }
-
-.nav-left{
-  display:flex;
-  flex-direction:column;
-}
-
-.welcome{
-  font-size:18px;
-  font-weight:bold;
-}
-
-.sub{
-  font-size:13px;
-  opacity:.9;
-}
-
-.nav-actions{
-  display:flex;
-  gap:12px;
-}
-
 .nav-box{
-  background:#ffffff;
-  color:#138808;
-  padding:10px 18px;
+  background:#138808;
+  color:#fff;
+  padding:10px 22px;
   border-radius:12px;
   text-decoration:none;
   font-weight:bold;
 }
-
 .logout-btn{
-  cursor:pointer;
   font-weight:bold;
+  cursor:pointer;
 }
-
-.chat-container{
+.container{
   max-width:900px;
-  margin:30px auto;
+  margin:120px auto;
+  padding:40px;
+  border-radius:20px;
+  box-shadow:0 8px 30px rgba(0,0,0,.15);
 }
-
-.chat-card{
-  padding:18px 22px;
-  border-radius:16px;
-  margin-bottom:15px;
-  cursor:pointer;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  background:#fff;
-  box-shadow:0 6px 18px rgba(0,0,0,.08);
-  transition:.2s;
+input, textarea{
+  width:100%;
+  padding:14px;
+  margin-top:15px;
+  border-radius:10px;
+  border:1px solid #ccc;
+  font-size:16px;
 }
-
-.chat-card:hover{
-  transform:translateY(-2px);
+textarea{min-height:160px}
+.error{
+  border:2px solid red;
 }
-
-.chat-card.unread{
-  background:#e3f2fd;
-  border-left:6px solid #1976d2;
-}
-
-.chat-left{
-  max-width:70%;
-}
-
-.chat-name{
-  font-weight:bold;
-  font-size:17px;
-}
-
-.chat-last{
-  color:#555;
+.error-text{
+  color:red;
   margin-top:6px;
-  white-space:nowrap;
+}
+.dropdown{
+  border:1px solid #ccc;
+  border-radius:10px;
+  margin-top:5px;
   overflow:hidden;
-  text-overflow:ellipsis;
 }
-
-.chat-right{
-  text-align:right;
+.dropdown div{
+  padding:10px;
+  cursor:pointer;
 }
-
-.chat-time{
-  font-size:13px;
-  color:#777;
+.dropdown div:hover{
+  background:#f0f0f0;
 }
-
-.unread-count{
-  margin-top:6px;
-  display:inline-block;
-  padding:4px 10px;
-  background:#d32f2f;
-  color:white;
-  border-radius:14px;
-  font-size:12px;
+.send-btn{
+  margin-top:25px;
+  background:#138808;
+  color:#fff;
+  padding:14px 30px;
+  border:none;
+  border-radius:12px;
   font-weight:bold;
+  cursor:pointer;
+}
+.toast {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  background: #2e7d32;
+  color: white;
+  padding: 12px 18px;
+  border-radius: 6px;
+  font-size: 14px;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(10px);
+  transition: all 0.3s ease;
+  z-index: 9999;
+}
+.toast.show {
+  opacity: 1;
+  transform: translateY(0);
 }
 </style>
 </head>
@@ -127,30 +105,33 @@ body{
 <body>
 
 <div class="top-nav">
-  <div class="nav-left">
-    <div class="welcome" id="welcomeText">Welcome</div>
-    <div class="sub">Your conversations</div>
-  </div>
-
-  <div class="nav-actions">
-    <a href="Message" class="nav-box">+ New Chat</a>
-    <span class="logout-btn" onclick="logout()">Logout</span>
-  </div>
+  <a href="Chat" class="nav-box">← Back to Chat</a>
+  <span class="logout-btn" onclick="logout()">Logout</span>
 </div>
 
-<div class="chat-container" id="chatList"></div>
+<div class="container">
+  <h2>New Message</h2>
+
+  <input id="to" placeholder="To (username)">
+  <div id="suggestions" class="dropdown"></div>
+  <div id="error" class="error-text"></div>
+
+  <input id="subject" placeholder="Subject">
+  <textarea id="message" placeholder="Type your message..."></textarea>
+
+  <button class="send-btn" onclick="sendMessage()">Send</button>
+</div>
+
+<div id="toast" class="toast">Message sent successfully</div>
 
 <script>
+
+/* AUTH — MATCHES YOUR LOGIN PAGE */
 const myLoginId = Number(sessionStorage.getItem("loginid"));
-const myUsername = sessionStorage.getItem("username");
+const myUsertype = sessionStorage.getItem("usertype");
 
 if(!myLoginId){
   location.replace("login");
-}
-
-if(myUsername){
-  document.getElementById("welcomeText").textContent =
-    "Welcome, " + myUsername;
 }
 
 function logout(){
@@ -158,73 +139,113 @@ function logout(){
   location.replace("login");
 }
 
-let lastRendered = "";
-
-/* LOAD CHATS */
-async function loadChats(){
-
-  const { data: chats } = await window.db
-    .from("chat_conversations")
-    .select("*")
-    .or(`user1id.eq.${myLoginId},user2id.eq.${myLoginId}`)
-    .order("last_time", { ascending:false });
-
-  if(!chats) return;
-
-  const currentSnapshot = JSON.stringify(chats);
-
-  if(currentSnapshot === lastRendered) return;
-  lastRendered = currentSnapshot;
-
-  const chatList = document.getElementById("chatList");
-  chatList.innerHTML = "";
-
-  for(const chat of chats){
-
-    const otherName =
-      chat.user1id === myLoginId ? chat.user2name : chat.user1name;
-
-    const otherId =
-      chat.user1id === myLoginId ? chat.user2id : chat.user1id;
-
-    /* ✅ Only check unread_for */
-    let isNew = chat.unread_for === myLoginId;
-
-    const card = document.createElement("div");
-    card.className = "chat-card" + (isNew ? " unread" : "");
-
-    card.onclick = () => {
-      sessionStorage.setItem("chatid", chat.chatid);
-      sessionStorage.setItem("otherid", otherId);
-      sessionStorage.setItem("othername", otherName);
-      location.href = "Read";
-    };
-
-    card.innerHTML = `
-      <div class="chat-left">
-        <div class="chat-name">${otherName}</div>
-        <div class="chat-last">${chat.last_message || ""}</div>
-      </div>
-      <div class="chat-right">
-        <div class="chat-time">
-          ${chat.last_time ? new Date(chat.last_time).toLocaleString() : ""}
-        </div>
-        ${isNew ? `<div class="unread-count">New</div>` : ""}
-      </div>
-    `;
-
-    chatList.appendChild(card);
-  }
+function showToast(){
+  const toast = document.getElementById("toast");
+  toast.classList.add("show");
+  setTimeout(() => {
+    toast.classList.remove("show");
+  }, 2500);
 }
 
-/* AUTO REFRESH */
-setInterval(loadChats, 2000);
+const toInput = document.getElementById("to");
+const suggestions = document.getElementById("suggestions");
+const errorBox = document.getElementById("error");
 
-/* FIRST LOAD */
-loadChats();
+let receiverId = null;
+let receiverName = null;
+
+/* USER SEARCH */
+toInput.addEventListener("input", async () => {
+
+  const val = toInput.value.trim();
+  suggestions.innerHTML="";
+  errorBox.textContent="";
+  toInput.classList.remove("error");
+  receiverId=null;
+  receiverName=null;
+
+  if(val.length < 2) return;
+
+  const { data } = await window.db
+    .from("logindata")
+    .select("loginid, username")
+    .ilike("username", val + "%")
+    .limit(5);
+
+  if(!data || data.length === 0){
+    toInput.classList.add("error");
+    errorBox.textContent="No username matches";
+    return;
+  }
+
+  data.forEach(u=>{
+    const div=document.createElement("div");
+    div.textContent=u.username;
+
+    div.onclick=()=>{
+      if(Number(u.loginid) === myLoginId){
+        errorBox.textContent="You cannot message yourself";
+        return;
+      }
+
+      toInput.value=u.username;
+      receiverId=Number(u.loginid);
+      receiverName=u.username;
+      suggestions.innerHTML="";
+    };
+
+    suggestions.appendChild(div);
+  });
+});
+
+
+/* SEND MESSAGE */
+async function sendMessage(){
+
+  const subject=document.getElementById("subject").value.trim();
+  const msg=document.getElementById("message").value.trim();
+
+  if(!receiverId || !msg){
+    alert("Receiver and message are required");
+    return;
+  }
+
+  /* CREATE CONVERSATION */
+  const { data: convo, error } = await window.db
+    .from("chat_conversations")
+    .insert({
+      user1id: myLoginId,
+      user2id: receiverId,
+      user1name: "User " + myLoginId,
+      user2name: receiverName,
+      last_message: subject || msg,
+      unread_for: receiverId
+    })
+    .select()
+    .single();
+
+  if(error){
+    alert("Failed to create chat");
+    return;
+  }
+
+  /* INSERT MESSAGE */
+  await window.db
+    .from("chat_messages")
+    .insert({
+      chatid: convo.chatid,
+      senderid: myLoginId,
+      sendername: "User " + myLoginId,
+      message: msg
+    });
+
+  showToast();
+
+  document.getElementById("message").value="";
+  document.getElementById("subject").value="";
+}
 
 </script>
 
 </body>
 </html>
-
