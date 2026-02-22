@@ -2,77 +2,123 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Chat | Saathi</title>
+<title> Chats | Saathi</title>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="supabase.js"></script>
 
 <style>
 body{
-  font-family:'Segoe UI',Tahoma,Verdana,sans-serif;
   margin:0;
-  background:#f5f5f5;
+  font-family:'Segoe UI',Tahoma;
+  background:#f4f6f9;
 }
 
 .top-nav{
   display:flex;
   justify-content:space-between;
   align-items:center;
-  background:#FF9933;
-  padding:15px 40px;
+  background:linear-gradient(90deg,#FF9933,#138808);
+  padding:16px 40px;
+  color:#fff;
+}
+
+.nav-left{
+  display:flex;
+  flex-direction:column;
+}
+
+.welcome{
+  font-size:18px;
+  font-weight:bold;
+}
+
+.sub{
+  font-size:13px;
+  opacity:.9;
+}
+
+.nav-actions{
+  display:flex;
+  gap:12px;
 }
 
 .nav-box{
-  background:#138808;
-  color:#fff;
-  padding:10px 22px;
+  background:#ffffff;
+  color:#138808;
+  padding:10px 18px;
   border-radius:12px;
   text-decoration:none;
   font-weight:bold;
 }
 
 .logout-btn{
-  font-weight:bold;
   cursor:pointer;
+  font-weight:bold;
 }
 
-.container{
+.chat-container{
   max-width:900px;
-  margin:40px auto;
-  padding:20px;
+  margin:30px auto;
 }
 
-.chat-item{
-  background:#fff;
-  padding:18px;
-  margin-bottom:12px;
-  border-radius:12px;
-  box-shadow:0 4px 10px rgba(0,0,0,.1);
+.chat-card{
+  padding:18px 22px;
+  border-radius:16px;
+  margin-bottom:15px;
   cursor:pointer;
   display:flex;
   justify-content:space-between;
   align-items:center;
+  background:#fff;
+  box-shadow:0 6px 18px rgba(0,0,0,.08);
+  transition:.2s;
 }
 
-.chat-item:hover{
-  background:#f0f0f0;
+.chat-card:hover{
+  transform:translateY(-2px);
+}
+
+.chat-card.unread{
+  background:#e3f2fd;
+  border-left:6px solid #1976d2;
+}
+
+.chat-left{
+  max-width:70%;
 }
 
 .chat-name{
   font-weight:bold;
+  font-size:17px;
 }
 
 .chat-last{
-  color:#666;
-  margin-top:4px;
+  color:#555;
+  margin-top:6px;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
 }
 
-.unread{
-  background:red;
+.chat-right{
+  text-align:right;
+}
+
+.chat-time{
+  font-size:13px;
+  color:#777;
+}
+
+.unread-count{
+  margin-top:6px;
+  display:inline-block;
+  padding:4px 10px;
+  background:#d32f2f;
   color:white;
+  border-radius:14px;
   font-size:12px;
-  padding:4px 8px;
-  border-radius:10px;
+  font-weight:bold;
 }
 </style>
 </head>
@@ -80,20 +126,30 @@ body{
 <body>
 
 <div class="top-nav">
-  <a href="NewMessage" class="nav-box">+ New Message</a>
-  <span class="logout-btn" onclick="logout()">Logout</span>
+  <div class="nav-left">
+    <div class="welcome" id="welcomeText">Welcome</div>
+    <div class="sub">Your conversations</div>
+  </div>
+
+  <div class="nav-actions">
+    <a href="Message" class="nav-box">+ New Chat</a>
+    <span class="logout-btn" onclick="logout()">Logout</span>
+  </div>
 </div>
 
-<div class="container" id="chatList">
-  Loading chats...
-</div>
+<div class="chat-container" id="chatList"></div>
 
 <script>
-
-/* AUTH */
 const myLoginId = Number(sessionStorage.getItem("loginid"));
+const myUsername = sessionStorage.getItem("username");
+
 if(!myLoginId){
   location.replace("login");
+}
+
+if(myUsername){
+  document.getElementById("welcomeText").textContent =
+    "Welcome, " + myUsername;
 }
 
 function logout(){
@@ -101,70 +157,69 @@ function logout(){
   location.replace("login");
 }
 
-const chatList = document.getElementById("chatList");
+let lastRendered = "";
 
-/* LOAD CONVERSATIONS */
+/* LOAD CHATS */
 async function loadChats(){
 
-  const { data, error } = await window.db
+  const { data: chats } = await window.db
     .from("chat_conversations")
     .select("*")
     .or(`user1id.eq.${myLoginId},user2id.eq.${myLoginId}`)
-    .order("chatid", { ascending:false });
+    .order("last_time", { ascending:false });
 
-  if(error || !data){
-    chatList.innerHTML = "Failed to load chats.";
-    return;
-  }
+  if(!chats) return;
 
-  if(data.length === 0){
-    chatList.innerHTML = "No conversations yet.";
-    return;
-  }
+  const currentSnapshot = JSON.stringify(chats);
 
+  if(currentSnapshot === lastRendered) return;
+  lastRendered = currentSnapshot;
+
+  const chatList = document.getElementById("chatList");
   chatList.innerHTML = "";
 
-  data.forEach(chat => {
+  for(const chat of chats){
 
-    const otherId = chat.user1id === myLoginId 
-        ? chat.user2id 
-        : chat.user1id;
+    const otherName =
+      chat.user1id === myLoginId ? chat.user2name : chat.user1name;
 
-    const otherName = chat.user1id === myLoginId 
-        ? chat.user2name 
-        : chat.user1name;
+    const otherId =
+      chat.user1id === myLoginId ? chat.user2id : chat.user1id;
 
-    const div = document.createElement("div");
-    div.className = "chat-item";
+    /* ✅ Only check unread_for */
+    let isNew = chat.unread_for === myLoginId;
 
-    div.innerHTML = `
-      <div>
+    const card = document.createElement("div");
+    card.className = "chat-card" + (isNew ? " unread" : "");
+
+    card.onclick = () => {
+      sessionStorage.setItem("chatid", chat.chatid);
+      sessionStorage.setItem("otherid", otherId);
+      sessionStorage.setItem("othername", otherName);
+      location.href = "Read";
+    };
+
+    card.innerHTML = `
+      <div class="chat-left">
         <div class="chat-name">${otherName}</div>
         <div class="chat-last">${chat.last_message || ""}</div>
       </div>
-      ${chat.unread_for === myLoginId ? '<div class="unread">New</div>' : ''}
+      <div class="chat-right">
+        <div class="chat-time">
+          ${chat.last_time ? new Date(chat.last_time).toLocaleString() : ""}
+        </div>
+        ${isNew ? `<div class="unread-count">New</div>` : ""}
+      </div>
     `;
 
-    div.onclick = async () => {
-
-      // Clear unread flag
-      if(chat.unread_for === myLoginId){
-        await window.db
-          .from("chat_conversations")
-          .update({ unread_for: null })
-          .eq("chatid", chat.chatid);
-      }
-
-      // Store chatid for message page
-      sessionStorage.setItem("activeChatId", chat.chatid);
-      location.href = "Messages";
-    };
-
-    chatList.appendChild(div);
-  });
-
+    chatList.appendChild(card);
+  }
 }
 
+/* AUTO REFRESH */
+setInterval(loadChats, 2000);
+
+/* FIRST LOAD */
 loadChats();
 
 </script>
