@@ -1,11 +1,9 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <title>New Message | Saathi</title>
 
-<!-- SUPABASE -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="supabase.js"></script>
 
@@ -15,8 +13,6 @@ body{
   margin:0;
   background:#fff;
 }
-
-/* NAV */
 .top-nav{
   display:flex;
   justify-content:space-between;
@@ -38,8 +34,6 @@ body{
   font-weight:bold;
   cursor:pointer;
 }
-
-/* CONTAINER */
 .container{
   max-width:900px;
   margin:120px auto;
@@ -47,8 +41,6 @@ body{
   border-radius:20px;
   box-shadow:0 8px 30px rgba(0,0,0,.15);
 }
-
-/* INPUTS */
 input, textarea{
   width:100%;
   padding:14px;
@@ -58,8 +50,6 @@ input, textarea{
   font-size:16px;
 }
 textarea{min-height:160px}
-
-/* ERROR */
 .error{
   border:2px solid red;
 }
@@ -67,8 +57,6 @@ textarea{min-height:160px}
   color:red;
   margin-top:6px;
 }
-
-/* DROPDOWN */
 .dropdown{
   border:1px solid #ccc;
   border-radius:10px;
@@ -82,8 +70,6 @@ textarea{min-height:160px}
 .dropdown div:hover{
   background:#f0f0f0;
 }
-
-/* BUTTON */
 .send-btn{
   margin-top:25px;
   background:#138808;
@@ -94,8 +80,6 @@ textarea{min-height:160px}
   font-weight:bold;
   cursor:pointer;
 }
-
-/* TOAST */
 .toast {
   position: fixed;
   bottom: 30px;
@@ -120,13 +104,11 @@ textarea{min-height:160px}
 
 <body>
 
-<!-- NAV -->
 <div class="top-nav">
   <a href="Chat" class="nav-box">← Back to Chat</a>
   <span class="logout-btn" onclick="logout()">Logout</span>
 </div>
 
-<!-- CONTENT -->
 <div class="container">
   <h2>New Message</h2>
 
@@ -140,25 +122,22 @@ textarea{min-height:160px}
   <button class="send-btn" onclick="sendMessage()">Send</button>
 </div>
 
-<!-- TOAST -->
 <div id="toast" class="toast">Message sent successfully</div>
 
 <script>
 /* AUTH */
-const myLoginId = sessionStorage.getItem("loginid");
+const myLoginId = Number(sessionStorage.getItem("loginid")); // convert to number
 const myUsername = sessionStorage.getItem("username");
 
 if(!myLoginId || !myUsername){
   location.replace("login");
 }
 
-/* LOGOUT */
 function logout(){
   sessionStorage.clear();
   location.replace("login");
 }
 
-/* TOAST */
 function showToast(){
   const toast = document.getElementById("toast");
   toast.classList.add("show");
@@ -167,7 +146,6 @@ function showToast(){
   }, 2500);
 }
 
-/* ELEMENTS */
 const toInput = document.getElementById("to");
 const suggestions = document.getElementById("suggestions");
 const errorBox = document.getElementById("error");
@@ -187,7 +165,7 @@ toInput.addEventListener("input", async () => {
   if(val.length < 2) return;
 
   const { data } = await window.db
-    .from("logininfo")
+    .from("logindata")   // ✅ FIXED TABLE NAME
     .select("loginid, username")
     .ilike("username", val + "%")
     .limit(5);
@@ -202,8 +180,12 @@ toInput.addEventListener("input", async () => {
     const div=document.createElement("div");
     div.textContent=u.username;
     div.onclick=()=>{
+      if(Number(u.loginid) === myLoginId){
+        errorBox.textContent="You cannot message yourself";
+        return;
+      }
       toInput.value=u.username;
-      receiverId=u.loginid;
+      receiverId=Number(u.loginid); // convert to number
       receiverName=u.username;
       suggestions.innerHTML="";
     };
@@ -221,10 +203,8 @@ async function sendMessage(){
     return;
   }
 
-  /* FIX: USE SESSION STORAGE USERNAME */
   const senderName = myUsername;
 
-  /* CREATE CONVERSATION */
   const { data: convo, error } = await window.db
     .from("chat_conversations")
     .insert({
@@ -243,7 +223,6 @@ async function sendMessage(){
     return;
   }
 
-  /* INSERT MESSAGE */
   await window.db
     .from("chat_messages")
     .insert({
@@ -253,10 +232,8 @@ async function sendMessage(){
       message: msg
     });
 
-  /* TOAST ONLY */
   showToast();
 
-  /* CLEAR INPUTS */
   document.getElementById("message").value="";
   document.getElementById("subject").value="";
 }
