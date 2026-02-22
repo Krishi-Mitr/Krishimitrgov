@@ -1,0 +1,266 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>New Message | Saathi</title>
+
+<!-- SUPABASE -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase.js"></script>
+
+<style>
+body{
+  font-family:'Segoe UI',Tahoma,Verdana,sans-serif;
+  margin:0;
+  background:#fff;
+}
+
+/* NAV */
+.top-nav{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  background:#FF9933;
+  padding:15px 40px;
+  position:fixed;
+  top:0;left:0;right:0;
+}
+.nav-box{
+  background:#138808;
+  color:#fff;
+  padding:10px 22px;
+  border-radius:12px;
+  text-decoration:none;
+  font-weight:bold;
+}
+.logout-btn{
+  font-weight:bold;
+  cursor:pointer;
+}
+
+/* CONTAINER */
+.container{
+  max-width:900px;
+  margin:120px auto;
+  padding:40px;
+  border-radius:20px;
+  box-shadow:0 8px 30px rgba(0,0,0,.15);
+}
+
+/* INPUTS */
+input, textarea{
+  width:100%;
+  padding:14px;
+  margin-top:15px;
+  border-radius:10px;
+  border:1px solid #ccc;
+  font-size:16px;
+}
+textarea{min-height:160px}
+
+/* ERROR */
+.error{
+  border:2px solid red;
+}
+.error-text{
+  color:red;
+  margin-top:6px;
+}
+
+/* DROPDOWN */
+.dropdown{
+  border:1px solid #ccc;
+  border-radius:10px;
+  margin-top:5px;
+  overflow:hidden;
+}
+.dropdown div{
+  padding:10px;
+  cursor:pointer;
+}
+.dropdown div:hover{
+  background:#f0f0f0;
+}
+
+/* BUTTON */
+.send-btn{
+  margin-top:25px;
+  background:#138808;
+  color:#fff;
+  padding:14px 30px;
+  border:none;
+  border-radius:12px;
+  font-weight:bold;
+  cursor:pointer;
+}
+
+/* TOAST */
+.toast {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  background: #2e7d32;
+  color: white;
+  padding: 12px 18px;
+  border-radius: 6px;
+  font-size: 14px;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(10px);
+  transition: all 0.3s ease;
+  z-index: 9999;
+}
+.toast.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+</style>
+</head>
+
+<body>
+
+<!-- NAV -->
+<div class="top-nav">
+  <a href="Chat" class="nav-box">← Back to Chat</a>
+  <span class="logout-btn" onclick="logout()">Logout</span>
+</div>
+
+<!-- CONTENT -->
+<div class="container">
+  <h2>New Message</h2>
+
+  <input id="to" placeholder="To (username)">
+  <div id="suggestions" class="dropdown"></div>
+  <div id="error" class="error-text"></div>
+
+  <input id="subject" placeholder="Subject">
+  <textarea id="message" placeholder="Type your message..."></textarea>
+
+  <button class="send-btn" onclick="sendMessage()">Send</button>
+</div>
+
+<!-- TOAST -->
+<div id="toast" class="toast">Message sent successfully</div>
+
+<script>
+/* AUTH */
+const myLoginId = sessionStorage.getItem("loginid");
+const myUsername = sessionStorage.getItem("username");
+
+if(!myLoginId || !myUsername){
+  location.replace("login");
+}
+
+/* LOGOUT */
+function logout(){
+  sessionStorage.clear();
+  location.replace("login");
+}
+
+/* TOAST */
+function showToast(){
+  const toast = document.getElementById("toast");
+  toast.classList.add("show");
+  setTimeout(() => {
+    toast.classList.remove("show");
+  }, 2500);
+}
+
+/* ELEMENTS */
+const toInput = document.getElementById("to");
+const suggestions = document.getElementById("suggestions");
+const errorBox = document.getElementById("error");
+
+let receiverId = null;
+let receiverName = null;
+
+/* USERNAME SEARCH */
+toInput.addEventListener("input", async () => {
+  const val = toInput.value.trim();
+  suggestions.innerHTML="";
+  errorBox.textContent="";
+  toInput.classList.remove("error");
+  receiverId=null;
+  receiverName=null;
+
+  if(val.length < 2) return;
+
+  const { data } = await window.db
+    .from("logininfo")
+    .select("loginid, username")
+    .ilike("username", val + "%")
+    .limit(5);
+
+  if(!data || data.length===0){
+    toInput.classList.add("error");
+    errorBox.textContent="No username matches";
+    return;
+  }
+
+  data.forEach(u=>{
+    const div=document.createElement("div");
+    div.textContent=u.username;
+    div.onclick=()=>{
+      toInput.value=u.username;
+      receiverId=u.loginid;
+      receiverName=u.username;
+      suggestions.innerHTML="";
+    };
+    suggestions.appendChild(div);
+  });
+});
+
+/* SEND MESSAGE */
+async function sendMessage(){
+  const subject=document.getElementById("subject").value.trim();
+  const msg=document.getElementById("message").value.trim();
+
+  if(!receiverId || !msg){
+    alert("Receiver and message are required");
+    return;
+  }
+
+  /* FIX: USE SESSION STORAGE USERNAME */
+  const senderName = myUsername;
+
+  /* CREATE CONVERSATION */
+  const { data: convo, error } = await window.db
+    .from("chat_conversations")
+    .insert({
+      user1id: myLoginId,
+      user2id: receiverId,
+      user1name: senderName,
+      user2name: receiverName,
+      last_message: subject || msg,
+      unread_for: receiverId
+    })
+    .select()
+    .single();
+
+  if(error){
+    alert("Failed to create chat");
+    return;
+  }
+
+  /* INSERT MESSAGE */
+  await window.db
+    .from("chat_messages")
+    .insert({
+      chatid: convo.chatid,
+      senderid: myLoginId,
+      sendername: senderName,
+      message: msg
+    });
+
+  /* TOAST ONLY */
+  showToast();
+
+  /* CLEAR INPUTS */
+  document.getElementById("message").value="";
+  document.getElementById("subject").value="";
+}
+</script>
+
+</body>
+</html>
