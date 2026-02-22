@@ -123,7 +123,7 @@ textarea{min-height:160px}
 
 <script>
 
-/* AUTH */
+/* AUTH CHECK */
 const loginString = sessionStorage.getItem("loginid");
 if(!loginString){
   location.replace("login");
@@ -133,20 +133,23 @@ let myId = null;
 let myUsername = null;
 let receiverId = null;
 let receiverName = null;
-let isSending = false; // 🔥 prevents duplicate sending
+let isSending = false; // prevent double click
 
 /* LOAD CURRENT USER */
 async function loadUser(){
-  const { data } = await window.db
+  const { data, error } = await window.db
     .from("logindata")
     .select("id, username")
     .eq("loginid", loginString)
     .single();
 
-  if(data){
-    myId = data.id;
-    myUsername = data.username;
+  if(error || !data){
+    location.replace("login");
+    return;
   }
+
+  myId = data.id;
+  myUsername = data.username;
 }
 loadUser();
 
@@ -163,12 +166,13 @@ function showToast(){
   setTimeout(()=>toast.classList.remove("show"),2500);
 }
 
-/* SEARCH USER (no duplicates) */
+/* USER SEARCH */
 const toInput=document.getElementById("to");
 const suggestions=document.getElementById("suggestions");
 const errorBox=document.getElementById("error");
 
 toInput.addEventListener("input", async()=>{
+
   const val=toInput.value.trim();
   suggestions.innerHTML="";
   errorBox.textContent="";
@@ -199,17 +203,20 @@ toInput.addEventListener("input", async()=>{
 
     const div=document.createElement("div");
     div.textContent=u.username;
+
     div.onclick=()=>{
       toInput.value=u.username;
       receiverId=u.id;
       receiverName=u.username;
       suggestions.innerHTML="";
     };
+
     suggestions.appendChild(div);
   });
 });
 
-/* SEND MESSAGE (fully protected) */
+/* SEND MESSAGE */
+/* ALWAYS CREATES NEW CONVERSATION */
 async function sendMessage(){
 
   if(isSending) return;
@@ -230,59 +237,61 @@ async function sendMessage(){
 
   try{
 
-    const { data: existing } = await window.db
+    // 🔥 ALWAYS CREATE NEW CONVERSATION
+    const { data: newChat, error: chatError } = await window.db
       .from("chat_conversations")
-      .select("*")
-      .or(`and(user1id.eq.${myId},user2id.eq.${receiverId}),and(user1id.eq.${receiverId},user2id.eq.${myId})`)
-      .maybeSingle();
+      .insert({
+        user1id: myId,
+        user2id: receiverId,
+        user1name: myUsername,
+        user2name: receiverName,
+        last_message: subject || msg,
+        unread_for: receiverId
+      })
+      .select()
+      .single();
 
-    let chatId;
-
-    if(existing){
-      chatId=existing.chatid;
-
-      await window.db
-        .from("chat_conversations")
-        .update({
-          last_message:subject || msg,
-          last_time:new Date(),
-          unread_for:receiverId
-        })
-        .eq("chatid",chatId);
-
-    }else{
-      const { data } = await window.db
-        .from("chat_conversations")
-        .insert({
-          user1id:myId,
-          user2id:receiverId,
-          user1name:myUsername,
-          user2name:receiverName,
-          last_message:subject || msg,
-          unread_for:receiverId
-        })
-        .select()
-        .single();
-
-      chatId=data.chatid;
+    if(chatError){
+      console.error(chatError);
+      alert("Error creating conversation");
+      isSending=false;
+      sendBtn.disabled=false;
+      return;
     }
 
-    await window.db
+    const chatId = newChat.chatid;
+
+    // 🔥 INSERT FIRST MESSAGE
+    const { error: msgError } = await window.db
       .from("chat_messages")
       .insert({
-        chatid:chatId,
-        senderid:myId,
-        sendername:myUsername,
-        message:msg
+        chatid: chatId,
+        senderid: myId,
+        sendername: myUsername,
+        message: msg
       });
 
+    if(msgError){
+      console.error(msgError);
+      alert("Error sending message");
+      isSending=false;
+      sendBtn.disabled=false;
+      return;
+    }
+
+    // SUCCESS
     showToast();
-    document.getElementById("message").value="";
+
+    document.getElementById("to").value="";
     document.getElementById("subject").value="";
+    document.getElementById("message").value="";
+
+    receiverId=null;
+    receiverName=null;
 
   }catch(err){
     console.error(err);
-    alert("Error sending message");
+    alert("Unexpected error");
   }
 
   isSending=false;
