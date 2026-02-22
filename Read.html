@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -14,7 +13,6 @@ body{
   margin:0;
   background:#eef2f7;
 }
-
 .top{
   position:fixed;
   top:0;left:0;right:0;
@@ -28,7 +26,6 @@ body{
   z-index:10;
   box-shadow:0 2px 10px rgba(0,0,0,.1);
 }
-
 .chat-box{
   max-width:900px;
   margin:90px auto 90px;
@@ -37,7 +34,6 @@ body{
   overflow-y:auto;
   scroll-behavior:smooth;
 }
-
 .msg{
   max-width:65%;
   padding:12px 16px;
@@ -48,29 +44,24 @@ body{
   word-wrap:break-word;
   animation:fadeIn .2s ease-in;
 }
-
 @keyframes fadeIn{
   from{opacity:0; transform:translateY(5px);}
   to{opacity:1; transform:translateY(0);}
 }
-
 .left{
   background:#ffffff;
   border:1px solid #ddd;
 }
-
 .right{
   background:#dcf8c6;
   margin-left:auto;
 }
-
 .time{
   font-size:11px;
   opacity:.6;
   margin-top:4px;
   text-align:right;
 }
-
 .reply-box{
   position:fixed;
   bottom:0;left:0;right:0;
@@ -80,7 +71,6 @@ body{
   gap:10px;
   border-top:1px solid #ddd;
 }
-
 textarea{
   flex:1;
   resize:none;
@@ -90,7 +80,6 @@ textarea{
   font-size:14px;
   height:45px;
 }
-
 button{
   background:#138808;
   color:#fff;
@@ -118,7 +107,7 @@ button:hover{
 
 <div class="reply-box">
   <textarea id="reply" placeholder="Type a reply..."></textarea>
-  <button onclick="sendReply()">Send</button>
+  <button id="sendBtn">Send</button>
 </div>
 
 <script>
@@ -135,9 +124,11 @@ document.getElementById("title").textContent = otherName || "Chat";
 
 const box = document.getElementById("chat");
 const replyInput = document.getElementById("reply");
+const sendBtn = document.getElementById("sendBtn");
 
 let loadedMessageIds = new Set();
 let lastMessageTime = null;
+let isSending = false;
 
 /* ADD MESSAGE */
 function addMessage(m){
@@ -150,14 +141,11 @@ function addMessage(m){
 
   div.innerHTML = `
     ${m.message}
-    <div class="time">
-      ${new Date(m.time).toLocaleTimeString()}
-    </div>
+    <div class="time">${new Date(m.time).toLocaleTimeString()}</div>
   `;
 
   box.appendChild(div);
   box.scrollTop = box.scrollHeight;
-
   lastMessageTime = m.time;
 }
 
@@ -175,9 +163,7 @@ async function loadMessages(){
   loadedMessageIds.clear();
   lastMessageTime = null;
 
-  if(data){
-    data.forEach(m => addMessage(m));
-  }
+  if(data) data.forEach(m => addMessage(m));
 
   markRead();
 }
@@ -208,42 +194,57 @@ async function markRead(){
     .eq("unread_for", myId);
 }
 
-/* SEND MESSAGE (FIXED) */
+/* SEND MESSAGE */
 async function sendReply(){
   const text = replyInput.value.trim();
-  if(!text) return;
+  if(!text || isSending) return;
 
-  const { data: me } = await window.db
-    .from("logininfo")
-    .select("username")
-    .eq("loginid", myId)
-    .single();
+  isSending = true;
+  sendBtn.disabled = true;
 
-  const { data: inserted, error } = await window.db
-    .from("chat_messages")
-    .insert({
-      chatid: chatid,
-      senderid: myId,
-      sendername: me.username,
-      message: text
-    })
-    .select()
-    .single();
+  try{
+    // get sender username
+    const { data: me, error: meErr } = await window.db
+      .from("logindata")
+      .select("username")
+      .eq("id", myId)
+      .single();
 
-  if(error) return;
+    if(meErr || !me) throw new Error("Failed to get username");
 
-  await window.db
-    .from("chat_conversations")
-    .update({
-      last_message: text,
-      unread_for: otherId
-    })
-    .eq("chatid", chatid);
+    const { data: inserted, error } = await window.db
+      .from("chat_messages")
+      .insert({
+        chatid: chatid,
+        senderid: myId,
+        sendername: me.username,
+        message: text
+      })
+      .select()
+      .single();
 
-  replyInput.value = "";
+    if(error) throw new Error("Failed to insert message");
 
-  /* Display using SERVER timestamp */
-  addMessage(inserted);
+    // update last message
+    await window.db
+      .from("chat_conversations")
+      .update({
+        last_message: text,
+        unread_for: otherId
+      })
+      .eq("chatid", chatid);
+
+    // display locally
+    addMessage(inserted);
+    replyInput.value = "";
+
+  }catch(err){
+    console.error(err);
+    alert("Failed to send message");
+  }
+
+  isSending = false;
+  sendBtn.disabled = false;
 }
 
 /* ENTER TO SEND */
