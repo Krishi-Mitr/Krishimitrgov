@@ -42,7 +42,7 @@ body.drawer-open { overflow: hidden; }
   gap: 14px;
 }
 
-/* ===== DASHBOARD STYLE HAMBURGER ===== */
+/* ===== HAMBURGER ===== */
 .hamburger-btn {
   background: rgba(255,255,255,0.15);
   border: none;
@@ -51,13 +51,8 @@ body.drawer-open { overflow: hidden; }
   cursor: pointer;
   display: flex;
   flex-direction: column;
-  justify-content: center;
   gap: 4px;
   transition: 0.3s;
-}
-
-.hamburger-btn:hover {
-  background: rgba(255,255,255,0.25);
 }
 
 .hamburger-btn span {
@@ -67,15 +62,12 @@ body.drawer-open { overflow: hidden; }
   transition: 0.3s;
 }
 
-/* Animation */
 .drawer-open .hamburger-btn span:nth-child(1) {
   transform: rotate(45deg) translate(5px,5px);
 }
-
 .drawer-open .hamburger-btn span:nth-child(2) {
   opacity: 0;
 }
-
 .drawer-open .hamburger-btn span:nth-child(3) {
   transform: rotate(-45deg) translate(5px,-5px);
 }
@@ -110,7 +102,6 @@ body.drawer-open { overflow: hidden; }
 .logout-btn:hover {
   background: #0a3d62;
   color: white;
-  transform: translateY(-2px);
 }
 
 .profile-btn img {
@@ -119,12 +110,6 @@ body.drawer-open { overflow: hidden; }
   border-radius: 50%;
   border: 2px solid #0a3d62;
   cursor: pointer;
-  transition: 0.3s;
-}
-
-.profile-btn img:hover {
-  transform: scale(1.1);
-  box-shadow: 0 0 15px rgba(10,61,98,0.4);
 }
 
 /* ===== DRAWER ===== */
@@ -143,12 +128,8 @@ body.drawer-open { overflow: hidden; }
   top: 84px;
   left: 14px;
   width: min(320px, calc(100vw - 28px));
-  max-height: calc(100vh - 98px);
-  overflow: auto;
   background: linear-gradient(180deg,#0a3d62,#082032);
-  border: 3px solid #ffffff;
   border-radius: 18px;
-  box-shadow: 0 18px 40px rgba(0,0,0,0.35);
   transform: translateX(-110%);
   transition: transform .25s ease;
   z-index: 9999;
@@ -164,22 +145,6 @@ body.drawer-open .nav-overlay {
 body.drawer-open .side-drawer {
   transform: translateX(0);
 }
-
-/* Drawer Menu */
-.menu-section { margin-bottom: 16px; }
-.menu-section-title {
-  color: #fff;
-  font-weight: 700;
-  margin-bottom: 8px;
-}
-.menu-list { list-style: none; padding: 0; margin: 0; }
-.menu-list li { margin-bottom: 8px; }
-.menu-list a {
-  text-decoration: none;
-  color: #e3f2fd;
-  font-weight: 500;
-}
-.menu-list a:hover { color: #fff; }
 
 /* ===== CHAT LIST ===== */
 .chat-container{
@@ -197,27 +162,18 @@ body.drawer-open .side-drawer {
   align-items:center;
   background:#fff;
   box-shadow:0 6px 18px rgba(0,0,0,.08);
-  transition:.2s;
 }
-.chat-card:hover{ transform:translateY(-2px); }
+
 .chat-card.unread{
   background:#e3f2fd;
   border-left:6px solid #1976d2;
 }
-.chat-left{ max-width:70%; }
+
 .chat-name{ font-weight:bold; font-size:17px; }
-.chat-last{
-  color:#555;
-  margin-top:6px;
-  white-space:nowrap;
-  overflow:hidden;
-  text-overflow:ellipsis;
-}
-.chat-right{ text-align:right; }
-.chat-time{ font-size:13px; color:#777; }
+.chat-last{ color:#555; margin-top:6px; }
+
 .unread-count{
   margin-top:6px;
-  display:inline-block;
   padding:4px 10px;
   background:#d32f2f;
   color:white;
@@ -234,9 +190,7 @@ body.drawer-open .side-drawer {
 <div class="top-nav">
   <div class="nav-left">
     <button class="hamburger-btn" id="menuBtn">
-      <span></span>
-      <span></span>
-      <span></span>
+      <span></span><span></span><span></span>
     </button>
     <p class="brand-title">Krishi Mitr</p>
   </div>
@@ -245,43 +199,17 @@ body.drawer-open .side-drawer {
     <button class="newchat-btn" onclick="location.href='Message'">
       + New Chat
     </button>
-
     <div class="profile-btn" onclick="location.href='Profile'">
-      <img src="profile_pic.png" alt="Profile">
+      <img src="profile_pic.png">
     </div>
-
     <button class="logout-btn" id="logoutBtn">Logout</button>
   </div>
 </div>
 
 <div class="nav-overlay" id="navOverlay" hidden></div>
-
 <nav class="side-drawer" id="sideNav" hidden>
   <div class="drawer-inner">
-
-    <div class="menu-section">
-      <div class="menu-section-title">Market</div>
-      <ul class="menu-list">
-        <li><a href="Update_crops">Manage Your Crops</a></li>
-        <li><a href="Sell">Sell Your Crop</a></li>
-        <li><a href="Buy">Buy Your Crop</a></li>
-      </ul>
-    </div>
-
-    <div class="menu-section">
-      <div class="menu-section-title">Tools</div>
-      <ul class="menu-list">
-        <li><a href="krishimitr">Crop Predictor</a></li>
-      </ul>
-    </div>
-
-    <div class="menu-section">
-      <div class="menu-section-title">System</div>
-      <ul class="menu-list">
-        <li><a href="Notification">Notification</a></li>
-      </ul>
-    </div>
-
+    <p style="color:white;">Menu</p>
   </div>
 </nav>
 
@@ -302,49 +230,39 @@ const menuBtn = document.getElementById("menuBtn");
 const sideNav = document.getElementById("sideNav");
 const navOverlay = document.getElementById("navOverlay");
 
-function openDrawer(){
-  document.body.classList.add("drawer-open");
-  sideNav.hidden=false;
-  navOverlay.hidden=false;
-}
-
-function closeDrawer(){
-  document.body.classList.remove("drawer-open");
-  setTimeout(()=>{
-    if(!document.body.classList.contains("drawer-open")){
-      sideNav.hidden=true;
-      navOverlay.hidden=true;
-    }
-  },220);
-}
-
-menuBtn.onclick=()=>{
-  document.body.classList.contains("drawer-open")
-  ? closeDrawer() : openDrawer();
+menuBtn.onclick = () => {
+  document.body.classList.toggle("drawer-open");
+  sideNav.hidden = !sideNav.hidden;
+  navOverlay.hidden = !navOverlay.hidden;
 };
-
-navOverlay.onclick=closeDrawer;
+navOverlay.onclick = menuBtn.onclick;
 
 /* Chat Logic */
 let lastRendered = "";
 
 async function loadChats(){
-  const { data: chats } = await window.db
+
+  const { data, error } = await window.db
     .from("chat_conversations")
     .select("*")
     .or(`user1id.eq.${myLoginId},user2id.eq.${myLoginId}`)
-    .order("last_time", { ascending:false });
+    .order("last_time",{ ascending:false });
 
-  if(!chats) return;
+  if(error){
+    console.error(error);
+    return;
+  }
 
-  const snapshot = JSON.stringify(chats);
+  if(!data) return;
+
+  const snapshot = JSON.stringify(data);
   if(snapshot === lastRendered) return;
   lastRendered = snapshot;
 
   const chatList = document.getElementById("chatList");
   chatList.innerHTML = "";
 
-  for(const chat of chats){
+  data.forEach(chat => {
 
     const otherName =
       chat.user1id === myLoginId ? chat.user2name : chat.user1name;
@@ -352,7 +270,7 @@ async function loadChats(){
     const otherId =
       chat.user1id === myLoginId ? chat.user2id : chat.user1id;
 
-    let isNew = chat.unread_for === myLoginId;
+    const isNew = chat.unread_for === myLoginId;
 
     const card = document.createElement("div");
     card.className = "chat-card" + (isNew ? " unread" : "");
@@ -365,23 +283,22 @@ async function loadChats(){
     };
 
     card.innerHTML = `
-      <div class="chat-left">
+      <div>
         <div class="chat-name">${otherName}</div>
         <div class="chat-last">${chat.last_message || ""}</div>
       </div>
-      <div class="chat-right">
-        <div class="chat-time">
-          ${chat.last_time ? new Date(chat.last_time).toLocaleString() : ""}
-        </div>
+      <div>
+        <div>${chat.last_time ? new Date(chat.last_time).toLocaleString() : ""}</div>
         ${isNew ? `<div class="unread-count">New</div>` : ""}
       </div>
     `;
 
     chatList.appendChild(card);
-  }
+
+  });
 }
 
-setInterval(loadChats, 2000);
+setInterval(loadChats,2000);
 loadChats();
 
 </script>
