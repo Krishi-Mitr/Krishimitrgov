@@ -44,43 +44,39 @@ body.drawer-open { overflow: hidden; }
 
 /* ===== DASHBOARD STYLE HAMBURGER ===== */
 .hamburger-btn {
-  width: 44px;
-  height: 44px;
-  border-radius: 12px;
-  border: 2px solid #0a3d62;
-  background: rgba(255,255,255,0.75);
-  display: grid;
-  place-items: center;
+  background: rgba(255,255,255,0.15);
+  border: none;
+  padding: 8px;
+  border-radius: 8px;
   cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
   transition: 0.3s;
 }
-.hamburger-btn:hover { transform: scale(1.05); }
 
-.hamburger-icon {
-  width: 20px;
-  height: 14px;
-  position: relative;
+.hamburger-btn:hover {
+  background: rgba(255,255,255,0.25);
 }
-.hamburger-icon span {
-  position: absolute;
-  left: 0;
-  right: 0;
-  height: 2.5px;
-  background: #0a3d62;
-  border-radius: 999px;
+
+.hamburger-btn span {
+  width: 22px;
+  height: 2px;
+  background: #000;
+  transition: 0.3s;
 }
-.hamburger-icon span:nth-child(1){ top:0; }
-.hamburger-icon span:nth-child(2){ top:5.5px; }
-.hamburger-icon span:nth-child(3){ top:11px; }
 
 /* Animation */
-.drawer-open .hamburger-icon span:nth-child(1) {
+.drawer-open .hamburger-btn span:nth-child(1) {
   transform: rotate(45deg) translate(5px,5px);
 }
-.drawer-open .hamburger-icon span:nth-child(2) {
+
+.drawer-open .hamburger-btn span:nth-child(2) {
   opacity: 0;
 }
-.drawer-open .hamburger-icon span:nth-child(3) {
+
+.drawer-open .hamburger-btn span:nth-child(3) {
   transform: rotate(-45deg) translate(5px,-5px);
 }
 
@@ -109,6 +105,7 @@ body.drawer-open { overflow: hidden; }
   cursor: pointer;
   transition: 0.3s;
 }
+
 .newchat-btn:hover,
 .logout-btn:hover {
   background: #0a3d62;
@@ -124,6 +121,7 @@ body.drawer-open { overflow: hidden; }
   cursor: pointer;
   transition: 0.3s;
 }
+
 .profile-btn img:hover {
   transform: scale(1.1);
   box-shadow: 0 0 15px rgba(10,61,98,0.4);
@@ -166,47 +164,21 @@ body.drawer-open .side-drawer {
   transform: translateX(0);
 }
 
-/* ===== DASHBOARD STYLE MENU BOXES ===== */
-.menu-section {
-  border-radius: 14px;
-  overflow: hidden;
-  border: 1px solid rgba(255,255,255,0.15);
-  margin-bottom: 14px;
-  background: rgba(255,255,255,0.05);
-}
-
+/* Drawer Menu */
+.menu-section { margin-bottom: 16px; }
 .menu-section-title {
-  padding: 12px 14px;
-  background: rgba(255,255,255,0.1);
-  color: white;
-  font-weight: 800;
-  font-size: 0.95rem;
+  color: #fff;
+  font-weight: 700;
+  margin-bottom: 8px;
 }
-
-.menu-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
+.menu-list { list-style: none; padding: 0; margin: 0; }
+.menu-list li { margin-bottom: 8px; }
 .menu-list a {
-  display: block;
-  padding: 14px;
   text-decoration: none;
-  color: white;
-  font-weight: 600;
-  background: rgba(255,255,255,0.08);
-  transition: 0.2s ease;
+  color: #e3f2fd;
+  font-weight: 500;
 }
-
-.menu-list li + li a {
-  border-top: 1px solid rgba(255,255,255,0.1);
-}
-
-.menu-list a:hover {
-  background: #1e3a8a;
-  padding-left: 20px;
-}
+.menu-list a:hover { color: #fff; }
 
 /* ===== CHAT LIST ===== */
 .chat-container{
@@ -261,9 +233,9 @@ body.drawer-open .side-drawer {
 <div class="top-nav">
   <div class="nav-left">
     <button class="hamburger-btn" id="menuBtn">
-      <div class="hamburger-icon">
-        <span></span><span></span><span></span>
-      </div>
+      <span></span>
+      <span></span>
+      <span></span>
     </button>
     <p class="brand-title">Krishi Mitr</p>
   </div>
@@ -302,7 +274,7 @@ body.drawer-open .side-drawer {
       </ul>
     </div>
 
-    <div class="menu-section" style="margin-bottom:0;">
+    <div class="menu-section">
       <div class="menu-section-title">System</div>
       <ul class="menu-list">
         <li><a href="Notification">Notification</a></li>
@@ -316,7 +288,16 @@ body.drawer-open .side-drawer {
 
 <script>
 
-/* Drawer Logic */
+const myLoginId = Number(sessionStorage.getItem("loginid"));
+if(!myLoginId){ location.replace("login"); }
+
+document.getElementById("logoutBtn").onclick = () => {
+  sessionStorage.clear();
+  location.replace("login");
+};
+
+/* Drawer - EXACT DASHBOARD STYLE */
+
 const menuBtn = document.getElementById("menuBtn");
 const sideNav = document.getElementById("sideNav");
 const navOverlay = document.getElementById("navOverlay");
@@ -325,29 +306,92 @@ function openDrawer(){
   document.body.classList.add("drawer-open");
   sideNav.hidden = false;
   navOverlay.hidden = false;
+
+  // force reflow for smooth animation
+  sideNav.offsetHeight;
 }
+
 function closeDrawer(){
   document.body.classList.remove("drawer-open");
-  setTimeout(()=>{
+
+  setTimeout(() => {
     if(!document.body.classList.contains("drawer-open")){
       sideNav.hidden = true;
       navOverlay.hidden = true;
     }
-  },220);
+  }, 250); // matches CSS transition
 }
-menuBtn.onclick=()=>{
-  document.body.classList.contains("drawer-open")
-  ? closeDrawer() : openDrawer();
-};
-navOverlay.onclick=closeDrawer;
 
-/* Logout */
-document.getElementById("logoutBtn").onclick = () => {
-  sessionStorage.clear();
-  location.replace("login");
-};
+menuBtn.addEventListener("click", () => {
+  if(document.body.classList.contains("drawer-open")){
+    closeDrawer();
+  } else {
+    openDrawer();
+  }
+});
 
-/* Chat logic remains unchanged below */
+navOverlay.addEventListener("click", closeDrawer);
+
+
+/* Chat Logic */
+let lastRendered = "";
+
+async function loadChats(){
+  const { data: chats } = await window.db
+    .from("chat_conversations")
+    .select("*")
+    .or(`user1id.eq.${myLoginId},user2id.eq.${myLoginId}`)
+    .order("last_time", { ascending:false });
+
+  if(!chats) return;
+
+  const snapshot = JSON.stringify(chats);
+  if(snapshot === lastRendered) return;
+  lastRendered = snapshot;
+
+  const chatList = document.getElementById("chatList");
+  chatList.innerHTML = "";
+
+  for(const chat of chats){
+
+    const otherName =
+      chat.user1id === myLoginId ? chat.user2name : chat.user1name;
+
+    const otherId =
+      chat.user1id === myLoginId ? chat.user2id : chat.user1id;
+
+    let isNew = chat.unread_for === myLoginId;
+
+    const card = document.createElement("div");
+    card.className = "chat-card" + (isNew ? " unread" : "");
+
+    card.onclick = () => {
+      sessionStorage.setItem("chatid", chat.chatid);
+      sessionStorage.setItem("otherid", otherId);
+      sessionStorage.setItem("othername", otherName);
+      location.href = "Read";
+    };
+
+    card.innerHTML = `
+      <div class="chat-left">
+        <div class="chat-name">${otherName}</div>
+        <div class="chat-last">${chat.last_message || ""}</div>
+      </div>
+      <div class="chat-right">
+        <div class="chat-time">
+          ${chat.last_time ? new Date(chat.last_time).toLocaleString() : ""}
+        </div>
+        ${isNew ? `<div class="unread-count">New</div>` : ""}
+      </div>
+    `;
+
+    chatList.appendChild(card);
+  }
+}
+
+setInterval(loadChats, 2000);
+loadChats();
+
 </script>
 
 </body>
