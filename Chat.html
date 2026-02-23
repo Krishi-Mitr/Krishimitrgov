@@ -160,7 +160,6 @@ body.drawer-open .nav-overlay {
   opacity: 1;
   pointer-events: auto;
 }
-
 body.drawer-open .side-drawer {
   transform: translateX(0);
 }
@@ -297,33 +296,42 @@ document.getElementById("logoutBtn").onclick = () => {
   location.replace("login");
 };
 
-/* Drawer */
+/* Drawer - EXACT DASHBOARD STYLE */
+
 const menuBtn = document.getElementById("menuBtn");
 const sideNav = document.getElementById("sideNav");
 const navOverlay = document.getElementById("navOverlay");
 
 function openDrawer(){
   document.body.classList.add("drawer-open");
-  sideNav.hidden=false;
-  navOverlay.hidden=false;
+  sideNav.hidden = false;
+  navOverlay.hidden = false;
+
+  // force reflow for smooth animation
+  sideNav.offsetHeight;
 }
 
 function closeDrawer(){
   document.body.classList.remove("drawer-open");
-  setTimeout(()=>{
+
+  setTimeout(() => {
     if(!document.body.classList.contains("drawer-open")){
-      sideNav.hidden=true;
-      navOverlay.hidden=true;
+      sideNav.hidden = true;
+      navOverlay.hidden = true;
     }
-  },220);
+  }, 250); // matches CSS transition
 }
 
-menuBtn.onclick=()=>{
-  document.body.classList.contains("drawer-open")
-  ? closeDrawer() : openDrawer();
-};
+menuBtn.addEventListener("click", () => {
+  if(document.body.classList.contains("drawer-open")){
+    closeDrawer();
+  } else {
+    openDrawer();
+  }
+});
 
-navOverlay.onclick=closeDrawer;
+navOverlay.addEventListener("click", closeDrawer);
+
 
 /* Chat Logic */
 let lastRendered = "";
