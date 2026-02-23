@@ -103,10 +103,6 @@ button{
 button:hover{
   background:#0f6b06;
 }
-button:disabled{
-  background:gray;
-  cursor:not-allowed;
-}
 </style>
 </head>
 
@@ -121,16 +117,16 @@ button:disabled{
 
 <div class="reply-box">
   <textarea id="reply" placeholder="Type a reply..."></textarea>
-  <button id="sendBtn">Send</button>
+  <button id="sendBtn" type="button">Send</button>
 </div>
 
 <script>
-const myId = String(sessionStorage.getItem("loginid"));
+const myLoginId = sessionStorage.getItem("loginid");
 const chatid = sessionStorage.getItem("chatid");
-const otherId = String(sessionStorage.getItem("otherid"));
+const otherId = sessionStorage.getItem("otherid");
 const otherName = sessionStorage.getItem("othername");
 
-if(!myId || !chatid){
+if(!myLoginId || !chatid){
   location.replace("Chat");
 }
 
@@ -150,7 +146,7 @@ function addMessage(m){
   loadedMessageIds.add(m.id);
 
   const div = document.createElement("div");
-  div.className = "msg " + (String(m.senderid) === myId ? "right" : "left");
+  div.className = "msg " + (String(m.senderid) === myLoginId ? "right" : "left");
 
   div.innerHTML = `
     ${m.message}
@@ -159,10 +155,11 @@ function addMessage(m){
 
   box.appendChild(div);
   box.scrollTop = box.scrollHeight;
+
   lastMessageTime = m.time;
 }
 
-/* LOAD ALL MESSAGES */
+/* LOAD MESSAGES */
 async function loadMessages(){
   const { data, error } = await window.db
     .from("chat_messages")
@@ -187,7 +184,6 @@ async function checkNewMessages(){
     .from("chat_messages")
     .select("*")
     .eq("chatid", chatid)
-    .gt("time", lastMessageTime || 0)
     .order("time", { ascending: true });
 
   if(data && data.length > 0){
@@ -202,42 +198,50 @@ async function markRead(){
     .from("chat_conversations")
     .update({ unread_for: null })
     .eq("chatid", chatid)
-    .eq("unread_for", myId);
+    .eq("unread_for", myLoginId);
 }
 
 /* SEND MESSAGE */
 async function sendReply(){
-  const text = replyInput.value.trim();
-  if(!text || isSending) return;
-
+  if(isSending) return;
   isSending = true;
   sendBtn.disabled = true;
 
+  const text = replyInput.value.trim();
+  if(!text){
+    isSending = false;
+    sendBtn.disabled = false;
+    return;
+  }
+
   try{
-    // Get sender username
-    const { data: me, error: meErr } = await window.db
+    // Get my username (fixed)
+    const { data: me } = await window.db
       .from("logindata")
       .select("username")
-      .eq("id", myId)
+      .eq("loginid", myLoginId) // ✅ was "id", now correct
       .single();
-
-    if(meErr || !me) throw new Error("Failed to get username");
 
     // Insert message
     const { data: inserted, error } = await window.db
       .from("chat_messages")
       .insert({
         chatid: chatid,
-        senderid: myId,
+        senderid: myLoginId,
         sendername: me.username,
         message: text
       })
       .select()
       .single();
 
-    if(error) throw new Error("Failed to insert message");
+    if(error){
+      console.error(error);
+      isSending = false;
+      sendBtn.disabled = false;
+      return;
+    }
 
-    // Update last message and unread for other user
+    // Update last message & unread_for in conversation
     await window.db
       .from("chat_conversations")
       .update({
@@ -246,13 +250,11 @@ async function sendReply(){
       })
       .eq("chatid", chatid);
 
-    // Display locally
-    addMessage(inserted);
     replyInput.value = "";
+    addMessage(inserted);
 
   }catch(err){
     console.error(err);
-    alert("Failed to send message");
   }
 
   isSending = false;
@@ -266,6 +268,9 @@ replyInput.addEventListener("keydown", e=>{
     sendReply();
   }
 });
+
+/* SEND BUTTON CLICK */
+sendBtn.addEventListener("click", sendReply); // ✅ attach click event
 
 /* START */
 loadMessages();
