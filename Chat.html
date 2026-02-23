@@ -19,7 +19,7 @@ body {
 }
 body.drawer-open { overflow: hidden; }
 
-/* ===== NAVBAR (COPIED FROM DASHBOARD) ===== */
+/* ===== NAVBAR ===== */
 .top-nav {
   position: fixed;
   top: 0;
@@ -85,6 +85,23 @@ body.drawer-open { overflow: hidden; }
   gap: 15px;
 }
 
+/* ===== NEW CHAT BUTTON (Same as Logout Style) ===== */
+.newchat-btn {
+  background: white;
+  color: #0a3d62;
+  border: 2px solid #0a3d62;
+  padding: 10px 18px;
+  border-radius: 10px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: 0.3s;
+}
+.newchat-btn:hover {
+  background: #0a3d62;
+  color: white;
+  transform: translateY(-2px);
+}
+
 .profile-btn img {
   width: 42px;
   height: 42px;
@@ -114,7 +131,7 @@ body.drawer-open { overflow: hidden; }
   transform: translateY(-2px);
 }
 
-/* ===== DRAWER (COPIED EXACTLY) ===== */
+/* ===== DRAWER ===== */
 .nav-overlay {
   position: fixed;
   inset: 0;
@@ -151,48 +168,7 @@ body.drawer-open .side-drawer {
   transform: translateX(0);
 }
 
-.menu-section {
-  border-radius: 14px;
-  overflow: hidden;
-  border: 1px solid rgba(255,255,255,0.15);
-  margin-bottom: 14px;
-  background: rgba(255,255,255,0.05);
-}
-
-.menu-section-title {
-  padding: 12px 14px;
-  background: rgba(255,255,255,0.1);
-  color: white;
-  font-weight: 800;
-  font-size: 0.95rem;
-}
-
-.menu-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.menu-list a {
-  display: block;
-  padding: 14px;
-  text-decoration: none;
-  color: white;
-  font-weight: 600;
-  background: rgba(255,255,255,0.08);
-  transition: 0.2s ease;
-}
-
-.menu-list li + li a {
-  border-top: 1px solid rgba(255,255,255,0.1);
-}
-
-.menu-list a:hover {
-  background: #1e3a8a;
-  padding-left: 20px;
-}
-
-/* ===== CHAT LIST (UNCHANGED) ===== */
+/* ===== CHAT LIST ===== */
 .chat-container{
   max-width:900px;
   margin:120px auto 40px;
@@ -252,45 +228,36 @@ body.drawer-open .side-drawer {
   </div>
 
   <div class="nav-right">
+
+    <!-- NEW CHAT BUTTON ADDED HERE -->
+    <button class="newchat-btn" onclick="location.href='Message'">
+      + New Chat
+    </button>
+
     <div class="profile-btn" onclick="location.href='Profile'">
       <img src="profile_pic.png" alt="Profile">
     </div>
+
     <button class="logout-btn" id="logoutBtn">Logout</button>
   </div>
 </div>
 
 <div class="nav-overlay" id="navOverlay" hidden></div>
-
-<nav class="side-drawer" id="sideNav" hidden>
-  <div class="drawer-inner">
-    <div class="menu-section">
-      <div class="menu-section-title">Chats</div>
-      <ul class="menu-list">
-        <li><a href="Message">New Chat</a></li>
-        <li><a href="Notification">Notifications</a></li>
-      </ul>
-    </div>
-  </div>
-</nav>
+<nav class="side-drawer" id="sideNav" hidden></nav>
 
 <div class="chat-container" id="chatList"></div>
 
 <script>
 const myLoginId = Number(sessionStorage.getItem("loginid"));
-const myUsername = sessionStorage.getItem("username");
-
-if(!myLoginId){
-  location.replace("login");
-}
+if(!myLoginId){ location.replace("login"); }
 
 function logout(){
   sessionStorage.clear();
   location.replace("login");
 }
-
 document.getElementById("logoutBtn").onclick = logout;
 
-/* Drawer Logic (Exact Dashboard Logic) */
+/* Drawer */
 const menuBtn = document.getElementById("menuBtn");
 const sideNav = document.getElementById("sideNav");
 const navOverlay = document.getElementById("navOverlay");
@@ -309,19 +276,16 @@ function closeDrawer(){
     }
   },220);
 }
-
 menuBtn.onclick=()=>{
   document.body.classList.contains("drawer-open")
   ? closeDrawer() : openDrawer();
 };
-
 navOverlay.onclick=closeDrawer;
 
-/* ===== CHAT LOGIC (UNCHANGED) ===== */
+/* Chat Logic */
 let lastRendered = "";
 
 async function loadChats(){
-
   const { data: chats } = await window.db
     .from("chat_conversations")
     .select("*")
@@ -330,21 +294,18 @@ async function loadChats(){
 
   if(!chats) return;
 
-  const currentSnapshot = JSON.stringify(chats);
-  if(currentSnapshot === lastRendered) return;
-  lastRendered = currentSnapshot;
+  const snapshot = JSON.stringify(chats);
+  if(snapshot === lastRendered) return;
+  lastRendered = snapshot;
 
   const chatList = document.getElementById("chatList");
   chatList.innerHTML = "";
 
   for(const chat of chats){
-
     const otherName =
       chat.user1id === myLoginId ? chat.user2name : chat.user1name;
-
     const otherId =
       chat.user1id === myLoginId ? chat.user2id : chat.user1id;
-
     let isNew = chat.unread_for === myLoginId;
 
     const card = document.createElement("div");
