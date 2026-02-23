@@ -340,14 +340,86 @@ menuBtn.onclick=()=>{
   ? closeDrawer() : openDrawer();
 };
 navOverlay.onclick=closeDrawer;
-
 /* Logout */
 document.getElementById("logoutBtn").onclick = () => {
   sessionStorage.clear();
   location.replace("login");
 };
+/* ===== AUTH CHECK ===== */
+const myLoginId = Number(sessionStorage.getItem("loginid"));
+if(!myLoginId){
+  location.replace("login");
+}
 
-/* Chat logic remains unchanged below */
+/* ===== CHAT LIST LOGIC ===== */
+
+let lastRendered = "";
+
+async function loadChats(){
+
+  const { data: chats } = await window.db
+    .from("chat_conversations")
+    .select("*")
+    .or(`user1id.eq.${myLoginId},user2id.eq.${myLoginId}`)
+    .order("last_time", { ascending:false });
+
+  if(!chats) return;
+
+  const snapshot = JSON.stringify(chats);
+
+  // prevent re-render if no changes
+  if(snapshot === lastRendered) return;
+  lastRendered = snapshot;
+
+  const chatList = document.getElementById("chatList");
+  chatList.innerHTML = "";
+
+  for(const chat of chats){
+
+    const otherName =
+      chat.user1id === myLoginId
+        ? chat.user2name
+        : chat.user1name;
+
+    const otherId =
+      chat.user1id === myLoginId
+        ? chat.user2id
+        : chat.user1id;
+
+    const isNew = chat.unread_for === myLoginId;
+
+    const card = document.createElement("div");
+    card.className = "chat-card" + (isNew ? " unread" : "");
+
+    card.onclick = () => {
+      sessionStorage.setItem("chatid", chat.chatid);
+      sessionStorage.setItem("otherid", otherId);
+      sessionStorage.setItem("othername", otherName);
+      location.href = "Read";
+    };
+
+    card.innerHTML = `
+      <div class="chat-left">
+        <div class="chat-name">${otherName}</div>
+        <div class="chat-last">${chat.last_message || ""}</div>
+      </div>
+      <div class="chat-right">
+        <div class="chat-time">
+          ${chat.last_time
+            ? new Date(chat.last_time).toLocaleString()
+            : ""}
+        </div>
+        ${isNew ? `<div class="unread-count">New</div>` : ""}
+      </div>
+    `;
+
+    chatList.appendChild(card);
+  }
+}
+
+/* ===== AUTO REFRESH ===== */
+setInterval(loadChats, 2000);
+loadChats();
 </script>
 
 </body>
