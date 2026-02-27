@@ -153,21 +153,41 @@ function updateCalc(id, price, deposit) {
 }
 
 async function sendRequest(id, name, ownerId, price, deposit) {
-  const days = document.getElementById("days_" + id).value;
-  const total = (days * price) + parseFloat(deposit);
+  const daysInput = document.getElementById("days_" + id);
+  const days = parseInt(daysInput.value);
+  const total = (days * parseFloat(price)) + parseFloat(deposit);
   
-  const { data: user } = await db.from("logindata").select("name, contact").eq("loginid", loginid).single();
+  const { data: user, error: userError } = await db
+    .from("logindata")
+    .select("name, contact")
+    .eq("loginid", loginid)
+    .single();
 
-  const { error } = await db.from("notifications").insert({
-    sender_id: loginid,
-    receiver_id: ownerId,
+  if (userError) {
+    alert("User Profile Error: " + userError.message);
+    return;
+  }
+
+  const { data, error } = await db.from("notifications").insert([{
+    sender_id: String(loginid),
+    receiver_id: String(ownerId),
     tool_id: id,
     tool_name: name,
     requested_days: days,
     total_price: total,
     sender_name: user.name,
-    contact_number: user.contact
-  });
+    contact_number: user.contact,
+    status: 'pending'
+  }]);
+
+  if (error) {
+    console.error("Full Error Object:", error);
+    alert("Save Failed: " + error.message + " | Field: " + error.details);
+  } else {
+    alert("Request successfully sent to " + name + " owner!");
+    daysInput.value = 1;
+  }
+}
 
   if(error) alert("Error sending request");
   else alert("Request sent to the owner! Check notifications for updates.");
