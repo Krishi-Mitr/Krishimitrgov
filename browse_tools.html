@@ -14,7 +14,6 @@ body {
   color: #1f2937;
 }
 body.drawer-open { overflow: hidden; }
-
 .top-nav {
   position: fixed;
   top: 0; left: 0; right: 0; height: 78px;
@@ -35,98 +34,67 @@ body.drawer-open { overflow: hidden; }
 .hamburger-icon span:nth-child(1) { top:0; }
 .hamburger-icon span:nth-child(2) { top:5.5px; }
 .hamburger-icon span:nth-child(3) { top:11px; }
-
-.nav-overlay {
-  position: fixed; inset: 0; background: rgba(0,0,0,0.25);
-  opacity: 0; pointer-events: none; transition: .2s ease; z-index: 9998;
-}
+.nav-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.25); opacity: 0; pointer-events: none; transition: .2s ease; z-index: 9998; }
 .side-drawer {
   position: fixed; top: 84px; left: 14px; width: min(320px, calc(100vw - 28px));
   max-height: calc(100vh - 98px); overflow: auto;
   background: linear-gradient(180deg,#0a3d62,#082032);
   border: 3px solid #ffffff; border-radius: 18px;
-  box-shadow: 0 18px 40px rgba(0,0,0,0.35);
   transform: translateX(-110%); transition: .25s ease; z-index: 9999;
 }
 .drawer-inner { padding: 14px; }
-
-.menu-section {
-  border-radius: 14px; overflow: hidden; border: 1px solid rgba(255,255,255,0.15);
-  margin-bottom: 14px; background: rgba(255,255,255,0.05);
-}
+.menu-section { border-radius: 14px; overflow: hidden; border: 1px solid rgba(255,255,255,0.15); margin-bottom: 14px; background: rgba(255,255,255,0.05); }
 .menu-section-title { padding: 12px 14px; background: rgba(255,255,255,0.1); color: white; font-weight: 800; }
 .menu-list { list-style: none; padding: 0; margin: 0; }
-.menu-list a {
-  display: block; padding: 14px; text-decoration: none; color: white;
-  font-weight: 600; background: rgba(255,255,255,0.08); transition: 0.2s;
-}
-.menu-list li+li a { border-top: 1px solid rgba(255,255,255,0.1); }
+.menu-list a { display: block; padding: 14px; text-decoration: none; color: white; font-weight: 600; background: rgba(255,255,255,0.08); transition: 0.2s; }
 .menu-list a:hover { background: #1e3a8a; padding-left: 20px; }
-
 body.drawer-open .nav-overlay { opacity: 1; pointer-events: auto; }
 body.drawer-open .side-drawer { transform: translateX(0); }
-
 .container { max-width: 1200px; margin: 120px auto 60px; padding: 0 20px; }
 .search-section { background: white; padding: 25px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); margin-bottom: 40px; }
 .filter-grid { display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: 15px; }
-input, select { padding: 12px; border: 2px solid #e2e8f0; border-radius: 12px; font-family: inherit; }
-
+input, select { padding: 12px; border: 2px solid #e2e8f0; border-radius: 12px; }
 .tool-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 25px; }
 .tool-card { background: white; border-radius: 22px; padding: 25px; box-shadow: 0 10px 20px rgba(0,0,0,0.05); border: 1px solid #eee; }
 .tool-title { font-size: 1.3rem; font-weight: 800; color: #0a3d62; margin: 10px 0; }
 .price-box { background: #f8fafc; padding: 15px; border-radius: 12px; margin: 15px 0; display: flex; justify-content: space-between; align-items: center; }
 .price-val { color: #138808; font-weight: 800; font-size: 1.4rem; }
-
-.rent-input-group { display: flex; flex-direction: column; gap: 10px; margin-top: 15px; border-top: 1px solid #eee; padding-top: 15px; }
-.rent-input-group label { font-size: 0.85rem; font-weight: 600; color: #64748b; }
-.rent-btn { background: #0a3d62; color: white; border: none; padding: 14px; border-radius: 10px; font-weight: 700; cursor: pointer; transition: 0.2s; }
-.rent-btn:hover { background: #138808; }
-
-@media (max-width: 800px) { .filter-grid { grid-template-columns: 1fr; } }
+.rent-btn { background: #0a3d62; color: white; border: none; padding: 14px; border-radius: 10px; font-weight: 700; cursor: pointer; width: 100%; }
 </style>
 </head>
 <body>
-
 <div class="top-nav">
   <div class="nav-left">
     <button class="hamburger-btn" id="menuBtn"><div class="hamburger-icon"><span></span><span></span><span></span></div></button>
-    <p style="font-weight:800; color:#0a3d62;">Krishi Mitr | Browse Tools</p>
+    <p style="font-weight:800; color:#0a3d62;">Krishi Mitr | Browse</p>
   </div>
-  <div class="nav-buttons">
-    <div class="profile-btn" onclick="location.href='Profile'"><img src="profile_pic.png" alt="Profile" style="width:42px; height:42px; border-radius:50%; border:2px solid #0a3d62; cursor:pointer;"></div>
-    <button onclick="sessionStorage.clear(); location.href='login';" style="background:white; color:#0a3d62; border:2px solid #0a3d62; padding:10px 18px; border-radius:10px; font-weight:700; cursor:pointer;">Logout</button>
-  </div>
+  <button onclick="sessionStorage.clear(); location.href='login';" style="background:white; color:#0a3d62; border:2px solid #0a3d62; padding:10px 18px; border-radius:10px; font-weight:700; cursor:pointer; margin-right:32px;">Logout</button>
 </div>
-
 <div class="nav-overlay" id="navOverlay" hidden></div>
 <nav class="side-drawer" id="sideNav" hidden>
   <div class="drawer-inner">
-    
     <div class="menu-section">
       <div class="menu-section-title">Main</div>
       <ul class="menu-list">
         <li><a href="Dashboard">Dashboard</a></li>
       </ul>
     </div>
-
-    <div class="menu-section">
+    <div class="menu-section" id="farmerMarketSection" style="display:none;">
       <div class="menu-section-title">Market</div>
       <ul class="menu-list">
         <li><a href="Update_crops">Manage Your Crops</a></li>
         <li><a href="Sell">Sell Your Crop</a></li>
-        <li><a href="Buy">Buy Your Crop</a></li>
       </ul>
     </div>
-
     <div class="menu-section">
       <div class="menu-section-title">Tools & Services</div>
       <ul class="menu-list">
+        <li><a href="browse_tools.html">Rent Tools & Machinery</a></li>
+        <li class="farmer-only" style="display:none;"><a href="tools_rental.html">List Tool for Rent</a></li>
+        <li class="farmer-only" style="display:none;"><a href="my_listings.html">My Tool Inventory</a></li>
         <li><a href="Crop_Predictor">Crop Predictor</a></li>
-        <li><a href="My_listings">Your Tools Listings</a></li>
-        <li><a href="tools_rental">List a Tool</a></li>
       </ul>
     </div>
-
     <div class="menu-section">
       <div class="menu-section-title">System</div>
       <ul class="menu-list">
@@ -134,122 +102,64 @@ input, select { padding: 12px; border: 2px solid #e2e8f0; border-radius: 12px; f
         <li><a href="Chat">Chat</a></li>
       </ul>
     </div>
-
   </div>
 </nav>
-
 <div class="container">
   <div class="search-section">
     <div class="filter-grid">
       <input type="text" id="qName" placeholder="Search machine name">
       <input type="text" id="qLoc" placeholder="Location">
-      <select id="qCat">
-        <option value="">All Categories</option>
-        <option value="Tractors">Tractors</option>
-        <option value="Ploughs">Ploughs</option>
-        <option value="Harvesters">Harvesters</option>
-      </select>
+      <select id="qCat"><option value="">All Categories</option><option value="Tractors">Tractors</option><option value="Ploughs">Ploughs</option><option value="Harvesters">Harvesters</option></select>
       <button onclick="performSearch()" style="background:#138808; color:white; border:none; padding:0 30px; border-radius:12px; cursor:pointer; font-weight:700;">Search</button>
     </div>
   </div>
   <div class="tool-grid" id="toolsDisplay"></div>
 </div>
-
 <script>
 const db = window.db;
 const loginid = sessionStorage.getItem("loginid");
-
+const usertype = sessionStorage.getItem("usertype");
+function checkPermissions() {
+  if (usertype === "Farmer") {
+    document.getElementById("farmerMarketSection").style.display = "block";
+    document.querySelectorAll(".farmer-only").forEach(el => el.style.display = "block");
+  }
+}
 async function fetchTools(name = "", loc = "", cat = "") {
   let req = db.from("tool_rentals").select("*").eq("is_available", true).neq("user_id", loginid);
-
   if(name) req = req.ilike("tool_name", `%${name}%`);
   if(loc) req = req.ilike("location", `%${loc}%`);
   if(cat) req = req.eq("category", cat);
-
-  const { data, error } = await req;
+  const { data } = await req;
   const container = document.getElementById("toolsDisplay");
-  container.innerHTML = "";
-
-  if(!data || data.length === 0) {
-    container.innerHTML = "<h3>No equipment matches your search.</h3>";
-    return;
-  }
-
-  data.forEach(tool => {
+  container.innerHTML = data?.length ? "" : "<h3>No tools available.</h3>";
+  data?.forEach(tool => {
     const card = document.createElement("div");
     card.className = "tool-card";
-    const baseTotal = parseFloat(tool.price_per_day) + parseFloat(tool.security_deposit);
-    card.innerHTML = `
-      <div class="tool-title">${tool.tool_name}</div>
-      <div style="color:#64748b; font-size:0.9rem;">📍 ${tool.location}</div>
-      <div class="price-box">
-        <div class="price-val">₹${tool.price_per_day} <small style="font-size:0.7rem; color:#64748b;">/ day</small></div>
-        <div style="text-align:right; font-size:0.7rem;">Deposit:<br><b>₹${tool.security_deposit}</b></div>
-      </div>
-      <div class="rent-input-group">
-        <label>Duration (Days)</label>
-        <input type="number" id="days_${tool.id}" min="1" value="1" onchange="updateCalc(${tool.id}, ${tool.price_per_day}, ${tool.security_deposit})">
-        <div id="calc_${tool.id}" style="font-size:0.8rem; color:#138808; font-weight:700;">Total: ₹${baseTotal}</div>
-        <button class="rent-btn" onclick="sendRequest(${tool.id}, '${tool.tool_name}', '${tool.user_id}', ${tool.price_per_day}, ${tool.security_deposit})">Request Rental</button>
-      </div>
-    `;
+    card.innerHTML = `<div class="tool-title">${tool.tool_name}</div><div style="color:#64748b; font-size:0.9rem;">📍 ${tool.location}</div><div class="price-box"><div class="price-val">₹${tool.price_per_day}</div></div><button class="rent-btn" onclick="sendRequest(${tool.id}, '${tool.tool_name}', '${tool.user_id}', ${tool.price_per_day}, ${tool.security_deposit})">Request Rental</button>`;
     container.appendChild(card);
   });
 }
-
-function updateCalc(id, price, deposit) {
-  const days = document.getElementById("days_" + id).value;
-  const total = (days * price) + parseFloat(deposit);
-  document.getElementById("calc_" + id).innerText = "Total: ₹" + total;
-}
-
 async function sendRequest(id, name, ownerId, price, deposit) {
-  const daysInput = document.getElementById("days_" + id);
-  const days = parseInt(daysInput.value);
-  const total = (days * parseFloat(price)) + parseFloat(deposit);
-  
   const { data: user } = await db.from("logindata").select("name").eq("loginid", loginid).maybeSingle();
-  const senderName = user?.name || "Farmer " + loginid;
-
-  const { error } = await db.from("notifications").insert([{
-    sender_id: String(loginid),
-    receiver_id: String(ownerId),
-    tool_id: id,
-    tool_name: name,
-    requested_days: days,
-    total_price: total,
-    sender_name: senderName,
-    status: 'pending'
-  }]);
-
-  if (error) {
-    alert("Error: " + error.message);
-  } else {
-    alert("Rental request for " + name + " sent successfully!");
-    daysInput.value = 1;
-  }
+  await db.from("notifications").insert([{ sender_id: String(loginid), receiver_id: String(ownerId), tool_id: id, tool_name: name, requested_days: 1, total_price: price, sender_name: user?.name || "Farmer", status: 'pending' }]);
+  alert("Request sent!");
 }
-
-function performSearch() {
-  fetchTools(document.getElementById("qName").value, document.getElementById("qLoc").value, document.getElementById("qCat").value);
-}
-
+function performSearch() { fetchTools(document.getElementById("qName").value, document.getElementById("qLoc").value, document.getElementById("qCat").value); }
 const menuBtn = document.getElementById("menuBtn");
 const sideNav = document.getElementById("sideNav");
 const navOverlay = document.getElementById("navOverlay");
-
 menuBtn.onclick = () => {
   const isOpen = document.body.classList.toggle("drawer-open");
   sideNav.hidden = !isOpen;
   navOverlay.hidden = !isOpen;
 };
-
 navOverlay.onclick = () => {
   document.body.classList.remove("drawer-open");
   sideNav.hidden = true;
   navOverlay.hidden = true;
 };
-
+checkPermissions();
 fetchTools();
 </script>
 </body>
