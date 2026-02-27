@@ -3,13 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <title>Dashboard - Krishi Mitr</title>
-
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="supabase.js"></script>
-
 <style>
-
-/* ===== SELL PAGE BACKGROUND ===== */
 body {
   margin: 0;
   font-family: "Poppins", Arial, sans-serif;
@@ -18,8 +14,6 @@ body {
   color: #1f2937;
 }
 body.drawer-open { overflow: hidden; }
-
-/* ===== NAVBAR ===== */
 .top-nav {
   position: fixed;
   top: 0;
@@ -35,13 +29,7 @@ body.drawer-open { overflow: hidden; }
   box-shadow: 0 6px 14px rgba(0,0,0,0.15);
   z-index: 9999;
 }
-
-.nav-left {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-}
-
+.nav-left { display: flex; align-items: center; gap: 14px; }
 .hamburger-btn {
   width: 44px;
   height: 44px;
@@ -54,7 +42,6 @@ body.drawer-open { overflow: hidden; }
   transition: 0.3s;
 }
 .hamburger-btn:hover { transform: scale(1.05); }
-
 .hamburger-icon {
   width: 20px;
   height: 14px;
@@ -71,21 +58,13 @@ body.drawer-open { overflow: hidden; }
 .hamburger-icon span:nth-child(1){ top:0; }
 .hamburger-icon span:nth-child(2){ top:5.5px; }
 .hamburger-icon span:nth-child(3){ top:11px; }
-
 .brand-title {
   margin: 0;
   font-size: 1.15rem;
   font-weight: 800;
   color: #0a3d62;
 }
-
-/* Right side */
-.nav-right {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-}
-
+.nav-right { display: flex; align-items: center; gap: 15px; }
 .profile-btn img {
   width: 42px;
   height: 42px;
@@ -98,7 +77,6 @@ body.drawer-open { overflow: hidden; }
   transform: scale(1.1);
   box-shadow: 0 0 15px rgba(10,61,98,0.4);
 }
-
 .logout-btn {
   background: white;
   color: #0a3d62;
@@ -114,8 +92,6 @@ body.drawer-open { overflow: hidden; }
   color: white;
   transform: translateY(-2px);
 }
-
-/* ===== DRAWER ===== */
 .nav-overlay {
   position: fixed;
   inset: 0;
@@ -125,7 +101,6 @@ body.drawer-open { overflow: hidden; }
   transition: opacity .2s ease;
   z-index: 9998;
 }
-
 .side-drawer {
   position: fixed;
   top: 84px;
@@ -141,18 +116,9 @@ body.drawer-open { overflow: hidden; }
   transition: transform .25s ease;
   z-index: 9999;
 }
-
 .drawer-inner { padding: 14px; }
-
-body.drawer-open .nav-overlay {
-  opacity: 1;
-  pointer-events: auto;
-}
-body.drawer-open .side-drawer {
-  transform: translateX(0);
-}
-
-/* ===== MENU STYLING ===== */
+body.drawer-open .nav-overlay { opacity: 1; pointer-events: auto; }
+body.drawer-open .side-drawer { transform: translateX(0); }
 .menu-section {
   border-radius: 14px;
   overflow: hidden;
@@ -160,7 +126,6 @@ body.drawer-open .side-drawer {
   margin-bottom: 14px;
   background: rgba(255,255,255,0.05);
 }
-
 .menu-section-title {
   padding: 12px 14px;
   background: rgba(255,255,255,0.1);
@@ -168,13 +133,7 @@ body.drawer-open .side-drawer {
   font-weight: 800;
   font-size: 0.95rem;
 }
-
-.menu-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
+.menu-list { list-style: none; padding: 0; margin: 0; }
 .menu-list a {
   display: block;
   padding: 14px;
@@ -184,23 +143,9 @@ body.drawer-open .side-drawer {
   background: rgba(255,255,255,0.08);
   transition: 0.2s ease;
 }
-
-.menu-list li + li a {
-  border-top: 1px solid rgba(255,255,255,0.1);
-}
-
-.menu-list a:hover {
-  background: #1e3a8a;
-  padding-left: 20px;
-}
-
-/* ===== DASHBOARD CONTENT ===== */
-.container {
-  margin-top: 170px;
-  display: flex;
-  justify-content: center;
-}
-
+.menu-list li + li a { border-top: 1px solid rgba(255,255,255,0.1); }
+.menu-list a:hover { background: #1e3a8a; padding-left: 20px; }
+.container { margin-top: 170px; display: flex; justify-content: center; }
 .welcome-card {
   background: rgba(255,255,255,0.85);
   backdrop-filter: blur(10px);
@@ -212,50 +157,22 @@ body.drawer-open .side-drawer {
   animation: fadeIn 0.9s ease forwards;
   transition: 0.4s;
 }
-.welcome-card:hover {
-  transform: translateY(-6px);
-  box-shadow: 0 30px 60px rgba(0,0,0,0.2);
-}
-
-#welcomeText {
-  font-size: 2.2rem;
-  font-weight: 800;
-  color: #0a3d62;
-  margin: 0;
-}
-
-.user-name {
-  background: linear-gradient(90deg,#ff9933,#138808);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-#roleText {
-  margin-top: 15px;
-  font-size: 1rem;
-  color: #555;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
+.welcome-card:hover { transform: translateY(-6px); box-shadow: 0 30px 60px rgba(0,0,0,0.2); }
+#welcomeText { font-size: 2.2rem; font-weight: 800; color: #0a3d62; margin: 0; }
+.user-name { background: linear-gradient(90deg,#ff9933,#138808); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+#roleText { margin-top: 15px; font-size: 1rem; color: #555; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 </style>
 </head>
-
 <body>
 
 <div class="top-nav">
   <div class="nav-left">
     <button class="hamburger-btn" id="menuBtn">
-      <div class="hamburger-icon">
-        <span></span><span></span><span></span>
-      </div>
+      <div class="hamburger-icon"><span></span><span></span><span></span></div>
     </button>
     <p class="brand-title">Krishi Mitr</p>
   </div>
-
   <div class="nav-right">
     <div class="profile-btn" onclick="location.href='Profile'">
       <img src="profile_pic.png" alt="Profile">
@@ -265,34 +182,38 @@ body.drawer-open .side-drawer {
 </div>
 
 <div class="nav-overlay" id="navOverlay" hidden></div>
-
 <nav class="side-drawer" id="sideNav" hidden>
   <div class="drawer-inner">
-
     <div class="menu-section">
+      <div class="menu-section-title">Main</div>
+      <ul class="menu-list">
+        <li><a href="Dashboard">Dashboard</a></li>
+      </ul>
+    </div>
+    <div class="menu-section" id="marketSection" style="display:none;">
       <div class="menu-section-title">Market</div>
       <ul class="menu-list">
         <li><a href="Update_crops">Manage Your Crops</a></li>
         <li><a href="Sell">Sell Your Crop</a></li>
-        <li><a href="Buy">Buy Your Crop</a></li>
       </ul>
     </div>
-
     <div class="menu-section">
-      <div class="menu-section-title">Tools</div>
+      <div class="menu-section-title">Tools & Services</div>
       <ul class="menu-list">
+        <li><a href="Buy">Buy Crops</a></li>
+        <li><a href="browse_tools.html">Rent Tools & Machinery</a></li>
+        <li class="farmer-only" style="display:none;"><a href="tools_rental.html">List Tool for Rent</a></li>
+        <li class="farmer-only" style="display:none;"><a href="my_listings.html">My Tool Inventory</a></li>
         <li><a href="krishimitr">Crop Predictor</a></li>
       </ul>
     </div>
-
     <div class="menu-section" style="margin-bottom:0;">
       <div class="menu-section-title">System</div>
       <ul class="menu-list">
         <li><a href="Notification">Notification</a></li>
-         <li><a href="Chat">Chat</a></li>
+        <li><a href="Chat">Chat</a></li>
       </ul>
     </div>
-
   </div>
 </nav>
 
@@ -326,10 +247,13 @@ async function initDashboard() {
   document.getElementById("welcomeText").innerHTML =
     `Welcome, <span class="user-name">${name}</span>`;
 
-  document.getElementById("roleText").innerText =
-    usertype === "Farmer"
-      ? "Manage crops, sell produce, and access smart tools."
-      : "Buy fresh produce directly from farmers.";
+  if (usertype === "Farmer") {
+    document.getElementById("roleText").innerText = "Manage crops, sell produce, and access smart tools.";
+    document.getElementById("marketSection").style.display = "block";
+    document.querySelectorAll(".farmer-only").forEach(el => el.style.display = "block");
+  } else {
+    document.getElementById("roleText").innerText = "Buy fresh produce directly from farmers and rent machinery.";
+  }
 }
 
 document.getElementById("logoutBtn").onclick = () => {
@@ -346,6 +270,7 @@ function openDrawer(){
   sideNav.hidden=false;
   navOverlay.hidden=false;
 }
+
 function closeDrawer(){
   document.body.classList.remove("drawer-open");
   setTimeout(()=>{
@@ -357,14 +282,12 @@ function closeDrawer(){
 }
 
 menuBtn.onclick=()=>{
-  document.body.classList.contains("drawer-open")
-  ? closeDrawer() : openDrawer();
+  document.body.classList.contains("drawer-open") ? closeDrawer() : openDrawer();
 };
 
 navOverlay.onclick=closeDrawer;
 
 initDashboard();
 </script>
-
 </body>
 </html>
