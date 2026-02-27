@@ -121,7 +121,12 @@ async function fetchTools(name = "", loc = "", cat = "") {
   if(loc) req = req.ilike("location", `%${loc}%`);
   if(cat) req = req.eq("category", cat);
 
-  const { data } = await req;
+  const { data, error } = await req;
+  if(error) {
+    console.error(error);
+    return;
+  }
+  
   const container = document.getElementById("toolsDisplay");
   container.innerHTML = "";
 
@@ -164,30 +169,26 @@ async function sendRequest(id, name, ownerId, price, deposit) {
   
   const { data: user, error: userError } = await db
     .from("logindata")
-    .select("name, contact")
+    .select("*")
     .eq("loginid", loginid)
-    .single();
+    .maybeSingle();
 
-  if (userError) {
-    alert("User Profile Error: " + userError.message);
-    return;
-  }
+  const senderIdentifier = (user && user.name) ? user.name : "Farmer " + loginid;
 
-  const { data, error } = await db.from("notifications").insert([{
+  const { error } = await db.from("notifications").insert([{
     sender_id: String(loginid),
     receiver_id: String(ownerId),
     tool_id: id,
     tool_name: name,
     requested_days: days,
     total_price: total,
-    sender_name: user.name,
-    contact_number: user.contact,
+    sender_name: senderIdentifier,
     status: 'pending'
   }]);
 
   if (error) {
-    console.error("Full Error Object:", error);
-    alert("Save Failed: " + error.message);
+    console.error(error);
+    alert("Request Failed: " + error.message);
   } else {
     alert("Request successfully sent to " + name + " owner!");
     daysInput.value = 1;
