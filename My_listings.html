@@ -13,6 +13,8 @@ body {
   background: linear-gradient(180deg,#f6e2cc 0%,#f7f9f8 45%,#dceee3 100%);
   color: #1f2937;
 }
+body.drawer-open { overflow: hidden; }
+
 .top-nav {
   position: fixed;
   top: 0;
@@ -28,72 +30,112 @@ body {
   box-shadow: 0 6px 14px rgba(0,0,0,0.15);
   z-index: 9999;
 }
-.brand-title { font-weight: 800; color: #0a3d62; }
-.container {
-  max-width: 1100px;
-  margin: 120px auto 60px;
-  padding: 0 20px;
-}
-.header-flex {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 30px;
-}
-.tool-grid {
+.nav-left { display: flex; align-items: center; gap: 14px; }
+.hamburger-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  border: 2px solid #0a3d62;
+  background: rgba(255,255,255,0.75);
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-  gap: 25px;
+  place-items: center;
+  cursor: pointer;
 }
+.hamburger-icon { width: 20px; height: 14px; position: relative; }
+.hamburger-icon span {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 2.5px;
+  background: #0a3d62;
+  border-radius: 999px;
+}
+.hamburger-icon span:nth-child(1) { top:0; }
+.hamburger-icon span:nth-child(2) { top:5.5px; }
+.hamburger-icon span:nth-child(3) { top:11px; }
+.brand-title { font-weight: 800; color: #0a3d62; }
+
+.nav-right { display: flex; align-items: center; gap: 15px; }
+.profile-btn img {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  border: 2px solid #0a3d62;
+  cursor: pointer;
+  transition: 0.3s;
+}
+.logout-btn {
+  background: white;
+  color: #0a3d62;
+  border: 2px solid #0a3d62;
+  padding: 10px 18px;
+  border-radius: 10px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.nav-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.25);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .2s ease;
+  z-index: 9998;
+}
+.side-drawer {
+  position: fixed;
+  top: 84px;
+  left: 14px;
+  width: min(320px, calc(100vw - 28px));
+  max-height: calc(100vh - 98px);
+  overflow: auto;
+  background: linear-gradient(180deg,#0a3d62,#082032);
+  border: 3px solid #ffffff;
+  border-radius: 18px;
+  transform: translateX(-110%);
+  transition: transform .25s ease;
+  z-index: 9999;
+}
+.drawer-inner { padding: 14px; }
+body.drawer-open .nav-overlay { opacity: 1; pointer-events: auto; }
+body.drawer-open .side-drawer { transform: translateX(0); }
+
+.menu-section {
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.15);
+  margin-bottom: 14px;
+  background: rgba(255,255,255,0.05);
+}
+.menu-section-title { padding: 12px 14px; background: rgba(255,255,255,0.1); color: white; font-weight: 800; font-size: 0.95rem; }
+.menu-list { list-style: none; padding: 0; margin: 0; }
+.menu-list a {
+  display: block;
+  padding: 14px;
+  text-decoration: none;
+  color: white;
+  font-weight: 600;
+  transition: 0.2s ease;
+}
+.menu-list a:hover { background: #1e3a8a; padding-left: 20px; }
+
+.container { max-width: 1100px; margin: 120px auto 60px; padding: 0 20px; }
+.tool-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 25px; }
 .tool-card {
   background: white;
   border-radius: 20px;
   padding: 25px;
   box-shadow: 0 10px 25px rgba(0,0,0,0.08);
   border-left: 6px solid #138808;
-  position: relative;
 }
 .tool-name { font-size: 1.3rem; font-weight: 800; color: #0a3d62; margin: 0 0 10px 0; }
-.tool-info { margin-bottom: 8px; font-size: 0.95rem; }
-.tool-price { color: #138808; font-weight: 700; font-size: 1.1rem; }
 .btn-group { display: flex; gap: 10px; margin-top: 20px; }
-.edit-btn {
-  flex: 1;
-  padding: 10px;
-  background: #f1f5f9;
-  border: 1px solid #cbd5e1;
-  border-radius: 8px;
-  font-weight: 600;
-  cursor: pointer;
-}
-.delete-btn {
-  flex: 1;
-  padding: 10px;
-  background: #fee2e2;
-  color: #dc2626;
-  border: 1px solid #fecaca;
-  border-radius: 8px;
-  font-weight: 600;
-  cursor: pointer;
-}
-.modal {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.5);
-  display: none;
-  place-items: center;
-  z-index: 10000;
-  padding: 20px;
-}
-.modal-content {
-  background: white;
-  padding: 30px;
-  border-radius: 20px;
-  width: 100%;
-  max-width: 500px;
-  max-height: 90vh;
-  overflow-y: auto;
-}
+.edit-btn, .delete-btn { flex: 1; padding: 10px; border-radius: 8px; font-weight: 600; cursor: pointer; border: 1px solid #ddd; }
+.delete-btn { background: #fee2e2; color: #dc2626; border-color: #fecaca; }
+
+.modal { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: none; place-items: center; z-index: 10000; padding: 20px; }
+.modal-content { background: white; padding: 30px; border-radius: 20px; width: 100%; max-width: 500px; }
 .form-field { margin-bottom: 15px; }
 .form-field label { display: block; font-weight: 600; margin-bottom: 5px; }
 .form-field input { width: 100%; padding: 10px; border: 2px solid #ddd; border-radius: 8px; box-sizing: border-box; }
@@ -103,14 +145,49 @@ body {
 <body>
 
 <div class="top-nav">
-  <p class="brand-title">Krishi Mitr | My Inventory</p>
-  <button onclick="location.href='tools_rental.html'" style="background:#0a3d62; color:white; border:none; padding:8px 16px; border-radius:8px; font-weight:600; cursor:pointer;">+ Add New</button>
+  <div class="nav-left">
+    <button class="hamburger-btn" id="menuBtn">
+      <div class="hamburger-icon"><span></span><span></span><span></span></div>
+    </button>
+    <p class="brand-title">Krishi Mitr | My Tools</p>
+  </div>
+  <div class="nav-right">
+    <div class="profile-btn" onclick="location.href='Profile'">
+      <img src="profile_pic.png" alt="Profile">
+    </div>
+    <button class="logout-btn" id="logoutBtn">Logout</button>
+  </div>
 </div>
 
-<div class="container">
-  <div class="header-flex">
-    <h1>Your Listed Equipment</h1>
+<div class="nav-overlay" id="navOverlay" hidden></div>
+<nav class="side-drawer" id="sideNav" hidden>
+  <div class="drawer-inner">
+    <div class="menu-section">
+      <div class="menu-section-title">Main</div>
+      <ul class="menu-list">
+        <li><a href="Dashboard">Dashboard</a></li>
+      </ul>
+    </div>
+    <div class="menu-section">
+      <div class="menu-section-title">Market</div>
+      <ul class="menu-list">
+        <li><a href="sell.html">Sell Your Crops</a></li>
+        <li><a href="Buy">Buy Your Crop</a></li>
+      </ul>
+    </div>
+    <div class="menu-section">
+      <div class="menu-section-title">Tools & Services</div>
+      <ul class="menu-list">
+        <li><a href="tools_rental.html">List Tool for Rent</a></li>
+        <li><a href="browse_tools.html">Browse Tools</a></li>
+        <li><a href="krishimitr">Crop Predictor</a></li>
+      </ul>
+    </div>
   </div>
+</nav>
+
+<div class="container">
+  <h1>Your Tool Inventory</h1>
   <div class="tool-grid" id="myToolsContainer"></div>
 </div>
 
@@ -128,10 +205,6 @@ body {
         <input type="number" id="editPrice">
       </div>
       <div class="form-field">
-        <label>Security Deposit (₹)</label>
-        <input type="number" id="editDeposit">
-      </div>
-      <div class="form-field">
         <label>Location</label>
         <input type="text" id="editLocation">
       </div>
@@ -147,20 +220,16 @@ const loginid = sessionStorage.getItem("loginid");
 
 async function fetchMyTools() {
   const { data, error } = await db.from("tool_rentals").select("*").eq("user_id", loginid);
-  if(error) return alert(error.message);
-  
+  if(error) return;
   const container = document.getElementById("myToolsContainer");
-  container.innerHTML = data.length ? "" : "<p>No tools listed yet.</p>";
-  
+  container.innerHTML = data.length ? "" : "<p>No tools listed.</p>";
   data.forEach(tool => {
     const card = document.createElement("div");
     card.className = "tool-card";
     card.innerHTML = `
       <p class="tool-name">${tool.tool_name}</p>
-      <div class="tool-info"><b>Category:</b> ${tool.category}</div>
-      <div class="tool-info"><b>Condition:</b> ${tool.condition}</div>
-      <div class="tool-info"><b>Location:</b> ${tool.location}</div>
-      <div class="tool-price">₹${tool.price_per_day} / day</div>
+      <div style="font-size:0.9rem; color:#64748b">📍 ${tool.location}</div>
+      <div style="font-weight:700; color:#138808; font-size:1.2rem; margin-top:10px;">₹${tool.price_per_day}/day</div>
       <div class="btn-group">
         <button class="edit-btn" onclick='openEdit(${JSON.stringify(tool)})'>Edit</button>
         <button class="delete-btn" onclick="deleteTool(${tool.id})">Delete</button>
@@ -174,7 +243,6 @@ function openEdit(tool) {
   document.getElementById("editId").value = tool.id;
   document.getElementById("editName").value = tool.tool_name;
   document.getElementById("editPrice").value = tool.price_per_day;
-  document.getElementById("editDeposit").value = tool.security_deposit;
   document.getElementById("editLocation").value = tool.location;
   document.getElementById("editModal").style.display = "grid";
 }
@@ -183,24 +251,38 @@ function closeModal() { document.getElementById("editModal").style.display = "no
 
 document.getElementById("updateForm").onsubmit = async (e) => {
   e.preventDefault();
-  const id = document.getElementById("editId").value;
-  const { error } = await db.from("tool_rentals").update({
+  await db.from("tool_rentals").update({
     tool_name: document.getElementById("editName").value,
     price_per_day: document.getElementById("editPrice").value,
-    security_deposit: document.getElementById("editDeposit").value,
     location: document.getElementById("editLocation").value
-  }).eq("id", id);
-  
-  if(error) alert(error.message);
-  else { closeModal(); fetchMyTools(); }
+  }).eq("id", document.getElementById("editId").value);
+  closeModal(); fetchMyTools();
 };
 
 async function deleteTool(id) {
-  if(!confirm("Are you sure you want to remove this listing?")) return;
-  const { error } = await db.from("tool_rentals").delete().eq("id", id);
-  if(error) alert(error.message);
-  else fetchMyTools();
+  if(confirm("Remove this listing?")) {
+    await db.from("tool_rentals").delete().eq("id", id);
+    fetchMyTools();
+  }
 }
+
+const menuBtn = document.getElementById("menuBtn");
+const sideNav = document.getElementById("sideNav");
+const navOverlay = document.getElementById("navOverlay");
+
+menuBtn.onclick = () => {
+  document.body.classList.toggle("drawer-open");
+  sideNav.hidden = !sideNav.hidden;
+  navOverlay.hidden = !navOverlay.hidden;
+};
+
+navOverlay.onclick = () => {
+  document.body.classList.remove("drawer-open");
+  sideNav.hidden = true;
+  navOverlay.hidden = true;
+};
+
+document.getElementById("logoutBtn").onclick = () => { sessionStorage.clear(); location.href="login"; };
 
 fetchMyTools();
 </script>
