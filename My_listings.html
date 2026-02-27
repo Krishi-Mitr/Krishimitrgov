@@ -17,13 +17,8 @@ body.drawer-open { overflow: hidden; }
 
 .top-nav {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 78px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+  top: 0; left: 0; right: 0; height: 78px;
+  display: flex; justify-content: space-between; align-items: center;
   padding: 0 32px;
   background: linear-gradient(90deg,#ff9933,#ffffff,#138808);
   border-bottom: 3px solid #0a3d62;
@@ -32,24 +27,11 @@ body.drawer-open { overflow: hidden; }
 }
 .nav-left { display: flex; align-items: center; gap: 14px; }
 .hamburger-btn {
-  width: 44px;
-  height: 44px;
-  border-radius: 12px;
-  border: 2px solid #0a3d62;
-  background: rgba(255,255,255,0.75);
-  display: grid;
-  place-items: center;
-  cursor: pointer;
+  width: 44px; height: 44px; border-radius: 12px; border: 2px solid #0a3d62;
+  background: rgba(255,255,255,0.75); display: grid; place-items: center; cursor: pointer;
 }
 .hamburger-icon { width: 20px; height: 14px; position: relative; }
-.hamburger-icon span {
-  position: absolute;
-  left: 0;
-  right: 0;
-  height: 2.5px;
-  background: #0a3d62;
-  border-radius: 999px;
-}
+.hamburger-icon span { position: absolute; left: 0; right: 0; height: 2.5px; background: #0a3d62; border-radius: 999px; }
 .hamburger-icon span:nth-child(1) { top:0; }
 .hamburger-icon span:nth-child(2) { top:5.5px; }
 .hamburger-icon span:nth-child(3) { top:11px; }
@@ -57,88 +39,58 @@ body.drawer-open { overflow: hidden; }
 
 .nav-right { display: flex; align-items: center; gap: 15px; }
 .profile-btn img {
-  width: 42px;
-  height: 42px;
-  border-radius: 50%;
-  border: 2px solid #0a3d62;
-  cursor: pointer;
-  transition: 0.3s;
+  width: 42px; height: 42px; border-radius: 50%; border: 2px solid #0a3d62;
+  cursor: pointer; transition: 0.3s;
 }
-.logout-btn {
-  background: white;
-  color: #0a3d62;
-  border: 2px solid #0a3d62;
-  padding: 10px 18px;
-  border-radius: 10px;
-  font-weight: 700;
-  cursor: pointer;
-}
+.logout-btn { background: white; color: #0a3d62; border: 2px solid #0a3d62; padding: 10px 18px; border-radius: 10px; font-weight: 700; cursor: pointer; }
 
 .nav-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.25);
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity .2s ease;
-  z-index: 9998;
+  position: fixed; inset: 0; background: rgba(0,0,0,0.25);
+  opacity: 0; pointer-events: none; transition: .2s ease; z-index: 9998;
 }
 .side-drawer {
-  position: fixed;
-  top: 84px;
-  left: 14px;
-  width: min(320px, calc(100vw - 28px));
-  max-height: calc(100vh - 98px);
-  overflow: auto;
+  position: fixed; top: 84px; left: 14px; width: min(320px, calc(100vw - 28px));
+  max-height: calc(100vh - 98px); overflow: auto;
   background: linear-gradient(180deg,#0a3d62,#082032);
-  border: 3px solid #ffffff;
-  border-radius: 18px;
-  transform: translateX(-110%);
-  transition: transform .25s ease;
-  z-index: 9999;
+  border: 3px solid #ffffff; border-radius: 18px;
+  box-shadow: 0 18px 40px rgba(0,0,0,0.35);
+  transform: translateX(-110%); transition: .25s ease; z-index: 9999;
 }
 .drawer-inner { padding: 14px; }
-body.drawer-open .nav-overlay { opacity: 1; pointer-events: auto; }
-body.drawer-open .side-drawer { transform: translateX(0); }
 
 .menu-section {
-  border-radius: 14px;
-  overflow: hidden;
-  border: 1px solid rgba(255,255,255,0.15);
-  margin-bottom: 14px;
-  background: rgba(255,255,255,0.05);
+  border-radius: 14px; overflow: hidden; border: 1px solid rgba(255,255,255,0.15);
+  margin-bottom: 14px; background: rgba(255,255,255,0.05);
 }
 .menu-section-title { padding: 12px 14px; background: rgba(255,255,255,0.1); color: white; font-weight: 800; font-size: 0.95rem; }
 .menu-list { list-style: none; padding: 0; margin: 0; }
 .menu-list a {
-  display: block;
-  padding: 14px;
-  text-decoration: none;
-  color: white;
-  font-weight: 600;
-  transition: 0.2s ease;
+  display: block; padding: 14px; text-decoration: none; color: white;
+  font-weight: 600; transition: 0.2s ease; background: rgba(255,255,255,0.08);
 }
+.menu-list li+li a { border-top: 1px solid rgba(255,255,255,0.1); }
 .menu-list a:hover { background: #1e3a8a; padding-left: 20px; }
+
+body.drawer-open .nav-overlay { opacity: 1; pointer-events: auto; }
+body.drawer-open .side-drawer { transform: translateX(0); }
 
 .container { max-width: 1100px; margin: 120px auto 60px; padding: 0 20px; }
 .tool-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 25px; }
 .tool-card {
-  background: white;
-  border-radius: 20px;
-  padding: 25px;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.08);
-  border-left: 6px solid #138808;
+  background: white; border-radius: 20px; padding: 25px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.08); border-left: 6px solid #138808;
 }
 .tool-name { font-size: 1.3rem; font-weight: 800; color: #0a3d62; margin: 0 0 10px 0; }
 .btn-group { display: flex; gap: 10px; margin-top: 20px; }
 .edit-btn, .delete-btn { flex: 1; padding: 10px; border-radius: 8px; font-weight: 600; cursor: pointer; border: 1px solid #ddd; }
+.edit-btn { background: #f0f9ff; color: #0369a1; border-color: #bae6fd; }
 .delete-btn { background: #fee2e2; color: #dc2626; border-color: #fecaca; }
 
 .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: none; place-items: center; z-index: 10000; padding: 20px; }
 .modal-content { background: white; padding: 30px; border-radius: 20px; width: 100%; max-width: 500px; }
 .form-field { margin-bottom: 15px; }
 .form-field label { display: block; font-weight: 600; margin-bottom: 5px; }
-.form-field input { width: 100%; padding: 10px; border: 2px solid #ddd; border-radius: 8px; box-sizing: border-box; }
+.form-field input { width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 8px; box-sizing: border-box; }
 .save-btn { width: 100%; padding: 12px; background: #0a3d62; color: white; border: none; border-radius: 10px; font-weight: 700; cursor: pointer; }
 </style>
 </head>
@@ -146,15 +98,11 @@ body.drawer-open .side-drawer { transform: translateX(0); }
 
 <div class="top-nav">
   <div class="nav-left">
-    <button class="hamburger-btn" id="menuBtn">
-      <div class="hamburger-icon"><span></span><span></span><span></span></div>
-    </button>
+    <button class="hamburger-btn" id="menuBtn"><div class="hamburger-icon"><span></span><span></span><span></span></div></button>
     <p class="brand-title">Krishi Mitr | My Tools</p>
   </div>
   <div class="nav-right">
-    <div class="profile-btn" onclick="location.href='Profile'">
-      <img src="profile_pic.png" alt="Profile">
-    </div>
+    <div class="profile-btn" onclick="location.href='Profile'"><img src="profile_pic.png" alt="Profile"></div>
     <button class="logout-btn" id="logoutBtn">Logout</button>
   </div>
 </div>
@@ -162,27 +110,40 @@ body.drawer-open .side-drawer { transform: translateX(0); }
 <div class="nav-overlay" id="navOverlay" hidden></div>
 <nav class="side-drawer" id="sideNav" hidden>
   <div class="drawer-inner">
+    
     <div class="menu-section">
       <div class="menu-section-title">Main</div>
       <ul class="menu-list">
         <li><a href="Dashboard">Dashboard</a></li>
       </ul>
     </div>
+
     <div class="menu-section">
       <div class="menu-section-title">Market</div>
       <ul class="menu-list">
-        <li><a href="sell.html">Sell Your Crops</a></li>
+        <li><a href="Update_crops">Manage Your Crops</a></li>
+        <li><a href="Sell">Sell Your Crop</a></li>
         <li><a href="Buy">Buy Your Crop</a></li>
       </ul>
     </div>
+
     <div class="menu-section">
       <div class="menu-section-title">Tools & Services</div>
       <ul class="menu-list">
-        <li><a href="tools_rental.html">List Tool for Rent</a></li>
-        <li><a href="browse_tools.html">Browse Tools</a></li>
-        <li><a href="krishimitr">Crop Predictor</a></li>
+        <li><a href="Crop_Predictor">Crop Predictor</a></li>
+        <li><a href="browse_tools.html">Rent Tools & Machinery</a></li>
+        <li><a href="tools_rental.html">List a Tool</a></li>
       </ul>
     </div>
+
+    <div class="menu-section">
+      <div class="menu-section-title">System</div>
+      <ul class="menu-list">
+        <li><a href="Notification">Notification</a></li>
+        <li><a href="Chat">Chat</a></li>
+      </ul>
+    </div>
+
   </div>
 </nav>
 
@@ -222,7 +183,7 @@ async function fetchMyTools() {
   const { data, error } = await db.from("tool_rentals").select("*").eq("user_id", loginid);
   if(error) return;
   const container = document.getElementById("myToolsContainer");
-  container.innerHTML = data.length ? "" : "<p>No tools listed.</p>";
+  container.innerHTML = data.length ? "" : "<p>No tools listed yet.</p>";
   data.forEach(tool => {
     const card = document.createElement("div");
     card.className = "tool-card";
@@ -256,11 +217,12 @@ document.getElementById("updateForm").onsubmit = async (e) => {
     price_per_day: document.getElementById("editPrice").value,
     location: document.getElementById("editLocation").value
   }).eq("id", document.getElementById("editId").value);
-  closeModal(); fetchMyTools();
+  closeModal(); 
+  fetchMyTools();
 };
 
 async function deleteTool(id) {
-  if(confirm("Remove this listing?")) {
+  if(confirm("Are you sure you want to remove this listing?")) {
     await db.from("tool_rentals").delete().eq("id", id);
     fetchMyTools();
   }
@@ -271,9 +233,9 @@ const sideNav = document.getElementById("sideNav");
 const navOverlay = document.getElementById("navOverlay");
 
 menuBtn.onclick = () => {
-  document.body.classList.toggle("drawer-open");
-  sideNav.hidden = !sideNav.hidden;
-  navOverlay.hidden = !navOverlay.hidden;
+  const isOpen = document.body.classList.toggle("drawer-open");
+  sideNav.hidden = !isOpen;
+  navOverlay.hidden = !isOpen;
 };
 
 navOverlay.onclick = () => {
