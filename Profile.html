@@ -3,10 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <title>Profile - Krishi Mitr</title>
-
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="supabase.js"></script>
-
 <style>
 body {
   margin: 0;
@@ -16,8 +14,6 @@ body {
   color: #1f2937;
 }
 body.drawer-open { overflow: hidden; }
-
-/* NAVBAR */
 .top-nav {
   position: fixed;
   top: 0;
@@ -33,13 +29,11 @@ body.drawer-open { overflow: hidden; }
   box-shadow: 0 6px 14px rgba(0,0,0,0.15);
   z-index: 9999;
 }
-
 .nav-left {
   display: flex;
   align-items: center;
   gap: 14px;
 }
-
 .hamburger-btn {
   width: 44px;
   height: 44px;
@@ -50,7 +44,6 @@ body.drawer-open { overflow: hidden; }
   place-items: center;
   cursor: pointer;
 }
-
 .hamburger-icon {
   width: 20px;
   height: 14px;
@@ -67,12 +60,10 @@ body.drawer-open { overflow: hidden; }
 .hamburger-icon span:nth-child(1){ top:0; }
 .hamburger-icon span:nth-child(2){ top:5.5px; }
 .hamburger-icon span:nth-child(3){ top:11px; }
-
 .brand-title {
   font-weight: 800;
   color: #0a3d62;
 }
-
 .logout-btn {
   background: white;
   color: #0a3d62;
@@ -81,9 +72,12 @@ body.drawer-open { overflow: hidden; }
   border-radius: 10px;
   font-weight: 700;
   cursor: pointer;
+  transition: 0.3s;
 }
-
-/* DRAWER */
+.logout-btn:hover {
+  background: #0a3d62;
+  color: white;
+}
 .nav-overlay {
   position: fixed;
   inset: 0;
@@ -93,106 +87,137 @@ body.drawer-open { overflow: hidden; }
   transition: 0.3s;
   z-index: 9998;
 }
-
 .side-drawer {
   position: fixed;
-  top: 90px;
-  left: 15px;
-  width: 300px;
+  top: 84px;
+  left: 14px;
+  width: min(320px, calc(100vw - 28px));
+  max-height: calc(100vh - 98px);
+  overflow: auto;
   background: linear-gradient(180deg,#0a3d62,#082032);
+  border: 3px solid #ffffff;
   border-radius: 18px;
-  padding: 20px;
-  transform: translateX(-120%);
+  box-shadow: 0 18px 40px rgba(0,0,0,0.35);
+  transform: translateX(-110%);
   transition: 0.3s ease;
   z-index: 9999;
 }
-
+.drawer-inner { padding: 14px; }
 body.drawer-open .nav-overlay {
   opacity: 1;
   pointer-events: auto;
 }
-
 body.drawer-open .side-drawer {
   transform: translateX(0);
 }
-
-.menu-section-title {
-  color: #fff;
-  font-weight: 700;
-  margin: 10px 0;
+.menu-section {
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.15);
+  margin-bottom: 14px;
+  background: rgba(255,255,255,0.05);
 }
-
+.menu-section-title {
+  padding: 12px 14px;
+  background: rgba(255,255,255,0.1);
+  color: white;
+  font-weight: 800;
+  font-size: 0.95rem;
+}
 .menu-list {
   list-style: none;
   padding: 0;
-  margin: 0 0 15px 0;
+  margin: 0;
 }
-
 .menu-list a {
   display: block;
-  padding: 10px;
+  padding: 14px;
   color: #fff;
   text-decoration: none;
-  border-radius: 8px;
+  font-weight: 600;
+  background: rgba(255,255,255,0.08);
+  transition: 0.2s ease;
 }
-
 .menu-list a:hover {
   background: #1e3a8a;
+  padding-left: 20px;
 }
-
-/* PROFILE */
+.menu-list li + li a {
+  border-top: 1px solid rgba(255,255,255,0.1);
+}
 .container {
   margin-top: 170px;
   display: flex;
   justify-content: center;
+  padding: 0 20px;
 }
-
 .profile-card {
   background: white;
-  padding: 50px;
+  padding: 40px;
   border-radius: 25px;
-  width: 420px;
+  width: 100%;
+  max-width: 450px;
   box-shadow: 0 20px 45px rgba(0,0,0,0.15);
 }
-
+.profile-card h2 {
+  color: #0a3d62;
+  margin-top: 0;
+  margin-bottom: 25px;
+  text-align: center;
+}
 .field {
   margin-bottom: 20px;
 }
-
 .field label {
+  display: block;
   font-weight: 600;
+  margin-bottom: 8px;
+  color: #374151;
 }
-
 .field input {
   width: 100%;
-  padding: 10px;
+  padding: 12px;
   border-radius: 10px;
-  border: 2px solid #0a3d62;
+  border: 2px solid #e5e7eb;
+  box-sizing: border-box;
+  font-size: 1rem;
+  transition: 0.3s;
 }
-
+.field input:disabled {
+  background: #f9fafb;
+  cursor: not-allowed;
+}
+.field input:focus {
+  border-color: #0a3d62;
+  outline: none;
+}
 .password-wrapper {
   position: relative;
 }
-
 .eye-btn {
   position: absolute;
-  right: 10px;
-  top: 35px;
+  right: 15px;
+  top: 40px;
   cursor: pointer;
+  font-size: 1.2rem;
+  color: #64748b;
 }
-
 .update-btn {
   width: 100%;
   padding: 14px;
   border-radius: 12px;
   border: none;
   font-weight: 700;
-  background: linear-gradient(135deg,#138808,#2ecc71);
+  background: linear-gradient(135deg,#0a3d62,#1e3a8a);
   color: white;
   cursor: pointer;
+  font-size: 1rem;
+  transition: 0.3s;
+  margin-top: 10px;
 }
-
-/* SUCCESS POPUP */
+.update-btn.editing-active {
+  background: linear-gradient(135deg,#138808,#2ecc71);
+}
 .success-popup {
   position: fixed;
   top: 100px;
@@ -202,18 +227,19 @@ body.drawer-open .side-drawer {
   padding: 14px 20px;
   border-radius: 12px;
   opacity: 0;
-  transition: 0.3s;
+  transform: translateY(-20px);
+  transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+  z-index: 10000;
 }
 .success-popup.show {
   opacity: 1;
+  transform: translateY(0);
 }
 </style>
 </head>
-
 <body>
 
-<!-- NAVBAR -->
 <div class="top-nav">
   <div class="nav-left">
     <button class="hamburger-btn" id="menuBtn">
@@ -226,54 +252,58 @@ body.drawer-open .side-drawer {
   <button class="logout-btn" id="logoutBtn">Logout</button>
 </div>
 
-<!-- DRAWER -->
 <div class="nav-overlay" id="navOverlay"></div>
 <nav class="side-drawer" id="sideNav">
-  <div class="menu-section-title">Main</div>
-  <ul class="menu-list">
-    <li><a href="Dashboard">Dashboard</a></li>
-  </ul>
-
-  <div class="menu-section-title">Market</div>
-  <ul class="menu-list">
-    <li><a href="Update_crops">Manage Your Crops</a></li>
-    <li><a href="Sell">Sell Your Crop</a></li>
-    <li><a href="Buy">Buy Your Crop</a></li>
-  </ul>
-
-  <div class="menu-section-title">Tools</div>
-  <ul class="menu-list">
-    <li><a href="krishimitr">Crop Predictor</a></li>
-  </ul>
-
-  <div class="menu-section-title">System</div>
-  <ul class="menu-list">
-    <li><a href="Notification">Notification</a></li>
-      <li><a href="Chat">Chat</a></li>
-  </ul>
+  <div class="drawer-inner">
+    <div class="menu-section">
+      <div class="menu-section-title">Main</div>
+      <ul class="menu-list">
+        <li><a href="Dashboard">Dashboard</a></li>
+      </ul>
+    </div>
+    <div class="menu-section" id="marketSection" style="display:none;">
+      <div class="menu-section-title">Market</div>
+      <ul class="menu-list">
+        <li><a href="Update_crops">Manage Your Crops</a></li>
+        <li><a href="Sell">Sell Your Crop</a></li>
+      </ul>
+    </div>
+    <div class="menu-section">
+      <div class="menu-section-title">Tools & Services</div>
+      <ul class="menu-list">
+        <li><a href="Buy">Buy Crops</a></li>
+        <li><a href="browse_tools.html">Rent Tools & Machinery</a></li>
+        <li class="farmer-only" style="display:none;"><a href="tools_rental.html">List Tool for Rent</a></li>
+        <li class="farmer-only" style="display:none;"><a href="my_listings.html">My Tool Inventory</a></li>
+        <li><a href="krishimitr">Crop Predictor</a></li>
+      </ul>
+    </div>
+    <div class="menu-section" style="margin-bottom:0;">
+      <div class="menu-section-title">System</div>
+      <ul class="menu-list">
+        <li><a href="Notification">Notification</a></li>
+        <li><a href="Chat">Chat</a></li>
+      </ul>
+    </div>
+  </div>
 </nav>
 
-<!-- PROFILE -->
 <div class="container">
   <div class="profile-card">
     <h2>Your Profile</h2>
-
     <div class="field">
       <label>Username</label>
       <input type="text" id="username" disabled>
     </div>
-
     <div class="field">
       <label>Name</label>
       <input type="text" id="name" disabled>
     </div>
-
     <div class="field password-wrapper">
       <label>Password</label>
       <input type="password" id="password" disabled>
       <span class="eye-btn" onclick="togglePassword()">👁</span>
     </div>
-
     <button class="update-btn" id="editBtn">Update Profile</button>
   </div>
 </div>
@@ -284,99 +314,100 @@ body.drawer-open .side-drawer {
 
 <script>
 document.addEventListener("DOMContentLoaded", function(){
+  const db = window.db;
+  const loginid = sessionStorage.getItem("loginid");
+  const usertype = sessionStorage.getItem("usertype");
 
-const db = window.db;
-const loginid = sessionStorage.getItem("loginid");
+  if(!loginid) {
+    location.href = "login";
+    return;
+  }
 
-/* LOAD PROFILE */
-async function loadProfile(){
+  function applyRolePermissions() {
+    if (usertype === "Farmer") {
+      document.getElementById("marketSection").style.display = "block";
+      document.querySelectorAll(".farmer-only").forEach(el => el.style.display = "block");
+    }
+  }
 
-  const { data, error } = await db
-    .from("logindata")
-    .select("*")
-    .eq("loginid", loginid)
-    .single();
-
-  console.log("DATA:", data);
-  console.log("KEYS:", Object.keys(data));
-
-  document.getElementById("username").value = data.username ?? "";
-  document.getElementById("name").value = data.name ?? "";
-  document.getElementById("password").value = data.password ?? "";
-}
-
-
-/* PASSWORD TOGGLE */
-window.togglePassword = function(){
-  password.type = password.type === "password" ? "text" : "password";
-};
-
-/* UPDATE PROFILE */
-let editing = false;
-
-editBtn.onclick = async function(){
-
-  const usernameInput = document.getElementById("username");
-  const nameInput = document.getElementById("name");
-  const passwordInput = document.getElementById("password");
-
-  if(!editing){
-    usernameInput.disabled = false;
-    nameInput.disabled = false;
-    passwordInput.disabled = false;
-    this.innerText = "Save Changes";
-    editing = true;
-  } else {
-
+  async function loadProfile(){
     const { data, error } = await db
       .from("logindata")
-      .update({
-        username: usernameInput.value,
-        name: nameInput.value,
-        password: passwordInput.value
-      })
+      .select("*")
       .eq("loginid", loginid)
-      .select();
+      .single();
 
-    console.log("UPDATED DATA:", data);
-    console.log("ERROR:", error);
-
-    if(error){
-      alert("Update failed");
-      return;
+    if(data) {
+      document.getElementById("username").value = data.username ?? "";
+      document.getElementById("name").value = data.name ?? "";
+      document.getElementById("password").value = data.password ?? "";
     }
-
-    usernameInput.disabled = true;
-    nameInput.disabled = true;
-    passwordInput.disabled = true;
-    this.innerText = "Update Profile";
-    editing = false;
-
-    successPopup.classList.add("show");
-    setTimeout(()=> successPopup.classList.remove("show"),3000);
   }
-};
 
+  window.togglePassword = function(){
+    const passInput = document.getElementById("password");
+    passInput.type = passInput.type === "password" ? "text" : "password";
+  };
 
-/* LOGOUT */
-logoutBtn.onclick = ()=>{
-  sessionStorage.clear();
-  location.href="login";
-};
+  let editing = false;
+  const editBtn = document.getElementById("editBtn");
 
-/* HAMBURGER */
-menuBtn.onclick = ()=>{
-  document.body.classList.toggle("drawer-open");
-};
+  editBtn.onclick = async function(){
+    const usernameInput = document.getElementById("username");
+    const nameInput = document.getElementById("name");
+    const passwordInput = document.getElementById("password");
 
-navOverlay.onclick = ()=>{
-  document.body.classList.remove("drawer-open");
-};
+    if(!editing){
+      usernameInput.disabled = false;
+      nameInput.disabled = false;
+      passwordInput.disabled = false;
+      this.innerText = "Save Changes";
+      this.classList.add("editing-active");
+      editing = true;
+    } else {
+      const { error } = await db
+        .from("logindata")
+        .update({
+          username: usernameInput.value,
+          name: nameInput.value,
+          password: passwordInput.value
+        })
+        .eq("loginid", loginid);
 
-loadProfile();
+      if(error){
+        alert("Update failed. Please try again.");
+        return;
+      }
 
+      usernameInput.disabled = true;
+      nameInput.disabled = true;
+      passwordInput.disabled = true;
+      this.innerText = "Update Profile";
+      this.classList.remove("editing-active");
+      editing = false;
+
+      const popup = document.getElementById("successPopup");
+      popup.classList.add("show");
+      setTimeout(()=> popup.classList.remove("show"), 3000);
+    }
+  };
+
+  document.getElementById("logoutBtn").onclick = ()=>{
+    sessionStorage.clear();
+    location.href="login";
+  };
+
+  document.getElementById("menuBtn").onclick = ()=>{
+    document.body.classList.toggle("drawer-open");
+  };
+
+  document.getElementById("navOverlay").onclick = ()=>{
+    document.body.classList.remove("drawer-open");
+  };
+
+  applyRolePermissions();
+  loadProfile();
 });
 </script>
-
 </body>
 </html>
