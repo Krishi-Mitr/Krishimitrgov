@@ -1,0 +1,375 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Browse Equipment - Krishi Mitr</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase.js"></script>
+<style>
+body {
+  margin: 0;
+  font-family: "Poppins", Arial, sans-serif;
+  min-height: 100vh;
+  background: linear-gradient(180deg,#f6e2cc 0%,#f7f9f8 45%,#dceee3 100%);
+  color: #1f2937;
+}
+body.drawer-open { overflow: hidden; }
+
+.top-nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 78px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 32px;
+  background: linear-gradient(90deg,#ff9933,#ffffff,#138808);
+  border-bottom: 3px solid #0a3d62;
+  box-shadow: 0 6px 14px rgba(0,0,0,0.15);
+  z-index: 9999;
+}
+.nav-left { display: flex; align-items: center; gap: 14px; }
+.hamburger-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  border: 2px solid #0a3d62;
+  background: rgba(255,255,255,0.75);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+}
+.hamburger-icon { width: 20px; height: 14px; position: relative; }
+.hamburger-icon span {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 2.5px;
+  background: #0a3d62;
+  border-radius: 999px;
+}
+.hamburger-icon span:nth-child(1) { top:0; }
+.hamburger-icon span:nth-child(2) { top:5.5px; }
+.hamburger-icon span:nth-child(3) { top:11px; }
+
+.brand-title { font-weight: 800; color: #0a3d62; font-size: 1.2rem; }
+
+.nav-right { display: flex; align-items: center; gap: 15px; }
+.profile-btn img {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  border: 2px solid #0a3d62;
+  cursor: pointer;
+  transition: 0.3s;
+}
+.logout-btn {
+  background: white;
+  color: #0a3d62;
+  border: 2px solid #0a3d62;
+  padding: 10px 18px;
+  border-radius: 10px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.nav-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.25);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .2s ease;
+  z-index: 9998;
+}
+.side-drawer {
+  position: fixed;
+  top: 84px;
+  left: 14px;
+  width: min(320px, calc(100vw - 28px));
+  max-height: calc(100vh - 98px);
+  overflow: auto;
+  background: linear-gradient(180deg,#0a3d62,#082032);
+  border: 3px solid #ffffff;
+  border-radius: 18px;
+  box-shadow: 0 18px 40px rgba(0,0,0,0.35);
+  transform: translateX(-110%);
+  transition: transform .25s ease;
+  z-index: 9999;
+}
+.drawer-inner { padding: 14px; }
+body.drawer-open .nav-overlay { opacity: 1; pointer-events: auto; }
+body.drawer-open .side-drawer { transform: translateX(0); }
+
+.menu-section {
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.15);
+  margin-bottom: 14px;
+  background: rgba(255,255,255,0.05);
+}
+.menu-section-title { padding: 12px 14px; background: rgba(255,255,255,0.1); color: white; font-weight: 800; font-size: 0.95rem; }
+.menu-list { list-style: none; padding: 0; margin: 0; }
+.menu-list a {
+  display: block;
+  padding: 14px;
+  text-decoration: none;
+  color: white;
+  font-weight: 600;
+  transition: 0.2s ease;
+}
+.menu-list a:hover { background: #1e3a8a; padding-left: 20px; }
+
+.container { max-width: 1200px; margin: 120px auto 60px; padding: 0 20px; }
+
+.search-section {
+  background: white;
+  padding: 30px;
+  border-radius: 24px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+  margin-bottom: 40px;
+}
+.filter-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr auto;
+  gap: 15px;
+}
+.filter-grid input, .filter-grid select {
+  width: 100%;
+  padding: 14px;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  font-size: 1rem;
+  box-sizing: border-box;
+}
+.search-trigger {
+  background: #138808;
+  color: white;
+  border: none;
+  padding: 0 35px;
+  border-radius: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: 0.2s;
+}
+.search-trigger:hover { background: #0a3d62; }
+
+.tool-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 25px;
+}
+.tool-card {
+  background: white;
+  border-radius: 22px;
+  overflow: hidden;
+  box-shadow: 0 15px 35px rgba(0,0,0,0.06);
+  border: 1px solid #f1f5f9;
+  transition: transform 0.3s ease;
+}
+.tool-card:hover { transform: translateY(-8px); }
+.tool-card-body { padding: 25px; }
+.category-badge {
+  background: #dcfce7;
+  color: #166534;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 5px 12px;
+  border-radius: 99px;
+  text-transform: uppercase;
+}
+.tool-title { font-size: 1.4rem; font-weight: 800; color: #0a3d62; margin: 12px 0 5px 0; }
+.tool-loc { color: #64748b; font-size: 0.9rem; display: flex; align-items: center; gap: 5px; }
+.pricing-row {
+  margin: 20px 0;
+  padding: 15px;
+  background: #f8fafc;
+  border-radius: 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.price-tag { color: #138808; font-weight: 800; font-size: 1.6rem; }
+.price-tag span { font-size: 0.85rem; color: #64748b; font-weight: 400; }
+.contact-btn {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  background: #0a3d62;
+  color: white;
+  text-decoration: none;
+  padding: 16px;
+  border-radius: 12px;
+  font-weight: 700;
+  transition: 0.2s;
+}
+.contact-btn:hover { background: #138808; }
+
+@media (max-width: 900px) {
+  .filter-grid { grid-template-columns: 1fr; }
+  .search-trigger { padding: 16px; }
+}
+</style>
+</head>
+<body>
+
+<div class="top-nav">
+  <div class="nav-left">
+    <button class="hamburger-btn" id="menuBtn">
+      <div class="hamburger-icon"><span></span><span></span><span></span></div>
+    </button>
+    <p class="brand-title">Krishi Mitr | Browse</p>
+  </div>
+  <div class="nav-right">
+    <div class="profile-btn" onclick="location.href='Profile'">
+      <img src="profile_pic.png" alt="Profile">
+    </div>
+    <button class="logout-btn" id="logoutBtn">Logout</button>
+  </div>
+</div>
+
+<div class="nav-overlay" id="navOverlay" hidden></div>
+<nav class="side-drawer" id="sideNav" hidden>
+  <div class="drawer-inner">
+    <div class="menu-section">
+      <div class="menu-section-title">Main</div>
+      <ul class="menu-list">
+        <li><a href="Dashboard">Dashboard</a></li>
+      </ul>
+    </div>
+    <div class="menu-section">
+      <div class="menu-section-title">Market</div>
+      <ul class="menu-list">
+        <li><a href="sell.html">Sell Your Crops</a></li>
+        <li><a href="Buy">Buy Your Crop</a></li>
+      </ul>
+    </div>
+    <div class="menu-section">
+      <div class="menu-section-title">Tools & Services</div>
+      <ul class="menu-list">
+        <li><a href="tools_rental.html">List Tool for Rent</a></li>
+        <li><a href="my_listings.html">My Tool Listings</a></li>
+        <li><a href="krishimitr">Crop Predictor</a></li>
+      </ul>
+    </div>
+    <div class="menu-section" style="margin-bottom:0;">
+      <div class="menu-section-title">System</div>
+      <ul class="menu-list">
+        <li><a href="Notification">Notification</a></li>
+        <li><a href="Chat">Chat</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<div class="container">
+  <div class="search-section">
+    <div class="filter-grid">
+      <input type="text" id="queryName" placeholder="Search tools (e.g. Tractor)">
+      <input type="text" id="queryLoc" placeholder="Village or District">
+      <select id="queryCat">
+        <option value="">All Categories</option>
+        <option value="Tractors">Tractors</option>
+        <option value="Harvesting">Harvesting</option>
+        <option value="Seeding">Seeding</option>
+        <option value="HandTools">Hand Tools</option>
+      </select>
+      <button class="search-trigger" onclick="performSearch()">Search Now</button>
+    </div>
+  </div>
+
+  <div class="tool-grid" id="toolsDisplay"></div>
+</div>
+
+<script>
+const db = window.db;
+const loginid = sessionStorage.getItem("loginid");
+
+async function fetchTools(name = "", loc = "", cat = "") {
+  let request = db.from("tool_rentals").select("*").eq("is_available", true);
+
+  if(name) request = request.ilike("tool_name", `%${name}%`);
+  if(loc) request = request.ilike("location", `%${loc}%`);
+  if(cat) request = request.eq("category", cat);
+
+  const { data, error } = await request.order('created_at', { ascending: false });
+
+  if(error) {
+    console.error(error.message);
+    return;
+  }
+
+  const container = document.getElementById("toolsDisplay");
+  container.innerHTML = data.length ? "" : "<div style='grid-column:1/-1; text-align:center; padding:50px;'><h3>No matching tools found. Try adjusting your filters.</h3></div>";
+
+  data.forEach(tool => {
+    const card = document.createElement("div");
+    card.className = "tool-card";
+    card.innerHTML = `
+      <div class="tool-card-body">
+        <span class="category-badge">${tool.category}</span>
+        <h3 class="tool-title">${tool.tool_name}</h3>
+        <div class="tool-loc">📍 ${tool.location}</div>
+        <div class="pricing-row">
+          <div class="price-tag">₹${tool.price_per_day}<span>/day</span></div>
+          <div style="text-align:right; font-size:0.8rem; color:#64748b;">Deposit:<br><b>₹${tool.security_deposit}</b></div>
+        </div>
+        <div style="margin-bottom:20px; font-size:0.9rem; color:#475569; line-height:1.5;">
+          ${tool.description ? tool.description.substring(0, 80) + '...' : 'No additional description provided.'}
+        </div>
+        <a href="tel:${tool.contact}" class="contact-btn">
+          <span>📞 Call Owner</span>
+        </a>
+      </div>
+    `;
+    container.appendChild(card);
+  });
+}
+
+function performSearch() {
+  const n = document.getElementById("queryName").value;
+  const l = document.getElementById("queryLoc").value;
+  const c = document.getElementById("queryCat").value;
+  fetchTools(n, l, c);
+}
+
+const menuBtn = document.getElementById("menuBtn");
+const sideNav = document.getElementById("sideNav");
+const navOverlay = document.getElementById("navOverlay");
+
+function openDrawer() {
+  document.body.classList.add("drawer-open");
+  sideNav.hidden = false;
+  navOverlay.hidden = false;
+}
+
+function closeDrawer() {
+  document.body.classList.remove("drawer-open");
+  setTimeout(() => {
+    if(!document.body.classList.contains("drawer-open")) {
+      sideNav.hidden = true;
+      navOverlay.hidden = true;
+    }
+  }, 220);
+}
+
+menuBtn.onclick = () => {
+  document.body.classList.contains("drawer-open") ? closeDrawer() : openDrawer();
+};
+
+navOverlay.onclick = closeDrawer;
+
+document.getElementById("logoutBtn").onclick = () => {
+  sessionStorage.clear();
+  location.href = "login";
+};
+
+fetchTools();
+</script>
+
+</body>
+</html>
