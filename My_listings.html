@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>My Tool Listings - Krishi Mitr</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase.js"></script>
+<style>
+body {
+  margin: 0;
+  font-family: "Poppins", Arial, sans-serif;
+  min-height: 100vh;
+  background: linear-gradient(180deg,#f6e2cc 0%,#f7f9f8 45%,#dceee3 100%);
+  color: #1f2937;
+}
+.top-nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 78px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 32px;
+  background: linear-gradient(90deg,#ff9933,#ffffff,#138808);
+  border-bottom: 3px solid #0a3d62;
+  box-shadow: 0 6px 14px rgba(0,0,0,0.15);
+  z-index: 9999;
+}
+.brand-title { font-weight: 800; color: #0a3d62; }
+.container {
+  max-width: 1100px;
+  margin: 120px auto 60px;
+  padding: 0 20px;
+}
+.header-flex {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+}
+.tool-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 25px;
+}
+.tool-card {
+  background: white;
+  border-radius: 20px;
+  padding: 25px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+  border-left: 6px solid #138808;
+  position: relative;
+}
+.tool-name { font-size: 1.3rem; font-weight: 800; color: #0a3d62; margin: 0 0 10px 0; }
+.tool-info { margin-bottom: 8px; font-size: 0.95rem; }
+.tool-price { color: #138808; font-weight: 700; font-size: 1.1rem; }
+.btn-group { display: flex; gap: 10px; margin-top: 20px; }
+.edit-btn {
+  flex: 1;
+  padding: 10px;
+  background: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.delete-btn {
+  flex: 1;
+  padding: 10px;
+  background: #fee2e2;
+  color: #dc2626;
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  display: none;
+  place-items: center;
+  z-index: 10000;
+  padding: 20px;
+}
+.modal-content {
+  background: white;
+  padding: 30px;
+  border-radius: 20px;
+  width: 100%;
+  max-width: 500px;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+.form-field { margin-bottom: 15px; }
+.form-field label { display: block; font-weight: 600; margin-bottom: 5px; }
+.form-field input { width: 100%; padding: 10px; border: 2px solid #ddd; border-radius: 8px; box-sizing: border-box; }
+.save-btn { width: 100%; padding: 12px; background: #0a3d62; color: white; border: none; border-radius: 10px; font-weight: 700; cursor: pointer; }
+</style>
+</head>
+<body>
+
+<div class="top-nav">
+  <p class="brand-title">Krishi Mitr | My Inventory</p>
+  <button onclick="location.href='tools_rental.html'" style="background:#0a3d62; color:white; border:none; padding:8px 16px; border-radius:8px; font-weight:600; cursor:pointer;">+ Add New</button>
+</div>
+
+<div class="container">
+  <div class="header-flex">
+    <h1>Your Listed Equipment</h1>
+  </div>
+  <div class="tool-grid" id="myToolsContainer"></div>
+</div>
+
+<div class="modal" id="editModal">
+  <div class="modal-content">
+    <h2 style="margin-top:0">Update Listing</h2>
+    <form id="updateForm">
+      <input type="hidden" id="editId">
+      <div class="form-field">
+        <label>Tool Name</label>
+        <input type="text" id="editName">
+      </div>
+      <div class="form-field">
+        <label>Price per Day (₹)</label>
+        <input type="number" id="editPrice">
+      </div>
+      <div class="form-field">
+        <label>Security Deposit (₹)</label>
+        <input type="number" id="editDeposit">
+      </div>
+      <div class="form-field">
+        <label>Location</label>
+        <input type="text" id="editLocation">
+      </div>
+      <button type="submit" class="save-btn">Save Changes</button>
+      <button type="button" onclick="closeModal()" style="width:100%; margin-top:10px; background:none; border:none; color:#64748b; font-weight:600; cursor:pointer;">Cancel</button>
+    </form>
+  </div>
+</div>
+
+<script>
+const db = window.db;
+const loginid = sessionStorage.getItem("loginid");
+
+async function fetchMyTools() {
+  const { data, error } = await db.from("tool_rentals").select("*").eq("user_id", loginid);
+  if(error) return alert(error.message);
+  
+  const container = document.getElementById("myToolsContainer");
+  container.innerHTML = data.length ? "" : "<p>No tools listed yet.</p>";
+  
+  data.forEach(tool => {
+    const card = document.createElement("div");
+    card.className = "tool-card";
+    card.innerHTML = `
+      <p class="tool-name">${tool.tool_name}</p>
+      <div class="tool-info"><b>Category:</b> ${tool.category}</div>
+      <div class="tool-info"><b>Condition:</b> ${tool.condition}</div>
+      <div class="tool-info"><b>Location:</b> ${tool.location}</div>
+      <div class="tool-price">₹${tool.price_per_day} / day</div>
+      <div class="btn-group">
+        <button class="edit-btn" onclick='openEdit(${JSON.stringify(tool)})'>Edit</button>
+        <button class="delete-btn" onclick="deleteTool(${tool.id})">Delete</button>
+      </div>
+    `;
+    container.appendChild(card);
+  });
+}
+
+function openEdit(tool) {
+  document.getElementById("editId").value = tool.id;
+  document.getElementById("editName").value = tool.tool_name;
+  document.getElementById("editPrice").value = tool.price_per_day;
+  document.getElementById("editDeposit").value = tool.security_deposit;
+  document.getElementById("editLocation").value = tool.location;
+  document.getElementById("editModal").style.display = "grid";
+}
+
+function closeModal() { document.getElementById("editModal").style.display = "none"; }
+
+document.getElementById("updateForm").onsubmit = async (e) => {
+  e.preventDefault();
+  const id = document.getElementById("editId").value;
+  const { error } = await db.from("tool_rentals").update({
+    tool_name: document.getElementById("editName").value,
+    price_per_day: document.getElementById("editPrice").value,
+    security_deposit: document.getElementById("editDeposit").value,
+    location: document.getElementById("editLocation").value
+  }).eq("id", id);
+  
+  if(error) alert(error.message);
+  else { closeModal(); fetchMyTools(); }
+};
+
+async function deleteTool(id) {
+  if(!confirm("Are you sure you want to remove this listing?")) return;
+  const { error } = await db.from("tool_rentals").delete().eq("id", id);
+  if(error) alert(error.message);
+  else fetchMyTools();
+}
+
+fetchMyTools();
+</script>
+</body>
+</html>
