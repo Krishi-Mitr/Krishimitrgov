@@ -1,241 +1,54 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<title>Notifications Hub - Krishi Mitr</title>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="supabase.js"></script>
-<style>
-body {
-  margin: 0;
-  font-family: "Poppins", Arial, sans-serif;
-  min-height: 100vh;
-  background: linear-gradient(180deg,#f6e2cc 0%,#f7f9f8 45%,#dceee3 100%);
-  color: #1f2937;
-}
-body.drawer-open { overflow: hidden; }
+async function loadNotifications() {
+  const container = document.getElementById("notificationList");
+  container.innerHTML = "<h3>Loading requests...</h3>";
 
-.top-nav {
-  position: fixed;
-  top: 0; left: 0; right: 0;
-  height: 78px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0 32px;
-  background: linear-gradient(90deg,#ff9933,#ffffff,#138808);
-  border-bottom: 3px solid #0a3d62;
-  box-shadow: 0 6px 14px rgba(0,0,0,0.15);
-  z-index: 9999;
-}
-.nav-left { display: flex; align-items: center; gap: 14px; }
-.hamburger-btn {
-  width: 44px; height: 44px; border-radius: 12px;
-  border: 2px solid #0a3d62;
-  background: rgba(255,255,255,0.75);
-  display: grid; place-items: center; cursor: pointer;
-}
-.hamburger-icon { width: 20px; height: 14px; position: relative; }
-.hamburger-icon span {
-  position: absolute; left: 0; right: 0; height: 2.5px;
-  background: #0a3d62; border-radius: 999px;
-}
-.hamburger-icon span:nth-child(1) { top: 0; }
-.hamburger-icon span:nth-child(2) { top: 5.5px; }
-.hamburger-icon span:nth-child(3) { top: 11px; }
-
-.brand-title { font-weight: 800; color: #0a3d62; }
-.nav-buttons { display: flex; align-items: center; gap: 15px; }
-.nav-btn { background: white; color: #0a3d62; border: 2px solid #0a3d62; padding: 10px 18px; border-radius: 10px; font-weight: 700; cursor: pointer; }
-
-.nav-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.25); opacity: 0; pointer-events: none; transition: .2s ease; z-index: 9998; }
-.side-drawer {
-  position: fixed; top: 84px; left: 14px; width: min(320px, calc(100vw - 28px));
-  max-height: calc(100vh - 98px); overflow: auto;
-  background: linear-gradient(180deg,#0a3d62,#082032);
-  border: 3px solid #ffffff; border-radius: 18px;
-  transform: translateX(-110%); transition: .25s ease; z-index: 9999;
-}
-.drawer-inner { padding: 14px; }
-.menu-section { border-radius: 14px; overflow: hidden; border: 1px solid rgba(255,255,255,0.15); margin-bottom: 14px; background: rgba(255,255,255,0.05); }
-.menu-section-title { padding: 12px 14px; background: rgba(255,255,255,0.1); color: white; font-weight: 800; }
-.menu-list { list-style: none; padding: 0; margin: 0; }
-.menu-list a { display: block; padding: 14px; text-decoration: none; color: white; font-weight: 600; background: rgba(255,255,255,0.08); }
-
-body.drawer-open .nav-overlay { opacity: 1; pointer-events: auto; }
-body.drawer-open .side-drawer { transform: translateX(0); }
-
-.container { max-width: 900px; margin: 150px auto 60px; padding: 0 20px; }
-.card { background: white; border-radius: 20px; padding: 25px; margin-bottom: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); position: relative; overflow: hidden; }
-.card.tool-card { border-left: 8px solid #ff9933; }
-.card.crop-card { border-left: 8px solid #138808; }
-
-.tag { position: absolute; top: 15px; right: 20px; font-size: 0.65rem; font-weight: 900; text-transform: uppercase; padding: 4px 10px; border-radius: 6px; }
-.tool-tag { background: #fff7ed; color: #c2410c; }
-.crop-tag { background: #f0fdf4; color: #166534; }
-
-.actions { margin-top: 20px; display: flex; gap: 12px; }
-.btn-accept { background: #138808; color: white; border: none; padding: 10px 22px; border-radius: 10px; font-weight: 700; cursor: pointer; }
-.btn-decline { background: #b30000; color: white; border: none; padding: 10px 22px; border-radius: 10px; font-weight: 700; cursor: pointer; }
-.status-pill { padding: 8px 16px; border-radius: 10px; font-weight: 700; width: fit-content; margin-top: 15px; }
-.status-pill.accepted { background: #138808; color: white; }
-.status-pill.declined { background: #b30000; color: white; }
-</style>
-</head>
-<body>
-
-<div class="top-nav">
-  <div class="nav-left">
-    <button class="hamburger-btn" id="menuBtn"><div class="hamburger-icon"><span></span><span></span><span></span></div></button>
-    <p class="brand-title">Krishi Mitr | Notifications</p>
-  </div>
-  <div class="nav-buttons">
-    <button class="nav-btn" onclick="sessionStorage.clear(); location.href='login';">Logout</button>
-  </div>
-</div>
-
-<div class="nav-overlay" id="navOverlay" hidden></div>
-<nav class="side-drawer" id="sideNav" hidden>
-  <div class="drawer-inner">
-    <div class="menu-section">
-      <div class="menu-section-title">Menu</div>
-      <ul class="menu-list">
-        <li><a href="Dashboard">Dashboard</a></li>
-        <li><a href="browse_tools.html">Browse Tools</a></li>
-        <li><a href="Update_crops">My Crops</a></li>
-      </ul>
-    </div>
-  </div>
-</nav>
-
-<div class="container" id="masterFeed"></div>
-
-<script>
-const db = window.db;
-const loginid = sessionStorage.getItem("loginid");
-
-async function loadAllNotifications() {
-  const feed = document.getElementById("masterFeed");
-  feed.innerHTML = "<h3>Syncing your marketplace...</h3>";
-
-  const { data: tools, error: toolErr } = await db
+  const { data: toolRequests, error: toolError } = await db
     .from("notifications")
     .select("*")
-    .or(`receiver_id.eq.${loginid},receiver_id.eq.${parseInt(loginid)}`)
+    .eq("receiver_id", String(loginid))
     .order("created_at", { ascending: false });
 
-  const { data: myCrops } = await db
-    .from("crop_sales")
-    .select("jid")
-    .eq("lid", loginid);
-
-  let cropRequests = [];
-  if (myCrops && myCrops.length > 0) {
-    const cropIds = myCrops.map(c => c.jid);
-    const { data: buyData } = await db
-      .from("buy_table")
-      .select("*")
-      .in("fid", cropIds)
-      .order("created_at", { ascending: false });
-    cropRequests = buyData || [];
-  }
-
-  if ((!tools || tools.length === 0) && cropRequests.length === 0) {
-    feed.innerHTML = "<h3>No new notifications found.</h3>";
+  if (toolError) {
+    console.error("Fetch Error:", toolError);
     return;
   }
 
-  feed.innerHTML = "";
+  const { data: crops } = await db.from("crop_sales").select("jid").eq("lid", loginid);
+  let cropRequests = [];
+  if (crops && crops.length > 0) {
+    const cropIds = crops.map(c => c.jid);
+    const { data } = await db.from("buy_table").select("*").in("fid", cropIds);
+    cropRequests = data || [];
+  }
 
-  tools?.forEach(item => {
+  container.innerHTML = "";
+
+  if (toolRequests.length === 0 && cropRequests.length === 0) {
+    container.innerHTML = "<h3>No notifications found.</h3>";
+    return;
+  }
+
+  toolRequests.forEach(item => {
     const card = document.createElement("div");
-    card.className = "card tool-card";
-    let actions = "";
+    card.className = "notification-card tool-request";
+    
+    let actionHtml = "";
     if (item.status === 'pending') {
-      actions = `
+      actionHtml = `
         <div class="actions">
-          <button class="btn-accept" onclick="handleTool(${item.id}, 'Accepted', ${item.tool_id})">Accept Rental</button>
-          <button class="btn-decline" onclick="handleTool(${item.id}, 'Declined')">Decline</button>
+          <button class="btn-accept" onclick="updateToolStatus(${item.id}, 'Accepted', ${item.tool_id})">Accept</button>
+          <button class="btn-decline" onclick="updateToolStatus(${item.id}, 'Declined')">Decline</button>
         </div>`;
     } else {
-      actions = `<div class="status-pill ${item.status.toLowerCase() === 'accepted' ? 'accepted' : 'declined'}">${item.status}</div>`;
+      actionHtml = `<div class="status ${item.status === 'Accepted' ? 'accepted' : 'declined'}">${item.status}</div>`;
     }
 
     card.innerHTML = `
-      <span class="tag tool-tag">Equipment Rental</span>
-      <strong>${item.sender_name}</strong> wants your <strong>${item.tool_name}</strong>
-      <div style="margin-top:10px; font-size:0.9rem; color:#4b5563;">
-        Days: ${item.requested_days} | Income: ₹${item.total_price}
-      </div>
-      ${actions}
+      <span class="type-tag tool-tag">Tool Rental</span>
+      <strong>${item.sender_name}</strong> wants to rent <strong>${item.tool_name}</strong>
+      <div class="detail-row">Days: ${item.requested_days} | Total: ₹${item.total_price}</div>
+      ${actionHtml}
     `;
-    feed.appendChild(card);
+    container.appendChild(card);
   });
-
-  for (const item of cropRequests) {
-    const { data: buyer } = await db.from("logindata").select("name").eq("loginid", item.lid).maybeSingle();
-    const card = document.createElement("div");
-    card.className = "card crop-card";
-    let actions = "";
-    if (item.is_confirmed) {
-      actions = `<div class="status-pill ${item.status.toLowerCase() === 'accepted' ? 'accepted' : 'declined'}">${item.status}</div>`;
-    } else {
-      actions = `
-        <div class="actions">
-          <button class="btn-accept" onclick="handleCrop('${item.id}', 'Accepted')">Accept Sale</button>
-          <button class="btn-decline" onclick="handleCrop('${item.id}', 'Declined')">Decline</button>
-        </div>`;
-    }
-
-    card.innerHTML = `
-      <span class="tag crop-tag">Crop Sale</span>
-      <strong>${buyer?.name || "Farmer " + item.lid}</strong> wants your <strong>${item.cname}</strong>
-      <div style="margin-top:10px; font-size:0.9rem; color:#4b5563;">
-        Quantity: ${item.quantity} kg
-      </div>
-      ${actions}
-    `;
-    feed.appendChild(card);
-  }
 }
-
-async function handleTool(id, status, toolId) {
-  if (status === "Accepted") {
-    await db.from("tool_rentals").update({ is_available: false }).eq("id", toolId);
-  }
-  await db.from("notifications").update({ status: status }).eq("id", id);
-  loadAllNotifications();
-}
-
-async function handleCrop(id, status) {
-  if (status === "Accepted") {
-    const { data: request } = await db.from("buy_table").select("*").eq("id", id).single();
-    const { data: crop } = await db.from("crop_sales").select("quantity").eq("jid", request.fid).single();
-    const remaining = crop.quantity - request.quantity;
-    if (remaining < 0) return alert("Insufficient stock!");
-    await db.from("crop_sales").update({ quantity: remaining }).eq("jid", request.fid);
-  }
-  await db.from("buy_table").update({ is_confirmed: true, status: status }).eq("id", id);
-  loadAllNotifications();
-}
-
-const menuBtn = document.getElementById("menuBtn");
-const sideNav = document.getElementById("sideNav");
-const navOverlay = document.getElementById("navOverlay");
-
-menuBtn.onclick = () => {
-  document.body.classList.toggle("drawer-open");
-  sideNav.hidden = !sideNav.hidden;
-  navOverlay.hidden = !navOverlay.hidden;
-};
-
-navOverlay.onclick = () => {
-  document.body.classList.remove("drawer-open");
-  sideNav.hidden = true;
-  navOverlay.hidden = true;
-};
-
-loadAllNotifications();
-</script>
-</body>
-</html>
