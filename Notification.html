@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Notifications - Krishi Mitr</title>
+<title>Notifications Hub - Krishi Mitr</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="supabase.js"></script>
 <style>
@@ -46,7 +46,6 @@ body.drawer-open { overflow: hidden; }
 
 .brand-title { font-weight: 800; color: #0a3d62; }
 .nav-buttons { display: flex; align-items: center; gap: 15px; }
-.profile-btn img { width: 42px; height: 42px; border-radius: 50%; border: 2px solid #0a3d62; cursor: pointer; }
 .nav-btn { background: white; color: #0a3d62; border: 2px solid #0a3d62; padding: 10px 18px; border-radius: 10px; font-weight: 700; cursor: pointer; }
 
 .nav-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.25); opacity: 0; pointer-events: none; transition: .2s ease; z-index: 9998; }
@@ -67,13 +66,20 @@ body.drawer-open .nav-overlay { opacity: 1; pointer-events: auto; }
 body.drawer-open .side-drawer { transform: translateX(0); }
 
 .container { max-width: 900px; margin: 150px auto 60px; padding: 0 20px; }
-.notification-card { background: white; border-radius: 20px; padding: 25px; margin-bottom: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.12); border-left: 8px solid #ff9933; }
-.actions { margin-top: 18px; display: flex; gap: 12px; }
-.btn-accept { background: #138808; color: white; border: none; padding: 10px 20px; border-radius: 10px; font-weight: 700; cursor: pointer; }
-.btn-decline { background: #b30000; color: white; border: none; padding: 10px 20px; border-radius: 10px; font-weight: 700; cursor: pointer; }
-.status { padding: 8px 16px; border-radius: 10px; font-weight: 700; width: fit-content; margin-top: 15px; }
-.status.accepted { background: #138808; color: white; }
-.status.declined { background: #b30000; color: white; }
+.card { background: white; border-radius: 20px; padding: 25px; margin-bottom: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); position: relative; overflow: hidden; }
+.card.tool-card { border-left: 8px solid #ff9933; }
+.card.crop-card { border-left: 8px solid #138808; }
+
+.tag { position: absolute; top: 15px; right: 20px; font-size: 0.65rem; font-weight: 900; text-transform: uppercase; padding: 4px 10px; border-radius: 6px; }
+.tool-tag { background: #fff7ed; color: #c2410c; }
+.crop-tag { background: #f0fdf4; color: #166534; }
+
+.actions { margin-top: 20px; display: flex; gap: 12px; }
+.btn-accept { background: #138808; color: white; border: none; padding: 10px 22px; border-radius: 10px; font-weight: 700; cursor: pointer; }
+.btn-decline { background: #b30000; color: white; border: none; padding: 10px 22px; border-radius: 10px; font-weight: 700; cursor: pointer; }
+.status-pill { padding: 8px 16px; border-radius: 10px; font-weight: 700; width: fit-content; margin-top: 15px; }
+.status-pill.accepted { background: #138808; color: white; }
+.status-pill.declined { background: #b30000; color: white; }
 </style>
 </head>
 <body>
@@ -84,7 +90,7 @@ body.drawer-open .side-drawer { transform: translateX(0); }
     <p class="brand-title">Krishi Mitr | Notifications</p>
   </div>
   <div class="nav-buttons">
-    <button class="nav-btn" id="logoutBtn">Logout</button>
+    <button class="nav-btn" onclick="sessionStorage.clear(); location.href='login';">Logout</button>
   </div>
 </div>
 
@@ -92,91 +98,125 @@ body.drawer-open .side-drawer { transform: translateX(0); }
 <nav class="side-drawer" id="sideNav" hidden>
   <div class="drawer-inner">
     <div class="menu-section">
-      <div class="menu-section-title">Navigation</div>
+      <div class="menu-section-title">Menu</div>
       <ul class="menu-list">
         <li><a href="Dashboard">Dashboard</a></li>
         <li><a href="browse_tools.html">Browse Tools</a></li>
+        <li><a href="Update_crops">My Crops</a></li>
       </ul>
     </div>
   </div>
 </nav>
 
-<div class="container" id="notificationList"></div>
+<div class="container" id="masterFeed"></div>
 
 <script>
 const db = window.db;
 const loginid = sessionStorage.getItem("loginid");
 
-async function loadNotifications() {
-  const container = document.getElementById("notificationList");
-  container.innerHTML = "<h3>Checking for requests...</h3>";
+async function loadAllNotifications() {
+  const feed = document.getElementById("masterFeed");
+  feed.innerHTML = "<h3>Syncing your marketplace...</h3>";
 
-  const { data: toolRequests, error } = await db
+  const { data: tools, error: toolErr } = await db
     .from("notifications")
     .select("*")
     .or(`receiver_id.eq.${loginid},receiver_id.eq.${parseInt(loginid)}`)
     .order("created_at", { ascending: false });
 
-  if (error) {
-    console.error("Database Error:", error);
-    container.innerHTML = "<h3>Error loading notifications.</h3>";
+  const { data: myCrops } = await db
+    .from("crop_sales")
+    .select("jid")
+    .eq("lid", loginid);
+
+  let cropRequests = [];
+  if (myCrops && myCrops.length > 0) {
+    const cropIds = myCrops.map(c => c.jid);
+    const { data: buyData } = await db
+      .from("buy_table")
+      .select("*")
+      .in("fid", cropIds)
+      .order("created_at", { ascending: false });
+    cropRequests = buyData || [];
+  }
+
+  if ((!tools || tools.length === 0) && cropRequests.length === 0) {
+    feed.innerHTML = "<h3>No new notifications found.</h3>";
     return;
   }
 
-  console.log("Found requests:", toolRequests);
+  feed.innerHTML = "";
 
-  if (!toolRequests || toolRequests.length === 0) {
-    container.innerHTML = "<h3>No tool rental requests found.</h3>";
-    return;
-  }
-
-  container.innerHTML = "";
-
-  toolRequests.forEach(item => {
+  tools?.forEach(item => {
     const card = document.createElement("div");
-    card.className = "notification-card";
-    
-    let actionHtml = "";
+    card.className = "card tool-card";
+    let actions = "";
     if (item.status === 'pending') {
-      actionHtml = `
+      actions = `
         <div class="actions">
-          <button class="btn-accept" onclick="updateToolStatus(${item.id}, 'Accepted', ${item.tool_id})">Confirm Rental</button>
-          <button class="btn-decline" onclick="updateToolStatus(${item.id}, 'Declined')">Decline</button>
+          <button class="btn-accept" onclick="handleTool(${item.id}, 'Accepted', ${item.tool_id})">Accept Rental</button>
+          <button class="btn-decline" onclick="handleTool(${item.id}, 'Declined')">Decline</button>
         </div>`;
     } else {
-      actionHtml = `<div class="status ${item.status === 'Accepted' ? 'accepted' : 'declined'}">${item.status}</div>`;
+      actions = `<div class="status-pill ${item.status.toLowerCase() === 'accepted' ? 'accepted' : 'declined'}">${item.status}</div>`;
     }
 
     card.innerHTML = `
-      <div style="font-size: 0.8rem; color: #64748b; margin-bottom: 5px;">Rental Request</div>
-      <strong>${item.sender_name}</strong> wants to rent your <strong>${item.tool_name}</strong>.
-      <div style="margin-top: 10px; font-size: 0.9rem;">
-        Duration: ${item.requested_days} days<br>
-        Total Income: <b>₹${item.total_price}</b>
+      <span class="tag tool-tag">Equipment Rental</span>
+      <strong>${item.sender_name}</strong> wants your <strong>${item.tool_name}</strong>
+      <div style="margin-top:10px; font-size:0.9rem; color:#4b5563;">
+        Days: ${item.requested_days} | Income: ₹${item.total_price}
       </div>
-      ${actionHtml}
+      ${actions}
     `;
-    container.appendChild(card);
+    feed.appendChild(card);
   });
+
+  for (const item of cropRequests) {
+    const { data: buyer } = await db.from("logindata").select("name").eq("loginid", item.lid).maybeSingle();
+    const card = document.createElement("div");
+    card.className = "card crop-card";
+    let actions = "";
+    if (item.is_confirmed) {
+      actions = `<div class="status-pill ${item.status.toLowerCase() === 'accepted' ? 'accepted' : 'declined'}">${item.status}</div>`;
+    } else {
+      actions = `
+        <div class="actions">
+          <button class="btn-accept" onclick="handleCrop('${item.id}', 'Accepted')">Accept Sale</button>
+          <button class="btn-decline" onclick="handleCrop('${item.id}', 'Declined')">Decline</button>
+        </div>`;
+    }
+
+    card.innerHTML = `
+      <span class="tag crop-tag">Crop Sale</span>
+      <strong>${buyer?.name || "Farmer " + item.lid}</strong> wants your <strong>${item.cname}</strong>
+      <div style="margin-top:10px; font-size:0.9rem; color:#4b5563;">
+        Quantity: ${item.quantity} kg
+      </div>
+      ${actions}
+    `;
+    feed.appendChild(card);
+  }
 }
 
-async function updateToolStatus(notifId, status, toolId) {
+async function handleTool(id, status, toolId) {
   if (status === "Accepted") {
-    const { error: toolError } = await db
-      .from("tool_rentals")
-      .update({ is_available: false })
-      .eq("id", toolId);
-    
-    if (toolError) alert("Error updating tool availability.");
+    await db.from("tool_rentals").update({ is_available: false }).eq("id", toolId);
   }
+  await db.from("notifications").update({ status: status }).eq("id", id);
+  loadAllNotifications();
+}
 
-  const { error: notifError } = await db
-    .from("notifications")
-    .update({ status: status })
-    .eq("id", notifId);
-
-  if (notifError) alert("Error updating request status.");
-  else loadNotifications();
+async function handleCrop(id, status) {
+  if (status === "Accepted") {
+    const { data: request } = await db.from("buy_table").select("*").eq("id", id).single();
+    const { data: crop } = await db.from("crop_sales").select("quantity").eq("jid", request.fid).single();
+    const remaining = crop.quantity - request.quantity;
+    if (remaining < 0) return alert("Insufficient stock!");
+    await db.from("crop_sales").update({ quantity: remaining }).eq("jid", request.fid);
+  }
+  await db.from("buy_table").update({ is_confirmed: true, status: status }).eq("id", id);
+  loadAllNotifications();
 }
 
 const menuBtn = document.getElementById("menuBtn");
@@ -195,12 +235,7 @@ navOverlay.onclick = () => {
   navOverlay.hidden = true;
 };
 
-document.getElementById("logoutBtn").onclick = () => {
-  sessionStorage.clear();
-  location.href = "login";
-};
-
-loadNotifications();
+loadAllNotifications();
 </script>
 </body>
 </html>
