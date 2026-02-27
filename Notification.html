@@ -80,8 +80,6 @@ body.drawer-open .side-drawer { transform: translateX(0); }
 .status-pill { padding: 8px 16px; border-radius: 10px; font-weight: 700; width: fit-content; margin-top: 15px; }
 .status-pill.accepted { background: #138808; color: white; }
 .status-pill.declined { background: #b30000; color: white; }
-
-.debug-info { background: #1e293b; color: #38bdf8; padding: 10px; border-radius: 8px; font-family: monospace; font-size: 0.8rem; margin-bottom: 20px; }
 </style>
 </head>
 <body>
@@ -110,10 +108,7 @@ body.drawer-open .side-drawer { transform: translateX(0); }
   </div>
 </nav>
 
-<div class="container">
-  <div id="debugBar" class="debug-info">Initializing System...</div>
-  <div id="masterFeed"></div>
-</div>
+<div class="container" id="masterFeed"></div>
 
 <script>
 const db = window.db;
@@ -121,22 +116,18 @@ const loginid = sessionStorage.getItem("loginid");
 
 async function loadAllNotifications() {
   const feed = document.getElementById("masterFeed");
-  const debug = document.getElementById("debugBar");
-  feed.innerHTML = "<h3>Syncing Marketplace...</h3>";
-
-  const cleanId = String(loginid).trim();
-  const numId = parseInt(cleanId);
+  feed.innerHTML = "<h3>Syncing your marketplace...</h3>";
 
   const { data: tools, error: toolErr } = await db
     .from("notifications")
     .select("*")
-    .or(`receiver_id.eq."${cleanId}",receiver_id.eq.${numId}`)
+    .or(`receiver_id.eq.${loginid},receiver_id.eq.${parseInt(loginid)}`)
     .order("created_at", { ascending: false });
 
   const { data: myCrops } = await db
     .from("crop_sales")
     .select("jid")
-    .eq("lid", cleanId);
+    .eq("lid", loginid);
 
   let cropRequests = [];
   if (myCrops && myCrops.length > 0) {
@@ -148,8 +139,6 @@ async function loadAllNotifications() {
       .order("created_at", { ascending: false });
     cropRequests = buyData || [];
   }
-
-  debug.innerText = `Logged in as: ${cleanId} | Tools Found: ${tools?.length || 0} | Crop Requests: ${cropRequests.length}`;
 
   if ((!tools || tools.length === 0) && cropRequests.length === 0) {
     feed.innerHTML = "<h3>No new notifications found.</h3>";
@@ -174,9 +163,9 @@ async function loadAllNotifications() {
 
     card.innerHTML = `
       <span class="tag tool-tag">Equipment Rental</span>
-      <strong>${item.sender_name || 'Farmer'}</strong> wants your <strong>${item.tool_name}</strong>
+      <strong>${item.sender_name}</strong> wants your <strong>${item.tool_name}</strong>
       <div style="margin-top:10px; font-size:0.9rem; color:#4b5563;">
-        Requested for ${item.requested_days} days | Est. Income: ₹${item.total_price}
+        Days: ${item.requested_days} | Income: ₹${item.total_price}
       </div>
       ${actions}
     `;
@@ -184,11 +173,12 @@ async function loadAllNotifications() {
   });
 
   for (const item of cropRequests) {
+    const { data: buyer } = await db.from("logindata").select("name").eq("loginid", item.lid).maybeSingle();
     const card = document.createElement("div");
     card.className = "card crop-card";
     let actions = "";
     if (item.is_confirmed) {
-      actions = `<div class="status-pill ${item.status?.toLowerCase() === 'accepted' ? 'accepted' : 'declined'}">${item.status}</div>`;
+      actions = `<div class="status-pill ${item.status.toLowerCase() === 'accepted' ? 'accepted' : 'declined'}">${item.status}</div>`;
     } else {
       actions = `
         <div class="actions">
@@ -199,9 +189,9 @@ async function loadAllNotifications() {
 
     card.innerHTML = `
       <span class="tag crop-tag">Crop Sale</span>
-      <strong>Buyer #${item.lid}</strong> wants your <strong>${item.cname}</strong>
+      <strong>${buyer?.name || "Farmer " + item.lid}</strong> wants your <strong>${item.cname}</strong>
       <div style="margin-top:10px; font-size:0.9rem; color:#4b5563;">
-        Quantity Requested: ${item.quantity} kg
+        Quantity: ${item.quantity} kg
       </div>
       ${actions}
     `;
