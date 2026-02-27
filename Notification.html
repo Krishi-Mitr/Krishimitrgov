@@ -3,230 +3,106 @@
 <head>
 <meta charset="UTF-8">
 <title>Notifications - Krishi Mitr</title>
-
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="supabase.js"></script>
-
 <style>
-body{
-  margin:0;
-  font-family:"Poppins",Arial,sans-serif;
-  min-height:100vh;
-  background:linear-gradient(180deg,#f6e2cc 0%,#f7f9f8 45%,#dceee3 100%);
-  color:#1f2937;
+body {
+  margin: 0;
+  font-family: "Poppins", Arial, sans-serif;
+  min-height: 100vh;
+  background: linear-gradient(180deg,#f6e2cc 0%,#f7f9f8 45%,#dceee3 100%);
+  color: #1f2937;
 }
-body.drawer-open{overflow:hidden}
+body.drawer-open { overflow: hidden; }
 
-/* ===== NAVBAR ===== */
-.top-nav{
-  position:fixed;
-  top:0; left:0; right:0;
-  height:78px;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  padding:0 32px;
-  background:linear-gradient(90deg,#ff9933,#ffffff,#138808);
-  border-bottom:3px solid #0a3d62;
-  box-shadow:0 6px 14px rgba(0,0,0,0.15);
-  z-index:9999;
+.top-nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: 78px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 32px;
+  background: linear-gradient(90deg,#ff9933,#ffffff,#138808);
+  border-bottom: 3px solid #0a3d62;
+  box-shadow: 0 6px 14px rgba(0,0,0,0.15);
+  z-index: 9999;
 }
-.nav-left{
-  display:flex;
-  align-items:center;
-  gap:14px;
+.nav-left { display: flex; align-items: center; gap: 14px; }
+.hamburger-btn {
+  width: 44px; height: 44px; border-radius: 12px;
+  border: 2px solid #0a3d62;
+  background: rgba(255,255,255,0.75);
+  display: grid; place-items: center; cursor: pointer;
 }
-.hamburger-btn{
-  width:44px;height:44px;border-radius:12px;
-  border:2px solid #0a3d62;
-  background:rgba(255,255,255,0.75);
-  display:grid;place-items:center;cursor:pointer;
+.hamburger-icon { width: 20px; height: 14px; position: relative; }
+.hamburger-icon span {
+  position: absolute; left: 0; right: 0; height: 2.5px;
+  background: #0a3d62; border-radius: 999px;
 }
-.hamburger-icon{
-  width:20px;height:14px;position:relative;
-}
-.hamburger-icon span{
-  position:absolute;left:0;right:0;height:2.5px;
-  background:#0a3d62;border-radius:999px;
-}
-.hamburger-icon span:nth-child(1){top:0;}
-.hamburger-icon span:nth-child(2){top:5.5px;}
-.hamburger-icon span:nth-child(3){top:11px;}
+.hamburger-icon span:nth-child(1) { top: 0; }
+.hamburger-icon span:nth-child(2) { top: 5.5px; }
+.hamburger-icon span:nth-child(3) { top: 11px; }
 
-.brand-title{
-  font-weight:800;
-  color:#0a3d62;
-}
+.brand-title { font-weight: 800; color: #0a3d62; }
+.nav-buttons { display: flex; align-items: center; gap: 15px; }
+.profile-btn img { width: 42px; height: 42px; border-radius: 50%; border: 2px solid #0a3d62; cursor: pointer; transition: 0.3s; }
+.nav-btn { background: white; color: #0a3d62; border: 2px solid #0a3d62; padding: 10px 18px; border-radius: 10px; font-weight: 700; cursor: pointer; }
 
-.nav-buttons{
-  display:flex;
-  align-items:center;
-  gap:15px;
+.nav-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.25); opacity: 0; pointer-events: none; transition: .2s ease; z-index: 9998; }
+.side-drawer {
+  position: fixed; top: 84px; left: 14px; width: min(320px, calc(100vw - 28px));
+  max-height: calc(100vh - 98px); overflow: auto;
+  background: linear-gradient(180deg,#0a3d62,#082032);
+  border: 3px solid #ffffff; border-radius: 18px;
+  box-shadow: 0 18px 40px rgba(0,0,0,0.35);
+  transform: translateX(-110%); transition: .25s ease; z-index: 9999;
 }
+.drawer-inner { padding: 14px; }
+.menu-section { border-radius: 14px; overflow: hidden; border: 1px solid rgba(255,255,255,0.15); margin-bottom: 14px; background: rgba(255,255,255,0.05); }
+.menu-section-title { padding: 12px 14px; background: rgba(255,255,255,0.1); color: white; font-weight: 800; }
+.menu-list { list-style: none; padding: 0; margin: 0; }
+.menu-list a { display: block; padding: 14px; text-decoration: none; color: white; font-weight: 600; background: rgba(255,255,255,0.08); }
+.menu-list a:hover { background: #1e3a8a; padding-left: 20px; }
 
-.profile-btn img{
-  width:42px;
-  height:42px;
-  border-radius:50%;
-  border:2px solid #0a3d62;
-  cursor:pointer;
-  transition:0.3s;
-}
-.profile-btn img:hover{
-  transform:scale(1.1);
-  box-shadow:0 0 15px rgba(10,61,98,0.4);
-}
+body.drawer-open .nav-overlay { opacity: 1; pointer-events: auto; }
+body.drawer-open .side-drawer { transform: translateX(0); }
 
-.nav-btn{
-  background:white;
-  color:#0a3d62;
-  border:2px solid #0a3d62;
-  padding:10px 18px;
-  border-radius:10px;
-  font-weight:700;
-  cursor:pointer;
-}
+.container { max-width: 900px; margin: 150px auto 60px; padding: 0 20px; }
+.notification-card { background: white; border-radius: 20px; padding: 25px; margin-bottom: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.12); border-left: 8px solid #0a3d62; position: relative; }
+.notification-card.tool-request { border-left-color: #ff9933; }
+.notification-card.crop-request { border-left-color: #138808; }
 
-/* ===== DRAWER ===== */
-.nav-overlay{
-  position:fixed;inset:0;
-  background:rgba(0,0,0,0.25);
-  opacity:0;pointer-events:none;
-  transition:.2s ease;
-  z-index:9998;
-}
-.side-drawer{
-  position:fixed;
-  top:84px;left:14px;
-  width:min(320px,calc(100vw - 28px));
-  max-height:calc(100vh - 98px);
-  overflow:auto;
-  background:linear-gradient(180deg,#0a3d62,#082032);
-  border:3px solid #ffffff;
-  border-radius:18px;
-  box-shadow:0 18px 40px rgba(0,0,0,0.35);
-  transform:translateX(-110%);
-  transition:.25s ease;
-  z-index:9999;
-}
-.drawer-inner{padding:14px;}
-.menu-section{
-  border-radius:14px;
-  overflow:hidden;
-  border:1px solid rgba(255,255,255,0.15);
-  margin-bottom:14px;
-  background:rgba(255,255,255,0.05);
-}
-.menu-section-title{
-  padding:12px 14px;
-  background:rgba(255,255,255,0.1);
-  color:white;
-  font-weight:800;
-}
-.menu-list{
-  list-style:none;
-  padding:0;margin:0;
-}
-.menu-list a{
-  display:block;
-  padding:14px;
-  text-decoration:none;
-  color:white;
-  font-weight:600;
-  background:rgba(255,255,255,0.08);
-}
-.menu-list li+li a{
-  border-top:1px solid rgba(255,255,255,0.1);
-}
-.menu-list a:hover{
-  background:#1e3a8a;
-  padding-left:20px;
-}
+.type-tag { position: absolute; top: 15px; right: 20px; font-size: 0.7rem; font-weight: 800; text-transform: uppercase; padding: 4px 10px; border-radius: 8px; }
+.tool-tag { background: #fff7ed; color: #c2410c; }
+.crop-tag { background: #f0fdf4; color: #166534; }
 
-body.drawer-open .nav-overlay{
-  opacity:1;
-  pointer-events:auto;
-}
-body.drawer-open .side-drawer{
-  transform:translateX(0);
-}
+.actions { margin-top: 18px; display: flex; gap: 12px; }
+.btn-accept { background: #138808; color: white; border: none; padding: 10px 20px; border-radius: 10px; font-weight: 700; cursor: pointer; }
+.btn-decline { background: #b30000; color: white; border: none; padding: 10px 20px; border-radius: 10px; font-weight: 700; cursor: pointer; }
+.status { padding: 8px 16px; border-radius: 10px; font-weight: 700; width: fit-content; margin-top: 15px; }
+.status.accepted { background: #138808; color: white; }
+.status.declined { background: #b30000; color: white; }
 
-/* ===== CONTENT ===== */
-.container{
-  max-width:900px;
-  margin:150px auto 60px;
-  padding:0 20px;
-}
-.notification-card{
-  background:white;
-  border-radius:20px;
-  padding:20px;
-  margin-bottom:20px;
-  box-shadow:0 10px 25px rgba(0,0,0,0.12);
-}
-.actions{
-  margin-top:12px;
-  display:flex;
-  gap:10px;
-}
-.btn-accept{
-  background:#138808;
-  color:white;
-  border:none;
-  padding:8px 16px;
-  border-radius:12px;
-  font-weight:700;
-  cursor:pointer;
-}
-.btn-decline{
-  background:#b30000;
-  color:white;
-  border:none;
-  padding:8px 16px;
-  border-radius:12px;
-  font-weight:700;
-  cursor:pointer;
-}
-.status{
-  padding:6px 12px;
-  border-radius:14px;
-  font-weight:700;
-  width:fit-content;
-}
-.status.accepted{
-  background:#138808;
-  color:white;
-}
-.status.declined{
-  background:#b30000;
-  color:white;
-}
+.detail-row { margin-top: 10px; font-size: 0.9rem; color: #4b5563; }
 </style>
 </head>
-
 <body>
 
-<!-- NAVBAR -->
 <div class="top-nav">
   <div class="nav-left">
     <button class="hamburger-btn" id="menuBtn">
-      <div class="hamburger-icon">
-        <span></span><span></span><span></span>
-      </div>
+      <div class="hamburger-icon"><span></span><span></span><span></span></div>
     </button>
-    <p class="brand-title">Krishi Mitr</p>
+    <p class="brand-title">Krishi Mitr | Notifications</p>
   </div>
-
   <div class="nav-buttons">
-    <div class="profile-btn" onclick="location.href='Profile'">
-      <img src="profile_pic.png" alt="Profile">
-    </div>
+    <div class="profile-btn" onclick="location.href='Profile'"><img src="profile_pic.png" alt="Profile"></div>
     <button class="nav-btn" id="logoutBtn">Logout</button>
   </div>
 </div>
 
 <div class="nav-overlay" id="navOverlay" hidden></div>
-
 <nav class="side-drawer" id="sideNav" hidden>
   <div class="drawer-inner">
     <div class="menu-section">
@@ -238,23 +114,25 @@ body.drawer-open .side-drawer{
     <div class="menu-section">
       <div class="menu-section-title">Market</div>
       <ul class="menu-list">
-        <li><a href="Update_crops">Manage Your Crops</a></li>
-        <li><a href="Sell">Sell Your Crop</a></li>
-        <li><a href="Buy">Buy Your Crop</a></li>
+        <li><a href="Update_crops">Manage Crops</a></li>
+        <li><a href="sell.html">Sell Your Crop</a></li>
+        <li><a href="Buy">Buy Market</a></li>
       </ul>
     </div>
     <div class="menu-section">
-      <div class="menu-section-title">Tools</div>
+      <div class="menu-section-title">Tool Rental</div>
       <ul class="menu-list">
-        <li><a href="Dashboard">Crop Predictor</a></li>
+        <li><a href="tools_rental.html">List a Tool</a></li>
+        <li><a href="my_listings.html">My Tool Listings</a></li>
+        <li><a href="browse_tools.html">Browse Tools</a></li>
       </ul>
     </div>
-
+    <div class="menu-section">
       <div class="menu-section-title">System</div>
-  <ul class="menu-list">
-      <li><a href="Chat">Chat</a></li>
-  </ul>
-</nav>
+      <ul class="menu-list">
+        <li><a href="Chat">Chat</a></li>
+      </ul>
+    </div>
   </div>
 </nav>
 
@@ -265,145 +143,122 @@ const db = window.db;
 const loginid = sessionStorage.getItem("loginid");
 const usertype = sessionStorage.getItem("usertype");
 
-if(!loginid || usertype!=="Farmer"){
-  location.href="login";
-}
+if(!loginid || usertype !== "Farmer") location.href = "login";
 
-async function loadNotifications(){
+async function loadNotifications() {
+  const container = document.getElementById("notificationList");
+  container.innerHTML = "<h3>Loading requests...</h3>";
 
-  const { data:crops } = await db
-    .from("crop_sales")
-    .select("jid")
-    .eq("lid",loginid);
+  const [cropsRes, toolsRes] = await Promise.all([
+    db.from("crop_sales").select("jid").eq("lid", loginid),
+    db.from("notifications").select("*").eq("receiver_id", loginid).order("created_at", { ascending: false })
+  ]);
 
-  if(!crops || crops.length===0){
-    notificationList.innerHTML="<h3>No notifications yet.</h3>";
+  let cropRequests = [];
+  if (cropsRes.data && cropsRes.data.length > 0) {
+    const cropIds = cropsRes.data.map(c => c.jid);
+    const { data } = await db.from("buy_table").select("*").in("fid", cropIds).order("created_at", { ascending: false });
+    cropRequests = data || [];
+  }
+
+  const toolRequests = toolsRes.data || [];
+  
+  if (cropRequests.length === 0 && toolRequests.length === 0) {
+    container.innerHTML = "<h3>No notifications yet.</h3>";
     return;
   }
 
-  const cropIds = crops.map(c=>c.jid);
+  container.innerHTML = "";
 
-  const { data:requests,error } = await db
-    .from("buy_table")
-    .select("*")
-    .in("fid",cropIds)
-    .order("created_at",{ascending:false});
-
-  if(error || !requests || requests.length===0){
-    notificationList.innerHTML="<h3>No notifications yet.</h3>";
-    return;
-  }
-
-  notificationList.innerHTML="";
-
-  for(const item of requests){
-
-    const { data:buyer } = await db
-      .from("logindata")
-      .select("name")
-      .eq("loginid",item.lid)
-      .maybeSingle();
-
-    const buyerName = buyer?.name || "Someone";
-
-    const card=document.createElement("div");
-    card.className="notification-card";
-
-    let actionHtml="";
-
-    if(item.is_confirmed){
-      actionHtml=`<div class="status ${item.status==="Accepted"?"accepted":"declined"}">${item.status}</div>`;
-    }else{
-      actionHtml=`
+  for (const item of toolRequests) {
+    const card = document.createElement("div");
+    card.className = "notification-card tool-request";
+    
+    let actions = "";
+    if (item.status === 'pending') {
+      actions = `
         <div class="actions">
-          <button class="btn-accept" onclick="updateStatus('${item.id}','Accepted')">Accept</button>
-          <button class="btn-decline" onclick="updateStatus('${item.id}','Declined')">Decline</button>
+          <button class="btn-accept" onclick="updateToolStatus(${item.id}, 'Accepted', ${item.tool_id})">Accept Rental</button>
+          <button class="btn-decline" onclick="updateToolStatus(${item.id}, 'Declined')">Decline</button>
+        </div>`;
+    } else {
+      actions = `<div class="status ${item.status === 'Accepted' ? 'accepted' : 'declined'}">${item.status}</div>`;
+    }
+
+    card.innerHTML = `
+      <span class="type-tag tool-tag">Tool Rental</span>
+      <strong>${item.sender_name}</strong> wants to rent your <strong>${item.tool_name}</strong>.
+      <div class="detail-row"><b>Duration:</b> ${item.requested_days} days | <b>Total:</b> ₹${item.total_price}</div>
+      <div class="detail-row"><b>Contact:</b> ${item.contact_number}</div>
+      ${actions}
+    `;
+    container.appendChild(card);
+  }
+
+  for (const item of cropRequests) {
+    const { data: buyer } = await db.from("logindata").select("name").eq("loginid", item.lid).maybeSingle();
+    const card = document.createElement("div");
+    card.className = "notification-card crop-request";
+    
+    let actions = "";
+    if (item.is_confirmed) {
+      actions = `<div class="status ${item.status === "Accepted" ? "accepted" : "declined"}">${item.status}</div>`;
+    } else {
+      actions = `
+        <div class="actions">
+          <button class="btn-accept" onclick="updateCropStatus('${item.id}', 'Accepted')">Accept Sale</button>
+          <button class="btn-decline" onclick="updateCropStatus('${item.id}', 'Declined')">Decline</button>
         </div>`;
     }
 
-    card.innerHTML=`
-      <strong>${buyerName}</strong> wants to buy 
-      <strong>${item.quantity} kg</strong> of your 
-      <strong>${item.cname}</strong> crop.
-      ${actionHtml}
+    card.innerHTML = `
+      <span class="type-tag crop-tag">Crop Purchase</span>
+      <strong>${buyer?.name || "Someone"}</strong> wants to buy <strong>${item.quantity} kg</strong> of your <strong>${item.cname}</strong>.
+      ${actions}
     `;
-
-    notificationList.appendChild(card);
+    container.appendChild(card);
   }
 }
 
-async function updateStatus(id,status){
-
-  if(status==="Accepted"){
-
-    const { data:request } = await db
-      .from("buy_table")
-      .select("*")
-      .eq("id",id)
-      .single();
-
-    const { data:crop } = await db
-      .from("crop_sales")
-      .select("quantity")
-      .eq("jid",request.fid)
-      .single();
-
-    const remaining = crop.quantity - request.quantity;
-
-    if(remaining < 0){
-      alert("Not enough quantity available!");
-      return;
-    }
-
-    await db
-      .from("crop_sales")
-      .update({ quantity: remaining })
-      .eq("jid",request.fid);
+async function updateToolStatus(notifId, status, toolId) {
+  if (status === "Accepted") {
+    await db.from("tool_rentals").update({ is_available: false }).eq("id", toolId);
   }
-
-  await db
-    .from("buy_table")
-    .update({
-      is_confirmed:true,
-      status:status
-    })
-    .eq("id",id);
-
+  await db.from("notifications").update({ status: status }).eq("id", notifId);
   loadNotifications();
 }
 
-document.getElementById("logoutBtn").onclick=()=>{
-  sessionStorage.clear();
-  location.href="login";
+async function updateCropStatus(id, status) {
+  if (status === "Accepted") {
+    const { data: request } = await db.from("buy_table").select("*").eq("id", id).single();
+    const { data: crop } = await db.from("crop_sales").select("quantity").eq("jid", request.fid).single();
+    const remaining = crop.quantity - request.quantity;
+    if (remaining < 0) return alert("Not enough quantity!");
+    await db.from("crop_sales").update({ quantity: remaining }).eq("jid", request.fid);
+  }
+  await db.from("buy_table").update({ is_confirmed: true, status: status }).eq("id", id);
+  loadNotifications();
+}
+
+const menuBtn = document.getElementById("menuBtn");
+const sideNav = document.getElementById("sideNav");
+const navOverlay = document.getElementById("navOverlay");
+
+menuBtn.onclick = () => {
+  document.body.classList.toggle("drawer-open");
+  sideNav.hidden = !sideNav.hidden;
+  navOverlay.hidden = !navOverlay.hidden;
 };
 
-/* Drawer Logic */
-const menuBtn=document.getElementById("menuBtn");
-const sideNav=document.getElementById("sideNav");
-const navOverlay=document.getElementById("navOverlay");
-
-function openDrawer(){
-  document.body.classList.add("drawer-open");
-  sideNav.hidden=false;
-  navOverlay.hidden=false;
-}
-function closeDrawer(){
+navOverlay.onclick = () => {
   document.body.classList.remove("drawer-open");
-  setTimeout(()=>{
-    if(!document.body.classList.contains("drawer-open")){
-      sideNav.hidden=true;
-      navOverlay.hidden=true;
-    }
-  },220);
-}
-
-menuBtn.onclick=()=>{
-  document.body.classList.contains("drawer-open") ? closeDrawer() : openDrawer();
+  sideNav.hidden = true;
+  navOverlay.hidden = true;
 };
-navOverlay.onclick=closeDrawer;
+
+document.getElementById("logoutBtn").onclick = () => { sessionStorage.clear(); location.href = "login"; };
 
 loadNotifications();
 </script>
-
 </body>
 </html>
