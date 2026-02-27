@@ -17,7 +17,6 @@ body {
 }
 body.drawer-open { overflow: hidden; }
 
-/* ===== NAVBAR ===== */
 .top-nav {
   position: fixed;
   top: 0;
@@ -70,7 +69,6 @@ body.drawer-open { overflow: hidden; }
   color: #0a3d62;
 }
 
-/* Right side: Profile + Logout */
 .nav-right {
   display: flex;
   align-items: center;
@@ -103,7 +101,6 @@ body.drawer-open { overflow: hidden; }
   color: white;
 }
 
-/* ===== DRAWER ===== */
 .nav-overlay {
   position: fixed;
   inset: 0;
@@ -138,7 +135,6 @@ body.drawer-open .side-drawer {
   transform: translateX(0);
 }
 
-/* ===== MENU STYLING ===== */
 .menu-section {
   border-radius: 14px;
   overflow: hidden;
@@ -166,7 +162,6 @@ body.drawer-open .side-drawer {
 .menu-list li + li a { border-top: 1px solid rgba(255,255,255,0.1); }
 .menu-list a:hover { background: #1e3a8a; padding-left: 20px; }
 
-/* ===== CONTENT ===== */
 .container {
   max-width: 900px;
   margin: 150px auto 60px;
@@ -211,7 +206,6 @@ input:focus, textarea:focus { outline: none; border-color: #ff9933; }
 </head>
 <body>
 
-<!-- NAVBAR -->
 <div class="top-nav">
   <div class="nav-left">
     <button class="hamburger-btn" id="menuBtn">
@@ -227,11 +221,10 @@ input:focus, textarea:focus { outline: none; border-color: #ff9933; }
   </div>
 </div>
 
-<!-- Drawer + overlay -->
 <div class="nav-overlay" id="navOverlay" hidden></div>
 <nav class="side-drawer" id="sideNav" hidden>
   <div class="drawer-inner">
-        <div class="menu-section">
+    <div class="menu-section">
       <div class="menu-section-title">Main</div>
       <ul class="menu-list">
         <li><a href="Dashboard">Dashboard</a></li>
@@ -245,22 +238,22 @@ input:focus, textarea:focus { outline: none; border-color: #ff9933; }
       </ul>
     </div>
     <div class="menu-section">
-      <div class="menu-section-title">Tools</div>
+      <div class="menu-section-title">Tools & Services</div>
       <ul class="menu-list">
         <li><a href="krishimitr">Crop Predictor</a></li>
+        <li><a href="tools_rental.html">Rent Tools & Machinery</a></li>
       </ul>
     </div>
     <div class="menu-section" style="margin-bottom:0;">
       <div class="menu-section-title">System</div>
       <ul class="menu-list">
         <li><a href="Notification">Notification</a></li>
-          <li><a href="Chat">Chat</a></li>
+        <li><a href="Chat">Chat</a></li>
       </ul>
     </div>
   </div>
 </nav>
 
-<!-- SELL FORM -->
 <div class="container">
   <div class="sell-card">
     <div class="sell-inner">
@@ -341,10 +334,8 @@ document.getElementById("sellForm").addEventListener("submit", async e=>{
   if(error){ alert(error.message); } else { alert("Crop listed successfully"); e.target.reset(); loadFarmer(); }
 });
 
-// LOGOUT
 document.getElementById("logoutBtn").onclick = ()=>{ sessionStorage.clear(); location.href="login"; };
 
-// HAMBURGER
 const menuBtn = document.getElementById("menuBtn");
 const sideNav = document.getElementById("sideNav");
 const navOverlay = document.getElementById("navOverlay");
