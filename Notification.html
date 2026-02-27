@@ -46,7 +46,7 @@ body.drawer-open { overflow: hidden; }
 
 .brand-title { font-weight: 800; color: #0a3d62; }
 .nav-buttons { display: flex; align-items: center; gap: 15px; }
-.profile-btn img { width: 42px; height: 42px; border-radius: 50%; border: 2px solid #0a3d62; cursor: pointer; transition: 0.3s; }
+.profile-btn img { width: 42px; height: 42px; border-radius: 50%; border: 2px solid #0a3d62; cursor: pointer; }
 .nav-btn { background: white; color: #0a3d62; border: 2px solid #0a3d62; padding: 10px 18px; border-radius: 10px; font-weight: 700; cursor: pointer; }
 
 .nav-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.25); opacity: 0; pointer-events: none; transition: .2s ease; z-index: 9998; }
@@ -55,7 +55,6 @@ body.drawer-open { overflow: hidden; }
   max-height: calc(100vh - 98px); overflow: auto;
   background: linear-gradient(180deg,#0a3d62,#082032);
   border: 3px solid #ffffff; border-radius: 18px;
-  box-shadow: 0 18px 40px rgba(0,0,0,0.35);
   transform: translateX(-110%); transition: .25s ease; z-index: 9999;
 }
 .drawer-inner { padding: 14px; }
@@ -63,41 +62,28 @@ body.drawer-open { overflow: hidden; }
 .menu-section-title { padding: 12px 14px; background: rgba(255,255,255,0.1); color: white; font-weight: 800; }
 .menu-list { list-style: none; padding: 0; margin: 0; }
 .menu-list a { display: block; padding: 14px; text-decoration: none; color: white; font-weight: 600; background: rgba(255,255,255,0.08); }
-.menu-list a:hover { background: #1e3a8a; padding-left: 20px; }
 
 body.drawer-open .nav-overlay { opacity: 1; pointer-events: auto; }
 body.drawer-open .side-drawer { transform: translateX(0); }
 
 .container { max-width: 900px; margin: 150px auto 60px; padding: 0 20px; }
-.notification-card { background: white; border-radius: 20px; padding: 25px; margin-bottom: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.12); border-left: 8px solid #0a3d62; position: relative; }
-.notification-card.tool-request { border-left-color: #ff9933; }
-.notification-card.crop-request { border-left-color: #138808; }
-
-.type-tag { position: absolute; top: 15px; right: 20px; font-size: 0.7rem; font-weight: 800; text-transform: uppercase; padding: 4px 10px; border-radius: 8px; }
-.tool-tag { background: #fff7ed; color: #c2410c; }
-.crop-tag { background: #f0fdf4; color: #166534; }
-
+.notification-card { background: white; border-radius: 20px; padding: 25px; margin-bottom: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.12); border-left: 8px solid #ff9933; }
 .actions { margin-top: 18px; display: flex; gap: 12px; }
 .btn-accept { background: #138808; color: white; border: none; padding: 10px 20px; border-radius: 10px; font-weight: 700; cursor: pointer; }
 .btn-decline { background: #b30000; color: white; border: none; padding: 10px 20px; border-radius: 10px; font-weight: 700; cursor: pointer; }
 .status { padding: 8px 16px; border-radius: 10px; font-weight: 700; width: fit-content; margin-top: 15px; }
 .status.accepted { background: #138808; color: white; }
 .status.declined { background: #b30000; color: white; }
-
-.detail-row { margin-top: 10px; font-size: 0.9rem; color: #4b5563; }
 </style>
 </head>
 <body>
 
 <div class="top-nav">
   <div class="nav-left">
-    <button class="hamburger-btn" id="menuBtn">
-      <div class="hamburger-icon"><span></span><span></span><span></span></div>
-    </button>
+    <button class="hamburger-btn" id="menuBtn"><div class="hamburger-icon"><span></span><span></span><span></span></div></button>
     <p class="brand-title">Krishi Mitr | Notifications</p>
   </div>
   <div class="nav-buttons">
-    <div class="profile-btn" onclick="location.href='Profile'"><img src="profile_pic.png" alt="Profile"></div>
     <button class="nav-btn" id="logoutBtn">Logout</button>
   </div>
 </div>
@@ -106,31 +92,10 @@ body.drawer-open .side-drawer { transform: translateX(0); }
 <nav class="side-drawer" id="sideNav" hidden>
   <div class="drawer-inner">
     <div class="menu-section">
-      <div class="menu-section-title">Main</div>
+      <div class="menu-section-title">Navigation</div>
       <ul class="menu-list">
         <li><a href="Dashboard">Dashboard</a></li>
-      </ul>
-    </div>
-    <div class="menu-section">
-      <div class="menu-section-title">Market</div>
-      <ul class="menu-list">
-        <li><a href="Update_crops">Manage Crops</a></li>
-        <li><a href="sell.html">Sell Your Crop</a></li>
-        <li><a href="Buy">Buy Market</a></li>
-      </ul>
-    </div>
-    <div class="menu-section">
-      <div class="menu-section-title">Tool Rental</div>
-      <ul class="menu-list">
-        <li><a href="tools_rental.html">List a Tool</a></li>
-        <li><a href="my_listings.html">My Tool Listings</a></li>
         <li><a href="browse_tools.html">Browse Tools</a></li>
-      </ul>
-    </div>
-    <div class="menu-section">
-      <div class="menu-section-title">System</div>
-      <ul class="menu-list">
-        <li><a href="Chat">Chat</a></li>
       </ul>
     </div>
   </div>
@@ -141,103 +106,77 @@ body.drawer-open .side-drawer { transform: translateX(0); }
 <script>
 const db = window.db;
 const loginid = sessionStorage.getItem("loginid");
-const usertype = sessionStorage.getItem("usertype");
-
-if(!loginid || usertype !== "Farmer") location.href = "login";
 
 async function loadNotifications() {
   const container = document.getElementById("notificationList");
-  container.innerHTML = "<h3>Loading requests...</h3>";
+  container.innerHTML = "<h3>Checking for requests...</h3>";
 
-  const [cropsRes, toolsRes] = await Promise.all([
-    db.from("crop_sales").select("jid").eq("lid", loginid),
-    db.from("notifications").select("*").eq("receiver_id", loginid).order("created_at", { ascending: false })
-  ]);
+  const { data: toolRequests, error } = await db
+    .from("notifications")
+    .select("*")
+    .or(`receiver_id.eq.${loginid},receiver_id.eq.${parseInt(loginid)}`)
+    .order("created_at", { ascending: false });
 
-  let cropRequests = [];
-  if (cropsRes.data && cropsRes.data.length > 0) {
-    const cropIds = cropsRes.data.map(c => c.jid);
-    const { data } = await db.from("buy_table").select("*").in("fid", cropIds).order("created_at", { ascending: false });
-    cropRequests = data || [];
+  if (error) {
+    console.error("Database Error:", error);
+    container.innerHTML = "<h3>Error loading notifications.</h3>";
+    return;
   }
 
-  const toolRequests = toolsRes.data || [];
-  
-  if (cropRequests.length === 0 && toolRequests.length === 0) {
-    container.innerHTML = "<h3>No notifications yet.</h3>";
+  console.log("Found requests:", toolRequests);
+
+  if (!toolRequests || toolRequests.length === 0) {
+    container.innerHTML = "<h3>No tool rental requests found.</h3>";
     return;
   }
 
   container.innerHTML = "";
 
-  for (const item of toolRequests) {
+  toolRequests.forEach(item => {
     const card = document.createElement("div");
-    card.className = "notification-card tool-request";
+    card.className = "notification-card";
     
-    let actions = "";
+    let actionHtml = "";
     if (item.status === 'pending') {
-      actions = `
+      actionHtml = `
         <div class="actions">
-          <button class="btn-accept" onclick="updateToolStatus(${item.id}, 'Accepted', ${item.tool_id})">Accept Rental</button>
+          <button class="btn-accept" onclick="updateToolStatus(${item.id}, 'Accepted', ${item.tool_id})">Confirm Rental</button>
           <button class="btn-decline" onclick="updateToolStatus(${item.id}, 'Declined')">Decline</button>
         </div>`;
     } else {
-      actions = `<div class="status ${item.status === 'Accepted' ? 'accepted' : 'declined'}">${item.status}</div>`;
+      actionHtml = `<div class="status ${item.status === 'Accepted' ? 'accepted' : 'declined'}">${item.status}</div>`;
     }
 
     card.innerHTML = `
-      <span class="type-tag tool-tag">Tool Rental</span>
+      <div style="font-size: 0.8rem; color: #64748b; margin-bottom: 5px;">Rental Request</div>
       <strong>${item.sender_name}</strong> wants to rent your <strong>${item.tool_name}</strong>.
-      <div class="detail-row"><b>Duration:</b> ${item.requested_days} days | <b>Total:</b> ₹${item.total_price}</div>
-      <div class="detail-row"><b>Contact:</b> ${item.contact_number}</div>
-      ${actions}
+      <div style="margin-top: 10px; font-size: 0.9rem;">
+        Duration: ${item.requested_days} days<br>
+        Total Income: <b>₹${item.total_price}</b>
+      </div>
+      ${actionHtml}
     `;
     container.appendChild(card);
-  }
-
-  for (const item of cropRequests) {
-    const { data: buyer } = await db.from("logindata").select("name").eq("loginid", item.lid).maybeSingle();
-    const card = document.createElement("div");
-    card.className = "notification-card crop-request";
-    
-    let actions = "";
-    if (item.is_confirmed) {
-      actions = `<div class="status ${item.status === "Accepted" ? "accepted" : "declined"}">${item.status}</div>`;
-    } else {
-      actions = `
-        <div class="actions">
-          <button class="btn-accept" onclick="updateCropStatus('${item.id}', 'Accepted')">Accept Sale</button>
-          <button class="btn-decline" onclick="updateCropStatus('${item.id}', 'Declined')">Decline</button>
-        </div>`;
-    }
-
-    card.innerHTML = `
-      <span class="type-tag crop-tag">Crop Purchase</span>
-      <strong>${buyer?.name || "Someone"}</strong> wants to buy <strong>${item.quantity} kg</strong> of your <strong>${item.cname}</strong>.
-      ${actions}
-    `;
-    container.appendChild(card);
-  }
+  });
 }
 
 async function updateToolStatus(notifId, status, toolId) {
   if (status === "Accepted") {
-    await db.from("tool_rentals").update({ is_available: false }).eq("id", toolId);
+    const { error: toolError } = await db
+      .from("tool_rentals")
+      .update({ is_available: false })
+      .eq("id", toolId);
+    
+    if (toolError) alert("Error updating tool availability.");
   }
-  await db.from("notifications").update({ status: status }).eq("id", notifId);
-  loadNotifications();
-}
 
-async function updateCropStatus(id, status) {
-  if (status === "Accepted") {
-    const { data: request } = await db.from("buy_table").select("*").eq("id", id).single();
-    const { data: crop } = await db.from("crop_sales").select("quantity").eq("jid", request.fid).single();
-    const remaining = crop.quantity - request.quantity;
-    if (remaining < 0) return alert("Not enough quantity!");
-    await db.from("crop_sales").update({ quantity: remaining }).eq("jid", request.fid);
-  }
-  await db.from("buy_table").update({ is_confirmed: true, status: status }).eq("id", id);
-  loadNotifications();
+  const { error: notifError } = await db
+    .from("notifications")
+    .update({ status: status })
+    .eq("id", notifId);
+
+  if (notifError) alert("Error updating request status.");
+  else loadNotifications();
 }
 
 const menuBtn = document.getElementById("menuBtn");
@@ -256,7 +195,10 @@ navOverlay.onclick = () => {
   navOverlay.hidden = true;
 };
 
-document.getElementById("logoutBtn").onclick = () => { sessionStorage.clear(); location.href = "login"; };
+document.getElementById("logoutBtn").onclick = () => {
+  sessionStorage.clear();
+  location.href = "login";
+};
 
 loadNotifications();
 </script>
