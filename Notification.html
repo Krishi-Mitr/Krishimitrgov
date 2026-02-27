@@ -14,7 +14,6 @@ body {
   color: #1f2937;
 }
 body.drawer-open { overflow: hidden; }
-
 .top-nav {
   position: fixed;
   top: 0; left: 0; right: 0; height: 78px;
@@ -35,17 +34,13 @@ body.drawer-open { overflow: hidden; }
 .hamburger-icon span:nth-child(1) { top: 0; }
 .hamburger-icon span:nth-child(2) { top: 5.5px; }
 .hamburger-icon span:nth-child(3) { top: 11px; }
-
 .brand-title { font-weight: 800; color: #0a3d62; font-size: 1.2rem; }
-
 .nav-buttons { display: flex; align-items: center; gap: 15px; }
 .profile-btn img {
   width: 42px; height: 42px; border-radius: 50%; border: 2px solid #0a3d62;
   cursor: pointer; transition: 0.3s;
 }
-.profile-btn img:hover { transform: scale(1.1); box-shadow: 0 0 15px rgba(10,61,98,0.4); }
 .nav-btn { background: white; color: #0a3d62; border: 2px solid #0a3d62; padding: 10px 18px; border-radius: 10px; font-weight: 700; cursor: pointer; }
-
 .nav-overlay {
   position: fixed; inset: 0; background: rgba(0,0,0,0.25);
   opacity: 0; pointer-events: none; transition: .2s ease; z-index: 9998;
@@ -59,29 +54,24 @@ body.drawer-open { overflow: hidden; }
   transform: translateX(-110%); transition: .25s ease; z-index: 9999;
 }
 .drawer-inner { padding: 14px; }
-
 .menu-section {
   border-radius: 14px; overflow: hidden; border: 1px solid rgba(255,255,255,0.15);
   margin-bottom: 14px; background: rgba(255,255,255,0.05);
 }
-.menu-section-title { padding: 12px 14px; background: rgba(255,255,255,0.1); color: white; font-weight: 800; text-transform: capitalize; }
+.menu-section-title { padding: 12px 14px; background: rgba(255,255,255,0.1); color: white; font-weight: 800; }
 .menu-list { list-style: none; padding: 0; margin: 0; }
 .menu-list a {
   display: block; padding: 14px; text-decoration: none; color: white;
   font-weight: 600; background: rgba(255,255,255,0.08); transition: 0.2s;
 }
-.menu-list li+li a { border-top: 1px solid rgba(255,255,255,0.1); }
 .menu-list a:hover { background: #1e3a8a; padding-left: 20px; }
-
 body.drawer-open .nav-overlay { opacity: 1; pointer-events: auto; }
 body.drawer-open .side-drawer { transform: translateX(0); }
-
 .container { max-width: 900px; margin: 150px auto 60px; padding: 0 20px; }
 .notification-card {
   background: white; border-radius: 20px; padding: 25px; margin-bottom: 20px;
   box-shadow: 0 10px 25px rgba(0,0,0,0.08); border: 1px solid #eee;
 }
-.card-type { font-size: 0.7rem; font-weight: 900; text-transform: uppercase; color: #64748b; margin-bottom: 8px; }
 .actions { margin-top: 15px; display: flex; gap: 10px; }
 .btn-accept { background: #138808; color: white; border: none; padding: 10px 20px; border-radius: 12px; font-weight: 700; cursor: pointer; }
 .btn-decline { background: #b30000; color: white; border: none; padding: 10px 20px; border-radius: 12px; font-weight: 700; cursor: pointer; }
@@ -91,7 +81,6 @@ body.drawer-open .side-drawer { transform: translateX(0); }
 </style>
 </head>
 <body>
-
 <div class="top-nav">
   <div class="nav-left">
     <button class="hamburger-btn" id="menuBtn"><div class="hamburger-icon"><span></span><span></span><span></span></div></button>
@@ -102,35 +91,31 @@ body.drawer-open .side-drawer { transform: translateX(0); }
     <button class="nav-btn" id="logoutBtn">Logout</button>
   </div>
 </div>
-
 <div class="nav-overlay" id="navOverlay" hidden></div>
 <nav class="side-drawer" id="sideNav" hidden>
   <div class="drawer-inner">
-    
     <div class="menu-section">
       <div class="menu-section-title">Main</div>
       <ul class="menu-list">
         <li><a href="Dashboard">Dashboard</a></li>
       </ul>
     </div>
-
-    <div class="menu-section">
+    <div class="menu-section" id="farmerMarketSection" style="display:none;">
       <div class="menu-section-title">Market</div>
       <ul class="menu-list">
         <li><a href="Update_crops">Manage Your Crops</a></li>
         <li><a href="Sell">Sell Your Crop</a></li>
-        <li><a href="Buy">Buy Your Crop</a></li>
       </ul>
     </div>
-
     <div class="menu-section">
       <div class="menu-section-title">Tools & Services</div>
       <ul class="menu-list">
-        <li><a href="Crop_Predictor">Crop Predictor</a></li>
         <li><a href="browse_tools.html">Rent Tools & Machinery</a></li>
+        <li class="farmer-only" style="display:none;"><a href="tools_rental.html">List Tool for Rent</a></li>
+        <li class="farmer-only" style="display:none;"><a href="my_listings.html">My Tool Inventory</a></li>
+        <li><a href="Crop_Predictor">Crop Predictor</a></li>
       </ul>
     </div>
-
     <div class="menu-section">
       <div class="menu-section-title">System</div>
       <ul class="menu-list">
@@ -138,23 +123,22 @@ body.drawer-open .side-drawer { transform: translateX(0); }
         <li><a href="Chat">Chat</a></li>
       </ul>
     </div>
-
   </div>
 </nav>
-
 <div class="container" id="notificationList"></div>
-
 <script>
 const db = window.db;
 const loginid = sessionStorage.getItem("loginid");
 const usertype = sessionStorage.getItem("usertype");
-
-if (!loginid || usertype !== "Farmer") { location.href = "login"; }
-
+if (!loginid) { location.href = "login"; }
+function checkPermissions() {
+  if (usertype === "Farmer") {
+    document.getElementById("farmerMarketSection").style.display = "block";
+    document.querySelectorAll(".farmer-only").forEach(el => el.style.display = "block");
+  }
+}
 async function loadNotifications() {
   const list = document.getElementById("notificationList");
-  list.innerHTML = "<h3>Updating notifications...</h3>";
-
   const { data: crops } = await db.from("crop_sales").select("jid").eq("lid", loginid);
   let cropRequests = [];
   if (crops && crops.length > 0) {
@@ -162,21 +146,13 @@ async function loadNotifications() {
     const { data } = await db.from("buy_table").select("*").in("fid", cropIds).order("created_at", { ascending: false });
     cropRequests = data || [];
   }
-
   const cleanId = String(loginid).trim();
-  const { data: toolRequests } = await db
-    .from("notifications")
-    .select("*")
-    .or(`receiver_id.eq."${cleanId}",receiver_id.eq.${parseInt(cleanId)}`)
-    .order("created_at", { ascending: false });
-
+  const { data: toolRequests } = await db.from("notifications").select("*").or(`receiver_id.eq."${cleanId}",receiver_id.eq.${parseInt(cleanId)}`).order("created_at", { ascending: false });
+  list.innerHTML = "";
   if (cropRequests.length === 0 && (!toolRequests || toolRequests.length === 0)) {
     list.innerHTML = "<h3>No notifications yet.</h3>";
     return;
   }
-
-  list.innerHTML = "";
-
   for (const item of cropRequests) {
     const { data: buyer } = await db.from("logindata").select("name").eq("loginid", item.lid).maybeSingle();
     const card = document.createElement("div");
@@ -184,55 +160,31 @@ async function loadNotifications() {
     let actions = item.is_confirmed 
       ? `<div class="status-pill ${item.status === 'Accepted' ? 'accepted' : 'declined'}">${item.status}</div>`
       : `<div class="actions"><button class="btn-accept" onclick="updateCropStatus('${item.id}','Accepted')">Accept</button><button class="btn-decline" onclick="updateCropStatus('${item.id}','Declined')">Decline</button></div>`;
-    
-    card.innerHTML = `
-      <div class="card-type">Crop Sale Request</div>
-      <strong>${buyer?.name || "Farmer " + item.lid}</strong> wants to buy <strong>${item.quantity} kg</strong> of your <strong>${item.cname}</strong>.
-      ${actions}
-    `;
+    card.innerHTML = `<strong>${buyer?.name || "Farmer"}</strong> wants to buy <strong>${item.quantity}kg</strong> of <strong>${item.cname}</strong>.${actions}`;
     list.appendChild(card);
   }
-
   toolRequests?.forEach(item => {
     const card = document.createElement("div");
     card.className = "notification-card";
     let actions = item.status !== 'pending'
       ? `<div class="status-pill ${item.status.toLowerCase() === 'accepted' ? 'accepted' : 'declined'}">${item.status}</div>`
       : `<div class="actions"><button class="btn-accept" onclick="updateToolStatus(${item.id},'Accepted',${item.tool_id})">Accept</button><button class="btn-decline" onclick="updateToolStatus(${item.id},'Declined')">Decline</button></div>`;
-    
-    card.innerHTML = `
-      <div class="card-type">Equipment Rental Request</div>
-      <strong>${item.sender_name || 'Farmer'}</strong> wants to rent your <strong>${item.tool_name}</strong> for ${item.requested_days} days.
-      <div style="font-size:0.9rem; margin-top:5px; color:#138808; font-weight:700;">Income: ₹${item.total_price}</div>
-      ${actions}
-    `;
+    card.innerHTML = `<strong>${item.sender_name}</strong> wants your <strong>${item.tool_name}</strong> for ${item.requested_days} days. Income: ₹${item.total_price}${actions}`;
     list.appendChild(card);
   });
 }
-
 async function updateCropStatus(id, status) {
-  if (status === "Accepted") {
-    const { data: req } = await db.from("buy_table").select("*").eq("id", id).single();
-    const { data: crop } = await db.from("crop_sales").select("quantity").eq("jid", req.fid).single();
-    if (crop.quantity < req.quantity) return alert("Not enough quantity!");
-    await db.from("crop_sales").update({ quantity: crop.quantity - req.quantity }).eq("jid", req.fid);
-  }
   await db.from("buy_table").update({ is_confirmed: true, status: status }).eq("id", id);
   loadNotifications();
 }
-
 async function updateToolStatus(id, status, toolId) {
   if (status === "Accepted") { await db.from("tool_rentals").update({ is_available: false }).eq("id", toolId); }
   await db.from("notifications").update({ status: status }).eq("id", id);
   loadNotifications();
 }
-
-document.getElementById("logoutBtn").onclick = () => { sessionStorage.clear(); location.href = "login"; };
-
 const menuBtn = document.getElementById("menuBtn");
 const sideNav = document.getElementById("sideNav");
 const navOverlay = document.getElementById("navOverlay");
-
 menuBtn.onclick = () => {
   const isOpen = document.body.classList.toggle("drawer-open");
   sideNav.hidden = !isOpen;
@@ -243,7 +195,8 @@ navOverlay.onclick = () => {
   sideNav.hidden = true;
   navOverlay.hidden = true;
 };
-
+document.getElementById("logoutBtn").onclick = () => { sessionStorage.clear(); location.href = "login"; };
+checkPermissions();
 loadNotifications();
 </script>
 </body>
