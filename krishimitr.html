@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Krishi Mitr - Crop Predictor</title>
+<title>Krishi Mitr - Crop Predictor & Advisor</title>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
@@ -20,6 +20,7 @@
   --text-main: #1f2937;
   --text-muted: #6b7280;
   --nav-bg: #0f172a;
+  --nav-border: #1e293b;
   --card-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
 }
 body {
@@ -56,7 +57,7 @@ body.drawer-open { overflow: hidden; }
   cursor: pointer;
   transition: 0.2s;
 }
-.hamburger-btn:hover { background: rgba(255,255,255,0.2); }
+.hamburger-btn:hover { background: rgba(255,255,255,0.2); transform: scale(1.02); }
 .hamburger-icon { width: 18px; height: 12px; position: relative; }
 .hamburger-icon span {
   position: absolute;
@@ -74,7 +75,7 @@ body.drawer-open { overflow: hidden; }
   background: #ef4444;
   color: white;
   border: none;
-  padding: 8px 16px;
+  padding: 8px 18px;
   border-radius: 8px;
   font-weight: 600;
   font-size: 0.875rem;
@@ -85,7 +86,7 @@ body.drawer-open { overflow: hidden; }
 .nav-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(15, 23, 42, 0.5);
+  background: rgba(15, 23, 42, 0.4);
   backdrop-filter: blur(4px);
   opacity: 0;
   pointer-events: none;
@@ -103,7 +104,7 @@ body.drawer-open { overflow: hidden; }
   transform: translateX(-100%);
   transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   z-index: 9999;
-  padding: 80px 20px 20px;
+  padding: 85px 20px 20px;
 }
 body.drawer-open .nav-overlay { opacity: 1; pointer-events: auto; }
 body.drawer-open .side-drawer { transform: translateX(0); }
@@ -114,6 +115,7 @@ body.drawer-open .side-drawer { transform: translateX(0); }
   text-transform: uppercase;
   color: var(--text-muted);
   margin-bottom: 12px;
+  padding-left: 12px;
   letter-spacing: 0.05em;
 }
 .menu-list { list-style: none; padding: 0; margin: 0; }
@@ -126,18 +128,19 @@ body.drawer-open .side-drawer { transform: translateX(0); }
   border-radius: 8px;
   transition: 0.2s;
 }
-.menu-list a:hover { background: #f3f4f6; color: var(--primary); }
-.main-content { margin-top: 100px; padding-bottom: 50px; }
+.menu-list a:hover { background: #f3f4f6; color: var(--primary); padding-left: 18px; }
+.main-content { margin-top: 100px; padding-bottom: 60px; }
 .hero-card {
   background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
   color: white;
-  padding: 32px;
+  padding: 35px;
   border-radius: 16px;
-  margin-bottom: 24px;
+  margin-bottom: 30px;
   box-shadow: var(--card-shadow);
+  border: 1px solid rgba(255,255,255,0.05);
 }
-.hero-card h2 { font-weight: 800; font-size: 1.875rem; margin-bottom: 8px; }
-.hero-card p { opacity: 0.8; font-size: 1rem; }
+.hero-card h2 { font-weight: 800; font-size: 2rem; margin-bottom: 10px; }
+.hero-card p { opacity: 0.75; font-size: 1.1rem; max-width: 700px; line-height: 1.5; }
 .vibrant-card {
   background: white;
   border-radius: 16px;
@@ -145,42 +148,56 @@ body.drawer-open .side-drawer { transform: translateX(0); }
   border: 1px solid #e5e7eb;
   box-shadow: var(--card-shadow);
   height: 100%;
+  transition: transform 0.2s;
 }
+.vibrant-card:hover { transform: translateY(-2px); }
 .vibrant-card h4 {
   font-weight: 700;
   color: var(--text-main);
-  margin-bottom: 20px;
+  margin-bottom: 22px;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
+  font-size: 1.25rem;
 }
-.form-label { font-weight: 600; font-size: 0.875rem; color: var(--text-main); margin-bottom: 6px; }
+.form-label { font-weight: 600; font-size: 0.875rem; color: var(--text-main); margin-bottom: 8px; display: block; }
 .form-control, .form-select {
   border: 1px solid #d1d5db;
-  border-radius: 8px;
-  padding: 10px 12px;
-  transition: 0.2s;
+  border-radius: 10px;
+  padding: 12px;
+  font-size: 0.95rem;
+  transition: all 0.2s;
 }
 .form-control:focus, .form-select:focus {
   border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+  outline: none;
 }
-.btn-primary { background: var(--primary); border: none; font-weight: 600; padding: 12px; border-radius: 8px; }
-.btn-primary:hover { background: var(--primary-hover); transform: translateY(-1px); }
-.btn-success { background: var(--secondary); border: none; font-weight: 600; padding: 12px; border-radius: 8px; }
-.btn-success:hover { background: var(--secondary-hover); transform: translateY(-1px); }
-.btn-warning { background: var(--accent); color: white; border: none; font-weight: 600; }
-.chart-container { position: relative; height: 320px; margin-top: 10px; }
+#horizon { height: 6px; background: #e5e7eb; border-radius: 10px; }
+#horizon::-webkit-slider-thumb { background: var(--primary); width: 18px; height: 18px; border-radius: 50%; cursor: pointer; }
+.btn-primary { background: var(--primary); border: none; font-weight: 700; padding: 14px; border-radius: 10px; width: 100%; transition: 0.2s; }
+.btn-primary:hover { background: var(--primary-hover); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2); }
+.btn-success { background: var(--secondary); border: none; font-weight: 700; padding: 14px; border-radius: 10px; width: 100%; transition: 0.2s; }
+.btn-success:hover { background: var(--secondary-hover); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2); }
+.btn-warning { background: var(--accent); color: white; border: none; font-weight: 700; padding: 14px; border-radius: 10px; width: 100%; transition: 0.2s; }
+.btn-warning:hover { opacity: 0.9; transform: translateY(-1px); color: white; }
+.btn-outline-info { border: 2px solid #0ea5e9; color: #0ea5e9; font-weight: 700; padding: 12px; border-radius: 10px; width: 100%; background: transparent; }
+.btn-outline-info:hover { background: #0ea5e9; color: white; }
+.chart-container { position: relative; height: 380px; width: 100%; }
 .recommend-box {
-  background: #f0f9ff;
-  border-left: 4px solid var(--primary);
-  padding: 16px;
-  border-radius: 8px;
+  background: #eff6ff;
+  border-left: 5px solid var(--primary);
+  padding: 20px;
+  border-radius: 12px;
+  font-size: 1rem;
+  line-height: 1.6;
 }
-#qrCanvas { display: block; margin: 20px auto 0; border: 4px solid white; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
-@media (max-width: 768px) {
-  .hero-card { padding: 24px; }
-  .main-content { margin-top: 90px; }
+.recommend-box strong { color: var(--primary); }
+#qrCanvas { display: block; margin: 25px auto 0; border: 8px solid white; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
+.help-text { font-size: 0.8rem; color: var(--text-muted); margin-top: 6px; display: block; font-style: italic; }
+@media (max-width: 991px) {
+  .hero-card { padding: 25px; text-align: center; }
+  .hero-card p { margin: 0 auto; }
 }
 </style>
 </head>
@@ -215,8 +232,9 @@ body.drawer-open .side-drawer { transform: translateX(0); }
     <div class="menu-section-title">Tools & Services</div>
     <ul class="menu-list">
       <li><a href="Buy">Buy Crops</a></li>
-      <li><a href="browse_tools.html">Rent Tools</a></li>
-      <li class="farmer-only" style="display:none;"><a href="tools_rental.html">List Tool</a></li>
+      <li><a href="browse_tools.html">Rent Tools & Machinery</a></li>
+      <li class="farmer-only" style="display:none;"><a href="tools_rental.html">List Tool for Rent</a></li>
+      <li class="farmer-only" style="display:none;"><a href="my_listings.html">My Tool Inventory</a></li>
       <li><a href="krishimitr">Crop Predictor</a></li>
     </ul>
   </div>
@@ -231,14 +249,14 @@ body.drawer-open .side-drawer { transform: translateX(0); }
 
 <div class="container main-content">
   <div class="hero-card">
-    <h2>Crop Predictor & Advisor</h2>
-    <p>Get real-time market forecasts and personalized farming insights to optimize your harvest.</p>
+    <h2>Crop Price Predictor & Advisor</h2>
+    <p>Empowering farmers with data-driven price forecasts and personalized cultivation insights. Stay ahead of market trends and optimize your harvest.</p>
   </div>
 
   <div class="row g-4">
-    <div class="col-lg-5">
+    <div class="col-xl-5 col-lg-6">
       <div class="vibrant-card mb-4">
-        <h4>📊 Price Prediction</h4>
+        <h4>📈 Price Prediction</h4>
         <div class="mb-3">
           <label class="form-label">Select Crop</label>
           <select id="cropSelect" class="form-select">
@@ -247,6 +265,11 @@ body.drawer-open .side-drawer { transform: translateX(0); }
             <option value="Sugarcane">Sugarcane</option>
             <option value="Cotton">Cotton</option>
             <option value="Maize">Maize</option>
+            <option value="Sorghum">Sorghum</option>
+            <option value="Barley">Barley</option>
+            <option value="Millet">Millet</option>
+            <option value="Soybean">Soybean</option>
+            <option value="Groundnut">Groundnut</option>
             <option value="Tomato">Tomato</option>
             <option value="Potato">Potato</option>
           </select>
@@ -256,21 +279,27 @@ body.drawer-open .side-drawer { transform: translateX(0); }
           <select id="regionSelect" class="form-select">
             <option value="Punjab">Punjab</option>
             <option value="Haryana">Haryana</option>
+            <option value="Uttar Pradesh">Uttar Pradesh</option>
             <option value="Maharashtra">Maharashtra</option>
             <option value="Karnataka">Karnataka</option>
+            <option value="Tamil Nadu">Tamil Nadu</option>
             <option value="Gujarat">Gujarat</option>
+            <option value="Rajasthan">Rajasthan</option>
           </select>
         </div>
         <div class="mb-4">
           <div class="d-flex justify-content-between align-items-center mb-2">
             <label class="form-label mb-0">Forecast Period</label>
-            <span class="badge bg-primary"><span id="hval">30</span> days</span>
+            <span class="badge bg-primary px-3 py-2"><span id="hval">30</span> days</span>
           </div>
           <input type="range" class="form-range" id="horizon" min="7" max="90" value="30">
+          <span class="help-text">Forecast prices for the next 7 to 90 days.</span>
         </div>
-        <button id="predictBtn" class="btn btn-primary w-100 mb-2">Predict Prices</button>
-        <button id="combineBtn" class="btn btn-warning w-100 mb-2">Predict + Get Advice</button>
-        <button id="exportBtn" class="btn btn-outline-secondary w-100">📥 Export CSV</button>
+        <div class="d-grid gap-2">
+          <button id="predictBtn" class="btn btn-primary">Predict Prices</button>
+          <button id="combineBtn" class="btn btn-warning">Predict + Get Advice</button>
+          <button id="exportBtn" class="btn btn-outline-info">📥 Export Data (CSV)</button>
+        </div>
       </div>
 
       <div class="vibrant-card">
@@ -278,44 +307,51 @@ body.drawer-open .side-drawer { transform: translateX(0); }
         <div class="mb-3">
           <label class="form-label">Soil Type</label>
           <select id="soilType" class="form-select">
-            <option value="Loamy">Loamy</option>
+            <option value="Loamy">Loamy (Best for most crops)</option>
             <option value="Clayey">Clayey</option>
             <option value="Sandy">Sandy</option>
+            <option value="Silty">Silty</option>
           </select>
         </div>
-        <div class="mb-3">
-          <label class="form-label">Rainfall (mm)</label>
-          <input type="number" id="rainfall" class="form-control" value="200">
+        <div class="row g-2 mb-4">
+          <div class="col-6">
+            <label class="form-label">Rainfall (mm)</label>
+            <input type="number" id="rainfall" class="form-control" value="200">
+          </div>
+          <div class="col-6">
+            <label class="form-label">Temp (°C)</label>
+            <input type="number" id="temp" class="form-control" value="25">
+          </div>
         </div>
-        <div class="mb-4">
-          <label class="form-label">Temperature (°C)</label>
-          <input type="number" id="temp" class="form-control" value="25">
-        </div>
-        <button id="adviseBtn" class="btn btn-success w-100">Get Advice</button>
+        <button id="adviseBtn" class="btn btn-success">Get Cultivation Advice</button>
       </div>
     </div>
 
-    <div class="col-lg-7">
+    <div class="col-xl-7 col-lg-6">
       <div class="vibrant-card mb-4">
-        <h4>📈 Market Trends</h4>
+        <h4>📊 Market Price Trends</h4>
         <div class="chart-container">
           <canvas id="priceChart"></canvas>
         </div>
       </div>
+      
       <div class="vibrant-card mb-4">
-        <h4>✅ Recommendations</h4>
+        <h4>✅ Strategy Recommendations</h4>
         <div id="actionCard" class="recommend-box">
-          <p class="text-muted mb-0">Run prediction to see actionable selling tips.</p>
+          <p class="text-muted mb-0">Initiate a prediction to receive personalized market entry and exit strategies.</p>
         </div>
       </div>
+
       <div class="vibrant-card mb-4">
         <h4>🌱 Farming Insights</h4>
-        <div id="advisorOutput" class="text-muted">
-          Input your environmental conditions to receive seed and fertilizer recommendations.
+        <div id="advisorOutput" class="text-muted" style="line-height: 1.7;">
+          Submit your soil and weather data to receive specific seed and fertilizer recommendations tailored to your region.
         </div>
       </div>
+
       <div class="vibrant-card text-center">
-        <h4>Share Platform</h4>
+        <h4>Platform Access</h4>
+        <p class="help-text">Scan to share this predictor tool with other farmers.</p>
         <canvas id="qrCanvas"></canvas>
       </div>
     </div>
@@ -340,8 +376,8 @@ menuBtn.onclick=()=>{
 };
 navOverlay.onclick=closeDrawer;
 
-const cropBase={Wheat:2000,Rice:2100,Sugarcane:1800,Cotton:2300,Maize:1600,Tomato:2000,Potato:1900};
-const volatility={Wheat:12,Rice:15,Sugarcane:10,Cotton:18,Maize:14,Tomato:18,Potato:16};
+const cropBase = { Wheat: 2000, Rice: 2100, Sugarcane: 1800, Cotton: 2300, Maize: 1600, Sorghum: 1500, Barley: 1400, Millet: 1300, Soybean: 1700, Groundnut: 1600, Tomato: 2000, Potato: 1900 };
+const volatility = { Wheat: 12, Rice: 15, Sugarcane: 10, Cotton: 18, Maize: 14, Sorghum: 13, Barley: 11, Millet: 10, Soybean: 15, Groundnut: 12, Tomato: 18, Potato: 16 };
 
 let priceChart = null;
 let lastForecast = [];
@@ -356,8 +392,9 @@ function genHistorical(crop, region) {
   let p = base + (Math.random() - 0.5) * 40;
   for (let i = days; i > 0; i--) {
     const seasonal = Math.sin(i / 7) * 8;
+    const regionBias = (region ? (region.length % 5) - 2 : 0) * 0.6;
     const noise = (Math.random() - 0.5) * vol;
-    p = Math.max(50, p + seasonal + noise);
+    p = Math.max(50, p + seasonal + noise + regionBias);
     const d = new Date();
     d.setDate(d.getDate() - i);
     arr.push({ date: d.toISOString().slice(0, 10), price: Math.round(p * 10) / 10 });
@@ -373,7 +410,8 @@ function forecastPrices(hist, days, crop) {
   let p = last;
   for (let i = 1; i <= days; i++) {
     const noise = (Math.random() - 0.5) * vol;
-    p = Math.max(20, p + slope * 0.6 + noise);
+    const seasonal = Math.sin((i + hist.length) / 7) * 6;
+    p = Math.max(20, p + slope * 0.6 + noise + seasonal * 0.3);
     const d = new Date();
     d.setDate(new Date().getDate() + i);
     preds.push({ date: d.toISOString().slice(0, 10), price: Math.round(p * 10) / 10 });
@@ -389,10 +427,10 @@ function initChart() {
     options: {
       responsive: true,
       maintainAspectRatio: false,
-      plugins: { legend: { display: true, position: 'top' } },
+      plugins: { legend: { display: true, position: 'top', labels: { font: { weight: 'bold' }, usePointStyle: true } } },
       scales: {
-        y: { grid: { color: '#f3f4f6' }, ticks: { color: '#6b7280' } },
-        x: { grid: { display: false }, ticks: { color: '#6b7280' } }
+        y: { grid: { color: '#f1f5f9' }, ticks: { color: '#64748b' }, title: { display: true, text: 'Price (₹/qtl)', font: { weight: 'bold' } } },
+        x: { grid: { display: false }, ticks: { color: '#64748b' } }
       }
     }
   });
@@ -405,8 +443,8 @@ function updateChart(hist, preds) {
 
   priceChart.data.labels = labels;
   priceChart.data.datasets = [
-    { label: 'Historical', data: histData, borderColor: '#2563eb', backgroundColor: 'rgba(37, 99, 235, 0.1)', fill: true, tension: 0.3, pointRadius: 0 },
-    { label: 'Forecast', data: predData, borderColor: '#10b981', borderDash: [5, 5], tension: 0.3, pointRadius: 0 }
+    { label: 'Historical Data', data: histData, borderColor: '#2563eb', backgroundColor: 'rgba(37, 99, 235, 0.1)', fill: true, tension: 0.3, pointRadius: 0 },
+    { label: 'Price Forecast', data: predData, borderColor: '#10b981', borderDash: [5, 5], tension: 0.3, pointRadius: 0, fill: false }
   ];
   priceChart.update();
 }
@@ -429,12 +467,12 @@ function runPrediction(withAdvice) {
   const diff = ((future - now) / now) * 100;
 
   const actionBox = document.getElementById('actionCard');
-  if (diff > 5) {
-    actionBox.innerHTML = `<strong>Bullish Trend:</strong> Prices are expected to rise by ${diff.toFixed(1)}%. We recommend holding stock if storage is available.`;
-  } else if (diff < -5) {
-    actionBox.innerHTML = `<strong>Bearish Trend:</strong> Prices may drop by ${Math.abs(diff).toFixed(1)}%. Consider selling your current harvest soon.`;
+  if (diff > 4) {
+    actionBox.innerHTML = `<strong>Bullish Outlook:</strong> Predicted prices for ${crop} are trending upward by ${diff.toFixed(1)}%. We recommend holding inventory for a potentially higher return in ${days} days.`;
+  } else if (diff < -4) {
+    actionBox.innerHTML = `<strong>Bearish Outlook:</strong> A price decline of ${Math.abs(diff).toFixed(1)}% is anticipated. It may be strategically advantageous to liquidate current stock before the drop.`;
   } else {
-    actionBox.innerHTML = `<strong>Stable Market:</strong> Prices are holding steady. Sell as per your immediate liquidity needs.`;
+    actionBox.innerHTML = `<strong>Stable Market:</strong> Prices are expected to remain within a narrow range. Maintain normal selling cycles and focus on operational efficiency.`;
   }
 
   if (withAdvice) runAdvisor(true);
@@ -443,11 +481,19 @@ function runPrediction(withAdvice) {
 function runAdvisor(inline) {
   const crop = document.getElementById('cropSelect').value;
   const soil = document.getElementById('soilType').value;
-  const rain = document.getElementById('rainfall').value;
+  const rain = parseFloat(document.getElementById('rainfall').value);
+  const temp = parseFloat(document.getElementById('temp').value);
   
-  const advice = `For ${crop} in ${soil} soil with ${rain}mm rainfall: We recommend high-yield hybrid seeds and Nitrogen-rich fertilizers. Ensure proper drainage to prevent root rot.`;
+  const seedOptions = { Rice: ['Flood-tolerant IR8', 'Basmati 370'], Wheat: ['Sonalika High-Yield', 'Drought-resistant HD2967'], Cotton: ['Bt Hybrid-6', 'Organic Suvin'] };
+  const fertOptions = { Rice: ['Urea + Zinc Sulphate', 'NPK 17:17:17'], Wheat: ['NPK 12:32:16', 'DAP + Potash'], Cotton: ['Balanced NPK + Boron', 'Organic Compost'] };
   
-  document.getElementById('advisorOutput').innerHTML = `<div class="text-dark"><strong>Expert Advice:</strong> ${advice}</div>`;
+  const seed = (seedOptions[crop] || ['Certified Hybrid Seeds'])[0];
+  const fert = (fertOptions[crop] || ['Balanced NPK 19:19:19 Fertilizer'])[0];
+  
+  let climateNote = rain < 100 ? "Low moisture levels detected; prioritize irrigation." : "Sufficient rainfall expected for standard cultivation.";
+  const advice = `<strong>Region Profile:</strong> ${soil} soil at ${temp}°C. ${climateNote}<br><br><strong>Seed Recommendation:</strong> ${seed}<br><strong>Fertilizer Strategy:</strong> ${fert}`;
+  
+  document.getElementById('advisorOutput').innerHTML = `<div class="text-dark">${advice}</div>`;
 }
 
 document.getElementById('predictBtn').onclick = () => runPrediction(false);
@@ -456,12 +502,12 @@ document.getElementById('adviseBtn').onclick = () => runAdvisor(false);
 document.getElementById('horizon').oninput = (e) => document.getElementById('hval').innerText = e.target.value;
 
 document.getElementById('exportBtn').onclick = () => {
-  if (!lastForecast.length) return alert("Predict first");
-  let csv = "Date,Price\n" + lastForecast.map(p => `${p.date},${p.price}`).join("\n");
+  if (!lastForecast.length) return alert("Please generate a prediction first.");
+  let csv = "Date,Predicted Price (₹/qtl)\n" + lastForecast.map(p => `${p.date},${p.price}`).join("\n");
   const blob = new Blob([csv], { type: 'text/csv' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
-  a.href = url; a.download = `Forecast_${lastCrop}.csv`; a.click();
+  a.href = url; a.download = `${lastCrop}_Forecast_${lastRegion}.csv`; a.click();
 };
 
 document.getElementById('logoutBtn').onclick = () => {
@@ -476,7 +522,7 @@ window.onload = () => {
     document.querySelectorAll(".farmer-only").forEach(el => el.style.display = "block");
   }
   initChart();
-  QRCode.toCanvas(document.getElementById('qrCanvas'), window.location.href, { width: 140, margin: 2 });
+  QRCode.toCanvas(document.getElementById('qrCanvas'), window.location.href, { width: 140, margin: 2, color: { dark: "#0f172a" } });
 };
 </script>
 </body>
