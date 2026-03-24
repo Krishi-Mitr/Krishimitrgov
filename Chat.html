@@ -2,10 +2,11 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Chats</title>
+<title>Chats - Krishi Mitr</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="supabase.js"></script>
 <style>
+/* Dashboard-Matched Core Styles */
 body {
   margin: 0;
   font-family: "Poppins", Arial, sans-serif;
@@ -14,6 +15,8 @@ body {
   color: #1f2937;
 }
 body.drawer-open { overflow: hidden; }
+
+/* Top Navigation - Exact Dashboard Match */
 .top-nav {
   position: fixed;
   top: 0;
@@ -29,11 +32,10 @@ body.drawer-open { overflow: hidden; }
   box-shadow: 0 6px 14px rgba(0,0,0,0.15);
   z-index: 9999;
 }
-.nav-left {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-}
+.nav-left { display: flex; align-items: center; gap: 14px; }
+.brand-title { margin: 0; font-size: 1.15rem; font-weight: 800; color: #0a3d62; }
+
+/* Hamburger Button with Scale Effect */
 .hamburger-btn {
   width: 44px;
   height: 44px;
@@ -46,35 +48,18 @@ body.drawer-open { overflow: hidden; }
   transition: 0.3s;
 }
 .hamburger-btn:hover { transform: scale(1.05); }
-.hamburger-icon {
-  width: 20px;
-  height: 14px;
-  position: relative;
-}
+.hamburger-icon { width: 20px; height: 14px; position: relative; }
 .hamburger-icon span {
   position: absolute;
-  left: 0;
-  right: 0;
-  height: 2.5px;
-  background: #0a3d62;
-  border-radius: 999px;
+  left: 0; right: 0; height: 2.5px;
+  background: #0a3d62; border-radius: 999px;
 }
 .hamburger-icon span:nth-child(1){ top:0; }
 .hamburger-icon span:nth-child(2){ top:5.5px; }
 .hamburger-icon span:nth-child(3){ top:11px; }
-.brand-title {
-  margin: 0;
-  font-size: 1.15rem;
-  font-weight: 800;
-  color: #0a3d62;
-}
-.nav-right {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-}
-.newchat-btn,
-.logout-btn {
+
+.nav-right { display: flex; align-items: center; gap: 15px; }
+.newchat-btn, .logout-btn {
   background: white;
   color: #0a3d62;
   border: 2px solid #0a3d62;
@@ -84,37 +69,31 @@ body.drawer-open { overflow: hidden; }
   cursor: pointer;
   transition: 0.3s;
 }
-.newchat-btn:hover,
-.logout-btn:hover {
+.newchat-btn:hover, .logout-btn:hover {
   background: #0a3d62;
   color: white;
   transform: translateY(-2px);
 }
 .profile-btn img {
-  width: 42px;
-  height: 42px;
+  width: 42px; height: 42px;
   border-radius: 50%;
   border: 2px solid #0a3d62;
   cursor: pointer;
   transition: 0.3s;
 }
-.profile-btn img:hover {
-  transform: scale(1.1);
-  box-shadow: 0 0 15px rgba(10,61,98,0.4);
-}
+.profile-btn img:hover { transform: scale(1.1); box-shadow: 0 0 15px rgba(10,61,98,0.4); }
+
+/* Side Drawer Styling - Dark Gradient */
 .nav-overlay {
-  position: fixed;
-  inset: 0;
+  position: fixed; inset: 0;
   background: rgba(0,0,0,0.25);
-  opacity: 0;
-  pointer-events: none;
+  opacity: 0; pointer-events: none;
   transition: opacity .2s ease;
   z-index: 9998;
 }
 .side-drawer {
   position: fixed;
-  top: 84px;
-  left: 14px;
+  top: 84px; left: 14px;
   width: min(320px, calc(100vw - 28px));
   max-height: calc(100vh - 98px);
   overflow: auto;
@@ -127,16 +106,11 @@ body.drawer-open { overflow: hidden; }
   z-index: 9999;
 }
 .drawer-inner { padding: 14px; }
-body.drawer-open .nav-overlay {
-  opacity: 1;
-  pointer-events: auto;
-}
-body.drawer-open .side-drawer {
-  transform: translateX(0);
-}
+body.drawer-open .nav-overlay { opacity: 1; pointer-events: auto; }
+body.drawer-open .side-drawer { transform: translateX(0); }
+
 .menu-section {
-  border-radius: 14px;
-  overflow: hidden;
+  border-radius: 14px; overflow: hidden;
   border: 1px solid rgba(255,255,255,0.15);
   margin-bottom: 14px;
   background: rgba(255,255,255,0.05);
@@ -144,72 +118,36 @@ body.drawer-open .side-drawer {
 .menu-section-title {
   padding: 12px 14px;
   background: rgba(255,255,255,0.1);
-  color: white;
-  font-weight: 800;
-  font-size: 0.95rem;
+  color: white; font-weight: 800; font-size: 0.95rem;
 }
-.menu-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
+.menu-list { list-style: none; padding: 0; margin: 0; }
 .menu-list a {
-  display: block;
-  padding: 14px;
-  text-decoration: none;
-  color: white;
-  font-weight: 600;
-  background: rgba(255,255,255,0.08);
+  display: block; padding: 14px;
+  text-decoration: none; color: white;
+  font-weight: 600; background: rgba(255,255,255,0.08);
   transition: 0.2s ease;
 }
-.menu-list li + li a {
-  border-top: 1px solid rgba(255,255,255,0.1);
+.menu-list li + li a { border-top: 1px solid rgba(255,255,255,0.1); }
+.menu-list a:hover { background: #1e3a8a; padding-left: 20px; }
+
+/* Chat List Layout */
+.chat-container { max-width: 900px; margin: 120px auto 40px; padding: 0 20px; }
+.chat-card {
+  padding: 18px 22px; border-radius: 16px; margin-bottom: 15px;
+  cursor: pointer; display: flex; justify-content: space-between; align-items: center;
+  background: #fff; box-shadow: 0 6px 18px rgba(0,0,0,.08); transition: .2s;
 }
-.menu-list a:hover {
-  background: #1e3a8a;
-  padding-left: 20px;
-}
-.chat-container{
-  max-width:900px;
-  margin:120px auto 40px;
-}
-.chat-card{
-  padding:18px 22px;
-  border-radius:16px;
-  margin-bottom:15px;
-  cursor:pointer;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  background:#fff;
-  box-shadow:0 6px 18px rgba(0,0,0,.08);
-  transition:.2s;
-}
-.chat-card:hover{ transform:translateY(-2px); }
-.chat-card.unread{
-  background:#e3f2fd;
-  border-left:6px solid #1976d2;
-}
-.chat-left{ max-width:70%; }
-.chat-name{ font-weight:bold; font-size:17px; }
-.chat-last{
-  color:#555;
-  margin-top:6px;
-  white-space:nowrap;
-  overflow:hidden;
-  text-overflow:ellipsis;
-}
-.chat-right{ text-align:right; }
-.chat-time{ font-size:13px; color:#777; }
-.unread-count{
-  margin-top:6px;
-  display:inline-block;
-  padding:4px 10px;
-  background:#d32f2f;
-  color:white;
-  border-radius:14px;
-  font-size:12px;
-  font-weight:bold;
+.chat-card:hover { transform: translateY(-2px); }
+.chat-card.unread { background: #e3f2fd; border-left: 6px solid #1976d2; }
+.chat-left { max-width: 70%; }
+.chat-name { font-weight: bold; font-size: 17px; }
+.chat-last { color: #555; margin-top: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.chat-right { text-align: right; }
+.chat-time { font-size: 13px; color: #777; }
+.unread-count {
+  margin-top: 6px; display: inline-block; padding: 4px 10px;
+  background: #d32f2f; color: white; border-radius: 14px;
+  font-size: 12px; font-weight: bold;
 }
 </style>
 </head>
@@ -218,16 +156,12 @@ body.drawer-open .side-drawer {
 <div class="top-nav">
   <div class="nav-left">
     <button class="hamburger-btn" id="menuBtn">
-      <div class="hamburger-icon">
-        <span></span><span></span><span></span>
-      </div>
+      <div class="hamburger-icon"><span></span><span></span><span></span></div>
     </button>
     <p class="brand-title">Krishi Mitr</p>
   </div>
   <div class="nav-right">
-    <button class="newchat-btn" onclick="location.href='Message'">
-      + New Chat
-    </button>
+    <button class="newchat-btn" onclick="location.href='Message'">+ New Chat</button>
     <div class="profile-btn" onclick="location.href='Profile'">
       <img src="profile_pic.png" alt="Profile">
     </div>
@@ -274,6 +208,13 @@ body.drawer-open .side-drawer {
 <div class="chat-container" id="chatList"></div>
 
 <script>
+const db = window.db;
+const myLoginId = Number(sessionStorage.getItem("loginid"));
+const usertype = sessionStorage.getItem("usertype");
+
+if(!myLoginId) location.replace("login");
+
+// Sidebar Logic matched to Dashboard.html
 const menuBtn = document.getElementById("menuBtn");
 const sideNav = document.getElementById("sideNav");
 const navOverlay = document.getElementById("navOverlay");
@@ -283,37 +224,30 @@ function openDrawer(){
   sideNav.hidden = false;
   navOverlay.hidden = false;
 }
+
 function closeDrawer(){
   document.body.classList.remove("drawer-open");
-  setTimeout(()=>{
+  setTimeout(() => {
     if(!document.body.classList.contains("drawer-open")){
       sideNav.hidden = true;
       navOverlay.hidden = true;
     }
-  },220);
+  }, 220); // Sync with Dashboard transition timing
 }
-menuBtn.onclick=()=>{
-  document.body.classList.contains("drawer-open")
-  ? closeDrawer() : openDrawer();
+
+menuBtn.onclick = () => {
+  document.body.classList.contains("drawer-open") ? closeDrawer() : openDrawer();
 };
-navOverlay.onclick=closeDrawer;
+navOverlay.onclick = closeDrawer;
 
 document.getElementById("logoutBtn").onclick = () => {
   sessionStorage.clear();
   location.replace("login");
 };
 
-const myLoginId = Number(sessionStorage.getItem("loginid"));
-const usertype = sessionStorage.getItem("usertype");
-
-if(!myLoginId){
-  location.replace("login");
-}
-
 function applyRolePermissions() {
   if (usertype === "Farmer") {
-    const market = document.getElementById("marketSection");
-    if(market) market.style.display = "block";
+    document.getElementById("marketSection").style.display = "block";
     document.querySelectorAll(".farmer-only").forEach(el => el.style.display = "block");
   }
 }
@@ -321,16 +255,14 @@ function applyRolePermissions() {
 let lastRendered = "";
 
 async function loadChats(){
-  const { data: chats } = await window.db
+  const { data: chats } = await db
     .from("chat_conversations")
     .select("*")
     .or(`user1id.eq.${myLoginId},user2id.eq.${myLoginId}`)
     .order("last_time", { ascending:false });
 
   if(!chats) return;
-
   const snapshot = JSON.stringify(chats);
-
   if(snapshot === lastRendered) return;
   lastRendered = snapshot;
 
@@ -338,21 +270,12 @@ async function loadChats(){
   chatList.innerHTML = "";
 
   for(const chat of chats){
-    const otherName =
-      chat.user1id === myLoginId
-        ? chat.user2name
-        : chat.user1name;
-
-    const otherId =
-      chat.user1id === myLoginId
-        ? chat.user2id
-        : chat.user1id;
-
+    const otherName = chat.user1id === myLoginId ? chat.user2name : chat.user1name;
+    const otherId = chat.user1id === myLoginId ? chat.user2id : chat.user1id;
     const isNew = chat.unread_for === myLoginId;
 
     const card = document.createElement("div");
     card.className = "chat-card" + (isNew ? " unread" : "");
-
     card.onclick = () => {
       sessionStorage.setItem("chatid", chat.chatid);
       sessionStorage.setItem("otherid", otherId);
@@ -363,13 +286,11 @@ async function loadChats(){
     card.innerHTML = `
       <div class="chat-left">
         <div class="chat-name">${otherName}</div>
-        <div class="chat-last">${chat.last_message || ""}</div>
+        <div class="chat-last">${chat.last_message || "No messages yet"}</div>
       </div>
       <div class="chat-right">
         <div class="chat-time">
-          ${chat.last_time
-            ? new Date(chat.last_time).toLocaleString()
-            : ""}
+          ${chat.last_time ? new Date(chat.last_time).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : ""}
         </div>
         ${isNew ? `<div class="unread-count">New</div>` : ""}
       </div>
@@ -378,7 +299,7 @@ async function loadChats(){
   }
 }
 
-setInterval(loadChats, 2000);
+setInterval(loadChats, 3000);
 applyRolePermissions();
 loadChats();
 </script>
