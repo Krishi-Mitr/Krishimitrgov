@@ -239,16 +239,35 @@ color:#e0e0e0;
 <button class="logout-btn" id="logoutBtn">Logout</button>
 </div>
 
-<div class="nav-overlay" id="navOverlay"></div>
-
-<nav class="side-drawer" id="sideNav">
-<div class="drawer-inner">
-<div class="menu-section-title">Tools</div>
-<ul class="menu-list">
-<li><a href="predictor.html">Crop Predictor</a></li>
-<li><a href="advisor.html">Switch to Advisor</a></li>
-</ul>
-</div>
+<div class="nav-overlay" id="navOverlay" hidden></div>
+<nav class="side-drawer" id="sideNav" hidden>
+  <div class="drawer-inner">
+    
+    <div class="menu-section" id="marketSection" style="display:none;">
+      <div class="menu-section-title">Market</div>
+      <ul class="menu-list">
+        <li><a href="Update_crops">Manage Your Crops</a></li>
+        <li><a href="Sell">Sell Your Crop</a></li>
+      </ul>
+    </div>
+    <div class="menu-section">
+      <div class="menu-section-title">Tools & Services</div>
+      <ul class="menu-list">
+        <li><a href="Buy">Buy Crops</a></li>
+        <li><a href="browse_tools.html">Rent Tools & Machinery</a></li>
+        <li class="farmer-only" style="display:none;"><a href="tools_rental.html">List Tool for Rent</a></li>
+        <li class="farmer-only" style="display:none;"><a href="my_listings.html">My Tool Inventory</a></li>
+        <li><a href="krishimitr">Crop Predictor</a></li>
+      </ul>
+    </div>
+    <div class="menu-section" style="margin-bottom:0;">
+      <div class="menu-section-title">System</div>
+      <ul class="menu-list">
+        <li><a href="Notification">Notification</a></li>
+        <li><a href="Chat">Chat</a></li>
+      </ul>
+    </div>
+  </div>
 </nav>
 
 <div class="container">
