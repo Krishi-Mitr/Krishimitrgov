@@ -79,13 +79,11 @@ body.dark .card{background:#2d2d2d;border-color:#4a9eff}
 </div>
 
 <script>
-
 (function(){
 let retry=0
 function checkAuth(){
 const loginid=sessionStorage.getItem("loginid")
-const usertype=sessionStorage.getItem("usertype")
-if(loginid && usertype==="Farmer") return
+if(loginid) return
 retry++
 if(retry<10)setTimeout(checkAuth,50)
 else location.href="login.html"
@@ -121,17 +119,21 @@ return arr[Math.floor(Math.random()*arr.length)]
 }
 
 function runAdvisor(){
-const crop=cropSelect.value
-const soil=soilType.value
-const rain=rainfall.value
-const temp=temp.value
+const crop=document.getElementById("cropSelect").value
+const soil=document.getElementById("soilType").value
+const rain=document.getElementById("rainfall").value
+const temp=document.getElementById("temp").value
 const seed=pick(seedOptions[crop]||["Local seeds"])
 const fert=pick(fertOptions[crop]||["Balanced fertilizer"])
-advisorOutput.innerText="Crop:"+crop+" Soil:"+soil+" Rain:"+rain+"mm Temp:"+temp+"°C Seed:"+seed+" Fertilizer:"+fert
+document.getElementById("advisorOutput").innerText="Crop:"+crop+" Soil:"+soil+" Rain:"+rain+"mm Temp:"+temp+"°C Seed:"+seed+" Fertilizer:"+fert
 }
 
-adviseBtn.onclick=runAdvisor
+document.getElementById("adviseBtn").onclick=runAdvisor
 
+document.getElementById("logoutBtn").onclick=()=>{
+sessionStorage.clear()
+location.href="login.html"
+}
 </script>
 
 </body>
