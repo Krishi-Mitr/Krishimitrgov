@@ -334,8 +334,7 @@ color:#e0e0e0;
 let retry=0
 function checkAuth(){
 const id=sessionStorage.getItem("loginid")
-const type=sessionStorage.getItem("usertype")
-if(id&&type==="Farmer")return
+if(id)return
 if(retry<10){retry++;setTimeout(checkAuth,50)}else location.href="login.html"
 }
 setTimeout(checkAuth,10)
