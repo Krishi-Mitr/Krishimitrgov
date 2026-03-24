@@ -241,33 +241,36 @@ color:#e0e0e0;
 
 <div class="nav-overlay" id="navOverlay" hidden></div>
 <nav class="side-drawer" id="sideNav" hidden>
-  <div class="drawer-inner">
-    
-    <div class="menu-section" id="marketSection" style="display:none;">
-      <div class="menu-section-title">Market</div>
-      <ul class="menu-list">
-        <li><a href="Update_crops">Manage Your Crops</a></li>
-        <li><a href="Sell">Sell Your Crop</a></li>
-      </ul>
-    </div>
-    <div class="menu-section">
-      <div class="menu-section-title">Tools & Services</div>
-      <ul class="menu-list">
-        <li><a href="Buy">Buy Crops</a></li>
-        <li><a href="browse_tools.html">Rent Tools & Machinery</a></li>
-        <li class="farmer-only" style="display:none;"><a href="tools_rental.html">List Tool for Rent</a></li>
-        <li class="farmer-only" style="display:none;"><a href="my_listings.html">My Tool Inventory</a></li>
-        <li><a href="krishimitr">Crop Predictor</a></li>
-      </ul>
-    </div>
-    <div class="menu-section" style="margin-bottom:0;">
-      <div class="menu-section-title">System</div>
-      <ul class="menu-list">
-        <li><a href="Notification">Notification</a></li>
-        <li><a href="Chat">Chat</a></li>
-      </ul>
-    </div>
-  </div>
+<div class="drawer-inner">
+
+<div class="menu-section" id="marketSection" style="display:none;">
+<div class="menu-section-title">Market</div>
+<ul class="menu-list">
+<li><a href="Update_crops">Manage Your Crops</a></li>
+<li><a href="Sell">Sell Your Crop</a></li>
+</ul>
+</div>
+
+<div class="menu-section">
+<div class="menu-section-title">Tools & Services</div>
+<ul class="menu-list">
+<li><a href="Buy">Buy Crops</a></li>
+<li><a href="browse_tools.html">Rent Tools & Machinery</a></li>
+<li class="farmer-only" style="display:none;"><a href="tools_rental.html">List Tool for Rent</a></li>
+<li class="farmer-only" style="display:none;"><a href="my_listings.html">My Tool Inventory</a></li>
+<li><a href="krishimitr">Crop Predictor</a></li>
+</ul>
+</div>
+
+<div class="menu-section" style="margin-bottom:0;">
+<div class="menu-section-title">System</div>
+<ul class="menu-list">
+<li><a href="Notification">Notification</a></li>
+<li><a href="Chat">Chat</a></li>
+</ul>
+</div>
+
+</div>
 </nav>
 
 <div class="container">
@@ -348,8 +351,26 @@ const menuBtn=document.getElementById("menuBtn")
 const sideNav=document.getElementById("sideNav")
 const overlay=document.getElementById("navOverlay")
 
-menuBtn.onclick=()=>document.body.classList.toggle("drawer-open")
-overlay.onclick=()=>document.body.classList.remove("drawer-open")
+function openDrawer(){
+sideNav.hidden=false
+overlay.hidden=false
+requestAnimationFrame(()=>document.body.classList.add("drawer-open"))
+}
+
+function closeDrawer(){
+document.body.classList.remove("drawer-open")
+setTimeout(()=>{
+sideNav.hidden=true
+overlay.hidden=true
+},250)
+}
+
+menuBtn.onclick=()=>{
+if(document.body.classList.contains("drawer-open"))closeDrawer()
+else openDrawer()
+}
+
+overlay.onclick=closeDrawer
 
 document.getElementById("logoutBtn").onclick=()=>{
 sessionStorage.clear()
