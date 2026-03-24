@@ -13,17 +13,15 @@ body {
     min-height: 100vh;
     background: linear-gradient(180deg, #f6e2cc 0%, #f7f9f8 45%, #dceee3 100%);
     color: #1f2937;
+    padding-top: 100px;
 }
 body.drawer-open { overflow: hidden; }
+
+/* Dashboard-Matched Navigation Bar */
 .top-nav {
     position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 78px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+    top: 0; left: 0; right: 0; height: 78px;
+    display: flex; justify-content: space-between; align-items: center;
     padding: 0 32px;
     background: linear-gradient(90deg,#ff9933,#ffffff,#138808);
     border-bottom: 3px solid #0a3d62;
@@ -31,91 +29,98 @@ body.drawer-open { overflow: hidden; }
     z-index: 9999;
 }
 .nav-left { display: flex; align-items: center; gap: 14px; }
+
+/* Hamburger Button with Scale Effect */
 .hamburger-btn {
-    width: 44px; height: 44px; border-radius: 12px; border: 2px solid #0a3d62;
-    background: rgba(255,255,255,0.75); display: grid; place-items: center; cursor: pointer;
+    width: 44px; height: 44px; border-radius: 12px;
+    border: 2px solid #0a3d62;
+    background: rgba(255,255,255,0.75);
+    display: grid; place-items: center;
+    cursor: pointer; transition: 0.3s;
 }
+.hamburger-btn:hover { transform: scale(1.05); }
 .hamburger-icon { width: 20px; height: 14px; position: relative; }
-.hamburger-icon span { position: absolute; left: 0; right: 0; height: 2.5px; background: #0a3d62; border-radius: 999px; }
-.hamburger-icon span:nth-child(1) { top:0; }
-.hamburger-icon span:nth-child(2) { top:5.5px; }
-.hamburger-icon span:nth-child(3) { top:11px; }
-.brand-title { font-weight: 800; color: #0a3d62; margin: 0; }
+.hamburger-icon span {
+    position: absolute; left: 0; right: 0; height: 2.5px;
+    background: #0a3d62; border-radius: 999px;
+}
+.hamburger-icon span:nth-child(1){ top:0; }
+.hamburger-icon span:nth-child(2){ top:5.5px; }
+.hamburger-icon span:nth-child(3){ top:11px; }
+
+.brand-title { margin: 0; font-size: 1.15rem; font-weight: 800; color: #0a3d62; }
 .logout-btn {
     background: white; color: #0a3d62; border: 2px solid #0a3d62;
-    padding: 10px 18px; border-radius: 10px; font-weight: 700; cursor: pointer;
+    padding: 10px 18px; border-radius: 10px; font-weight: 700;
+    cursor: pointer; transition: 0.3s;
 }
+.logout-btn:hover { background: #0a3d62; color: white; transform: translateY(-2px); }
+
+/* Side Drawer - Dark Gradient Match */
 .nav-overlay {
     position: fixed; inset: 0; background: rgba(0,0,0,0.25);
-    opacity: 0; pointer-events: none; transition: .2s ease; z-index: 9998;
+    opacity: 0; pointer-events: none; transition: opacity .2s ease; z-index: 9998;
 }
 .side-drawer {
-    position: fixed; top: 84px; left: 14px; width: min(320px, calc(100vw - 28px));
-    max-height: calc(100vh - 98px); overflow: auto;
+    position: fixed; top: 84px; left: 14px;
+    width: min(320px, calc(100vw - 28px));
+    max-height: calc(100vh - 98px);
+    overflow: auto;
     background: linear-gradient(180deg,#0a3d62,#082032);
     border: 3px solid #ffffff; border-radius: 18px;
     box-shadow: 0 18px 40px rgba(0,0,0,0.35);
-    transform: translateX(-110%); transition: .25s ease; z-index: 9999;
+    transform: translateX(-110%); transition: transform .25s ease; z-index: 9999;
 }
 .drawer-inner { padding: 14px; }
-.menu-section {
-    border-radius: 14px; overflow: hidden; border: 1px solid rgba(255,255,255,0.15);
-    margin-bottom: 14px; background: rgba(255,255,255,0.05);
-}
-.menu-section-title { padding: 12px 14px; background: rgba(255,255,255,0.1); color: white; font-weight: 800; font-size: 0.95rem; }
-.menu-list { list-style: none; padding: 0; margin: 0; }
-.menu-list a {
-    display: block; padding: 14px; text-decoration: none; color: white;
-    font-weight: 600; transition: 0.2s ease; background: rgba(255,255,255,0.08);
-}
-.menu-list a:hover { background: #1e3a8a; padding-left: 20px; }
 body.drawer-open .nav-overlay { opacity: 1; pointer-events: auto; }
 body.drawer-open .side-drawer { transform: translateX(0); }
-.container { max-width: 1100px; margin: 120px auto 60px; padding: 0 20px; }
-.page-title { text-align: center; font-size: 2.2rem; font-weight: 800; color: #0a3d62; margin-bottom: 40px; }
-.crop-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 25px; }
+
+.menu-section {
+    border-radius: 14px; overflow: hidden;
+    border: 1px solid rgba(255,255,255,0.15);
+    margin-bottom: 14px; background: rgba(255,255,255,0.05);
+}
+.menu-section-title {
+    padding: 12px 14px; background: rgba(255,255,255,0.1);
+    color: white; font-weight: 800; font-size: 0.95rem;
+}
+.menu-list { list-style: none; padding: 0; margin: 0; }
+.menu-list a {
+    display: block; padding: 14px; text-decoration: none;
+    color: white; font-weight: 600; background: rgba(255,255,255,0.08);
+    transition: 0.2s ease;
+}
+.menu-list li + li a { border-top: 1px solid rgba(255,255,255,0.1); }
+.menu-list a:hover { background: #1e3a8a; padding-left: 20px; }
+
+/* Grid Layout */
+.container { max-width: 1100px; margin: 0 auto; padding: 0 20px; }
+.crops-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; }
 .crop-card {
-    background: white; border-radius: 20px; padding: 24px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.06); cursor: pointer;
-    border-left: 6px solid #ff9933; transition: transform 0.3s ease, box-shadow 0.3s ease;
+    background: white; border-radius: 20px; padding: 25px; cursor: pointer;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.05); transition: 0.3s;
+    border: 1px solid #e5e7eb; border-top: 6px solid #ff9933;
 }
-.crop-card:hover { transform: translateY(-8px); box-shadow: 0 15px 35px rgba(0,0,0,0.12); }
+.crop-card:hover { transform: translateY(-5px); box-shadow: 0 15px 35px rgba(0,0,0,0.1); }
+
+/* Modal Styles */
 .modal {
-    position: fixed; inset: 0; background: rgba(10, 61, 98, 0.7);
-    backdrop-filter: blur(10px); display: none; align-items: center;
-    justify-content: center; z-index: 10000; padding: 20px;
+    position: fixed; inset: 0; background: rgba(0,0,0,0.5);
+    display: none; justify-content: center; align-items: center; z-index: 10001;
 }
-.modal-box {
-    width: 100%; max-width: 800px; max-height: 85vh;
-    background: white; padding: 35px; border-radius: 28px;
-    overflow-y: auto; box-shadow: 0 30px 60px rgba(0,0,0,0.25);
+.modal-content {
+    background: white; padding: 35px; border-radius: 25px; width: min(600px, 95%);
+    max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.3);
 }
-.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
-.form-group { display: flex; flex-direction: column; }
-.form-group.full { grid-column: span 2; }
-.form-group label { font-weight: 700; font-size: 0.85rem; color: #4b5563; margin-bottom: 8px; }
-.form-group input, .form-group select, .form-group textarea {
-    padding: 12px 16px; border: 2px solid #e5e7eb; border-radius: 12px; font-size: 1rem;
+.form-group { margin-bottom: 15px; }
+.form-group label { display: block; margin-bottom: 5px; font-weight: 600; color: #4b5563; }
+.form-group input, .form-group textarea {
+    width: 100%; padding: 12px; border: 2px solid #e5e7eb; border-radius: 10px; font-size: 15px;
 }
-.modal-footer { display: flex; gap: 15px; margin-top: 35px; }
-.btn { flex: 1; padding: 16px; border: none; border-radius: 14px; font-weight: 800; cursor: pointer; }
-.btn-update { background: #138808; color: white; }
-.btn-delete { background: #fee2e2; color: #dc2626; }
-.btn-close { background: #f3f4f6; color: #4b5563; }
-
-    .profile-btn img {
-  width: 42px;
-  height: 42px;
-  border-radius: 50%;
-  border: 2px solid #0a3d62;
-  cursor: pointer;
-  transition: 0.3s;
-}
-
-.profile-btn img:hover {
-  transform: scale(1.1);
-  box-shadow: 0 0 15px rgba(10,61,98,0.4);
-}
+.btn-group { display: flex; gap: 12px; margin-top: 25px; }
+.btn-save { background: #138808; color: white; border: none; padding: 14px; border-radius: 12px; flex: 1; font-weight: 700; cursor: pointer; }
+.btn-delete { background: #dc2626; color: white; border: none; padding: 14px; border-radius: 12px; flex: 1; font-weight: 700; cursor: pointer; }
+.btn-close { background: #6b7280; color: white; border: none; padding: 14px; border-radius: 12px; cursor: pointer; }
 </style>
 </head>
 <body>
@@ -127,106 +132,70 @@ body.drawer-open .side-drawer { transform: translateX(0); }
         </button>
         <p class="brand-title">Krishi Mitr</p>
     </div>
-
-    <div class="nav-right" style="display:flex; align-items:center; gap:15px; margin-right:32px;">
-        <div class="profile-btn" onclick="location.href='Profile'">
-            <img src="profile_pic.png" alt="Profile">
-        </div>
-
-        <button onclick="sessionStorage.clear(); location.href='login';"
-            style="background:white; color:#0a3d62; border:2px solid #0a3d62;
-            padding:10px 18px; border-radius:10px; font-weight:700; cursor:pointer;">
-            Logout
-        </button>
-    </div>
-
-</div>
-
-  <button onclick="sessionStorage.clear(); location.href='login';"
-    style="background:white; color:#0a3d62; border:2px solid #0a3d62;
-    padding:10px 18px; border-radius:10px; font-weight:700; cursor:pointer;">
-    Logout
-  </button>
-
+    <button class="logout-btn" id="logoutBtn">Logout</button>
 </div>
 
 <div class="nav-overlay" id="navOverlay" hidden></div>
 <nav class="side-drawer" id="sideNav" hidden>
-  <div class="drawer-inner">
-    <div class="menu-section">
-      <div class="menu-section-title">Main</div>
-      <ul class="menu-list">
-        <li><a href="Dashboard">Dashboard</a></li>
-      </ul>
+    <div class="drawer-inner">
+        <div class="menu-section">
+            <div class="menu-section-title">Main</div>
+            <ul class="menu-list">
+                <li><a href="Dashboard">Dashboard</a></li>
+            </ul>
+        </div>
+        <div class="menu-section" id="marketSection" style="display:none;">
+            <div class="menu-section-title">Market</div>
+            <ul class="menu-list">
+                <li><a href="Update_crops">Manage Your Crops</a></li>
+                <li><a href="Sell">Sell Your Crop</a></li>
+            </ul>
+        </div>
+        <div class="menu-section">
+            <div class="menu-section-title">Tools & Services</div>
+            <ul class="menu-list">
+                <li><a href="Buy">Buy Crops</a></li>
+                <li><a href="browse_tools.html">Rent Tools & Machinery</a></li>
+                <li class="farmer-only" style="display:none;"><a href="tools_rental.html">List Tool for Rent</a></li>
+                <li class="farmer-only" style="display:none;"><a href="my_listings.html">My Tool Inventory</a></li>
+                <li><a href="krishimitr">Crop Predictor</a></li>
+                <li><a href="advisor">Crop Advisor</a></li>
+            </ul>
+        </div>
+        <div class="menu-section" style="margin-bottom:0;">
+            <div class="menu-section-title">System</div>
+            <ul class="menu-list">
+                <li><a href="Notification">Notification</a></li>
+                <li><a href="Chat">Chat</a></li>
+            </ul>
+        </div>
     </div>
-    <div class="menu-section">
-      <div class="menu-section-title">Market</div>
-      <ul class="menu-list">
-        <li><a href="Sell">Sell Your Crop</a></li>
-      </ul>
-    </div>
-    <div class="menu-section">
-      <div class="menu-section-title">Tools & Services</div>
-      <ul class="menu-list">
-        <li><a href="Buy">Buy Crops</a></li>
-        <li><a href="browse_tools.html">Rent Tools & Machinery</a></li>
-        <li ><a href="tools_rental.html">List Tool for Rent</a></li>
-        <li> <a href="my_listings.html">My Tool Inventory</a></li>
-        <li><a href="krishimitr">Crop Predictor</a></li>
-                  <li><a href="advisor">Crop Advisor</a></li>
-
-      </ul>
-    </div>
-    <div class="menu-section" style="margin-bottom:0;">
-      <div class="menu-section-title">System</div>
-      <ul class="menu-list">
-        <li><a href="Notification">Notification</a></li>
-        <li><a href="Chat">Chat</a></li>
-      </ul>
-    </div>
-  </div>
 </nav>
 
 <div class="container">
-    <h1 class="page-title">Manage Your Crop Inventory</h1>
-    <div id="cropList" class="crop-grid"></div>
+    <h2 style="color: #0a3d62; margin-bottom: 25px;">Manage Your Listed Crops</h2>
+    <div id="cropsGrid" class="crops-grid"></div>
 </div>
 
-<div class="modal" id="modal">
-    <div class="modal-box">
-        <div class="modal-header"><h3>Update Crop Specifications</h3></div>
-        <div class="form-grid">
-            <div class="form-group"><label>Crop Name</label><input type="text" id="upd_name"></div>
-            <div class="form-group">
-                <label>Category</label>
-                <select id="upd_category">
-                    <option value="Grains">Grains</option>
-                    <option value="Vegetables">Vegetables</option>
-                    <option value="Fruits">Fruits</option>
-                    <option value="Pulses">Pulses</option>
-                </select>
-            </div>
-            <div class="form-group"><label>Price (₹ per kg)</label><input type="number" id="upd_price"></div>
-            <div class="form-group"><label>Total Quantity (kg)</label><input type="number" id="upd_qty"></div>
-            <div class="form-group"><label>Min Order (kg)</label><input type="number" id="upd_min_qty"></div>
-            <div class="form-group">
-                <label>Quality</label>
-                <select id="upd_quality">
-                    <option value="Grade A">Grade A</option>
-                    <option value="Grade B">Grade B</option>
-                    <option value="Grade C">Grade C</option>
-                </select>
-            </div>
-            <div class="form-group"><label>Harvest Date</label><input type="date" id="upd_harvest"></div>
-            <div class="form-group"><label>Available Until</label><input type="date" id="upd_expiry"></div>
-            <div class="form-group full"><label>Location</label><input type="text" id="upd_location"></div>
-            <div class="form-group full"><label>Contact</label><input type="text" id="upd_contact"></div>
-            <div class="form-group full"><label>Description</label><textarea id="upd_description" rows="3"></textarea></div>
+<div id="editModal" class="modal">
+    <div class="modal-content">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+            <h3 style="margin:0; color:#0a3d62;">Update Crop Listing</h3>
+            <button class="btn-close" onclick="closeModal()">✕</button>
         </div>
-        <div class="modal-footer">
-            <button class="btn btn-update" onclick="submitChanges()">Apply Updates</button>
-            <button class="btn btn-delete" onclick="handleDeletion()">Remove Listing</button>
-            <button class="btn btn-close" onclick="closeModal()">Discard</button>
+        <div class="form-group"><label>Crop Name</label><input type="text" id="upd_name"></div>
+        <div class="form-group"><label>Category</label><input type="text" id="upd_cat"></div>
+        <div class="form-group"><label>Quantity (kg)</label><input type="number" id="upd_qty"></div>
+        <div class="form-group"><label>Price (₹/kg)</label><input type="number" id="upd_price"></div>
+        <div class="form-group"><label>Location</label><input type="text" id="upd_location"></div>
+        <div class="form-group"><label>Contact</label><input type="text" id="upd_contact"></div>
+        <div class="form-group"><label>Harvest Date</label><input type="date" id="upd_harvest"></div>
+        <div class="form-group"><label>Available Until</label><input type="date" id="upd_expiry"></div>
+        <div class="form-group"><label>Description</label><textarea id="upd_description" rows="3"></textarea></div>
+        
+        <div class="btn-group">
+            <button class="btn-save" onclick="handleUpdate()">Save Changes</button>
+            <button class="btn-delete" onclick="handleDeletion()">Delete Listing</button>
         </div>
     </div>
 </div>
@@ -235,60 +204,93 @@ body.drawer-open .side-drawer { transform: translateX(0); }
 const db = window.db;
 const loginid = sessionStorage.getItem("loginid");
 const usertype = sessionStorage.getItem("usertype");
-
-if (!loginid || usertype !== "Farmer") {
-    location.href = "Dashboard";
-}
-
 let activeCropId = null;
 let activeJid = null;
-let localCropBuffer = [];
 
-async function fetchFarmerCrops() {
-    const container = document.getElementById("cropList");
-    const { data, error } = await db.from("crop_sales").select("*").eq("lid", loginid);
-    if (error) return;
-    localCropBuffer = data;
-    container.innerHTML = data.map((crop, index) => `
-        <div class="crop-card" onclick="triggerEditModal(${index})">
-            <div style="font-size: 0.75rem; font-weight: 800; color: #ff9933; text-transform: uppercase;">${crop.crop_category}</div>
-            <h3 style="margin: 5px 0; color: #0a3d62;">${crop.crop_name}</h3>
-            <div style="display: flex; justify-content: space-between;">
-                <span style="font-weight: 700; color: #138808;">₹${crop.price}/kg</span>
-                <span style="color: #6b7280;">Stock: ${crop.quantity}kg</span>
-            </div>
-        </div>
-    `).join("");
+if(!loginid) location.href="login";
+
+// Nav drawer Logic
+const menuBtn = document.getElementById("menuBtn");
+const sideNav = document.getElementById("sideNav");
+const navOverlay = document.getElementById("navOverlay");
+
+function openDrawer(){
+    document.body.classList.add("drawer-open");
+    sideNav.hidden = false;
+    navOverlay.hidden = false;
 }
 
-function triggerEditModal(index) {
-    const crop = localCropBuffer[index];
+function closeDrawer(){
+    document.body.classList.remove("drawer-open");
+    setTimeout(() => {
+        if(!document.body.classList.contains("drawer-open")){
+            sideNav.hidden = true;
+            navOverlay.hidden = true;
+        }
+    }, 220);
+}
+
+menuBtn.onclick = () => {
+    document.body.classList.contains("drawer-open") ? closeDrawer() : openDrawer();
+};
+navOverlay.onclick = closeDrawer;
+
+document.getElementById("logoutBtn").onclick = () => {
+    sessionStorage.clear();
+    location.href = "login";
+};
+
+function applyRolePermissions() {
+    if (usertype === "Farmer") {
+        document.getElementById("marketSection").style.display = "block";
+        document.querySelectorAll(".farmer-only").forEach(el => el.style.display = "block");
+    }
+}
+
+async function fetchFarmerCrops() {
+    const { data, error } = await db.from("crop_sales").select("*").eq("lid", loginid);
+    if(error) return;
+    
+    const grid = document.getElementById("cropsGrid");
+    grid.innerHTML = data.length ? "" : "<p>No crops listed yet.</p>";
+    
+    data.forEach(crop => {
+        const card = document.createElement("div");
+        card.className = "crop-card";
+        card.onclick = () => openModal(crop);
+        card.innerHTML = `
+            <h3 style="margin:0 0 10px; color:#0a3d62;">${crop.crop_name}</h3>
+            <p><b>Price:</b> ₹${crop.price}/kg</p>
+            <p><b>Quantity:</b> ${crop.quantity} kg</p>
+            <p><b>Location:</b> ${crop.location}</p>
+        `;
+        grid.appendChild(card);
+    });
+}
+
+function openModal(crop) {
     activeCropId = crop.id;
     activeJid = crop.jid;
     document.getElementById("upd_name").value = crop.crop_name;
-    document.getElementById("upd_category").value = crop.crop_category;
-    document.getElementById("upd_price").value = crop.price;
+    document.getElementById("upd_cat").value = crop.crop_category;
     document.getElementById("upd_qty").value = crop.quantity;
-    document.getElementById("upd_min_qty").value = crop.min_quantity;
-    document.getElementById("upd_quality").value = crop.quality;
-    document.getElementById("upd_harvest").value = crop.harvest_date;
-    document.getElementById("upd_expiry").value = crop.available_until;
+    document.getElementById("upd_price").value = crop.price;
     document.getElementById("upd_location").value = crop.location;
     document.getElementById("upd_contact").value = crop.contact_info;
+    document.getElementById("upd_harvest").value = crop.harvest_date;
+    document.getElementById("upd_expiry").value = crop.available_until;
     document.getElementById("upd_description").value = crop.description;
-    document.getElementById("modal").style.display = "flex";
+    document.getElementById("editModal").style.display = "flex";
 }
 
-function closeModal() { document.getElementById("modal").style.display = "none"; }
+function closeModal() { document.getElementById("editModal").style.display = "none"; }
 
-async function submitChanges() {
+async function handleUpdate() {
     const updateData = {
         crop_name: document.getElementById("upd_name").value,
-        crop_category: document.getElementById("upd_category").value,
-        price: parseFloat(document.getElementById("upd_price").value),
-        quantity: parseInt(document.getElementById("upd_qty").value),
-        min_quantity: parseInt(document.getElementById("upd_min_qty").value),
-        quality: document.getElementById("upd_quality").value,
+        crop_category: document.getElementById("upd_cat").value,
+        quantity: document.getElementById("upd_qty").value,
+        price: document.getElementById("upd_price").value,
         harvest_date: document.getElementById("upd_harvest").value,
         available_until: document.getElementById("upd_expiry").value,
         location: document.getElementById("upd_location").value,
@@ -313,24 +315,7 @@ async function handleDeletion() {
     fetchFarmerCrops();
 }
 
-const menuBtn = document.getElementById("menuBtn");
-const sideNav = document.getElementById("sideNav");
-const navOverlay = document.getElementById("navOverlay");
-
-menuBtn.onclick = () => {
-    const isOpen = document.body.classList.toggle("drawer-open");
-    sideNav.hidden = !isOpen;
-    navOverlay.hidden = !isOpen;
-};
-
-navOverlay.onclick = () => {
-    document.body.classList.remove("drawer-open");
-    sideNav.hidden = true;
-    navOverlay.hidden = true;
-};
-
-document.getElementById("logoutBtn").onclick = () => { sessionStorage.clear(); location.href="login"; };
-
+applyRolePermissions();
 fetchFarmerCrops();
 </script>
 </body>
