@@ -46,7 +46,9 @@ body.drawer-open { overflow: hidden; }
   display: grid;
   place-items: center;
   cursor: pointer;
+  transition: 0.3s;
 }
+.hamburger-btn:hover { transform: scale(1.05); }
 .hamburger-icon {
   width: 20px;
   height: 14px;
@@ -60,31 +62,20 @@ body.drawer-open { overflow: hidden; }
   background: #0a3d62;
   border-radius: 999px;
 }
-.hamburger-icon span:nth-child(1) { top:0; }
-.hamburger-icon span:nth-child(2) { top:5.5px; }
-.hamburger-icon span:nth-child(3) { top:11px; }
+.hamburger-icon span:nth-child(1){ top:0; }
+.hamburger-icon span:nth-child(2){ top:5.5px; }
+.hamburger-icon span:nth-child(3){ top:11px; }
 
 .brand-title {
+  margin: 0;
+  font-size: 1.15rem;
   font-weight: 800;
   color: #0a3d62;
 }
-
 .nav-right {
   display: flex;
   align-items: center;
   gap: 15px;
-}
-.profile-btn img {
-  width: 42px;
-  height: 42px;
-  border-radius: 50%;
-  border: 2px solid #0a3d62;
-  cursor: pointer;
-  transition: 0.3s;
-}
-.profile-btn img:hover {
-  transform: scale(1.1);
-  box-shadow: 0 0 15px rgba(10,61,98,0.4);
 }
 .logout-btn {
   background: white;
@@ -99,6 +90,7 @@ body.drawer-open { overflow: hidden; }
 .logout-btn:hover {
   background: #0a3d62;
   color: white;
+  transform: translateY(-2px);
 }
 
 .nav-overlay {
@@ -126,14 +118,8 @@ body.drawer-open { overflow: hidden; }
   z-index: 9999;
 }
 .drawer-inner { padding: 14px; }
-
-body.drawer-open .nav-overlay {
-  opacity: 1;
-  pointer-events: auto;
-}
-body.drawer-open .side-drawer {
-  transform: translateX(0);
-}
+body.drawer-open .nav-overlay { opacity: 1; pointer-events: auto; }
+body.drawer-open .side-drawer { transform: translateX(0); }
 
 .menu-section {
   border-radius: 14px;
@@ -162,46 +148,16 @@ body.drawer-open .side-drawer {
 .menu-list li + li a { border-top: 1px solid rgba(255,255,255,0.1); }
 .menu-list a:hover { background: #1e3a8a; padding-left: 20px; }
 
-.container {
-  max-width: 900px;
-  margin: 150px auto 60px;
-}
-.sell-card {
-  background: white;
-  border-radius: 26px;
-  padding: 8px;
-  box-shadow: 0 18px 40px rgba(0,0,0,0.18);
-}
-.sell-inner {
-  background: white;
-  border-radius: 20px;
-  padding: 50px;
-  border-top: 6px solid #ff9933;
-  border-bottom: 6px solid #138808;
-}
-label { font-weight: 600; margin-top: 14px; display: block; }
-input, textarea {
-  width: 100%;
-  padding: 12px;
-  border-radius: 12px;
-  border: 2px solid #0a3d62;
-  font-size: 1em;
-}
-textarea { resize: vertical; }
-input:focus, textarea:focus { outline: none; border-color: #ff9933; }
-.input-error { border: 2px solid #dc2626 !important; background: #fff5f5; }
-.submit-btn {
-  margin-top: 30px;
-  width: 100%;
-  padding: 16px;
-  border: none;
-  border-radius: 14px;
-  font-size: 1.1em;
-  font-weight: 700;
-  background: linear-gradient(135deg,#138808,#2ecc71);
-  color: white;
-  cursor: pointer;
-}
+.container { max-width: 800px; margin: 120px auto 50px; padding: 0 20px; }
+.sell-card { background: white; padding: 40px; border-radius: 25px; box-shadow: 0 20px 50px rgba(0,0,0,0.1); border-top: 8px solid #ff9933; }
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.full-width { grid-column: span 2; }
+.sell-card h2 { margin-top: 0; color: #0a3d62; text-align: center; margin-bottom: 30px; }
+label { display: block; margin-bottom: 8px; font-weight: 600; color: #374151; }
+input, select, textarea { width: 100%; padding: 12px; border: 2px solid #e5e7eb; border-radius: 12px; font-size: 15px; box-sizing: border-box; }
+input:focus { border-color: #0a3d62; outline: none; }
+.submit-btn { width: 100%; padding: 16px; background: #138808; color: white; border: none; border-radius: 15px; font-size: 18px; font-weight: 700; cursor: pointer; transition: 0.3s; margin-top: 20px; }
+.submit-btn:hover { background: #0e6306; transform: translateY(-2px); box-shadow: 0 10px 20px rgba(19,136,8,0.2); }
 </style>
 </head>
 <body>
@@ -214,9 +170,6 @@ input:focus, textarea:focus { outline: none; border-color: #ff9933; }
     <p class="brand-title">Krishi Mitr</p>
   </div>
   <div class="nav-right">
-    <div class="profile-btn" onclick="location.href='Profile'">
-      <img src="profile_pic.png" alt="Profile">
-    </div>
     <button class="logout-btn" id="logoutBtn">Logout</button>
   </div>
 </div>
@@ -230,9 +183,11 @@ input:focus, textarea:focus { outline: none; border-color: #ff9933; }
         <li><a href="Dashboard">Dashboard</a></li>
       </ul>
     </div>
+    <div class="menu-section" id="marketSection" style="display:none;">
       <div class="menu-section-title">Market</div>
       <ul class="menu-list">
         <li><a href="Update_crops">Manage Your Crops</a></li>
+        <li><a href="Sell">Sell Your Crop</a></li>
       </ul>
     </div>
     <div class="menu-section">
@@ -240,8 +195,8 @@ input:focus, textarea:focus { outline: none; border-color: #ff9933; }
       <ul class="menu-list">
         <li><a href="Buy">Buy Crops</a></li>
         <li><a href="browse_tools.html">Rent Tools & Machinery</a></li>
-        <li><a href="tools_rental.html">List Tool for Rent</a></li>
-        <li ><a href="my_listings.html">My Tool Inventory</a></li>
+        <li class="farmer-only" style="display:none;"><a href="tools_rental.html">List Tool for Rent</a></li>
+        <li class="farmer-only" style="display:none;"><a href="my_listings.html">My Tool Inventory</a></li>
         <li><a href="krishimitr">Crop Predictor</a></li>
         <li><a href="advisor">Crop Advisor</a></li>
       </ul>
@@ -258,38 +213,79 @@ input:focus, textarea:focus { outline: none; border-color: #ff9933; }
 
 <div class="container">
   <div class="sell-card">
-    <div class="sell-inner">
-      <h1>Sell Your Crops</h1>
-      <form id="sellForm">
+    <h2>List Your Crop</h2>
+    <form id="sellForm" class="form-grid">
+      <div>
         <label>Farmer Name</label>
-        <input type="text" id="farmerName" readonly>
+        <input type="text" id="farmerName" required readonly>
+      </div>
+      <div>
         <label>Crop Name</label>
-        <input type="text" id="cropName" placeholder="Example: Wheat">
+        <input type="text" id="cropName" placeholder="e.g. Basmati Rice" required>
+      </div>
+      <div>
         <label>Crop Category</label>
-        <input type="text" id="cropCategory" placeholder="Example: Grains">
+        <select id="cropCategory">
+          <option>Cereals</option>
+          <option>Vegetables</option>
+          <option>Fruits</option>
+          <option>Pulses</option>
+          <option>Oilseeds</option>
+          <option>Spices</option>
+        </select>
+      </div>
+      <div>
         <label>Total Quantity (kg)</label>
-        <input type="number" id="quantity" placeholder="Example: 500">
-        <label>Minimum Order Quantity (kg)</label>
-        <input type="number" id="minQuantity" placeholder="Example: 50">
+        <input type="number" id="quantity" required>
+      </div>
+      <div>
+        <label>Min Order (kg)</label>
+        <input type="number" id="minQuantity" required>
+      </div>
+      <div>
         <label>Price per kg (₹)</label>
-        <input type="number" id="price" placeholder="Example: 25">
-        <label>Quality</label>
-        <input type="text" id="quality" placeholder="Example: A Grade">
+        <input type="number" id="price" required>
+      </div>
+      <div>
+        <label>Quality Grade</label>
+        <select id="quality">
+          <option>Premium (A+)</option>
+          <option>High (A)</option>
+          <option>Standard (B)</option>
+        </select>
+      </div>
+      <div>
         <label>Harvest Date</label>
-        <input type="date" id="harvestDate">
+        <input type="date" id="harvestDate" required>
+      </div>
+      <div>
         <label>Available Until</label>
-        <input type="date" id="availableUntil">
-        <label>Delivery Type</label>
-        <input type="text" id="deliveryType" placeholder="Example: Pickup / Transport">
-        <label>Location / Address</label>
-        <input type="text" id="cropLocation" placeholder="Example: Nashik, Maharashtra">
-        <label>Contact Number</label>
-        <input type="tel" id="contactInfo" placeholder="Example: 9876543210">
-        <label>Description (optional)</label>
-        <textarea id="description" placeholder="Any additional details"></textarea>
-        <button class="submit-btn">Submit Crop</button>
-      </form>
-    </div>
+        <input type="date" id="availableUntil" required>
+      </div>
+      <div>
+        <label>Delivery/Pickup</label>
+        <select id="deliveryType">
+          <option>Self Pickup</option>
+          <option>Farmer Delivery</option>
+          <option>Negotiable</option>
+        </select>
+      </div>
+      <div class="full-width">
+        <label>Location (City/Village)</label>
+        <input type="text" id="cropLocation" required>
+      </div>
+      <div class="full-width">
+        <label>Contact Info</label>
+        <input type="text" id="contactInfo" required>
+      </div>
+      <div class="full-width">
+        <label>Additional Description</label>
+        <textarea id="description" rows="3"></textarea>
+      </div>
+      <div class="full-width">
+        <button type="submit" class="submit-btn">List Crop for Sale</button>
+      </div>
+    </form>
   </div>
 </div>
 
@@ -298,24 +294,47 @@ const db = window.db;
 const loginid = sessionStorage.getItem("loginid");
 const usertype = sessionStorage.getItem("usertype");
 
-if(!loginid || usertype !== "Farmer"){ location.href="login"; }
+if(!loginid){ location.href="login"; }
 
 async function loadFarmer(){
-  const { data } = await db.from("logindata").select("name").eq("loginid", loginid).maybeSingle();
-  farmerName.value = data?.name || "";
+  const { data } = await db.from("logindata").select("name").eq("loginid", loginid).single();
+  if(data) document.getElementById("farmerName").value = data.name;
 }
 
-document.getElementById("sellForm").addEventListener("submit", async e=>{
-  e.preventDefault();
-  let valid = true;
-  const fields = [cropName, cropCategory, quantity, minQuantity, price, quality, harvestDate, availableUntil, deliveryType, cropLocation, contactInfo];
-  fields.forEach(f=>{
-    f.classList.remove("input-error");
-    if(!f.value.trim()){ f.classList.add("input-error"); f.placeholder="This field is required"; valid=false; }
-  });
-  if(!/^\d{10}$/.test(contactInfo.value)){ contactInfo.classList.add("input-error"); contactInfo.value=""; contactInfo.placeholder="Enter valid 10 digit mobile number"; valid=false; }
-  if(!valid) return;
+function applyRolePermissions() {
+  if (usertype === "Farmer") {
+    document.getElementById("marketSection").style.display = "block";
+    document.querySelectorAll(".farmer-only").forEach(el => el.style.display = "block");
+  }
+}
 
+const menuBtn = document.getElementById("menuBtn");
+const sideNav = document.getElementById("sideNav");
+const navOverlay = document.getElementById("navOverlay");
+
+function openDrawer(){
+  document.body.classList.add("drawer-open");
+  sideNav.hidden=false;
+  navOverlay.hidden=false;
+}
+
+function closeDrawer(){
+  document.body.classList.remove("drawer-open");
+  setTimeout(()=>{
+    if(!document.body.classList.contains("drawer-open")){
+      sideNav.hidden=true;
+      navOverlay.hidden=true;
+    }
+  },220);
+}
+
+menuBtn.onclick = ()=>{ document.body.classList.contains("drawer-open") ? closeDrawer() : openDrawer(); };
+navOverlay.onclick = closeDrawer;
+
+document.getElementById("logoutBtn").onclick = ()=>{ sessionStorage.clear(); location.href="login"; };
+
+document.getElementById("sellForm").addEventListener("submit", async (e)=>{
+  e.preventDefault();
   const { error } = await db.from("crop_sales").insert({
     farmer_name: farmerName.value,
     crop_name: cropName.value,
@@ -333,23 +352,12 @@ document.getElementById("sellForm").addEventListener("submit", async e=>{
     jid: crypto.randomUUID(),
     lid: loginid
   });
-  if(error){ alert(error.message); } else { alert("Crop listed successfully"); e.target.reset(); loadFarmer(); }
+  if(error){ alert(error.message); } 
+  else { alert("Crop listed successfully"); e.target.reset(); loadFarmer(); }
 });
 
-document.getElementById("logoutBtn").onclick = ()=>{ sessionStorage.clear(); location.href="login"; };
-
-const menuBtn = document.getElementById("menuBtn");
-const sideNav = document.getElementById("sideNav");
-const navOverlay = document.getElementById("navOverlay");
-
-function openDrawer(){ document.body.classList.add("drawer-open"); sideNav.hidden=false; navOverlay.hidden=false; menuBtn.setAttribute("aria-expanded","true"); }
-function closeDrawer(){ document.body.classList.remove("drawer-open"); menuBtn.setAttribute("aria-expanded","false"); setTimeout(()=>{ if(!document.body.classList.contains("drawer-open")){ sideNav.hidden=true; navOverlay.hidden=true; }},220); }
-
-menuBtn.onclick = ()=>{ document.body.classList.contains("drawer-open") ? closeDrawer() : openDrawer(); };
-navOverlay.onclick = closeDrawer;
-
+applyRolePermissions();
 loadFarmer();
 </script>
-
 </body>
 </html>
