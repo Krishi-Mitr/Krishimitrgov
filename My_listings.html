@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>My Tool Listings</title>
+<title>My Tool Listings - Krishi Mitr</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="supabase.js"></script>
 <style>
@@ -12,8 +12,10 @@ body {
   min-height: 100vh;
   background: linear-gradient(180deg,#f6e2cc 0%,#f7f9f8 45%,#dceee3 100%);
   color: #1f2937;
+  padding-top: 100px;
 }
 body.drawer-open { overflow: hidden; }
+
 .top-nav {
   position: fixed;
   top: 0; left: 0; right: 0; height: 78px;
@@ -26,85 +28,104 @@ body.drawer-open { overflow: hidden; }
 }
 .nav-left { display: flex; align-items: center; gap: 14px; }
 .hamburger-btn {
-  width: 44px; height: 44px; border-radius: 12px; border: 2px solid #0a3d62;
-  background: rgba(255,255,255,0.75); display: grid; place-items: center; cursor: pointer;
-}
-.hamburger-icon { width: 20px; height: 14px; position: relative; }
-.hamburger-icon span { position: absolute; left: 0; right: 0; height: 2.5px; background: #0a3d62; border-radius: 999px; }
-.hamburger-icon span:nth-child(1) { top:0; }
-.hamburger-icon span:nth-child(2) { top:5.5px; }
-.hamburger-icon span:nth-child(3) { top:11px; }
-.brand-title { font-weight: 800; color: #0a3d62; }
-.nav-right { display: flex; align-items: center; gap: 15px; }
-.profile-btn img {
-  width: 42px; height: 42px; border-radius: 50%; border: 2px solid #0a3d62;
+  width: 44px; height: 44px; border-radius: 12px;
+  border: 2px solid #0a3d62;
+  background: rgba(255,255,255,0.75);
+  display: grid; place-items: center;
   cursor: pointer; transition: 0.3s;
 }
-.logout-btn { background: white; color: #0a3d62; border: 2px solid #0a3d62; padding: 10px 18px; border-radius: 10px; font-weight: 700; cursor: pointer; transition: 0.3s; }
-.logout-btn:hover { background: #0a3d62; color: white; }
+.hamburger-btn:hover { transform: scale(1.05); }
+.hamburger-icon { width: 20px; height: 14px; position: relative; }
+.hamburger-icon span {
+  position: absolute; left: 0; right: 0; height: 2.5px;
+  background: #0a3d62; border-radius: 999px;
+}
+.hamburger-icon span:nth-child(1){ top:0; }
+.hamburger-icon span:nth-child(2){ top:5.5px; }
+.hamburger-icon span:nth-child(3){ top:11px; }
+
+.brand-title { margin: 0; font-size: 1.15rem; font-weight: 800; color: #0a3d62; }
+.logout-btn {
+  background: white; color: #0a3d62; border: 2px solid #0a3d62;
+  padding: 10px 18px; border-radius: 10px; font-weight: 700;
+  cursor: pointer; transition: 0.3s;
+}
+.logout-btn:hover { background: #0a3d62; color: white; transform: translateY(-2px); }
+
 .nav-overlay {
   position: fixed; inset: 0; background: rgba(0,0,0,0.25);
-  opacity: 0; pointer-events: none; transition: .2s ease; z-index: 9998;
+  opacity: 0; pointer-events: none; transition: opacity .2s ease; z-index: 9998;
 }
 .side-drawer {
-  position: fixed; top: 84px; left: 14px; width: min(320px, calc(100vw - 28px));
-  max-height: calc(100vh - 98px); overflow: auto;
+  position: fixed; top: 84px; left: 14px;
+  width: min(320px, calc(100vw - 28px));
+  max-height: calc(100vh - 98px);
+  overflow: auto;
   background: linear-gradient(180deg,#0a3d62,#082032);
   border: 3px solid #ffffff; border-radius: 18px;
   box-shadow: 0 18px 40px rgba(0,0,0,0.35);
-  transform: translateX(-110%); transition: .25s ease; z-index: 9999;
+  transform: translateX(-110%); transition: transform .25s ease; z-index: 9999;
 }
 .drawer-inner { padding: 14px; }
-.menu-section {
-  border-radius: 14px; overflow: hidden; border: 1px solid rgba(255,255,255,0.15);
-  margin-bottom: 14px; background: rgba(255,255,255,0.05);
-}
-.menu-section-title { padding: 12px 14px; background: rgba(255,255,255,0.1); color: white; font-weight: 800; font-size: 0.95rem; }
-.menu-list { list-style: none; padding: 0; margin: 0; }
-.menu-list a {
-  display: block; padding: 14px; text-decoration: none; color: white;
-  font-weight: 600; transition: 0.2s ease; background: rgba(255,255,255,0.08);
-}
-.menu-list li+li a { border-top: 1px solid rgba(255,255,255,0.1); }
-.menu-list a:hover { background: #1e3a8a; padding-left: 20px; }
 body.drawer-open .nav-overlay { opacity: 1; pointer-events: auto; }
 body.drawer-open .side-drawer { transform: translateX(0); }
-.container { max-width: 1100px; margin: 120px auto 60px; padding: 0 20px; }
-.tool-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 25px; }
-.tool-card {
-  background: white; border-radius: 20px; padding: 25px;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.08); border-left: 6px solid #138808;
-  transition: 0.3s;
+
+.menu-section {
+  border-radius: 14px; overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.15);
+  margin-bottom: 14px; background: rgba(255,255,255,0.05);
 }
-.tool-card:hover { transform: translateY(-5px); box-shadow: 0 15px 35px rgba(0,0,0,0.12); }
-.tool-name { font-size: 1.3rem; font-weight: 800; color: #0a3d62; margin: 0 0 10px 0; }
-.btn-group { display: flex; gap: 10px; margin-top: 20px; }
-.edit-btn, .delete-btn { flex: 1; padding: 10px; border-radius: 8px; font-weight: 600; cursor: pointer; border: 1px solid #ddd; transition: 0.2s; }
-.edit-btn { background: #f0f9ff; color: #0369a1; border-color: #bae6fd; }
-.edit-btn:hover { background: #e0f2fe; }
-.delete-btn { background: #fee2e2; color: #dc2626; border-color: #fecaca; }
-.delete-btn:hover { background: #fecaca; }
-.modal { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: none; place-items: center; z-index: 10000; padding: 20px; }
-.modal-content { background: white; padding: 30px; border-radius: 20px; width: 100%; max-width: 500px; box-shadow: 0 25px 50px rgba(0,0,0,0.2); }
-.form-field { margin-bottom: 15px; }
-.form-field label { display: block; font-weight: 600; margin-bottom: 5px; color: #374151; }
-.form-field input { width: 100%; padding: 12px; border: 2px solid #e5e7eb; border-radius: 8px; box-sizing: border-box; transition: 0.2s; }
-.form-field input:focus { border-color: #0a3d62; outline: none; }
-.save-btn { width: 100%; padding: 12px; background: #0a3d62; color: white; border: none; border-radius: 10px; font-weight: 700; cursor: pointer; transition: 0.3s; }
-.save-btn:hover { background: #082c47; }
+.menu-section-title {
+  padding: 12px 14px; background: rgba(255,255,255,0.1);
+  color: white; font-weight: 800; font-size: 0.95rem;
+}
+.menu-list { list-style: none; padding: 0; margin: 0; }
+.menu-list a {
+  display: block; padding: 14px; text-decoration: none;
+  color: white; font-weight: 600; background: rgba(255,255,255,0.08);
+  transition: 0.2s ease;
+}
+.menu-list li + li a { border-top: 1px solid rgba(255,255,255,0.1); }
+.menu-list a:hover { background: #1e3a8a; padding-left: 20px; }
+
+.container { max-width: 1000px; margin: auto; padding: 20px; }
+.tool-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
+.tool-card {
+  background: white; border-radius: 15px; padding: 20px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1); border-top: 5px solid #138808;
+}
+.tool-card h3 { margin: 0 0 10px; color: #0a3d62; }
+.tool-card p { margin: 5px 0; color: #4b5563; }
+.btn-group { display: flex; gap: 10px; margin-top: 15px; }
+.btn-edit { background: #ff9933; color: white; border: none; padding: 8px 15px; border-radius: 8px; cursor: pointer; flex: 1; font-weight: 600; }
+.btn-delete { background: #dc2626; color: white; border: none; padding: 8px 15px; border-radius: 8px; cursor: pointer; flex: 1; font-weight: 600; }
+
+.modal {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.5);
+  display: none; justify-content: center; align-items: center; z-index: 10001;
+}
+.modal-content {
+  background: white; padding: 30px; border-radius: 20px;
+  width: min(500px, 90%); box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+}
+.form-group { margin-bottom: 15px; }
+.form-group label { display: block; margin-bottom: 5px; font-weight: 600; }
+.form-group input { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; }
+.modal-btns { display: flex; gap: 10px; margin-top: 20px; }
+.btn-save { background: #138808; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; flex: 1; font-weight: 600; }
+.btn-close { background: #6b7280; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; flex: 1; font-weight: 600; }
 </style>
 </head>
 <body>
 
 <div class="top-nav">
   <div class="nav-left">
-    <button class="hamburger-btn" id="menuBtn"><div class="hamburger-icon"><span></span><span></span><span></span></div></button>
+    <button class="hamburger-btn" id="menuBtn">
+      <div class="hamburger-icon"><span></span><span></span><span></span></div>
+    </button>
     <p class="brand-title">Krishi Mitr</p>
   </div>
-  <div class="nav-right">
-    <div class="profile-btn" onclick="location.href='Profile'"><img src="profile_pic.png" alt="Profile"></div>
-    <button class="logout-btn" id="logoutBtn">Logout</button>
-  </div>
+  <button class="logout-btn" id="logoutBtn">Logout</button>
 </div>
 
 <div class="nav-overlay" id="navOverlay" hidden></div>
@@ -129,6 +150,7 @@ body.drawer-open .side-drawer { transform: translateX(0); }
         <li><a href="Buy">Buy Crops</a></li>
         <li><a href="browse_tools.html">Rent Tools & Machinery</a></li>
         <li class="farmer-only" style="display:none;"><a href="tools_rental.html">List Tool for Rent</a></li>
+        <li class="farmer-only" style="display:none;"><a href="my_listings.html">My Tool Inventory</a></li>
         <li><a href="krishimitr">Crop Predictor</a></li>
         <li><a href="advisor">Crop Advisor</a></li>
       </ul>
@@ -144,29 +166,31 @@ body.drawer-open .side-drawer { transform: translateX(0); }
 </nav>
 
 <div class="container">
-  <h1 style="color: #0a3d62; margin-bottom: 30px;">Your Tool Inventory</h1>
-  <div class="tool-grid" id="myToolsContainer"></div>
+  <h2 style="color: #0a3d62; margin-bottom: 25px;">My Tool Inventory</h2>
+  <div class="tool-grid" id="toolGrid"></div>
 </div>
 
-<div class="modal" id="editModal">
+<div id="editModal" class="modal">
   <div class="modal-content">
-    <h2 style="margin-top:0; color: #0a3d62;">Update Listing</h2>
+    <h3 style="margin-top:0;">Edit Listing</h3>
     <form id="updateForm">
       <input type="hidden" id="editId">
-      <div class="form-field">
+      <div class="form-group">
         <label>Tool Name</label>
         <input type="text" id="editName" required>
       </div>
-      <div class="form-field">
+      <div class="form-group">
         <label>Price per Day (₹)</label>
         <input type="number" id="editPrice" required>
       </div>
-      <div class="form-field">
+      <div class="form-group">
         <label>Location</label>
         <input type="text" id="editLocation" required>
       </div>
-      <button type="submit" class="save-btn">Save Changes</button>
-      <button type="button" onclick="closeModal()" style="width:100%; margin-top:10px; background:none; border:none; color:#64748b; font-weight:600; cursor:pointer;">Cancel</button>
+      <div class="modal-btns">
+        <button type="button" class="btn-close" onclick="closeModal()">Cancel</button>
+        <button type="submit" class="btn-save">Update Listing</button>
+      </div>
     </form>
   </div>
 </div>
@@ -176,13 +200,7 @@ const db = window.db;
 const loginid = sessionStorage.getItem("loginid");
 const usertype = sessionStorage.getItem("usertype");
 
-if (!loginid) {
-  location.href = "login";
-}
-
-if (usertype !== "Farmer") {
-  location.href = "Dashboard";
-}
+if (!loginid) { location.href = "login"; }
 
 function applyRolePermissions() {
   if (usertype === "Farmer") {
@@ -191,38 +209,68 @@ function applyRolePermissions() {
   }
 }
 
+const menuBtn = document.getElementById("menuBtn");
+const sideNav = document.getElementById("sideNav");
+const navOverlay = document.getElementById("navOverlay");
+
+function openDrawer() {
+  document.body.classList.add("drawer-open");
+  sideNav.hidden = false;
+  navOverlay.hidden = false;
+}
+
+function closeDrawer() {
+  document.body.classList.remove("drawer-open");
+  setTimeout(() => {
+    if (!document.body.classList.contains("drawer-open")) {
+      sideNav.hidden = true;
+      navOverlay.hidden = true;
+    }
+  }, 220);
+}
+
+menuBtn.onclick = () => {
+  document.body.classList.contains("drawer-open") ? closeDrawer() : openDrawer();
+};
+navOverlay.onclick = closeDrawer;
+
+document.getElementById("logoutBtn").onclick = () => {
+  sessionStorage.clear();
+  location.href = "login";
+};
+
 async function fetchMyTools() {
-  const { data, error } = await db.from("tool_rentals").select("*").eq("user_id", loginid);
-  if(error) return;
-  const container = document.getElementById("myToolsContainer");
-  container.innerHTML = data.length ? "" : "<p style='color:#64748b; font-style:italic;'>No tools listed yet. Click 'List Tool for Rent' in the sidebar to start.</p>";
+  const { data, error } = await db.from("tool_rentals").select("*").eq("lid", loginid);
+  if (error) return;
+  
+  const grid = document.getElementById("toolGrid");
+  grid.innerHTML = data.length ? "" : "<p>You haven't listed any tools yet.</p>";
+  
   data.forEach(tool => {
     const card = document.createElement("div");
     card.className = "tool-card";
     card.innerHTML = `
-      <p class="tool-name">${tool.tool_name}</p>
-      <div style="font-size:0.9rem; color:#64748b">📍 ${tool.location}</div>
-      <div style="font-weight:700; color:#138808; font-size:1.4rem; margin-top:10px;">₹${tool.price_per_day}/day</div>
+      <h3>${tool.tool_name}</h3>
+      <p><b>Price:</b> ₹${tool.price_per_day}/day</p>
+      <p><b>Location:</b> ${tool.location}</p>
       <div class="btn-group">
-        <button class="edit-btn" onclick='openEdit(${JSON.stringify(tool).replace(/'/g, "&apos;")})'>Edit</button>
-        <button class="delete-btn" onclick="deleteTool(${tool.id})">Delete</button>
+        <button class="btn-edit" onclick='openEditModal(${JSON.stringify(tool)})'>Edit</button>
+        <button class="btn-delete" onclick="deleteTool(${tool.id})">Delete</button>
       </div>
     `;
-    container.appendChild(card);
+    grid.appendChild(card);
   });
 }
 
-function openEdit(tool) {
+function openEditModal(tool) {
   document.getElementById("editId").value = tool.id;
   document.getElementById("editName").value = tool.tool_name;
   document.getElementById("editPrice").value = tool.price_per_day;
   document.getElementById("editLocation").value = tool.location;
-  document.getElementById("editModal").style.display = "grid";
+  document.getElementById("editModal").style.display = "flex";
 }
 
-function closeModal() { 
-  document.getElementById("editModal").style.display = "none"; 
-}
+function closeModal() { document.getElementById("editModal").style.display = "none"; }
 
 document.getElementById("updateForm").onsubmit = async (e) => {
   e.preventDefault();
@@ -232,45 +280,16 @@ document.getElementById("updateForm").onsubmit = async (e) => {
     location: document.getElementById("editLocation").value
   }).eq("id", document.getElementById("editId").value);
   
-  if (!error) {
-    closeModal(); 
-    fetchMyTools();
-  } else {
-    alert("Error updating listing.");
-  }
+  if (!error) { closeModal(); fetchMyTools(); }
+  else { alert("Error updating listing."); }
 };
 
 async function deleteTool(id) {
-  if(confirm("Are you sure you want to remove this listing? This action cannot be undone.")) {
+  if (confirm("Are you sure you want to remove this listing?")) {
     const { error } = await db.from("tool_rentals").delete().eq("id", id);
-    if (!error) {
-      fetchMyTools();
-    } else {
-      alert("Error deleting tool.");
-    }
+    if (!error) fetchMyTools();
   }
 }
-
-const menuBtn = document.getElementById("menuBtn");
-const sideNav = document.getElementById("sideNav");
-const navOverlay = document.getElementById("navOverlay");
-
-menuBtn.onclick = () => {
-  const isOpen = document.body.classList.toggle("drawer-open");
-  sideNav.hidden = !isOpen;
-  navOverlay.hidden = !isOpen;
-};
-
-navOverlay.onclick = () => {
-  document.body.classList.remove("drawer-open");
-  sideNav.hidden = true;
-  navOverlay.hidden = true;
-};
-
-document.getElementById("logoutBtn").onclick = () => { 
-  sessionStorage.clear(); 
-  location.href="login"; 
-};
 
 applyRolePermissions();
 fetchMyTools();
