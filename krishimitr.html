@@ -1,286 +1,257 @@
 <!doctype html>
 <html lang="en">
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>KrishiMitr — Price Predictor</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <style>
-        body {
-            background: linear-gradient(to bottom, #FF9933 0%, #FFFFFF 50%, #138808 100%);
-            background-attachment: fixed;
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding-top: 80px;
-        }
-        .top-nav {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 78px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0 32px;
-            background: linear-gradient(90deg, #ff9933, #ffffff, #138808);
-            border-bottom: 3px solid #0a3d62;
-            box-shadow: 0 6px 14px rgba(0, 0, 0, 0.15);
-            z-index: 9999;
-        }
-        .nav-left {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-        }
-        .hamburger-btn {
-            width: 44px;
-            height: 44px;
-            border-radius: 12px;
-            border: 2px solid #0a3d62;
-            background: rgba(255, 255, 255, 0.75);
-            display: grid;
-            place-items: center;
-            cursor: pointer;
-        }
-        .hamburger-icon {
-            width: 20px;
-            height: 14px;
-            position: relative;
-        }
-        .hamburger-icon span {
-            position: absolute;
-            left: 0;
-            right: 0;
-            height: 2.5px;
-            background: #0a3d62;
-            border-radius: 999px;
-        }
-        .hamburger-icon span:nth-child(1) { top: 0; }
-        .hamburger-icon span:nth-child(2) { top: 5.5px; }
-        .hamburger-icon span:nth-child(3) { top: 11px; }
-        .brand-title {
-            margin: 0;
-            font-size: 1.15rem;
-            font-weight: 800;
-            color: #0a3d62;
-        }
-        .logout-btn {
-            background: white;
-            color: #0a3d62;
-            border: 2px solid #0a3d62;
-            padding: 10px 22px;
-            border-radius: 10px;
-            font-weight: 700;
-            cursor: pointer;
-        }
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-        .card {
-            background: white;
-            padding: 20px;
-            border-radius: 15px;
-            margin-bottom: 20px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-            border: 2px solid #000000;
-        }
-        .form-group { margin-bottom: 15px; }
-        .form-group label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: 600;
-            color: #000080;
-        }
-        .form-control {
-            width: 100%;
-            padding: 10px;
-            border: 2px solid #000000;
-            border-radius: 8px;
-        }
-        #horizon {
-            width: 100%;
-            height: 6px;
-            margin: 8px 0;
-            cursor: pointer;
-        }
-        .btn {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-            width: 100%;
-            margin-top: 10px;
-        }
-        .btn-primary { background: #16A34A; color: white; }
-        .btn-info { background: #06B6D4; color: #000; }
-        .chart-container { position: relative; height: 400px; margin: 20px 0; }
-        .side-drawer {
-            position: fixed;
-            top: 84px;
-            left: 14px;
-            width: 280px;
-            background: white;
-            border: 3px solid #0a3d62;
-            border-radius: 18px;
-            transform: translateX(-120%);
-            transition: transform .25s ease;
-            z-index: 9999;
-            padding: 15px;
-        }
-        body.drawer-open .side-drawer { transform: translateX(0); }
-        .menu-list { list-style: none; padding: 0; }
-        .menu-list a {
-            display: block;
-            padding: 10px;
-            text-decoration: none;
-            color: #0a3d62;
-            font-weight: 800;
-            border-bottom: 1px solid #eee;
-        }
-    </style>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>KrishiMitr — Crop Price Predictor</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+body{background:linear-gradient(to bottom,#FF9933 0%,#FFFFFF 50%,#138808 100%);background-attachment:fixed;font-family:Arial,sans-serif;margin:0;padding-top:80px}
+.top-nav{position:fixed;top:0;left:0;right:0;height:78px;display:flex;justify-content:space-between;align-items:center;padding:0 32px;background:linear-gradient(90deg,#ff9933,#ffffff,#138808);border-bottom:3px solid #0a3d62;box-shadow:0 6px 14px rgba(0,0,0,0.15);z-index:9999}
+.nav-left{display:flex;align-items:center;gap:14px}
+.hamburger-btn{width:44px;height:44px;border-radius:12px;border:2px solid #0a3d62;background:rgba(255,255,255,0.75);display:grid;place-items:center;cursor:pointer}
+.hamburger-icon{width:20px;height:14px;position:relative}
+.hamburger-icon span{position:absolute;left:0;right:0;height:2.5px;background:#0a3d62;border-radius:999px}
+.hamburger-icon span:nth-child(1){top:0}
+.hamburger-icon span:nth-child(2){top:5.5px}
+.hamburger-icon span:nth-child(3){top:11px}
+.brand-title{margin:0;font-size:1.15rem;font-weight:800;color:#0a3d62}
+.brand-subtitle{margin:0;font-size:.9rem;font-weight:700;color:rgba(10,61,98,.8)}
+.logout-btn{background:white;color:#0a3d62;border:2px solid #0a3d62;padding:10px 22px;border-radius:10px;font-weight:700;cursor:pointer}
+.nav-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.25);opacity:0;pointer-events:none;transition:opacity .2s ease;z-index:9998}
+.side-drawer{position:fixed;top:84px;left:14px;width:min(320px,calc(100vw - 28px));max-height:calc(100vh - 98px);overflow:auto;background:white;border:3px solid #0a3d62;border-radius:18px;box-shadow:0 18px 40px rgba(0,0,0,.22);transform:translateX(-110%);transition:transform .25s ease;z-index:9999}
+.drawer-inner{padding:14px}
+.menu-section{border-radius:14px;overflow:hidden;border:1px solid rgba(10,61,98,.18);margin-bottom:14px;background:#fff}
+.menu-section-title{padding:12px 14px;background:#eef2ff;color:#0a3d62;font-weight:800;font-size:.95rem}
+.menu-list{list-style:none;padding:0;margin:0}
+.menu-list a{display:block;padding:14px 14px;text-decoration:none;color:#0a3d62;font-weight:800;background:#f1f5f9}
+.menu-list li+li a{border-top:1px solid rgba(10,61,98,.1)}
+.menu-list a:hover{background:#e2e8f0}
+body.drawer-open .nav-overlay{opacity:1;pointer-events:auto}
+body.drawer-open .side-drawer{transform:translateX(0)}
+.container{max-width:1200px;margin:0 auto;padding:20px}
+.card{background:white;padding:20px;border-radius:15px;margin-bottom:20px;box-shadow:0 4px 10px rgba(0,0,0,.1);border:2px solid #000}
+.form-group{margin-bottom:15px}
+.form-group label{display:block;margin-bottom:5px;font-weight:600;color:#000080}
+.form-control{width:100%;padding:10px;border:2px solid #000;border-radius:8px;font-size:14px}
+#horizon{width:100%;height:6px;background:#e0e0e0;border-radius:3px}
+.horizon-label{display:flex;justify-content:space-between;align-items:center;margin-bottom:5px}
+.horizon-value{font-weight:700;color:#000080}
+.btn-primary{background:#16A34A;color:white}
+.btn-primary:hover{background:#FF9933;color:#000}
+.btn-info{background:#06B6D4;color:#000}
+.chart-container{position:relative;height:400px;margin:20px 0}
+body.dark{background:linear-gradient(to bottom,#1a1a1a 0%,#2d2d2d 50%,#1a1a1a 100%);color:#e0e0e0}
+body.dark .card{background:#2d2d2d;border-color:#4a9eff}
+</style>
 </head>
+
 <body>
-    <div class="top-nav">
-        <div class="nav-left">
-            <button class="hamburger-btn" id="menuBtn">
-                <div class="hamburger-icon"><span></span><span></span><span></span></div>
-            </button>
-            <p class="brand-title">Krishi Mitr | Predictor</p>
-        </div>
-        <button class="logout-btn" id="logoutBtn">Logout</button>
-    </div>
-    <nav class="side-drawer" id="sideNav">
-        <div class="menu-list">
-            <a href="predictor.html">Price Predictor</a>
-            <a href="advisor.html">Crop Advisor</a>
-            <a href="Dashboard">Dashboard</a>
-        </div>
-    </nav>
-    <div class="container">
-        <div class="row">
-            <div class="col-md-4">
-                <div class="card">
-                    <h4>Price Prediction</h4>
-                    <div class="form-group">
-                        <label>Select Crop</label>
-                        <select id="cropSelect" class="form-control">
-                            <option value="Wheat">Wheat</option>
-                            <option value="Rice">Rice</option>
-                            <option value="Sugarcane">Sugarcane</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>Select Region</label>
-                        <select id="regionSelect" class="form-control">
-                            <option value="Punjab">Punjab</option>
-                            <option value="Maharashtra">Maharashtra</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>Forecast Period: <span id="hval">30</span> days</label>
-                        <input type="range" id="horizon" min="7" max="90" value="30">
-                    </div>
-                    <button id="predictBtn" class="btn btn-primary">Predict Prices</button>
-                    <button id="exportBtn" class="btn btn-info">Export CSV</button>
-                </div>
-                <div class="card" id="actionCard">
-                    <p class="text-muted">Predictions will appear here.</p>
-                </div>
-            </div>
-            <div class="col-md-8">
-                <div class="card">
-                    <h4>Price Chart</h4>
-                    <div class="chart-container">
-                        <canvas id="priceChart"></canvas>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <script>
-        const cropBase = { Wheat: 2000, Rice: 2100, Sugarcane: 1800 };
-        const volatility = { Wheat: 12, Rice: 15, Sugarcane: 10 };
-        let priceChart = null;
-        let lastForecast = [];
 
-        function checkAuth() {
-            if (!sessionStorage.getItem("loginid")) window.location.href = "login.html";
-        }
-        checkAuth();
+<div class="top-nav">
+<div class="nav-left">
+<button class="hamburger-btn" id="menuBtn">
+<div class="hamburger-icon"><span></span><span></span><span></span></div>
+</button>
+<div>
+<p class="brand-title">Krishi Mitr</p>
+<p class="brand-subtitle">Crop Predictor</p>
+</div>
+</div>
+<button class="logout-btn" id="logoutBtn">Logout</button>
+</div>
 
-        document.getElementById('menuBtn').onclick = () => document.body.classList.toggle('drawer-open');
-        document.getElementById('logoutBtn').onclick = () => { sessionStorage.clear(); location.href="login.html"; };
-        document.getElementById('horizon').oninput = (e) => document.getElementById('hval').innerText = e.target.value;
+<div class="nav-overlay" id="navOverlay" hidden></div>
 
-        function genHistorical(crop, region) {
-            const base = cropBase[crop];
-            const vol = volatility[crop];
-            const arr = [];
-            let p = base;
-            for (let i = 90; i > 0; i--) {
-                p = Math.max(50, p + (Math.random() - 0.5) * vol);
-                const d = new Date();
-                d.setDate(d.getDate() - i);
-                arr.push({ date: d.toISOString().slice(0, 10), price: Math.round(p * 10) / 10 });
-            }
-            return arr;
-        }
+<nav class="side-drawer" id="sideNav" hidden>
+<div class="drawer-inner">
+<div class="menu-section">
+<div class="menu-section-title">Tools</div>
+<ul class="menu-list">
+<li><a href="predictor.html">Crop Price Predictor</a></li>
+<li><a href="advisor.html">Switch to Advisor</a></li>
+</ul>
+</div>
+</div>
+</nav>
 
-        function forecastPrices(hist, days, crop) {
-            const vol = volatility[crop];
-            let p = hist[hist.length - 1].price;
-            const preds = [];
-            for (let i = 1; i <= days; i++) {
-                p = Math.max(20, p + (Math.random() - 0.5) * vol);
-                const d = new Date();
-                d.setDate(new Date().getDate() + i);
-                preds.push({ date: d.toISOString().slice(0, 10), price: Math.round(p * 10) / 10 });
-            }
-            return preds;
-        }
+<div class="container">
 
-        function updateChart(hist, preds) {
-            const ctx = document.getElementById('priceChart').getContext('2d');
-            if (priceChart) priceChart.destroy();
-            priceChart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: hist.map(h => h.date).concat(preds.map(p => p.date)),
-                    datasets: [
-                        { label: 'Historical', data: hist.map(h => h.price), borderColor: '#0d6efd', fill: false },
-                        { label: 'Forecast', data: new Array(hist.length).fill(null).concat(preds.map(p => p.price)), borderColor: '#198754', borderDash: [5,5], fill: false }
-                    ]
-                }
-            });
-        }
+<div class="card">
+<h2>Crop Price Predictor</h2>
+<p>Select crop and region to forecast future prices</p>
+</div>
 
-        document.getElementById('predictBtn').onclick = () => {
-            const crop = document.getElementById('cropSelect').value;
-            const region = document.getElementById('regionSelect').value;
-            const days = parseInt(document.getElementById('horizon').value);
-            const hist = genHistorical(crop, region);
-            const preds = forecastPrices(hist, days, crop);
-            lastForecast = preds;
-            updateChart(hist, preds);
-            document.getElementById('actionCard').innerHTML = `<strong>Trend:</strong> Analysis complete for ${crop} in ${region}.`;
-        };
+<div class="row">
+<div class="col-md-6">
 
-        document.getElementById('exportBtn').onclick = () => {
-            if (!lastForecast.length) return alert("Predict first");
-            let csv = "Date,Price\n" + lastForecast.map(p => `${p.date},${p.price}`).join("\n");
-            const blob = new Blob([csv], { type: 'text/csv' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = "forecast.csv";
-            a.click();
-        };
-    </script>
+<div class="card">
+
+<div class="form-group">
+<label>Select Crop</label>
+<select id="cropSelect" class="form-control">
+<option>Wheat</option>
+<option>Rice</option>
+<option>Sugarcane</option>
+<option>Cotton</option>
+<option>Maize</option>
+<option>Soybean</option>
+<option>Groundnut</option>
+<option>Tomato</option>
+<option>Potato</option>
+</select>
+</div>
+
+<div class="form-group">
+<label>Select Region</label>
+<select id="regionSelect" class="form-control">
+<option>Punjab</option>
+<option>Haryana</option>
+<option>Maharashtra</option>
+<option>Karnataka</option>
+<option>Tamil Nadu</option>
+<option>Gujarat</option>
+</select>
+</div>
+
+<div class="form-group">
+<div class="horizon-label">
+<label>Forecast Period</label>
+<span class="horizon-value"><span id="hval">30</span> days</span>
+</div>
+<input type="range" id="horizon" min="7" max="90" value="30">
+</div>
+
+<button id="predictBtn" class="btn btn-primary w-100">Predict Prices</button>
+<button id="exportBtn" class="btn btn-info w-100 mt-2">Export CSV</button>
+
+</div>
+
+</div>
+
+<div class="col-md-6">
+
+<div class="card">
+<h4>Price Chart</h4>
+<div class="chart-container">
+<canvas id="priceChart"></canvas>
+</div>
+</div>
+
+<div class="card">
+<h4>Recommendation</h4>
+<div id="actionCard"></div>
+</div>
+
+</div>
+</div>
+</div>
+
+<script>
+
+(function(){
+let retry=0
+function checkAuth(){
+const id=sessionStorage.getItem("loginid")
+const type=sessionStorage.getItem("usertype")
+if(id&&type==="Farmer") return
+if(retry<10){retry++;setTimeout(checkAuth,50)}
+else location.href="login.html"
+}
+setTimeout(checkAuth,10)
+})()
+
+function initDarkMode(){
+if(localStorage.getItem("darkMode")==="true") document.body.classList.add("dark")
+}
+initDarkMode()
+
+const menuBtn=document.getElementById("menuBtn")
+const sideNav=document.getElementById("sideNav")
+const navOverlay=document.getElementById("navOverlay")
+
+function openDrawer(){
+document.body.classList.add("drawer-open")
+sideNav.hidden=false
+navOverlay.hidden=false
+}
+function closeDrawer(){
+document.body.classList.remove("drawer-open")
+setTimeout(()=>{sideNav.hidden=true;navOverlay.hidden=true},200)
+}
+menuBtn.onclick=()=>document.body.classList.contains("drawer-open")?closeDrawer():openDrawer()
+navOverlay.onclick=closeDrawer
+
+document.getElementById("logoutBtn").onclick=()=>{sessionStorage.clear();location.href="login.html"}
+
+const cropBase={Wheat:2000,Rice:2100,Sugarcane:1800,Cotton:2300,Maize:1600,Soybean:1700,Groundnut:1600,Tomato:2000,Potato:1900}
+const volatility={Wheat:12,Rice:15,Sugarcane:10,Cotton:18,Maize:14,Soybean:15,Groundnut:12,Tomato:18,Potato:16}
+
+function genHistorical(crop){
+let arr=[];let p=cropBase[crop]
+for(let i=90;i>0;i--){
+p+=Math.random()*10-5
+const d=new Date();d.setDate(d.getDate()-i)
+arr.push({date:d.toISOString().slice(0,10),price:p})
+}
+return arr
+}
+
+function forecastPrices(hist,days,crop){
+let preds=[];let p=hist[hist.length-1].price
+for(let i=1;i<=days;i++){
+p+=Math.random()*volatility[crop]-volatility[crop]/2
+const d=new Date();d.setDate(d.getDate()+i)
+preds.push({date:d.toISOString().slice(0,10),price:p})
+}
+return preds
+}
+
+let priceChart=new Chart(document.getElementById("priceChart"),{type:"line",data:{labels:[],datasets:[]},options:{responsive:true}})
+
+function updateChart(hist,preds){
+const labels=hist.map(h=>h.date).concat(preds.map(p=>p.date))
+const histData=hist.map(h=>h.price).concat(new Array(preds.length).fill(null))
+const predData=new Array(hist.length-1).fill(null).concat([hist[hist.length-1].price]).concat(preds.map(p=>p.price))
+
+priceChart.data.labels=labels
+priceChart.data.datasets=[
+{label:"Historical",data:histData,borderColor:"#0d6efd"},
+{label:"Forecast",data:predData,borderDash:[6,4],borderColor:"#198754"}
+]
+priceChart.update()
+}
+
+let lastForecast=[],lastCrop=""
+
+function runPrediction(){
+const crop=document.getElementById("cropSelect").value
+const days=parseInt(document.getElementById("horizon").value)
+const hist=genHistorical(crop)
+const preds=forecastPrices(hist,days,crop)
+updateChart(hist,preds)
+lastForecast=preds
+lastCrop=crop
+}
+
+function exportCSV(){
+if(!lastForecast.length) return
+let csv="Date,Price\n"
+lastForecast.forEach(p=>csv+=p.date+","+p.price+"\n")
+const blob=new Blob([csv])
+const a=document.createElement("a")
+a.href=URL.createObjectURL(blob)
+a.download=lastCrop+"_forecast.csv"
+a.click()
+}
+
+document.getElementById("predictBtn").onclick=runPrediction
+document.getElementById("exportBtn").onclick=exportCSV
+document.getElementById("horizon").oninput=e=>document.getElementById("hval").innerText=e.target.value
+
+</script>
 </body>
 </html>
