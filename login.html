@@ -167,7 +167,7 @@ body.dark .small-link {
 <script src="supabase.js"></script>
 
 <script>
-  const loginScreen = document.getElementById("loginScreen");
+const loginScreen = document.getElementById("loginScreen");
   const registerScreen = document.getElementById("registerScreen");
   const form = document.getElementById("loginForm");
   const msg = document.getElementById("message");
@@ -187,7 +187,7 @@ body.dark .small-link {
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
 
-    msg.style.color = "#FF3333";  // error color
+    msg.style.color = "#FF3333";
     msg.textContent = "Checking credentials...";
 
     const username = document.getElementById("username").value.trim();
@@ -196,7 +196,7 @@ body.dark .small-link {
     try {
       const { data, error } = await window.db
         .from("logindata")
-        .select("loginid, username, password, usertype")
+        .select("id, loginid, username, password, usertype")
         .eq("username", username)
         .maybeSingle();
 
@@ -210,10 +210,11 @@ body.dark .small-link {
         return;
       }
 
-      // Login success - store session info
       sessionStorage.clear();
-      sessionStorage.setItem("loginid", data.loginid);
+      
+      sessionStorage.setItem("loginid", data.id); 
       sessionStorage.setItem("usertype", data.usertype);
+      sessionStorage.setItem("legacy_id", data.loginid);
 
       msg.style.color = "green";
       msg.textContent = "Login successful! Redirecting...";
