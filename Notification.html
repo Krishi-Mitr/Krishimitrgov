@@ -87,11 +87,13 @@ menuBtn.onclick = () => toggleDrawer(!document.body.classList.contains("drawer-o
 navOverlay.onclick = () => toggleDrawer(false);
 async function initializeApp() {
     const { data: { user } } = await db.auth.getUser();
-    if (!user) { window.location.href = "login.html"; return; }
+    const backupId = sessionStorage.getItem("loginid");
+    if (!user && !backupId) { window.location.href = "login.html"; return; }
+    const activeId = user ? user.id : backupId;
     if (sessionStorage.getItem("usertype") === "Farmer") document.getElementById("marketSection").style.display = "block";
     logoutBtn.onclick = async () => { await db.auth.signOut(); sessionStorage.clear(); window.location.href = "login.html"; };
     const loadNotifications = async () => {
-        const { data: notes } = await db.from("notifications").select("*").eq("user_id", user.id).eq("status", "Pending").order("created_at", { ascending: false });
+        const { data: notes } = await db.from("notifications").select("*").eq("user_id", activeId).eq("status", "Pending").order("created_at", { ascending: false });
         listContainer.innerHTML = notes?.length ? "" : '<div class="card">No new notifications.</div>';
         notes?.forEach(n => {
             const card = document.createElement("div");
