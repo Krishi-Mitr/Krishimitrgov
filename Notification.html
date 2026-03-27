@@ -210,7 +210,7 @@ async function loadNotifications() {
   const { data: notifications, error } = await db
     .from("notifications")
     .select("*")
-    .eq("user_id", loginid)
+    .eq("user_id", loginid) 
     .eq("status", "Pending");
 
   if (error) {
@@ -224,39 +224,22 @@ async function loadNotifications() {
   cropList.innerHTML = "";
   toolList.innerHTML = "";
 
-  let hasCrops = false;
-  let hasTools = false;
-
   notifications.forEach(item => {
     const card = document.createElement("div");
     card.className = "card";
     
+    const actionButtons = `
+      <div class="actions">
+        <button class="btn-accept" onclick="handleAction(${item.id}, 'Accepted', '${item.buy_id ? 'crop' : 'tool'}', ${item.buy_id || item.tool_id})">Accept</button>
+        <button class="btn-decline" onclick="handleAction(${item.id}, 'Declined', '${item.buy_id ? 'crop' : 'tool'}', ${item.buy_id || item.tool_id})">Decline</button>
+      </div>`;
+
     if (item.buy_id) {
-      if (!hasCrops) {
-        cropList.innerHTML = "<h4>Crop Orders</h4>";
-        hasCrops = true;
-      }
-      card.innerHTML = `
-        <strong>${item.title}</strong>
-        <p>${item.message}</p>
-        <div class="actions">
-          <button class="btn-accept" onclick="handleAction('${item.id}', 'Accepted', 'crop', ${item.buy_id})">Accept</button>
-          <button class="btn-decline" onclick="handleAction('${item.id}', 'Declined', 'crop', ${item.buy_id})">Decline</button>
-        </div>`;
+      card.innerHTML = `<strong>${item.title}</strong><p>${item.message}</p>${actionButtons}`;
       cropList.appendChild(card);
     } else if (item.tool_id) {
-      if (!hasTools) {
-        toolList.innerHTML = "<h4>Tool Rental Requests</h4>";
-        hasTools = true;
-      }
       card.style.borderLeftColor = "#138808";
-      card.innerHTML = `
-        <strong>${item.title}</strong>
-        <p>${item.message}</p>
-        <div class="actions">
-          <button class="btn-accept" onclick="handleAction('${item.id}', 'Accepted', 'tool', ${item.tool_id})">Accept</button>
-          <button class="btn-decline" onclick="handleAction('${item.id}', 'Declined', 'tool', ${item.tool_id})">Decline</button>
-        </div>`;
+      card.innerHTML = `<strong>${item.title}</strong><p>${item.message}</p>${actionButtons}`;
       toolList.appendChild(card);
     }
   });
