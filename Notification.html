@@ -54,7 +54,6 @@ body.drawer-open .side-drawer { transform: translateX(0); }
 </style>
 </head>
 <body>
-
 <div class="top-nav">
   <div class="nav-left">
     <button class="hamburger-btn" id="menuBtn"><div class="hamburger-icon"><span></span><span></span><span></span></div></button>
@@ -62,7 +61,6 @@ body.drawer-open .side-drawer { transform: translateX(0); }
   </div>
   <button class="logout-btn" id="logoutBtn">Logout</button>
 </div>
-
 <div class="nav-overlay" id="navOverlay"></div>
 <nav class="side-drawer" id="sideNav">
   <div class="menu-section">
@@ -78,29 +76,20 @@ body.drawer-open .side-drawer { transform: translateX(0); }
     <ul class="menu-list"><li><a href="Notification">Notification</a></li><li><a href="Chat">Chat</a></li></ul>
   </div>
 </nav>
-
 <div class="container">
   <h2 style="color: #0a3d62; margin-bottom: 25px;">Notifications Hub</h2>
   <div id="notificationList"></div>
 </div>
-
 <script>
 const menuBtn = document.getElementById("menuBtn"), sideNav = document.getElementById("sideNav"), navOverlay = document.getElementById("navOverlay"), logoutBtn = document.getElementById("logoutBtn"), listContainer = document.getElementById("notificationList");
-
-function toggleDrawer(open) {
-  document.body.classList.toggle("drawer-open", open);
-}
+function toggleDrawer(open) { document.body.classList.toggle("drawer-open", open); }
 menuBtn.onclick = () => toggleDrawer(!document.body.classList.contains("drawer-open"));
 navOverlay.onclick = () => toggleDrawer(false);
-
 async function initializeApp() {
     const { data: { user } } = await db.auth.getUser();
     if (!user) { window.location.href = "login.html"; return; }
-    
     if (sessionStorage.getItem("usertype") === "Farmer") document.getElementById("marketSection").style.display = "block";
-
     logoutBtn.onclick = async () => { await db.auth.signOut(); sessionStorage.clear(); window.location.href = "login.html"; };
-
     const loadNotifications = async () => {
         const { data: notes } = await db.from("notifications").select("*").eq("user_id", user.id).eq("status", "Pending").order("created_at", { ascending: false });
         listContainer.innerHTML = notes?.length ? "" : '<div class="card">No new notifications.</div>';
@@ -116,14 +105,12 @@ async function initializeApp() {
             listContainer.appendChild(card);
         });
     };
-
     window.handleAction = async (notifId, buyId, toolId, status) => {
         await db.from("notifications").update({ status: status, is_read: true }).eq("id", notifId);
         if (buyId) await db.from("buy_table").update({ status: status, is_confirmed: true }).eq("id", buyId);
         else if (toolId) await db.from("tool_rentals").update({ status: status, is_available: status !== 'Accepted' }).eq("id", toolId);
         loadNotifications();
     };
-
     db.channel('feed').on('postgres_changes', { event: '*', schema: 'public', table: 'notifications' }, loadNotifications).subscribe();
     loadNotifications();
 }
