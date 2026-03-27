@@ -155,7 +155,7 @@ async function initializeApp() {
     };
 
     const loadNotifications = async () => {
-        const { data: notes, error } = await db.from("notifications")
+        const { data: notes } = await db.from("notifications")
             .select("*")
             .eq("user_id", loginId)
             .eq("status", "Pending")
@@ -166,28 +166,27 @@ async function initializeApp() {
         notes?.forEach(n => {
             const card = document.createElement("div");
             card.className = "card";
-            card.style.borderLeftColor = n.type === 'tool' ? '#138808' : '#ff9933';
+            card.style.borderLeftColor = n.tool_id ? '#138808' : '#ff9933';
             card.innerHTML = `
                 <h4>${n.title}</h4>
                 <p>${n.message}</p>
-                <small>From: ${n.sender_name || 'System'}</small>
                 <div class="actions">
-                    <button class="btn-accept" onclick="handleAction('${n.id}', '${n.related_id}', '${n.type}', 'Accepted')">Accept</button>
-                    <button class="btn-decline" onclick="handleAction('${n.id}', '${n.related_id}', '${n.type}', 'Declined')">Decline</button>
+                    <button class="btn-accept" onclick="handleAction('${n.id}', ${n.buy_id}, ${n.tool_id}, 'Accepted')">Accept</button>
+                    <button class="btn-decline" onclick="handleAction('${n.id}', ${n.buy_id}, ${n.tool_id}, 'Declined')">Decline</button>
                 </div>
             `;
             listContainer.appendChild(card);
         });
     };
 
-    window.handleAction = async (notifId, relatedId, type, status) => {
+    window.handleAction = async (notifId, buyId, toolId, status) => {
         await db.from("notifications").update({ status: status, is_read: true }).eq("id", notifId);
 
-        if (type === 'crop') {
-            await db.from("buy_table").update({ status: status, is_confirmed: true }).eq("id", relatedId);
-        } else {
-            const isAvailable = status !== 'Accepted';
-            await db.from("tool_rentals").update({ status: status, is_available: isAvailable }).eq("id", relatedId);
+        if (buyId) {
+            await db.from("buy_table").update({ status: status, is_confirmed: true }).eq("id", buyId);
+        } else if (toolId) {
+            const active = status !== 'Accepted';
+            await db.from("tool_rentals").update({ status: status, is_available: active }).eq("id", toolId);
         }
         loadNotifications();
     };
