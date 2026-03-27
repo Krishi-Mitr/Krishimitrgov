@@ -164,7 +164,9 @@ const db = window.db;
 const loginid = sessionStorage.getItem("loginid");
 const usertype = sessionStorage.getItem("usertype");
 
-if (!loginid) { location.href = "login"; }
+if (!loginid) { 
+    location.href = "login"; 
+}
 
 const menuBtn = document.getElementById("menuBtn");
 const sideNav = document.getElementById("sideNav");
@@ -199,7 +201,7 @@ document.getElementById("logoutBtn").onclick = () => {
 function applyRolePermissions() {
   if (usertype === "Farmer") {
     const market = document.getElementById("marketSection");
-    if(market) market.style.display = "block";
+    if (market) market.style.display = "block";
     document.querySelectorAll(".farmer-only").forEach(el => el.style.display = "block");
   }
 }
@@ -211,7 +213,10 @@ async function loadNotifications() {
     .eq("user_id", loginid)
     .eq("status", "Pending");
 
-  if (error) return;
+  if (error) {
+    console.error("Fetch error:", error.message);
+    return;
+  }
 
   const cropList = document.getElementById("cropNotifications");
   const toolList = document.getElementById("toolNotifications");
@@ -235,8 +240,8 @@ async function loadNotifications() {
         <strong>${item.title}</strong>
         <p>${item.message}</p>
         <div class="actions">
-          <button class="btn-accept" onclick="handleAction('${item.id}', 'Accepted', 'crop', '${item.buy_id}')">Accept</button>
-          <button class="btn-decline" onclick="handleAction('${item.id}', 'Declined', 'crop', '${item.buy_id}')">Decline</button>
+          <button class="btn-accept" onclick="handleAction('${item.id}', 'Accepted', 'crop', ${item.buy_id})">Accept</button>
+          <button class="btn-decline" onclick="handleAction('${item.id}', 'Declined', 'crop', ${item.buy_id})">Decline</button>
         </div>`;
       cropList.appendChild(card);
     } else if (item.tool_id) {
@@ -249,42 +254,43 @@ async function loadNotifications() {
         <strong>${item.title}</strong>
         <p>${item.message}</p>
         <div class="actions">
-          <button class="btn-accept" onclick="handleAction('${item.id}', 'Accepted', 'tool', '${item.tool_id}')">Accept</button>
-          <button class="btn-decline" onclick="handleAction('${item.id}', 'Declined', 'tool', '${item.tool_id}')">Decline</button>
+          <button class="btn-accept" onclick="handleAction('${item.id}', 'Accepted', 'tool', ${item.tool_id})">Accept</button>
+          <button class="btn-decline" onclick="handleAction('${item.id}', 'Declined', 'tool', ${item.tool_id})">Decline</button>
         </div>`;
       toolList.appendChild(card);
     }
   });
 }
 
-async function handleAction(notificationId, status, type, referenceId) {
+async function handleAction(notifUuid, status, type, refId) {
   try {
     const { error: notifError } = await db
       .from("notifications")
       .update({ status: status, is_read: true })
-      .eq("id", notificationId);
+      .eq("id", notifUuid);
 
     if (notifError) throw notifError;
 
     if (type === 'crop') {
       await db.from("buy_table")
         .update({ status: status, is_confirmed: true })
-        .eq("id", referenceId);
-    } else {
-      if (status === "Accepted") {
+        .eq("id", refId);
+    } else if (type === 'tool') {
+      if (status === 'Accepted') {
         await db.from("tool_rentals")
           .update({ is_available: false })
-          .eq("id", referenceId);
+          .eq("id", refId);
       }
     }
 
-    loadNotifications();
+    await loadNotifications();
   } catch (err) {
-    console.error("Update failed:", err.message);
+    console.error("Action failed:", err.message);
   }
 }
 
 applyRolePermissions();
 loadNotifications();
-</script></body>
+</script>
+</body>
 </html>
