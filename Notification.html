@@ -12,8 +12,10 @@ body {
   min-height: 100vh;
   background: linear-gradient(180deg, #f6e2cc 0%, #f7f9f8 45%, #dceee3 100%);
   color: #1f2937;
+  padding-top: 100px;
 }
 body.drawer-open { overflow: hidden; }
+
 .top-nav {
   position: fixed;
   top: 0; left: 0; right: 0; height: 78px;
@@ -25,72 +27,90 @@ body.drawer-open { overflow: hidden; }
   z-index: 9999;
 }
 .nav-left { display: flex; align-items: center; gap: 14px; }
+
 .hamburger-btn {
-  width: 44px; height: 44px; border-radius: 12px; border: 2px solid #0a3d62;
-  background: rgba(255, 255, 255, 0.75); display: grid; place-items: center; cursor: pointer;
-}
-.hamburger-icon { width: 20px; height: 14px; position: relative; }
-.hamburger-icon span { position: absolute; left: 0; right: 0; height: 2.5px; background: #0a3d62; border-radius: 999px; }
-.hamburger-icon span:nth-child(1) { top: 0; }
-.hamburger-icon span:nth-child(2) { top: 5.5px; }
-.hamburger-icon span:nth-child(3) { top: 11px; }
-.brand-title { font-weight: 800; color: #0a3d62; font-size: 1.2rem; }
-.nav-buttons { display: flex; align-items: center; gap: 15px; }
-.profile-btn img {
-  width: 42px; height: 42px; border-radius: 50%; border: 2px solid #0a3d62;
+  width: 44px; height: 44px; border-radius: 12px;
+  border: 2px solid #0a3d62;
+  background: rgba(255,255,255,0.75);
+  display: grid; place-items: center;
   cursor: pointer; transition: 0.3s;
 }
-.nav-btn { background: white; color: #0a3d62; border: 2px solid #0a3d62; padding: 10px 18px; border-radius: 10px; font-weight: 700; cursor: pointer; }
+.hamburger-btn:hover { transform: scale(1.05); }
+.hamburger-icon { width: 20px; height: 14px; position: relative; }
+.hamburger-icon span {
+  position: absolute; left: 0; right: 0; height: 2.5px;
+  background: #0a3d62; border-radius: 999px;
+}
+.hamburger-icon span:nth-child(1){ top:0; }
+.hamburger-icon span:nth-child(2){ top:5.5px; }
+.hamburger-icon span:nth-child(3){ top:11px; }
+
+.brand-title { margin: 0; font-size: 1.15rem; font-weight: 800; color: #0a3d62; }
+.logout-btn {
+  background: white; color: #0a3d62; border: 2px solid #0a3d62;
+  padding: 10px 18px; border-radius: 10px; font-weight: 700;
+  cursor: pointer; transition: 0.3s;
+}
+.logout-btn:hover { background: #0a3d62; color: white; transform: translateY(-2px); }
+
 .nav-overlay {
   position: fixed; inset: 0; background: rgba(0,0,0,0.25);
-  opacity: 0; pointer-events: none; transition: .2s ease; z-index: 9998;
+  opacity: 0; pointer-events: none; transition: opacity .2s ease; z-index: 9998;
 }
 .side-drawer {
-  position: fixed; top: 84px; left: 14px; width: min(320px, calc(100vw - 28px));
-  max-height: calc(100vh - 98px); overflow: auto;
-  background: linear-gradient(180deg, #0a3d62, #082032);
+  position: fixed; top: 84px; left: 14px;
+  width: min(320px, calc(100vw - 28px));
+  max-height: calc(100vh - 98px);
+  overflow: auto;
+  background: linear-gradient(180deg,#0a3d62,#082032);
   border: 3px solid #ffffff; border-radius: 18px;
   box-shadow: 0 18px 40px rgba(0,0,0,0.35);
-  transform: translateX(-110%); transition: .25s ease; z-index: 9999;
+  transform: translateX(-110%); transition: transform .25s ease; z-index: 9999;
 }
 .drawer-inner { padding: 14px; }
-.menu-section {
-  border-radius: 14px; overflow: hidden; border: 1px solid rgba(255,255,255,0.15);
-  margin-bottom: 14px; background: rgba(255,255,255,0.05);
-}
-.menu-section-title { padding: 12px 14px; background: rgba(255,255,255,0.1); color: white; font-weight: 800; }
-.menu-list { list-style: none; padding: 0; margin: 0; }
-.menu-list a {
-  display: block; padding: 14px; text-decoration: none; color: white;
-  font-weight: 600; background: rgba(255,255,255,0.08); transition: 0.2s;
-}
-.menu-list a:hover { background: #1e3a8a; padding-left: 20px; }
 body.drawer-open .nav-overlay { opacity: 1; pointer-events: auto; }
 body.drawer-open .side-drawer { transform: translateX(0); }
-.container { max-width: 900px; margin: 150px auto 60px; padding: 0 20px; }
-.notification-card {
-  background: white; border-radius: 20px; padding: 25px; margin-bottom: 20px;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.08); border: 1px solid #eee;
+
+.menu-section {
+  border-radius: 14px; overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.15);
+  margin-bottom: 14px; background: rgba(255,255,255,0.05);
 }
-.actions { margin-top: 15px; display: flex; gap: 10px; }
-.btn-accept { background: #138808; color: white; border: none; padding: 10px 20px; border-radius: 12px; font-weight: 700; cursor: pointer; }
-.btn-decline { background: #b30000; color: white; border: none; padding: 10px 20px; border-radius: 12px; font-weight: 700; cursor: pointer; }
-.status-pill { padding: 8px 16px; border-radius: 14px; font-weight: 700; width: fit-content; margin-top: 10px; }
-.status-pill.accepted { background: #138808; color: white; }
-.status-pill.declined { background: #b30000; color: white; }
+.menu-section-title {
+  padding: 12px 14px; background: rgba(255,255,255,0.1);
+  color: white; font-weight: 800; font-size: 0.95rem;
+}
+.menu-list { list-style: none; padding: 0; margin: 0; }
+.menu-list a {
+  display: block; padding: 14px; text-decoration: none;
+  color: white; font-weight: 600; background: rgba(255,255,255,0.08);
+  transition: 0.2s ease;
+}
+.menu-list li + li a { border-top: 1px solid rgba(255,255,255,0.1); }
+.menu-list a:hover { background: #1e3a8a; padding-left: 20px; }
+
+.container { max-width: 800px; margin: auto; padding: 0 20px; }
+.card {
+  background: white; padding: 20px; border-radius: 15px; margin-bottom: 20px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1); border-left: 6px solid #ff9933;
+}
+.actions { margin-top: 10px; display: flex; gap: 10px; }
+.btn-accept { background: #138808; color: white; border: none; padding: 8px 15px; border-radius: 6px; cursor: pointer; }
+.btn-decline { background: #dc2626; color: white; border: none; padding: 8px 15px; border-radius: 6px; cursor: pointer; }
 </style>
 </head>
 <body>
+
 <div class="top-nav">
   <div class="nav-left">
-    <button class="hamburger-btn" id="menuBtn"><div class="hamburger-icon"><span></span><span></span><span></span></div></button>
+    <button class="hamburger-btn" id="menuBtn">
+      <div class="hamburger-icon"><span></span><span></span><span></span></div>
+    </button>
     <p class="brand-title">Krishi Mitr</p>
   </div>
-  <div class="nav-buttons">
-    <div class="profile-btn" onclick="location.href='Profile'"><img src="profile_pic.png" alt="Profile"></div>
-    <button class="nav-btn" id="logoutBtn">Logout</button>
-  </div>
+  <button class="logout-btn" id="logoutBtn">Logout</button>
 </div>
+
 <div class="nav-overlay" id="navOverlay" hidden></div>
 <nav class="side-drawer" id="sideNav" hidden>
   <div class="drawer-inner">
@@ -115,6 +135,7 @@ body.drawer-open .side-drawer { transform: translateX(0); }
         <li class="farmer-only" style="display:none;"><a href="tools_rental.html">List Tool for Rent</a></li>
         <li class="farmer-only" style="display:none;"><a href="my_listings.html">My Tool Inventory</a></li>
         <li><a href="krishimitr">Crop Predictor</a></li>
+        <li><a href="advisor">Crop Advisor</a></li>
       </ul>
     </div>
     <div class="menu-section" style="margin-bottom:0;">
@@ -126,79 +147,168 @@ body.drawer-open .side-drawer { transform: translateX(0); }
     </div>
   </div>
 </nav>
-<div class="container" id="notificationList"></div>
+
+<div class="container">
+  <h2 style="color: #0a3d62; margin-bottom: 25px;">Notifications Hub</h2>
+  <div id="cropNotifications"></div>
+  <div id="toolNotifications"></div>
+  <div id="emptyState" style="display: none;">
+    <div class="card" style="border-left-color: #0a3d62;">
+        <p>No active notifications at this time.</p>
+    </div>
+  </div>
+</div>
+
 <script>
-const db = window.db;
-const loginid = sessionStorage.getItem("loginid");
-const usertype = sessionStorage.getItem("usertype");
-if (!loginid) { location.href = "login"; }
-function checkPermissions() {
-  if (usertype === "Farmer") {
-    document.getElementById("farmerMarketSection").style.display = "block";
-    document.querySelectorAll(".farmer-only").forEach(el => el.style.display = "block");
-  }
-}
-async function loadNotifications() {
-  const list = document.getElementById("notificationList");
-  const { data: crops } = await db.from("crop_sales").select("jid").eq("lid", loginid);
-  let cropRequests = [];
-  if (crops && crops.length > 0) {
-    const cropIds = crops.map(c => c.jid);
-    const { data } = await db.from("buy_table").select("*").in("fid", cropIds).order("created_at", { ascending: false });
-    cropRequests = data || [];
-  }
-  const cleanId = String(loginid).trim();
-  const { data: toolRequests } = await db.from("notifications").select("*").or(`receiver_id.eq."${cleanId}",receiver_id.eq.${parseInt(cleanId)}`).order("created_at", { ascending: false });
-  list.innerHTML = "";
-  if (cropRequests.length === 0 && (!toolRequests || toolRequests.length === 0)) {
-    list.innerHTML = "<h3>No notifications yet.</h3>";
-    return;
-  }
-  for (const item of cropRequests) {
-    const { data: buyer } = await db.from("logindata").select("name").eq("loginid", item.lid).maybeSingle();
-    const card = document.createElement("div");
-    card.className = "notification-card";
-    let actions = item.is_confirmed 
-      ? `<div class="status-pill ${item.status === 'Accepted' ? 'accepted' : 'declined'}">${item.status}</div>`
-      : `<div class="actions"><button class="btn-accept" onclick="updateCropStatus('${item.id}','Accepted')">Accept</button><button class="btn-decline" onclick="updateCropStatus('${item.id}','Declined')">Decline</button></div>`;
-    card.innerHTML = `<strong>${buyer?.name || "Farmer"}</strong> wants to buy <strong>${item.quantity}kg</strong> of <strong>${item.cname}</strong>.${actions}`;
-    list.appendChild(card);
-  }
-  toolRequests?.forEach(item => {
-    const card = document.createElement("div");
-    card.className = "notification-card";
-    let actions = item.status !== 'pending'
-      ? `<div class="status-pill ${item.status.toLowerCase() === 'accepted' ? 'accepted' : 'declined'}">${item.status}</div>`
-      : `<div class="actions"><button class="btn-accept" onclick="updateToolStatus(${item.id},'Accepted',${item.tool_id})">Accept</button><button class="btn-decline" onclick="updateToolStatus(${item.id},'Declined')">Decline</button></div>`;
-    card.innerHTML = `<strong>${item.sender_name}</strong> wants your <strong>${item.tool_name}</strong> for ${item.requested_days} days. Income: ₹${item.total_price}${actions}`;
-    list.appendChild(card);
-  });
-}
-async function updateCropStatus(id, status) {
-  await db.from("buy_table").update({ is_confirmed: true, status: status }).eq("id", id);
-  loadNotifications();
-}
-async function updateToolStatus(id, status, toolId) {
-  if (status === "Accepted") { await db.from("tool_rentals").update({ is_available: false }).eq("id", toolId); }
-  await db.from("notifications").update({ status: status }).eq("id", id);
-  loadNotifications();
-}
 const menuBtn = document.getElementById("menuBtn");
 const sideNav = document.getElementById("sideNav");
 const navOverlay = document.getElementById("navOverlay");
-menuBtn.onclick = () => {
-  const isOpen = document.body.classList.toggle("drawer-open");
-  sideNav.hidden = !isOpen;
-  navOverlay.hidden = !isOpen;
-};
-navOverlay.onclick = () => {
+const logoutBtn = document.getElementById("logoutBtn");
+const cropContainer = document.getElementById("cropNotifications");
+const toolContainer = document.getElementById("toolNotifications");
+const emptyState = document.getElementById("emptyState");
+
+function openDrawer(){
+  document.body.classList.add("drawer-open");
+  sideNav.hidden=false;
+  navOverlay.hidden=false;
+}
+
+function closeDrawer(){
   document.body.classList.remove("drawer-open");
-  sideNav.hidden = true;
-  navOverlay.hidden = true;
+  setTimeout(()=>{
+    if(!document.body.classList.contains("drawer-open")){
+      sideNav.hidden=true;
+      navOverlay.hidden=true;
+    }
+  },220);
+}
+
+menuBtn.onclick = () => {
+  document.body.classList.contains("drawer-open") ? closeDrawer() : openDrawer();
 };
-document.getElementById("logoutBtn").onclick = () => { sessionStorage.clear(); location.href = "login"; };
-checkPermissions();
-loadNotifications();
+navOverlay.onclick = closeDrawer;
+
+async function initializeApp() {
+    const { data: { user } } = await db.auth.getUser();
+    
+    if (!user) {
+        window.location.href = "login.html";
+        return;
+    }
+
+    const userId = user.id;
+    const userType = sessionStorage.getItem("usertype");
+
+    if (userType === "Farmer") {
+        document.getElementById("marketSection").style.display = "block";
+        document.querySelectorAll(".farmer-only").forEach(el => el.style.display = "block");
+    }
+
+    logoutBtn.onclick = async () => {
+        await db.auth.signOut();
+        sessionStorage.clear();
+        window.location.href = "login.html";
+    };
+
+    const loadNotifications = async () => {
+        const [cropsResponse, toolsResponse] = await Promise.all([
+            db.from("buy_table")
+              .select("*")
+              .eq("fid", userId)
+              .eq("is_confirmed", false)
+              .order("created_at", { ascending: false }),
+            db.from("tool_rental")
+              .select("*")
+              .eq("owner_id", userId)
+              .eq("status", "Pending")
+              .order("created_at", { ascending: false })
+        ]);
+
+        cropContainer.innerHTML = "";
+        toolContainer.innerHTML = "";
+        
+        const crops = cropsResponse.data || [];
+        const tools = toolsResponse.data || [];
+
+        if (crops.length === 0 && tools.length === 0) {
+            emptyState.style.display = "block";
+        } else {
+            emptyState.style.display = "none";
+        }
+
+        if (crops.length > 0) {
+            const title = document.createElement("h4");
+            title.innerText = "Crop Purchase Requests";
+            cropContainer.appendChild(title);
+            
+            crops.forEach(item => {
+                const card = document.createElement("div");
+                card.className = "card";
+                card.innerHTML = `
+                    <strong>Buyer ID: ${item.lid}</strong> wants to buy <strong>${item.fname}</strong> (${item.quantity} units).
+                    <div class="actions">
+                        <button class="btn-accept" onclick="acceptCrop('${item.id}')">Accept</button>
+                        <button class="btn-decline" onclick="decline('${item.id}', 'buy_table')">Decline</button>
+                    </div>
+                `;
+                cropContainer.appendChild(card);
+            });
+        }
+
+        if (tools.length > 0) {
+            const title = document.createElement("h4");
+            title.innerText = "Equipment Rental Requests";
+            toolContainer.appendChild(title);
+
+            tools.forEach(item => {
+                const card = document.createElement("div");
+                card.className = "card";
+                card.style.borderLeftColor = "#138808";
+                card.innerHTML = `
+                    <strong>${item.user_id}</strong> requested <strong>${item.tool_name}</strong>.
+                    <p>Price: ₹${item.price_per_day}/day</p>
+                    <div class="actions">
+                        <button class="btn-accept" onclick="acceptTool('${item.id}', '${item.tool_id}')">Accept</button>
+                        <button class="btn-decline" onclick="decline('${item.id}', 'tool_rental')">Decline</button>
+                    </div>
+                `;
+                toolContainer.appendChild(card);
+            });
+        }
+    };
+
+    window.acceptCrop = async (id) => {
+        await db.from("buy_table")
+                .update({ status: 'Accepted', is_confirmed: true })
+                .eq("id", id);
+        loadNotifications();
+    };
+
+    window.acceptTool = async (id, toolId) => {
+        await Promise.all([
+            db.from("tool_rental").update({ status: 'Accepted' }).eq("id", id),
+            db.from("tool_rental").update({ is_available: false }).eq("id", toolId)
+        ]);
+        loadNotifications();
+    };
+
+    window.decline = async (id, table) => {
+        await db.from(table)
+                .update({ status: 'Declined', is_confirmed: table === 'buy_table' })
+                .eq("id", id);
+        loadNotifications();
+    };
+
+    db.channel('room1')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'buy_table' }, loadNotifications)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'tool_rental' }, loadNotifications)
+      .subscribe();
+
+    loadNotifications();
+}
+
+initializeApp();
 </script>
 </body>
 </html>
