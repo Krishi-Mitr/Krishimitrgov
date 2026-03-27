@@ -164,112 +164,102 @@ const db = window.db;
 const loginid = sessionStorage.getItem("loginid");
 const usertype = sessionStorage.getItem("usertype");
 
-if (!loginid) { 
-    location.href = "login"; 
-}
+if (!loginid) { location.href = "login"; }
 
+// Navigation Drawer Logic
 const menuBtn = document.getElementById("menuBtn");
 const sideNav = document.getElementById("sideNav");
 const navOverlay = document.getElementById("navOverlay");
 
-function openDrawer(){
-  document.body.classList.add("drawer-open");
-  sideNav.hidden=false;
-  navOverlay.hidden=false;
+function openDrawer() {
+    document.body.classList.add("drawer-open");
+    sideNav.hidden = false;
+    navOverlay.hidden = false;
 }
 
-function closeDrawer(){
-  document.body.classList.remove("drawer-open");
-  setTimeout(()=>{
-    if(!document.body.classList.contains("drawer-open")){
-      sideNav.hidden=true;
-      navOverlay.hidden=true;
-    }
-  },220);
+function closeDrawer() {
+    document.body.classList.remove("drawer-open");
+    setTimeout(() => {
+        if (!document.body.classList.contains("drawer-open")) {
+            sideNav.hidden = true;
+            navOverlay.hidden = true;
+        }
+    }, 220);
 }
 
-menuBtn.onclick = () => {
-  document.body.classList.contains("drawer-open") ? closeDrawer() : openDrawer();
-};
+menuBtn.onclick = () => document.body.classList.contains("drawer-open") ? closeDrawer() : openDrawer();
 navOverlay.onclick = closeDrawer;
 
 document.getElementById("logoutBtn").onclick = () => {
-  sessionStorage.clear();
-  location.href = "login";
+    sessionStorage.clear();
+    location.href = "login";
 };
 
 function applyRolePermissions() {
-  if (usertype === "Farmer") {
-    const market = document.getElementById("marketSection");
-    if (market) market.style.display = "block";
-    document.querySelectorAll(".farmer-only").forEach(el => el.style.display = "block");
-  }
+    if (usertype === "Farmer") {
+        const market = document.getElementById("marketSection");
+        if (market) market.style.display = "block";
+        document.querySelectorAll(".farmer-only").forEach(el => el.style.display = "block");
+    }
 }
 
 async function loadNotifications() {
-  const { data: notifications, error } = await db
-    .from("notifications")
-    .select("*")
-    .eq("user_id", loginid) 
-    .eq("status", "Pending");
+    // Queries notifications based on the bigint loginid
+    const { data: notifications, error } = await db
+        .from("notifications")
+        .select("*")
+        .eq("user_id", loginid)
+        .eq("status", "Pending");
 
-  if (error) {
-    console.error("Fetch error:", error.message);
-    return;
-  }
-
-  const cropList = document.getElementById("cropNotifications");
-  const toolList = document.getElementById("toolNotifications");
-  
-  cropList.innerHTML = "";
-  toolList.innerHTML = "";
-
-  notifications.forEach(item => {
-    const card = document.createElement("div");
-    card.className = "card";
-    
-    const actionButtons = `
-      <div class="actions">
-        <button class="btn-accept" onclick="handleAction(${item.id}, 'Accepted', '${item.buy_id ? 'crop' : 'tool'}', ${item.buy_id || item.tool_id})">Accept</button>
-        <button class="btn-decline" onclick="handleAction(${item.id}, 'Declined', '${item.buy_id ? 'crop' : 'tool'}', ${item.buy_id || item.tool_id})">Decline</button>
-      </div>`;
-
-    if (item.buy_id) {
-      card.innerHTML = `<strong>${item.title}</strong><p>${item.message}</p>${actionButtons}`;
-      cropList.appendChild(card);
-    } else if (item.tool_id) {
-      card.style.borderLeftColor = "#138808";
-      card.innerHTML = `<strong>${item.title}</strong><p>${item.message}</p>${actionButtons}`;
-      toolList.appendChild(card);
+    if (error) {
+        console.error("Error fetching notifications:", error.message);
+        return;
     }
-  });
+
+    const cropList = document.getElementById("cropNotifications");
+    const toolList = document.getElementById("toolNotifications");
+    
+    cropList.innerHTML = "";
+    toolList.innerHTML = "";
+
+    notifications.forEach(item => {
+        const card = document.createElement("div");
+        card.className = "card";
+        
+        // Dynamic action buttons passing IDs correctly as integers
+        const actionHtml = `
+            <div class="actions">
+                <button class="btn-accept" onclick="handleAction(${item.id}, 'Accepted', '${item.buy_id ? 'crop' : 'tool'}', ${item.buy_id || item.tool_id})">Accept</button>
+                <button class="btn-decline" onclick="handleAction(${item.id}, 'Declined', '${item.buy_id ? 'crop' : 'tool'}', ${item.buy_id || item.tool_id})">Decline</button>
+            </div>`;
+
+        if (item.buy_id) {
+            card.innerHTML = `<strong>${item.title}</strong><p>${item.message}</p>${actionHtml}`;
+            cropList.appendChild(card);
+        } else if (item.tool_id) {
+            card.style.borderLeftColor = "#138808";
+            card.innerHTML = `<strong>${item.title}</strong><p>${item.message}</p>${actionHtml}`;
+            toolList.appendChild(card);
+        }
+    });
 }
 
-async function handleAction(notifUuid, status, type, refId) {
-  try {
-    const { error: notifError } = await db
-      .from("notifications")
-      .update({ status: status, is_read: true })
-      .eq("id", notifUuid);
+async function handleAction(notifId, status, type, refId) {
+    try {
+        // 1. Update the notification status
+        await db.from("notifications").update({ status: status, is_read: true }).eq("id", notifId);
 
-    if (notifError) throw notifError;
+        // 2. Update the linked table (buy_table or tool_rentals)
+        if (type === 'crop') {
+            await db.from("buy_table").update({ status: status, is_confirmed: true }).eq("id", refId);
+        } else if (type === 'tool' && status === 'Accepted') {
+            await db.from("tool_rentals").update({ is_available: false }).eq("id", refId);
+        }
 
-    if (type === 'crop') {
-      await db.from("buy_table")
-        .update({ status: status, is_confirmed: true })
-        .eq("id", refId);
-    } else if (type === 'tool') {
-      if (status === 'Accepted') {
-        await db.from("tool_rentals")
-          .update({ is_available: false })
-          .eq("id", refId);
-      }
+        loadNotifications();
+    } catch (err) {
+        console.error("Failed to update status:", err);
     }
-
-    await loadNotifications();
-  } catch (err) {
-    console.error("Action failed:", err.message);
-  }
 }
 
 applyRolePermissions();
