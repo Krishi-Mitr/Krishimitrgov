@@ -15,7 +15,6 @@ body {
   padding-top: 100px;
 }
 body.drawer-open { overflow: hidden; }
-
 .top-nav {
   position: fixed;
   top: 0; left: 0; right: 0; height: 78px;
@@ -27,7 +26,6 @@ body.drawer-open { overflow: hidden; }
   z-index: 9999;
 }
 .nav-left { display: flex; align-items: center; gap: 14px; }
-
 .hamburger-btn {
   width: 44px; height: 44px; border-radius: 12px;
   border: 2px solid #0a3d62;
@@ -35,7 +33,6 @@ body.drawer-open { overflow: hidden; }
   display: grid; place-items: center;
   cursor: pointer; transition: 0.3s;
 }
-.hamburger-btn:hover { transform: scale(1.05); }
 .hamburger-icon { width: 20px; height: 14px; position: relative; }
 .hamburger-icon span {
   position: absolute; left: 0; right: 0; height: 2.5px;
@@ -44,15 +41,12 @@ body.drawer-open { overflow: hidden; }
 .hamburger-icon span:nth-child(1){ top:0; }
 .hamburger-icon span:nth-child(2){ top:5.5px; }
 .hamburger-icon span:nth-child(3){ top:11px; }
-
 .brand-title { margin: 0; font-size: 1.15rem; font-weight: 800; color: #0a3d62; }
 .logout-btn {
   background: white; color: #0a3d62; border: 2px solid #0a3d62;
   padding: 10px 18px; border-radius: 10px; font-weight: 700;
   cursor: pointer; transition: 0.3s;
 }
-.logout-btn:hover { background: #0a3d62; color: white; transform: translateY(-2px); }
-
 .nav-overlay {
   position: fixed; inset: 0; background: rgba(0,0,0,0.25);
   opacity: 0; pointer-events: none; transition: opacity .2s ease; z-index: 9998;
@@ -64,31 +58,19 @@ body.drawer-open { overflow: hidden; }
   overflow: auto;
   background: linear-gradient(180deg,#0a3d62,#082032);
   border: 3px solid #ffffff; border-radius: 18px;
-  box-shadow: 0 18px 40px rgba(0,0,0,0.35);
   transform: translateX(-110%); transition: transform .25s ease; z-index: 9999;
 }
 .drawer-inner { padding: 14px; }
 body.drawer-open .nav-overlay { opacity: 1; pointer-events: auto; }
 body.drawer-open .side-drawer { transform: translateX(0); }
-
 .menu-section {
   border-radius: 14px; overflow: hidden;
   border: 1px solid rgba(255,255,255,0.15);
   margin-bottom: 14px; background: rgba(255,255,255,0.05);
 }
-.menu-section-title {
-  padding: 12px 14px; background: rgba(255,255,255,0.1);
-  color: white; font-weight: 800; font-size: 0.95rem;
-}
+.menu-section-title { padding: 12px 14px; color: white; font-weight: 800; }
 .menu-list { list-style: none; padding: 0; margin: 0; }
-.menu-list a {
-  display: block; padding: 14px; text-decoration: none;
-  color: white; font-weight: 600; background: rgba(255,255,255,0.08);
-  transition: 0.2s ease;
-}
-.menu-list li + li a { border-top: 1px solid rgba(255,255,255,0.1); }
-.menu-list a:hover { background: #1e3a8a; padding-left: 20px; }
-
+.menu-list a { display: block; padding: 14px; text-decoration: none; color: white; font-weight: 600; }
 .container { max-width: 800px; margin: auto; padding: 0 20px; }
 .card {
   background: white; padding: 20px; border-radius: 15px; margin-bottom: 20px;
@@ -116,26 +98,13 @@ body.drawer-open .side-drawer { transform: translateX(0); }
   <div class="drawer-inner">
     <div class="menu-section">
       <div class="menu-section-title">Main</div>
-      <ul class="menu-list">
-        <li><a href="Dashboard">Dashboard</a></li>
-      </ul>
+      <ul class="menu-list"><li><a href="Dashboard">Dashboard</a></li></ul>
     </div>
     <div class="menu-section" id="marketSection" style="display:none;">
       <div class="menu-section-title">Market</div>
       <ul class="menu-list">
         <li><a href="Update_crops">Manage Your Crops</a></li>
         <li><a href="Sell">Sell Your Crop</a></li>
-      </ul>
-    </div>
-    <div class="menu-section">
-      <div class="menu-section-title">Tools & Services</div>
-      <ul class="menu-list">
-        <li><a href="Buy">Buy Crops</a></li>
-        <li><a href="browse_tools.html">Rent Tools & Machinery</a></li>
-        <li class="farmer-only" style="display:none;"><a href="tools_rental.html">List Tool for Rent</a></li>
-        <li class="farmer-only" style="display:none;"><a href="my_listings.html">My Tool Inventory</a></li>
-        <li><a href="krishimitr">Crop Predictor</a></li>
-        <li><a href="advisor">Crop Advisor</a></li>
       </ul>
     </div>
     <div class="menu-section" style="margin-bottom:0;">
@@ -150,13 +119,7 @@ body.drawer-open .side-drawer { transform: translateX(0); }
 
 <div class="container">
   <h2 style="color: #0a3d62; margin-bottom: 25px;">Notifications Hub</h2>
-  <div id="cropNotifications"></div>
-  <div id="toolNotifications"></div>
-  <div id="emptyState" style="display: none;">
-    <div class="card" style="border-left-color: #0a3d62;">
-        <p>No active notifications at this time.</p>
-    </div>
-  </div>
+  <div id="notificationList"></div>
 </div>
 
 <script>
@@ -164,44 +127,26 @@ const menuBtn = document.getElementById("menuBtn");
 const sideNav = document.getElementById("sideNav");
 const navOverlay = document.getElementById("navOverlay");
 const logoutBtn = document.getElementById("logoutBtn");
-const cropContainer = document.getElementById("cropNotifications");
-const toolContainer = document.getElementById("toolNotifications");
-const emptyState = document.getElementById("emptyState");
+const listContainer = document.getElementById("notificationList");
 
 function openDrawer(){
   document.body.classList.add("drawer-open");
   sideNav.hidden=false;
   navOverlay.hidden=false;
 }
-
 function closeDrawer(){
   document.body.classList.remove("drawer-open");
-  setTimeout(()=>{
-    if(!document.body.classList.contains("drawer-open")){
-      sideNav.hidden=true;
-      navOverlay.hidden=true;
-    }
-  },220);
+  setTimeout(()=>{ if(!document.body.classList.contains("drawer-open")){ sideNav.hidden=true; navOverlay.hidden=true; } },220);
 }
-
-menuBtn.onclick = () => {
-  document.body.classList.contains("drawer-open") ? closeDrawer() : openDrawer();
-};
+menuBtn.onclick = () => { document.body.classList.contains("drawer-open") ? closeDrawer() : openDrawer(); };
 navOverlay.onclick = closeDrawer;
 
 async function initializeApp() {
     const loginId = sessionStorage.getItem("loginid");
     const userType = sessionStorage.getItem("usertype");
 
-    if (!loginId) {
-        window.location.href = "login.html";
-        return;
-    }
-
-    if (userType === "Farmer") {
-        document.getElementById("marketSection").style.display = "block";
-        document.querySelectorAll(".farmer-only").forEach(el => el.style.display = "block");
-    }
+    if (!loginId) { window.location.href = "login.html"; return; }
+    if (userType === "Farmer") { document.getElementById("marketSection").style.display = "block"; }
 
     logoutBtn.onclick = async () => {
         await db.auth.signOut();
@@ -210,83 +155,44 @@ async function initializeApp() {
     };
 
     const loadNotifications = async () => {
-        const [cropsRes, toolsRes] = await Promise.all([
-            db.from("buy_table").select("*").eq("fid", loginId).eq("is_confirmed", false),
-            db.from("tool_rentals").select("*").eq("owner_name", loginId).eq("status", "Pending")
-        ]);
+        const { data: notes, error } = await db.from("notifications")
+            .select("*")
+            .eq("user_id", loginId)
+            .eq("status", "Pending")
+            .order("created_at", { ascending: false });
 
-        cropContainer.innerHTML = "";
-        toolContainer.innerHTML = "";
-        
-        const crops = cropsRes.data || [];
-        const tools = toolsRes.data || [];
+        listContainer.innerHTML = notes && notes.length ? "" : '<div class="card">No new notifications.</div>';
 
-        if (crops.length === 0 && tools.length === 0) {
-            emptyState.style.display = "block";
+        notes?.forEach(n => {
+            const card = document.createElement("div");
+            card.className = "card";
+            card.style.borderLeftColor = n.type === 'tool' ? '#138808' : '#ff9933';
+            card.innerHTML = `
+                <h4>${n.title}</h4>
+                <p>${n.message}</p>
+                <small>From: ${n.sender_name || 'System'}</small>
+                <div class="actions">
+                    <button class="btn-accept" onclick="handleAction('${n.id}', '${n.related_id}', '${n.type}', 'Accepted')">Accept</button>
+                    <button class="btn-decline" onclick="handleAction('${n.id}', '${n.related_id}', '${n.type}', 'Declined')">Decline</button>
+                </div>
+            `;
+            listContainer.appendChild(card);
+        });
+    };
+
+    window.handleAction = async (notifId, relatedId, type, status) => {
+        await db.from("notifications").update({ status: status, is_read: true }).eq("id", notifId);
+
+        if (type === 'crop') {
+            await db.from("buy_table").update({ status: status, is_confirmed: true }).eq("id", relatedId);
         } else {
-            emptyState.style.display = "none";
+            const isAvailable = status !== 'Accepted';
+            await db.from("tool_rentals").update({ status: status, is_available: isAvailable }).eq("id", relatedId);
         }
-
-        if (crops.length > 0) {
-            const h4 = document.createElement("h4");
-            h4.innerText = "Crop Purchase Requests";
-            cropContainer.appendChild(h4);
-            crops.forEach(item => {
-                const div = document.createElement("div");
-                div.className = "card";
-                div.innerHTML = `
-                    <strong>Buyer ID: ${item.lid}</strong> wants to buy <strong>${item.cname}</strong> (Qty: ${item.quantity}).
-                    <div class="actions">
-                        <button class="btn-accept" onclick="acceptCrop('${item.id}')">Accept</button>
-                        <button class="btn-decline" onclick="decline('${item.id}', 'buy_table')">Decline</button>
-                    </div>`;
-                cropContainer.appendChild(div);
-            });
-        }
-
-        if (tools.length > 0) {
-            const h4 = document.createElement("h4");
-            h4.innerText = "Equipment Rental Requests";
-            toolContainer.appendChild(h4);
-            tools.forEach(item => {
-                const div = document.createElement("div");
-                div.className = "card";
-                div.style.borderLeftColor = "#138808";
-                div.innerHTML = `
-                    <strong>${item.user_id}</strong> requested <strong>${item.tool_name}</strong>.
-                    <div class="actions">
-                        <button class="btn-accept" onclick="acceptTool('${item.id}', '${item.tool_id}')">Accept</button>
-                        <button class="btn-decline" onclick="decline('${item.id}', 'tool_rentals')">Decline</button>
-                    </div>`;
-                toolContainer.appendChild(div);
-            });
-        }
-    };
-
-    window.acceptCrop = async (id) => {
-        await db.from("buy_table").update({ status: 'Accepted', is_confirmed: true }).eq("id", id);
         loadNotifications();
     };
 
-    window.acceptTool = async (id, toolId) => {
-        await Promise.all([
-            db.from("tool_rentals").update({ status: 'Accepted' }).eq("id", id),
-            db.from("tool_rentals").update({ is_available: false }).eq("id", toolId)
-        ]);
-        loadNotifications();
-    };
-
-    window.decline = async (id, table) => {
-        const updateData = table === 'buy_table' ? { status: 'Declined', is_confirmed: true } : { status: 'Declined' };
-        await db.from(table).update(updateData).eq("id", id);
-        loadNotifications();
-    };
-
-    db.channel('realtime_hub')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'buy_table' }, loadNotifications)
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'tool_rentals' }, loadNotifications)
-      .subscribe();
-
+    db.channel('notif_feed').on('postgres_changes', { event: '*', schema: 'public', table: 'notifications' }, loadNotifications).subscribe();
     loadNotifications();
 }
 
