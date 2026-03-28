@@ -364,23 +364,25 @@ async function confirmBuy() {
     const buyerName = userData.username;
 
     // ✅ 2. Insert into buy_table (MATCHES SELL STRUCTURE)
-    const { data: buyData, error: buyError } = await db
-      .from("buy_table")
-      .insert({
-        fname: selectedCrop.farmer_name ?? "",
-        fid: Number(selectedCrop.lid),          // ✅ farmer id
-        cname: selectedCrop.crop_name ?? "",
-        cid: Number(selectedCrop.id),
-        status: "Pending",
-        lid: Number(loginid),                   // ✅ buyer id
-        buyer_name: buyerName ?? "",
-        quantity: Number(qty),
-        price_per_kg: Number(selectedCrop.price),
-        total_price: Number(total),
-        is_confirmed: false
-      })
-      .select()
-      .single();
+   const { data: buyData, error: buyError } = await db
+  .from("buy_table")
+  .insert({
+    user_id: Number(loginid),   // ✅🔥 ADD THIS (MAIN FIX)
+
+    fname: selectedCrop.farmer_name ?? "",
+    fid: Number(selectedCrop.lid),
+    cname: selectedCrop.crop_name ?? "",
+    cid: Number(selectedCrop.id),
+    status: "Pending",
+    lid: Number(loginid),
+    buyer_name: buyerName ?? "",
+    quantity: Number(qty),
+    price_per_kg: Number(selectedCrop.price),
+    total_price: Number(total),
+    is_confirmed: false
+  })
+  .select()
+  .single();
 
     if (buyError) {
       console.error("BUY ERROR FULL:", JSON.stringify(buyError, null, 2));
