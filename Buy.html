@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Buy Crops</title>
+<title>Buy Crop</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="supabase.js"></script>
 <style>
@@ -394,20 +394,19 @@ const { data: buyData, error: buyError } = await db
    
 
     // ✅ 3. Create notification (FIXED bigint issue)
-    const { error: notifError } = await db
-      .from("notifications")
-      .insert({
-        user_id: parseInt(selectedCrop.lid), // 👈 IMPORTANT FIX
-        buy_id: buyData.id,
-        title: "New Purchase Request",
-        message: `${buyerName} ordered ${qty} kg of ${selectedCrop.crop_name} (₹${total})`,
-        is_read: false
-      });
+   const { error: notifError } = await db
+  .from("notifications")
+  .insert({
+    lid: Number(selectedCrop.lid), // ✅ use lid instead of user_id
+    buy_id: buyData.id,
+    title: "New Purchase Request",
+    message: `${buyerName} ordered ${qty} kg of ${selectedCrop.crop_name} (₹${total})`,
+    is_read: false
+  });
 
-    if (notifError) {
-      console.error("Notification Error:", notifError);
-    }
-
+   if (notifError) {
+  console.error("Notification Error FULL:", JSON.stringify(notifError, null, 2));
+}
     showMessage(`Purchase Request Sent!\nTotal Cost: ₹${total}`);
 
     closeBuyPopup();
