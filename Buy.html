@@ -245,72 +245,72 @@ body.drawer-open .side-drawer { transform: translateX(0); }
 <script>
 const db = window.db;
 const loginid = sessionStorage.getItem("loginid");
+const usertype = sessionStorage.getItem("usertype");
 
 if (!loginid) {
-  alert("Session expired. Please login again.");
   location.href = "login";
 }
 
 let selectedCrop = null;
 
-// ✅ SAFE VALUE HELPER
-function safe(val, def = "") {
-  return val === null || val === undefined ? def : val;
-}
-
-// ✅ LOAD CROPS (SAFE)
-async function loadCrops() {
-  try {
-    const { data, error } = await db
-      .from("crop_sales")
-      .select("*")
-      .neq("lid", Number(loginid));
-
-    if (error) throw error;
-
-    const grid = document.getElementById("cropGrid");
-    grid.innerHTML = "";
-
-    if (!data || data.length === 0) {
-      grid.innerHTML = "<p>No crops available</p>";
-      return;
-    }
-
-    data.forEach(crop => {
-      const card = document.createElement("div");
-      card.className = "crop-card";
-
-      card.innerHTML = `
-        <h3>${safe(crop.crop_name)}</h3>
-        <p><b>Farmer:</b> ${safe(crop.farmer_name)}</p>
-        <p><b>Quantity:</b> ${safe(crop.quantity)} kg</p>
-        <p><b>Price:</b> ₹${safe(crop.price)}/kg</p>
-        <button style="width:100%;margin-top:10px;">Buy</button>
-      `;
-
-      card.querySelector("button").onclick = () => openBuyPopup(crop);
-      grid.appendChild(card);
-    });
-
-  } catch (err) {
-    console.error("LOAD ERROR:", err);
-    showMessage("Failed to load crops");
+// ✅ Role UI
+function applyRolePermissions() {
+  if (usertype === "Farmer") {
+    document.getElementById("marketSection").style.display = "block";
+    document.querySelectorAll(".farmer-only").forEach(el => el.style.display = "block");
   }
 }
 
-// ✅ OPEN POPUP
+// ✅ Load crops
+async function loadCrops() {
+  const { data, error } = await db
+    .from("crop_sales")
+    .select("*")
+    .neq("lid", loginid);
+
+  if (error) {
+    console.error(error);
+    return;
+  }
+
+  const grid = document.getElementById("cropGrid");
+  grid.innerHTML = "";
+
+  data.forEach(crop => {
+    const card = document.createElement("div");
+    card.className = "crop-card";
+
+    card.innerHTML = `
+      <h3>${crop.crop_name}</h3>
+      <p><b>Farmer:</b> ${crop.farmer_name}</p>
+      <p><b>Total Quantity:</b> ${crop.quantity} kg</p>
+      <p><b>Quality:</b> ${crop.quality}</p>
+      <div class="price">₹${crop.price}/kg</div>
+      <button style="width:100%; margin-top:15px; padding:12px; background:#0a3d62; color:white; border:none; border-radius:10px; cursor:pointer; font-weight:700;">
+        Buy Now
+      </button>
+    `;
+
+    card.querySelector("button").onclick = () => openBuyPopup(crop);
+    grid.appendChild(card);
+  });
+}
+
+// ✅ Open popup
 function openBuyPopup(crop) {
   selectedCrop = crop;
 
   document.getElementById("cropDetails").innerHTML = `
-    <p>Farmer: ${safe(crop.farmer_name)}</p>
-    <p>Crop: ${safe(crop.crop_name)}</p>
-    <p>Min Qty: ${safe(crop.min_quantity, 1)}</p>
-    <p>Available: ${safe(crop.quantity, 0)}</p>
-    <p>Price: ₹${safe(crop.price, 0)}</p>
+    <div class="detail"><b>Farmer:</b> ${crop.farmer_name}</div>
+    <div class="detail"><b>Crop:</b> ${crop.crop_name}</div>
+    <div class="detail"><b>Category:</b> ${crop.crop_category}</div>
+    <div class="detail"><b>Total Quantity:</b> ${crop.quantity} kg</div>
+    <div class="detail"><b>Minimum Order:</b> ${crop.min_quantity} kg</div>
+    <div class="detail"><b>Price:</b> ₹${crop.price}/kg</div>
+    <div class="detail"><b>Location:</b> ${crop.location}</div>
+    <div class="detail"><b>Contact:</b> ${crop.contact_info}</div>
   `;
 
-  document.getElementById("buyQuantity").value = "";
   document.getElementById("buyPopup").style.display = "flex";
 }
 
@@ -318,7 +318,7 @@ function closeBuyPopup() {
   document.getElementById("buyPopup").style.display = "none";
 }
 
-// ✅ MESSAGE
+// ✅ Message popup
 function showMessage(msg) {
   document.getElementById("messageText").innerText = msg;
   document.getElementById("messagePopup").style.display = "flex";
@@ -327,39 +327,28 @@ function showMessage(msg) {
 function closeMessage() {
   document.getElementById("messagePopup").style.display = "none";
 }
-
-// ✅ FINAL SAFE BUY FUNCTION
 async function confirmBuy() {
+  const qty = parseInt(document.getElementById("buyQuantity").value);
+
+  if (!qty || qty <= 0) {
+    showMessage("Please enter valid quantity");
+    return;
+  }
+
+  if (qty < selectedCrop.min_quantity) {
+    showMessage("Enter more than minimum quantity");
+    return;
+  }
+
+  if (qty > selectedCrop.quantity) {
+    showMessage("Enter less than available quantity");
+    return;
+  }
+
+  const total = qty * selectedCrop.price;
+
   try {
-    if (!selectedCrop) {
-      showMessage("No crop selected");
-      return;
-    }
-
-    const qty = Number(document.getElementById("buyQuantity").value);
-
-    if (!qty || qty <= 0) {
-      showMessage("Enter valid quantity");
-      return;
-    }
-
-    const minQty = Number(safe(selectedCrop.min_quantity, 1));
-    const maxQty = Number(safe(selectedCrop.quantity, 0));
-    const price = Number(safe(selectedCrop.price, 0));
-
-    if (qty < minQty) {
-      showMessage("Below minimum quantity");
-      return;
-    }
-
-    if (qty > maxQty) {
-      showMessage("Exceeds available quantity");
-      return;
-    }
-
-    const total = qty * price;
-
-    // ✅ GET USER
+    // ✅ 1. Get buyer name
     const { data: userData, error: userError } = await db
       .from("logindata")
       .select("username")
@@ -367,56 +356,104 @@ async function confirmBuy() {
       .single();
 
     if (userError || !userData) {
-      throw new Error("User fetch failed");
+      console.error("User Fetch Error:", userError);
+      showMessage("Unable to fetch buyer name");
+      return;
     }
 
-    const buyerName = safe(userData.username, "Unknown");
+    const buyerName = userData.username;
 
-    // ✅ INSERT BUY (NO created_at)
-    const { data: insertData, error: insertError } = await db
-      .from("buy_table")
-      .insert([{
-        fname: safe(selectedCrop.farmer_name),
-        fid: Number(safe(selectedCrop.lid, 0)),
-        cname: safe(selectedCrop.crop_name),
-        cid: Number(safe(selectedCrop.id, 0)),
-        status: "Pending",
-        lid: Number(loginid),
-        is_confirmed: false,
-        quantity: qty,
-        buyer_name: buyerName,
-        price_per_kg: price,
-        total_price: total
-      }])
-      .select()
-      .single();
+    // ✅ 2. Insert into buy_table (MATCHES SELL STRUCTURE)
+   const { data: buyData, error: buyError } = await db
+  .from("buy_table")
+  .insert({
+    fname: selectedCrop.farmer_name ?? "",
+    fid: Number(selectedCrop.lid),        // farmer id
+    cname: selectedCrop.crop_name ?? "",
+    cid: Number(selectedCrop.id),
+    status: "Pending",
+    lid: Number(loginid),                 // buyer id ✅ IMPORTANT
+    quantity: Number(qty),
+    buyer_name: buyerName ?? "",
+    price_per_kg: Number(selectedCrop.price),
+    total_price: Number(total),
+    is_confirmed: false
+  })
+  .select()
+  .single();
 
-    if (insertError) throw insertError;
+    if (buyError) {
+      console.error("BUY ERROR FULL:", JSON.stringify(buyError, null, 2));
+      showMessage(buyError.message);
+      return;
+    }
 
-    // ✅ NOTIFICATION (NON-BLOCKING)
-    try {
-      await db.from("notifications").insert({
-        user_id: Number(selectedCrop.lid),
-        buy_id: insertData.id,
-        title: "New Order",
-        message: `${buyerName} ordered ${qty}kg of ${safe(selectedCrop.crop_name)}`,
+    // ✅ 3. Notification (SAFE BIGINT FIX)
+    const farmerId = Number(selectedCrop.lid);
+
+    if (!farmerId) {
+      console.error("Invalid farmer ID:", selectedCrop.lid);
+      showMessage("Invalid farmer ID");
+      return;
+    }
+
+    const { error: notifError } = await db
+      .from("notifications")
+      .insert({
+        user_id: farmerId,   // ✅ farmer gets notification
+        buy_id: buyData.id,
+        title: "New Purchase Request",
+        message: `${buyerName} ordered ${qty} kg of ${selectedCrop.crop_name} (₹${total})`,
         is_read: false
       });
-    } catch (notifErr) {
-      console.warn("Notification failed (ignored):", notifErr);
+
+    if (notifError) {
+      console.error("Notification Error:", notifError);
     }
 
-    showMessage(`Order placed! Total ₹${total}`);
+    // ✅ SUCCESS
+    showMessage(`Purchase Request Sent!\nTotal Cost: ₹${total}`);
+
     closeBuyPopup();
     loadCrops();
 
   } catch (err) {
-    console.error("BUY ERROR:", err);
-    showMessage(err.message || "Something went wrong");
+    console.error("Unexpected Error:", err);
+    showMessage("Something went wrong");
   }
 }
+// ✅ Drawer + Logout
+const menuBtn = document.getElementById("menuBtn");
+const sideNav = document.getElementById("sideNav");
+const navOverlay = document.getElementById("navOverlay");
 
-// INIT
+function openDrawer() {
+  document.body.classList.add("drawer-open");
+  sideNav.hidden = false;
+  navOverlay.hidden = false;
+}
+
+function closeDrawer() {
+  document.body.classList.remove("drawer-open");
+  setTimeout(() => {
+    sideNav.hidden = true;
+    navOverlay.hidden = true;
+  }, 200);
+}
+
+menuBtn.onclick = () => {
+  document.body.classList.contains("drawer-open") ? closeDrawer() : openDrawer();
+};
+
+navOverlay.onclick = closeDrawer;
+
+document.getElementById("logoutBtn").onclick = () => {
+  sessionStorage.clear();
+  location.href = "login";
+};
+
+// ✅ Init
+applyRolePermissions();
 loadCrops();
 </script>
 </body>
