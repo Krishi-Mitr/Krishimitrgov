@@ -366,30 +366,33 @@ async function confirmBuy() {
     const buyerName = userData.username;
 
     // ✅ 2. Save to buy_table
-    const { data: buyData, error: buyError } = await db
-      .from("buy_table")
-      .insert({
-        fname: selectedCrop.farmer_name,
-        fid: parseInt(selectedCrop.lid),
-        cname: selectedCrop.crop_name,
-        cid: selectedCrop.id,
-        status: "Pending",
-        lid: parseInt(loginid),
-        buyer_name: buyerName,
-        quantity: qty,
-        price_per_kg: selectedCrop.price,
-        total_price: total,
-        is_confirmed: false
-      })
-      .select()
-      .single();
+   // ✅ SAFE BUY INSERT ONLY
+const { data: buyData, error: buyError } = await db
+  .from("buy_table")
+  .insert({
+    fname: selectedCrop.farmer_name ?? "",
+    fid: Number(selectedCrop.lid),
+    cname: selectedCrop.crop_name ?? "",
+    cid: Number(selectedCrop.id),
+    status: "Pending",
+    lid: Number(loginid),
+    buyer_name: buyerName ?? "",
+    quantity: Number(qty),
+    price_per_kg: Number(selectedCrop.price),
+    total_price: Number(total),
+    is_confirmed: false
+  })
+  .select()
+  .single();
 
     if (buyError) {
-      console.error("Buy Error FULL:", buyError);
-      showMessage("Error saving purchase");
-      return;
-    }
+  console.error("BUY ERROR FULL:", JSON.stringify(buyError, null, 2));
+  alert(buyError.message);
+  return;
+}
 
+   
+/*
     // ✅ 3. Create notification (FIXED bigint issue)
     const { error: notifError } = await db
       .from("notifications")
@@ -400,7 +403,7 @@ async function confirmBuy() {
         message: `${buyerName} ordered ${qty} kg of ${selectedCrop.crop_name} (₹${total})`,
         is_read: false
       });
-
+*/
     if (notifError) {
       console.error("Notification Error:", notifError);
     }
