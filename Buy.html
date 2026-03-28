@@ -363,17 +363,53 @@ async function confirmBuy() {
     const buyerName = userData.username;
 
     // ✅ INSERT (FIXED TYPES)
+  async function confirmBuy() {
+  const qty = parseInt(document.getElementById("buyQuantity").value);
+
+  if (!qty || qty <= 0) {
+    showMessage("Please enter valid quantity");
+    return;
+  }
+
+  if (qty < selectedCrop.min_quantity) {
+    showMessage("Enter more than minimum quantity");
+    return;
+  }
+
+  if (qty > selectedCrop.quantity) {
+    showMessage("Enter less than available quantity");
+    return;
+  }
+
+  const total = qty * selectedCrop.price;
+
+  try {
+    // ✅ Get buyer name
+    const { data: userData, error: userError } = await db
+      .from("logindata")
+      .select("username")
+      .eq("loginid", loginid) // loginid is string in DB
+      .single();
+
+    if (userError || !userData) {
+      showMessage("Unable to fetch buyer name");
+      return;
+    }
+
+    const buyerName = userData.username;
+
+    // ✅ INSERT INTO buy_table (MATCH YOUR SCHEMA)
     const { data: buyData, error: buyError } = await db
       .from("buy_table")
       .insert([{
-        fname: selectedCrop.farmer_name || "",
-        fid: String(selectedCrop.lid),   // ✅ STRING FIX
-        cname: selectedCrop.crop_name || "",
-        cid: String(selectedCrop.id),    // ✅ STRING FIX
+        fname: selectedCrop.farmer_name,
+        fid: String(selectedCrop.lid),      // farmer id (string/varchar)
+        cname: selectedCrop.crop_name,
+        cid: String(selectedCrop.id),       // crop id (string)
         status: "Pending",
-        lid: parseInt(loginid),          // ✅ INTEGER
+        lid: parseInt(loginid),             // buyer id (int8)
         quantity: qty,
-        buyer_name: buyerName || "",
+        buyer_name: buyerName,
         price_per_kg: selectedCrop.price,
         total_price: total,
         is_confirmed: false
@@ -387,11 +423,11 @@ async function confirmBuy() {
       return;
     }
 
-    // ✅ NOTIFICATION FIX (BIGINT SAFE)
+    // ✅ INSERT INTO notifications (BIGINT SAFE)
     const { error: notifError } = await db
       .from("notifications")
       .insert({
-        user_id: parseInt(selectedCrop.fid), // ✅ BIGINT FIX
+        user_id: parseInt(selectedCrop.lid), // farmer gets notification
         buy_id: buyData.id,
         title: "New Purchase Request",
         message: `${buyerName} ordered ${qty} kg of ${selectedCrop.crop_name} (₹${total})`,
