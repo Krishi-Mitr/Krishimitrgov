@@ -348,59 +348,50 @@ async function confirmBuy() {
   const total = qty * selectedCrop.price;
 
   try {
-    // ✅ 1. Get buyer name
+    // ✅ Get buyer name
     const { data: userData, error: userError } = await db
       .from("logindata")
       .select("username")
-      .eq("loginid", Number(loginid))
+      .eq("loginid", loginid) // ⚠️ STRING (your DB uses varchar)
       .single();
 
     if (userError || !userData) {
-      console.error("User Fetch Error:", userError);
       showMessage("Unable to fetch buyer name");
       return;
     }
 
     const buyerName = userData.username;
 
-    // ✅ 2. Insert into buy_table (MATCHES SELL STRUCTURE)
-   const { data: buyData, error: buyError } = await db
-  .from("buy_table")
-  .insert({
-    fname: selectedCrop.farmer_name ?? "",
-    fid: Number(selectedCrop.lid),        // farmer id
-    cname: selectedCrop.crop_name ?? "",
-    cid: Number(selectedCrop.id),
-    status: "Pending",
-    lid: Number(loginid),                 // buyer id ✅ IMPORTANT
-    quantity: Number(qty),
-    buyer_name: buyerName ?? "",
-    price_per_kg: Number(selectedCrop.price),
-    total_price: Number(total),
-    is_confirmed: false
-  })
-  .select()
-  .single();
+    // ✅ INSERT (FIXED TYPES)
+    const { data: buyData, error: buyError } = await db
+      .from("buy_table")
+      .insert([{
+        fname: selectedCrop.farmer_name || "",
+        fid: String(selectedCrop.lid),   // ✅ STRING FIX
+        cname: selectedCrop.crop_name || "",
+        cid: String(selectedCrop.id),    // ✅ STRING FIX
+        status: "Pending",
+        lid: parseInt(loginid),          // ✅ INTEGER
+        quantity: qty,
+        buyer_name: buyerName || "",
+        price_per_kg: selectedCrop.price,
+        total_price: total,
+        is_confirmed: false
+      }])
+      .select()
+      .single();
 
     if (buyError) {
-      console.error("BUY ERROR FULL:", JSON.stringify(buyError, null, 2));
+      console.error("BUY ERROR:", buyError);
       showMessage(buyError.message);
       return;
     }
 
-    // ✅ 3. Notification (SAFE BIGINT FIX)
-    const farmerId = Number(selectedCrop.lid);
-
-    if (!farmerId) {
-      console.error("Invalid farmer ID:", selectedCrop.lid);
-      showMessage("Invalid farmer ID");
-      return;
-    }
-
+    // ✅ NOTIFICATION FIX (BIGINT SAFE)
     const { error: notifError } = await db
       .from("notifications")
       .insert({
-        user_id: farmerId,   // ✅ farmer gets notification
+        user_id: parseInt(selectedCrop.lid), // ✅ BIGINT FIX
         buy_id: buyData.id,
         title: "New Purchase Request",
         message: `${buyerName} ordered ${qty} kg of ${selectedCrop.crop_name} (₹${total})`,
@@ -411,7 +402,6 @@ async function confirmBuy() {
       console.error("Notification Error:", notifError);
     }
 
-    // ✅ SUCCESS
     showMessage(`Purchase Request Sent!\nTotal Cost: ₹${total}`);
 
     closeBuyPopup();
