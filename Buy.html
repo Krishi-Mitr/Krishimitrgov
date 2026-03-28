@@ -337,14 +337,6 @@ async function confirmBuy() {
     return;
   }
 
-  async function confirmBuy() {
-  const qty = parseInt(document.getElementById("buyQuantity").value);
-
-  if (!qty || qty <= 0) {
-    showMessage("Please enter valid quantity");
-    return;
-  }
-
   if (qty < selectedCrop.min_quantity) {
     showMessage("Enter more than minimum quantity");
     return;
@@ -362,7 +354,7 @@ async function confirmBuy() {
     const { data: userData, error: userError } = await db
       .from("logindata")
       .select("username")
-      .eq("loginid", parseInt(loginid)) // ✅ FIX
+      .eq("loginid", parseInt(loginid))
       .single();
 
     if (userError || !userData) {
@@ -378,11 +370,11 @@ async function confirmBuy() {
       .from("buy_table")
       .insert({
         fname: selectedCrop.farmer_name,
-        fid: parseInt(selectedCrop.lid),   // ✅ FIX
+        fid: parseInt(selectedCrop.lid),
         cname: selectedCrop.crop_name,
         cid: selectedCrop.id,
         status: "Pending",
-        lid: parseInt(loginid),            // ✅ FIX
+        lid: parseInt(loginid),
         buyer_name: buyerName,
         quantity: qty,
         price_per_kg: selectedCrop.price,
@@ -398,11 +390,11 @@ async function confirmBuy() {
       return;
     }
 
-    // ✅ 3. Create notification
+    // ✅ 3. Create notification (FIXED bigint issue)
     const { error: notifError } = await db
       .from("notifications")
       .insert({
-        user_id: parseInt(selectedCrop.lid), // ✅ FIX (MAIN ERROR)
+        user_id: parseInt(selectedCrop.lid), // 👈 IMPORTANT FIX
         buy_id: buyData.id,
         title: "New Purchase Request",
         message: `${buyerName} ordered ${qty} kg of ${selectedCrop.crop_name} (₹${total})`,
@@ -423,7 +415,6 @@ async function confirmBuy() {
     showMessage("Something went wrong");
   }
 }
-
 // ✅ Drawer + Logout
 const menuBtn = document.getElementById("menuBtn");
 const sideNav = document.getElementById("sideNav");
