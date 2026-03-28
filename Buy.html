@@ -244,12 +244,15 @@ body.drawer-open .side-drawer { transform: translateX(0); }
 </div>
 
 <script>
-const db=window.db;
-const loginid=sessionStorage.getItem("loginid");
-const usertype=sessionStorage.getItem("usertype");
-if(!loginid){location.href="login"}
+const db = window.db;
+const loginid = sessionStorage.getItem("loginid");
+const usertype = sessionStorage.getItem("usertype");
 
-let selectedCrop=null;
+if (!loginid) {
+  location.href = "login";
+}
+
+let selectedCrop = null;
 
 function applyRolePermissions() {
   if (usertype === "Farmer") {
@@ -258,29 +261,44 @@ function applyRolePermissions() {
   }
 }
 
-async function loadCrops(){
-  const {data}=await db.from("crop_sales").select("*").neq("lid",loginid);
-  const grid=document.getElementById("cropGrid");
-  grid.innerHTML="";
-  data.forEach(crop=>{
-    const card=document.createElement("div");
-    card.className="crop-card";
-    card.innerHTML=`
+async function loadCrops() {
+  const { data, error } = await db
+    .from("crop_sales")
+    .select("*")
+    .neq("lid", loginid);
+
+  if (error) {
+    console.error(error);
+    return;
+  }
+
+  const grid = document.getElementById("cropGrid");
+  grid.innerHTML = "";
+
+  data.forEach(crop => {
+    const card = document.createElement("div");
+    card.className = "crop-card";
+
+    card.innerHTML = `
       <h3>${crop.crop_name}</h3>
       <p><b>Farmer:</b> ${crop.farmer_name}</p>
       <p><b>Total Quantity:</b> ${crop.quantity} kg</p>
       <p><b>Quality:</b> ${crop.quality}</p>
       <div class="price">₹${crop.price}/kg</div>
-      <button class="buy-btn" style="width:100%; margin-top:15px; padding:12px; background:#0a3d62; color:white; border:none; border-radius:10px; cursor:pointer; font-weight:700;">Buy Now</button>
+      <button style="width:100%; margin-top:15px; padding:12px; background:#0a3d62; color:white; border:none; border-radius:10px; cursor:pointer; font-weight:700;">
+        Buy Now
+      </button>
     `;
-    card.querySelector("button").onclick=()=>openBuyPopup(crop);
+
+    card.querySelector("button").onclick = () => openBuyPopup(crop);
     grid.appendChild(card);
   });
 }
 
-function openBuyPopup(crop){
-  selectedCrop=crop;
-  document.getElementById("cropDetails").innerHTML=`
+function openBuyPopup(crop) {
+  selectedCrop = crop;
+
+  document.getElementById("cropDetails").innerHTML = `
     <div class="detail"><b>Farmer:</b> ${crop.farmer_name}</div>
     <div class="detail"><b>Crop:</b> ${crop.crop_name}</div>
     <div class="detail"><b>Category:</b> ${crop.crop_category}</div>
@@ -290,65 +308,118 @@ function openBuyPopup(crop){
     <div class="detail"><b>Location:</b> ${crop.location}</div>
     <div class="detail"><b>Contact:</b> ${crop.contact_info}</div>
   `;
-  document.getElementById("buyPopup").style.display="flex";
+
+  document.getElementById("buyPopup").style.display = "flex";
 }
 
-function closeBuyPopup(){document.getElementById("buyPopup").style.display="none"}
-function showMessage(msg){document.getElementById("messageText").innerText=msg;document.getElementById("messagePopup").style.display="flex"}
-function closeMessage(){document.getElementById("messagePopup").style.display="none"}
+function closeBuyPopup() {
+  document.getElementById("buyPopup").style.display = "none";
+}
 
-async function confirmBuy(){
-  const qty=parseInt(document.getElementById("buyQuantity").value);
-  if(!qty){showMessage("Please enter quantity");return;}
-  if(qty<selectedCrop.min_quantity){showMessage("Enter more than minimum quantity");return;}
-  if(qty>selectedCrop.quantity){showMessage("Enter less than available quantity");return;}
-  const total=qty*selectedCrop.price;
-  await db.from("buy_table").insert({
-    fname:selectedCrop.farmer_name,
-    fid:selectedCrop.jid,
-    cname:selectedCrop.crop_name,
-    cid:selectedCrop.id,
-    status:"Pending",
-    lid:loginid,
-    quantity:qty,
-    is_confirmed:false
-  });
+function showMessage(msg) {
+  document.getElementById("messageText").innerText = msg;
+  document.getElementById("messagePopup").style.display = "flex";
+}
+
+function closeMessage() {
+  document.getElementById("messagePopup").style.display = "none";
+}
+
+async function confirmBuy() {
+  const qty = parseInt(document.getElementById("buyQuantity").value);
+
+  if (!qty) {
+    showMessage("Please enter quantity");
+    return;
+  }
+
+  if (qty < selectedCrop.min_quantity) {
+    showMessage("Enter more than minimum quantity");
+    return;
+  }
+
+  if (qty > selectedCrop.quantity) {
+    showMessage("Enter less than available quantity");
+    return;
+  }
+
+  const total = qty * selectedCrop.price;
+
+  // ✅ 1. SAVE BUY REQUEST
+  const { data: buyData, error: buyError } = await db
+    .from("buy_table")
+    .insert({
+      fname: selectedCrop.farmer_name,
+      fid: selectedCrop.lid, // ✅ FIXED
+      cname: selectedCrop.crop_name,
+      cid: selectedCrop.id,
+      status: "Pending",
+      lid: loginid,
+      quantity: qty,
+      is_confirmed: false
+    })
+    .select()
+    .single();
+
+  if (buyError) {
+    console.error("Buy Error:", buyError);
+    showMessage("Error saving purchase");
+    return;
+  }
+
+  // ✅ 2. CREATE NOTIFICATION
+  const { error: notifError } = await db
+    .from("notifications")
+    .insert({
+      user_id: selectedCrop.lid, // farmer gets notification
+      buy_id: buyData.id,
+      title: "New Purchase Request",
+      message: `Order received: ${qty} kg of ${selectedCrop.crop_name}`,
+      status: "Pending",
+      is_read: false
+    });
+
+  if (notifError) {
+    console.error("Notification Error:", notifError);
+  }
+
   showMessage(`Purchase Request Sent!\nTotal Cost: ₹${total}\nWaiting for Farmer Confirmation.`);
+
   closeBuyPopup();
   loadCrops();
 }
 
+// Drawer & Logout
 const menuBtn = document.getElementById("menuBtn");
 const sideNav = document.getElementById("sideNav");
 const navOverlay = document.getElementById("navOverlay");
 
-function openDrawer(){
+function openDrawer() {
   document.body.classList.add("drawer-open");
-  sideNav.hidden=false;
-  navOverlay.hidden=false;
+  sideNav.hidden = false;
+  navOverlay.hidden = false;
 }
 
-function closeDrawer(){
+function closeDrawer() {
   document.body.classList.remove("drawer-open");
-  setTimeout(()=>{
-    if(!document.body.classList.contains("drawer-open")){
-      sideNav.hidden=true;
-      navOverlay.hidden=true;
-    }
-  },220);
+  setTimeout(() => {
+    sideNav.hidden = true;
+    navOverlay.hidden = true;
+  }, 200);
 }
 
-menuBtn.onclick=()=>{
+menuBtn.onclick = () => {
   document.body.classList.contains("drawer-open") ? closeDrawer() : openDrawer();
 };
 
-navOverlay.onclick=closeDrawer;
+navOverlay.onclick = closeDrawer;
 
-document.getElementById("logoutBtn").onclick = () => { 
-  sessionStorage.clear(); 
-  location.href="login"; 
+document.getElementById("logoutBtn").onclick = () => {
+  sessionStorage.clear();
+  location.href = "login";
 };
 
+// Init
 applyRolePermissions();
 loadCrops();
 </script>
