@@ -337,6 +337,14 @@ async function confirmBuy() {
     return;
   }
 
+  async function confirmBuy() {
+  const qty = parseInt(document.getElementById("buyQuantity").value);
+
+  if (!qty || qty <= 0) {
+    showMessage("Please enter valid quantity");
+    return;
+  }
+
   if (qty < selectedCrop.min_quantity) {
     showMessage("Enter more than minimum quantity");
     return;
@@ -354,7 +362,7 @@ async function confirmBuy() {
     const { data: userData, error: userError } = await db
       .from("logindata")
       .select("username")
-      .eq("loginid", loginid)
+      .eq("loginid", parseInt(loginid)) // ✅ FIX
       .single();
 
     if (userError || !userData) {
@@ -370,11 +378,11 @@ async function confirmBuy() {
       .from("buy_table")
       .insert({
         fname: selectedCrop.farmer_name,
-        fid: selectedCrop.lid,
+        fid: parseInt(selectedCrop.lid),   // ✅ FIX
         cname: selectedCrop.crop_name,
         cid: selectedCrop.id,
         status: "Pending",
-        lid: loginid,
+        lid: parseInt(loginid),            // ✅ FIX
         buyer_name: buyerName,
         quantity: qty,
         price_per_kg: selectedCrop.price,
@@ -394,7 +402,7 @@ async function confirmBuy() {
     const { error: notifError } = await db
       .from("notifications")
       .insert({
-        user_id: selectedCrop.lid,
+        user_id: parseInt(selectedCrop.lid), // ✅ FIX (MAIN ERROR)
         buy_id: buyData.id,
         title: "New Purchase Request",
         message: `${buyerName} ordered ${qty} kg of ${selectedCrop.crop_name} (₹${total})`,
