@@ -370,6 +370,8 @@ async function confirmBuy() {
 const { data: buyData, error: buyError } = await db
   .from("buy_table")
   .insert({
+    user_id: Number(loginid),   // ✅🔥 FORCE BIGINT (MAIN FIX)
+
     fname: selectedCrop.farmer_name ?? "",
     fid: Number(selectedCrop.lid),
     cname: selectedCrop.crop_name ?? "",
@@ -383,7 +385,7 @@ const { data: buyData, error: buyError } = await db
     is_confirmed: false
   })
   .select()
-  .single();
+  .single();;
 
     if (buyError) {
   console.error("BUY ERROR FULL:", JSON.stringify(buyError, null, 2));
