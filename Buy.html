@@ -2,9 +2,11 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Buy Crop</title>
+<title>Buy Crops</title>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="supabase.js"></script>
+
 <style>
 body {
   margin: 0;
@@ -165,103 +167,46 @@ body.drawer-open .side-drawer { transform: translateX(0); }
 .message-box{background:white;padding:30px;width:400px;border-radius:20px;text-align:center}
 </style>
 </head>
+
 <body>
-
-<div class="top-nav">
-  <div class="nav-left">
-    <button class="hamburger-btn" id="menuBtn">
-      <div class="hamburger-icon"><span></span><span></span><span></span></div>
-    </button>
-    <p class="brand-title">Krishi Mitr</p>
-  </div>
-  <div class="nav-right">
-    <div class="profile-btn" onclick="location.href='Profile'">
-      <img src="profile_pic.png" alt="Profile">
-    </div>
-    <button class="logout-btn" id="logoutBtn">Logout</button>
-  </div>
-</div>
-
-<div class="nav-overlay" id="navOverlay" hidden></div>
-<nav class="side-drawer" id="sideNav" hidden>
-  <div class="drawer-inner">
-    <div class="menu-section">
-      <div class="menu-section-title">Main</div>
-      <ul class="menu-list">
-        <li><a href="Dashboard">Dashboard</a></li>
-      </ul>
-    </div>
-    <div class="menu-section" id="marketSection" style="display:none;">
-      <div class="menu-section-title">Market</div>
-      <ul class="menu-list">
-        <li><a href="Update_crops">Manage Your Crops</a></li>
-        <li><a href="Sell">Sell Your Crop</a></li>
-      </ul>
-    </div>
-    <div class="menu-section">
-      <div class="menu-section-title">Tools & Services</div>
-      <ul class="menu-list">
-        <li><a href="Buy">Buy Crops</a></li>
-        <li><a href="browse_tools.html">Rent Tools & Machinery</a></li>
-        <li class="farmer-only" style="display:none;"><a href="tools_rental.html">List Tool for Rent</a></li>
-        <li class="farmer-only" style="display:none;"><a href="my_listings.html">My Tool Inventory</a></li>
-        <li><a href="krishimitr">Crop Predictor</a></li>
-        <li><a href="advisor">Crop Advisor</a></li>
-      </ul>
-    </div>
-    <div class="menu-section" style="margin-bottom:0;">
-      <div class="menu-section-title">System</div>
-      <ul class="menu-list">
-        <li><a href="Notification">Notification</a></li>
-        <li><a href="Chat">Chat</a></li>
-      </ul>
-    </div>
-  </div>
-</nav>
 
 <div class="container">
   <div class="crop-grid" id="cropGrid"></div>
 </div>
 
+<!-- BUY POPUP -->
 <div id="buyPopup" class="popup-overlay">
   <div class="popup-box">
     <span class="popup-close" onclick="closeBuyPopup()">&times;</span>
     <h2>Crop Details</h2>
     <div id="cropDetails"></div>
-    <input type="number" id="buyQuantity" placeholder="Enter quantity (kg)" style="width: 100%; padding: 10px; margin-top: 15px; border-radius: 8px; border: 1px solid #ccc;">
+
+    <input type="number" id="buyQuantity" placeholder="Enter quantity (kg)">
+
     <div class="popup-buttons">
-      <button class="popup-btn cancel" onclick="closeBuyPopup()">Cancel</button>
-      <button class="popup-btn confirm" onclick="confirmBuy()">Confirm Purchase</button>
+      <button onclick="closeBuyPopup()">Cancel</button>
+      <button onclick="confirmBuy()">Confirm Purchase</button>
     </div>
   </div>
 </div>
 
+<!-- MESSAGE -->
 <div id="messagePopup" class="popup-overlay">
   <div class="message-box">
     <p id="messageText"></p>
     <button onclick="closeMessage()">OK</button>
   </div>
 </div>
+
 <script>
 const db = window.db;
 const loginid = sessionStorage.getItem("loginid");
-const usertype = sessionStorage.getItem("usertype");
 
-if (!loginid) {
-  location.href = "login";
-}
+if (!loginid) location.href = "login";
 
 let selectedCrop = null;
 
-// ✅ Role UI
-function applyRolePermissions() {
-  if (usertype === "Farmer") {
-    document.getElementById("marketSection").style.display = "block";
-    document.querySelectorAll(".farmer-only").forEach(el => el.style.display = "block");
-  }
-}
-
-// ✅ Load crops
+// ✅ LOAD CROPS
 async function loadCrops() {
   const { data, error } = await db
     .from("crop_sales")
@@ -278,17 +223,12 @@ async function loadCrops() {
 
   data.forEach(crop => {
     const card = document.createElement("div");
-    card.className = "crop-card";
-
     card.innerHTML = `
       <h3>${crop.crop_name}</h3>
-      <p><b>Farmer:</b> ${crop.farmer_name}</p>
-      <p><b>Total Quantity:</b> ${crop.quantity} kg</p>
-      <p><b>Quality:</b> ${crop.quality}</p>
-      <div class="price">₹${crop.price}/kg</div>
-      <button style="width:100%; margin-top:15px; padding:12px; background:#0a3d62; color:white; border:none; border-radius:10px; cursor:pointer; font-weight:700;">
-        Buy Now
-      </button>
+      <p>Farmer: ${crop.farmer_name}</p>
+      <p>Quantity: ${crop.quantity} kg</p>
+      <p>Price: ₹${crop.price}/kg</p>
+      <button>Buy</button>
     `;
 
     card.querySelector("button").onclick = () => openBuyPopup(crop);
@@ -296,19 +236,16 @@ async function loadCrops() {
   });
 }
 
-// ✅ Open popup
+// ✅ OPEN POPUP
 function openBuyPopup(crop) {
   selectedCrop = crop;
 
   document.getElementById("cropDetails").innerHTML = `
-    <div class="detail"><b>Farmer:</b> ${crop.farmer_name}</div>
-    <div class="detail"><b>Crop:</b> ${crop.crop_name}</div>
-    <div class="detail"><b>Category:</b> ${crop.crop_category}</div>
-    <div class="detail"><b>Total Quantity:</b> ${crop.quantity} kg</div>
-    <div class="detail"><b>Minimum Order:</b> ${crop.min_quantity} kg</div>
-    <div class="detail"><b>Price:</b> ₹${crop.price}/kg</div>
-    <div class="detail"><b>Location:</b> ${crop.location}</div>
-    <div class="detail"><b>Contact:</b> ${crop.contact_info}</div>
+    <p>Farmer: ${crop.farmer_name}</p>
+    <p>Crop: ${crop.crop_name}</p>
+    <p>Min Qty: ${crop.min_quantity}</p>
+    <p>Available: ${crop.quantity}</p>
+    <p>Price: ₹${crop.price}</p>
   `;
 
   document.getElementById("buyPopup").style.display = "flex";
@@ -318,7 +255,7 @@ function closeBuyPopup() {
   document.getElementById("buyPopup").style.display = "none";
 }
 
-// ✅ Message popup
+// ✅ MESSAGE
 function showMessage(msg) {
   document.getElementById("messageText").innerText = msg;
   document.getElementById("messagePopup").style.display = "flex";
@@ -327,134 +264,86 @@ function showMessage(msg) {
 function closeMessage() {
   document.getElementById("messagePopup").style.display = "none";
 }
+
+// ✅ CONFIRM BUY (FINAL FIXED)
 async function confirmBuy() {
-  const qty = parseInt(document.getElementById("buyQuantity").value);
+
+  const qty = Number(document.getElementById("buyQuantity").value);
 
   if (!qty || qty <= 0) {
-    showMessage("Please enter valid quantity");
+    showMessage("Enter valid quantity");
     return;
   }
 
-  if (qty < selectedCrop.min_quantity) {
-    showMessage("Enter more than minimum quantity");
+  if (qty < Number(selectedCrop.min_quantity)) {
+    showMessage("Below minimum quantity");
     return;
   }
 
-  if (qty > selectedCrop.quantity) {
-    showMessage("Enter less than available quantity");
+  if (qty > Number(selectedCrop.quantity)) {
+    showMessage("Exceeds available quantity");
     return;
   }
 
-  const total = qty * selectedCrop.price;
+  const total = qty * Number(selectedCrop.price);
 
-  try {
-    // ✅ 1. Get buyer name
-    const { data: userData, error: userError } = await db
-      .from("logindata")
-      .select("username")
-      .eq("loginid", Number(loginid))
-      .single();
+  // ✅ GET BUYER NAME
+  const { data: userData, error: userError } = await db
+    .from("logindata")
+    .select("username")
+    .eq("loginid", Number(loginid))
+    .single();
 
-    if (userError || !userData) {
-      console.error("User Fetch Error:", userError);
-      showMessage("Unable to fetch buyer name");
-      return;
-    }
-
-    const buyerName = userData.username;
-
-    // ✅ 2. Insert into buy_table (MATCHES SELL STRUCTURE)
-   const { data: buyData, error: buyError } = await db
-  .from("buy_table")
-  .insert({
-    fname: selectedCrop.farmer_name ?? "",
-    fid: Number(selectedCrop.lid),        // farmer id
-    cname: selectedCrop.crop_name ?? "",
-    cid: Number(selectedCrop.id),
-    status: "Pending",
-    lid: Number(loginid),                 // buyer id ✅ IMPORTANT
-    quantity: Number(qty),
-    buyer_name: buyerName ?? "",
-    price_per_kg: Number(selectedCrop.price),
-    total_price: Number(total),
-    is_confirmed: false
-  })
-  .select()
-  .single();
-
-    if (buyError) {
-      console.error("BUY ERROR FULL:", JSON.stringify(buyError, null, 2));
-      showMessage(buyError.message);
-      return;
-    }
-
-    // ✅ 3. Notification (SAFE BIGINT FIX)
-    const farmerId = Number(selectedCrop.lid);
-
-    if (!farmerId) {
-      console.error("Invalid farmer ID:", selectedCrop.lid);
-      showMessage("Invalid farmer ID");
-      return;
-    }
-
-    const { error: notifError } = await db
-      .from("notifications")
-      .insert({
-        user_id: farmerId,   // ✅ farmer gets notification
-        buy_id: buyData.id,
-        title: "New Purchase Request",
-        message: `${buyerName} ordered ${qty} kg of ${selectedCrop.crop_name} (₹${total})`,
-        is_read: false
-      });
-
-    if (notifError) {
-      console.error("Notification Error:", notifError);
-    }
-
-    // ✅ SUCCESS
-    showMessage(`Purchase Request Sent!\nTotal Cost: ₹${total}`);
-
-    closeBuyPopup();
-    loadCrops();
-
-  } catch (err) {
-    console.error("Unexpected Error:", err);
-    showMessage("Something went wrong");
+  if (userError || !userData) {
+    showMessage("User fetch failed");
+    return;
   }
+
+  const buyerName = userData.username;
+
+  // ✅ INSERT INTO BUY TABLE
+  const { data, error } = await db
+    .from("buy_table")
+    .insert([{
+      fname: selectedCrop.farmer_name,
+      fid: Number(selectedCrop.lid),
+      cname: selectedCrop.crop_name,
+      cid: Number(selectedCrop.id),
+      status: "Pending",
+      lid: Number(loginid),
+      created_at: new Date().toISOString(), // ✅ IMPORTANT
+      is_confirmed: false,
+      quantity: qty,
+      buyer_name: buyerName,
+      price_per_kg: Number(selectedCrop.price),
+      total_price: total
+    }])
+    .select()
+    .single();
+
+  if (error) {
+    console.error("INSERT ERROR:", error);
+    showMessage(error.message);
+    return;
+  }
+
+  // ✅ NOTIFICATION
+  await db.from("notifications").insert({
+    user_id: Number(selectedCrop.lid),
+    buy_id: data.id,
+    title: "New Order",
+    message: `${buyerName} ordered ${qty}kg of ${selectedCrop.crop_name}`,
+    is_read: false
+  });
+
+  showMessage("Order placed successfully!");
+  closeBuyPopup();
+  loadCrops();
 }
-// ✅ Drawer + Logout
-const menuBtn = document.getElementById("menuBtn");
-const sideNav = document.getElementById("sideNav");
-const navOverlay = document.getElementById("navOverlay");
 
-function openDrawer() {
-  document.body.classList.add("drawer-open");
-  sideNav.hidden = false;
-  navOverlay.hidden = false;
-}
-
-function closeDrawer() {
-  document.body.classList.remove("drawer-open");
-  setTimeout(() => {
-    sideNav.hidden = true;
-    navOverlay.hidden = true;
-  }, 200);
-}
-
-menuBtn.onclick = () => {
-  document.body.classList.contains("drawer-open") ? closeDrawer() : openDrawer();
-};
-
-navOverlay.onclick = closeDrawer;
-
-document.getElementById("logoutBtn").onclick = () => {
-  sessionStorage.clear();
-  location.href = "login";
-};
-
-// ✅ Init
-applyRolePermissions();
+// INIT
 loadCrops();
 </script>
+
 </body>
 </html>
