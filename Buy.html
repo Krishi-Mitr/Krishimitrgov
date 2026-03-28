@@ -242,7 +242,6 @@ body.drawer-open .side-drawer { transform: translateX(0); }
     <button onclick="closeMessage()">OK</button>
   </div>
 </div>
-
 <script>
 const db = window.db;
 const loginid = sessionStorage.getItem("loginid");
@@ -254,6 +253,7 @@ if (!loginid) {
 
 let selectedCrop = null;
 
+// ✅ Role UI
 function applyRolePermissions() {
   if (usertype === "Farmer") {
     document.getElementById("marketSection").style.display = "block";
@@ -261,6 +261,7 @@ function applyRolePermissions() {
   }
 }
 
+// ✅ Load crops
 async function loadCrops() {
   const { data, error } = await db
     .from("crop_sales")
@@ -295,6 +296,7 @@ async function loadCrops() {
   });
 }
 
+// ✅ Open popup
 function openBuyPopup(crop) {
   selectedCrop = crop;
 
@@ -316,6 +318,7 @@ function closeBuyPopup() {
   document.getElementById("buyPopup").style.display = "none";
 }
 
+// ✅ Message popup
 function showMessage(msg) {
   document.getElementById("messageText").innerText = msg;
   document.getElementById("messagePopup").style.display = "flex";
@@ -325,11 +328,12 @@ function closeMessage() {
   document.getElementById("messagePopup").style.display = "none";
 }
 
+// ✅ MAIN BUY FUNCTION (FIXED)
 async function confirmBuy() {
   const qty = parseInt(document.getElementById("buyQuantity").value);
 
-  if (!qty) {
-    showMessage("Please enter quantity");
+  if (!qty || qty <= 0) {
+    showMessage("Please enter valid quantity");
     return;
   }
 
@@ -345,51 +349,74 @@ async function confirmBuy() {
 
   const total = qty * selectedCrop.price;
 
-  // ✅ 1. SAVE BUY REQUEST
-  const { data: buyData, error: buyError } = await db
-    .from("buy_table")
-    .insert({
-      fname: selectedCrop.farmer_name,
-      fid: selectedCrop.lid, // ✅ FIXED
-      cname: selectedCrop.crop_name,
-      cid: selectedCrop.id,
-      status: "Pending",
-      lid: loginid,
-      quantity: qty,
-      is_confirmed: false
-    })
-    .select()
-    .single();
+  try {
+    // ✅ 1. Get buyer name
+    const { data: userData, error: userError } = await db
+      .from("logindata")
+      .select("username")
+      .eq("loginid", loginid)
+      .single();
 
-  if (buyError) {
-    console.error("Buy Error:", buyError);
-    showMessage("Error saving purchase");
-    return;
+    if (userError || !userData) {
+      console.error("User Fetch Error:", userError);
+      showMessage("Unable to fetch buyer name");
+      return;
+    }
+
+    const buyerName = userData.username;
+
+    // ✅ 2. Save to buy_table
+    const { data: buyData, error: buyError } = await db
+      .from("buy_table")
+      .insert({
+        fname: selectedCrop.farmer_name,
+        fid: selectedCrop.lid,
+        cname: selectedCrop.crop_name,
+        cid: selectedCrop.id,
+        status: "Pending",
+        lid: loginid,
+        buyer_name: buyerName,
+        quantity: qty,
+        price_per_kg: selectedCrop.price,
+        total_price: total,
+        is_confirmed: false
+      })
+      .select()
+      .single();
+
+    if (buyError) {
+      console.error("Buy Error FULL:", buyError);
+      showMessage("Error saving purchase");
+      return;
+    }
+
+    // ✅ 3. Create notification
+    const { error: notifError } = await db
+      .from("notifications")
+      .insert({
+        user_id: selectedCrop.lid,
+        buy_id: buyData.id,
+        title: "New Purchase Request",
+        message: `${buyerName} ordered ${qty} kg of ${selectedCrop.crop_name} (₹${total})`,
+        is_read: false
+      });
+
+    if (notifError) {
+      console.error("Notification Error:", notifError);
+    }
+
+    showMessage(`Purchase Request Sent!\nTotal Cost: ₹${total}`);
+
+    closeBuyPopup();
+    loadCrops();
+
+  } catch (err) {
+    console.error(err);
+    showMessage("Something went wrong");
   }
-
-  // ✅ 2. CREATE NOTIFICATION
-  const { error: notifError } = await db
-    .from("notifications")
-    .insert({
-      user_id: selectedCrop.lid, // farmer gets notification
-      buy_id: buyData.id,
-      title: "New Purchase Request",
-      message: `Order received: ${qty} kg of ${selectedCrop.crop_name}`,
-      status: "Pending",
-      is_read: false
-    });
-
-  if (notifError) {
-    console.error("Notification Error:", notifError);
-  }
-
-  showMessage(`Purchase Request Sent!\nTotal Cost: ₹${total}\nWaiting for Farmer Confirmation.`);
-
-  closeBuyPopup();
-  loadCrops();
 }
 
-// Drawer & Logout
+// ✅ Drawer + Logout
 const menuBtn = document.getElementById("menuBtn");
 const sideNav = document.getElementById("sideNav");
 const navOverlay = document.getElementById("navOverlay");
@@ -419,7 +446,7 @@ document.getElementById("logoutBtn").onclick = () => {
   location.href = "login";
 };
 
-// Init
+// ✅ Init
 applyRolePermissions();
 loadCrops();
 </script>
