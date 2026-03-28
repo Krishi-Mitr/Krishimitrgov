@@ -391,7 +391,7 @@ async function confirmBuy() {
     const { error: notifError } = await db
       .from("notifications")
       .insert({
-        user_id: parseInt(selectedCrop.lid), // ✅ BIGINT FIX
+        user_id: parseInt(selectedCrop.fid), // ✅ BIGINT FIX
         buy_id: buyData.id,
         title: "New Purchase Request",
         message: `${buyerName} ordered ${qty} kg of ${selectedCrop.crop_name} (₹${total})`,
