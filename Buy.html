@@ -367,16 +367,14 @@ async function confirmBuy() {
    const { data: buyData, error: buyError } = await db
   .from("buy_table")
   .insert({
-    user_id: Number(loginid),   // ✅🔥 ADD THIS (MAIN FIX)
-
     fname: selectedCrop.farmer_name ?? "",
-    fid: Number(selectedCrop.lid),
+    fid: Number(selectedCrop.lid),        // farmer id
     cname: selectedCrop.crop_name ?? "",
     cid: Number(selectedCrop.id),
     status: "Pending",
-    lid: Number(loginid),
-    buyer_name: buyerName ?? "",
+    lid: Number(loginid),                 // buyer id ✅ IMPORTANT
     quantity: Number(qty),
+    buyer_name: buyerName ?? "",
     price_per_kg: Number(selectedCrop.price),
     total_price: Number(total),
     is_confirmed: false
