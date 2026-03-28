@@ -392,7 +392,7 @@ const { data: buyData, error: buyError } = await db
 }
 
    
-/*
+
     // ✅ 3. Create notification (FIXED bigint issue)
     const { error: notifError } = await db
       .from("notifications")
@@ -403,7 +403,7 @@ const { data: buyData, error: buyError } = await db
         message: `${buyerName} ordered ${qty} kg of ${selectedCrop.crop_name} (₹${total})`,
         is_read: false
       });
-*/
+
     if (notifError) {
       console.error("Notification Error:", notifError);
     }
