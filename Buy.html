@@ -327,8 +327,6 @@ function showMessage(msg) {
 function closeMessage() {
   document.getElementById("messagePopup").style.display = "none";
 }
-
-// ✅ MAIN BUY FUNCTION (FIXED)
 async function confirmBuy() {
   const qty = parseInt(document.getElementById("buyQuantity").value);
 
@@ -354,7 +352,7 @@ async function confirmBuy() {
     const { data: userData, error: userError } = await db
       .from("logindata")
       .select("username")
-      .eq("loginid", parseInt(loginid))
+      .eq("loginid", Number(loginid))
       .single();
 
     if (userError || !userData) {
@@ -365,55 +363,62 @@ async function confirmBuy() {
 
     const buyerName = userData.username;
 
-    // ✅ 2. Save to buy_table
-   // ✅ SAFE BUY INSERT ONLY
-const { data: buyData, error: buyError } = await db
-  .from("buy_table")
-  .insert({
-    fname: selectedCrop.farmer_name ?? "",
-    fid: Number(selectedCrop.lid),
-    cname: selectedCrop.crop_name ?? "",
-    cid: Number(selectedCrop.id),
-    status: "Pending",
-    lid: Number(loginid), // ✅ THIS is your buyer ID
-    buyer_name: buyerName ?? "",
-    quantity: Number(qty),
-    price_per_kg: Number(selectedCrop.price),
-    total_price: Number(total),
-    is_confirmed: false
-  })
-  .select()
-  .single();
+    // ✅ 2. Insert into buy_table (MATCHES SELL STRUCTURE)
+    const { data: buyData, error: buyError } = await db
+      .from("buy_table")
+      .insert({
+        fname: selectedCrop.farmer_name ?? "",
+        fid: Number(selectedCrop.lid),          // ✅ farmer id
+        cname: selectedCrop.crop_name ?? "",
+        cid: Number(selectedCrop.id),
+        status: "Pending",
+        lid: Number(loginid),                   // ✅ buyer id
+        buyer_name: buyerName ?? "",
+        quantity: Number(qty),
+        price_per_kg: Number(selectedCrop.price),
+        total_price: Number(total),
+        is_confirmed: false
+      })
+      .select()
+      .single();
 
     if (buyError) {
-  console.error("BUY ERROR FULL:", JSON.stringify(buyError, null, 2));
-  alert(buyError.message);
-  return;
-}
+      console.error("BUY ERROR FULL:", JSON.stringify(buyError, null, 2));
+      showMessage(buyError.message);
+      return;
+    }
 
-   
+    // ✅ 3. Notification (SAFE BIGINT FIX)
+    const farmerId = Number(selectedCrop.lid);
 
-    // ✅ 3. Create notification (FIXED bigint issue)
-   const { error: notifError } = await db
-  .from("notifications")
-  .insert({
-    lid: Number(selectedCrop.lid), // ✅ use lid instead of user_id
-    buy_id: buyData.id,
-    title: "New Purchase Request",
-    message: `${buyerName} ordered ${qty} kg of ${selectedCrop.crop_name} (₹${total})`,
-    is_read: false
-  });
+    if (!farmerId) {
+      console.error("Invalid farmer ID:", selectedCrop.lid);
+      showMessage("Invalid farmer ID");
+      return;
+    }
 
-   if (notifError) {
-  console.error("Notification Error FULL:", JSON.stringify(notifError, null, 2));
-}
+    const { error: notifError } = await db
+      .from("notifications")
+      .insert({
+        user_id: farmerId,   // ✅ farmer gets notification
+        buy_id: buyData.id,
+        title: "New Purchase Request",
+        message: `${buyerName} ordered ${qty} kg of ${selectedCrop.crop_name} (₹${total})`,
+        is_read: false
+      });
+
+    if (notifError) {
+      console.error("Notification Error:", notifError);
+    }
+
+    // ✅ SUCCESS
     showMessage(`Purchase Request Sent!\nTotal Cost: ₹${total}`);
 
     closeBuyPopup();
     loadCrops();
 
   } catch (err) {
-    console.error(err);
+    console.error("Unexpected Error:", err);
     showMessage("Something went wrong");
   }
 }
