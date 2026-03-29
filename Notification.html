@@ -229,7 +229,7 @@ console.log({notifications});
         // Dynamic action buttons passing IDs correctly as integers
         const actionHtml = `
             <div class="actions">
-                <button class="btn-accept" onclick="handleAction(${item.id}, 'Accepted', '${item.buy_id ? 'crop' : 'tool'}', ${item.buy_id || item.tool_id})">Accept</button>
+                <button class="btn-accept" onclick="handleAction(${item.id}, 'Accepted', '${item.cname ? 'crop' : 'tool'}', ${item.cname || item.tool_id})">Accept</button>
                 <button class="btn-decline" onclick="handleAction(${item.id}, 'Declined', '${item.buy_id ? 'crop' : 'tool'}', ${item.buy_id || item.tool_id})">Decline</button>
             </div>`;
 
