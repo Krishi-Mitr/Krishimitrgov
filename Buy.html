@@ -368,7 +368,7 @@ async function confirmBuy() {
       .from("buy_table")
       .insert([{
         fname: selectedCrop.farmer_name,
-        fid: Number(selectedCrop.lid),   // BIGINT as number
+        fid: selectedCrop.lid,   // BIGINT as number
         cname: selectedCrop.crop_name,
         cid: Number(selectedCrop.id),    // BIGINT as number
         status: "Pending",
