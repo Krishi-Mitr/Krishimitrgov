@@ -397,7 +397,7 @@ const insertPayload = {
   .select("*")
   .single();*/
      const { data: buyData, error: buyError } = await db
-  .from("test_buy")
+  .from("buy_table")
   .insert([{fname:selectedCrop.farmer_name,   // string
             fid: selectedCrop.lid,
             cname: selectedCrop.crop_name,
