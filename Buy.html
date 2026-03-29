@@ -364,10 +364,13 @@ async function confirmBuy() {
     const buyerName = userData.username;
 
     console.log({
-  selectedCrop_lid: selectedCrop.lid,
-  selectedCrop_id: loginid,
-  typeof_lid: typeof selectedCrop.lid,
-  typeof_id: typeof loginid
+  fid: selectedCrop.lid, typeof_selecteCroplid: typeof selectedCrop.lid,
+  lid: loginid,typeof_loginid: typeof loginid,
+ fname: selectedCrop.farmer_name, typeof_fname: typeof   selectedCrop.farmer_name,
+    cname: selectedCrop.crop_name, typeof_cname:typeof   selectedCrop.crop_name,  
+    cid: selectedCrop.id, typeof_cid:typeof  selectedCrop.id,  
+     quantity: qty, typeof_quantity: typeof qty,
+ buyer_name: buyerName, typeof_buyer_name: typeof buyerName
 });
 
     // Prepare payload
