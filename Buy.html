@@ -362,11 +362,13 @@ async function confirmBuy() {
     }
 
     const buyerName = userData.username;
-console.log({
-  selectedCrop_lid: selectedCrop.lid,
-  selectedCrop_id: selectedCrop.id,
-  typeof_lid: typeof selectedCrop.lid,
-  typeof_id: typeof selectedCrop.id
+console.log("Insert payload:", {
+  fname: selectedCrop.farmer_name,
+  fid: selectedCrop.lid,
+  cname: selectedCrop.crop_name,
+  cid: selectedCrop.id,
+  status: "Pending",
+  lid: loginid
 });
     // ✅ Insert into buy_table (bigint as numbers, no strings)
     const { data: buyData, error: buyError } = await db
