@@ -398,7 +398,8 @@ const insertPayload = {
   .from("test_buy")
   .insert([{fname:selectedCrop.farmer_name,   // string
             fid: selectedCrop.lid,
-            cname: selectedCrop.crop_name}])
+            cname: selectedCrop.crop_name,
+            cid: selectedCrop.id}])
   .select("*")
   .single();
     if (buyError) {
