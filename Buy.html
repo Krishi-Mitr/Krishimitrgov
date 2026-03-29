@@ -404,7 +404,8 @@ const insertPayload = {
             cid: selectedCrop.id,
             status: "Pending",
              lid: loginid,
-            quantity: qty}])
+            quantity: qty,
+            buyer_name: buyerName}])
   .select("*")
   .single();
     if (buyError) {
