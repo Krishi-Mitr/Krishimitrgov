@@ -233,7 +233,7 @@ console.log({notifications});
                 <button class="btn-decline" onclick="handleAction(${item.id}, 'Declined', '${item.buy_id ? 'crop' : 'tool'}', ${item.buy_id || item.tool_id})">Decline</button>
             </div>`;
 
-        if (item.buy_id) {
+        if (item.cname) {
             card.innerHTML = `<strong>${item.title}</strong><p>${item.message}</p>${actionHtml}`;
             cropList.appendChild(card);
         } else if (item.tool_id) {
