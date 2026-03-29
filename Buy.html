@@ -372,7 +372,7 @@ async function confirmBuy() {
      quantity: qty, typeof_quantity: typeof qty,
  buyer_name: buyerName, typeof_buyer_name: typeof buyerName
 });
-
+/*
     // Prepare payload
 const insertPayload = {
   fname: selectedCrop.farmer_name,   // string
@@ -392,6 +392,12 @@ const insertPayload = {
     const { data: buyData, error: buyError } = await db
   .from("buy_table")
   .insert([insertPayload])
+  .select("*")
+  .single();*/
+     const { data: buyData, error: buyError } = await db
+  .from("test_buy")
+  .insert([fname: selectedCrop.farmer_name,   // string
+  fid: selectedCrop.lid])
   .select("*")
   .single();
     if (buyError) {
