@@ -363,16 +363,16 @@ async function confirmBuy() {
 
     const buyerName = userData.username;
 
-    // ✅ Insert into buy_table
+    // ✅ Insert into buy_table with bigint columns as strings
     const { data: buyData, error: buyError } = await db
       .from("buy_table")
       .insert([{
         fname: selectedCrop.farmer_name,
-        fid: Number(selectedCrop.lid),  // farmer login id
+        fid: selectedCrop.lid.toString(),   // BIGINT as string
         cname: selectedCrop.crop_name,
-        cid: Number(selectedCrop.id),   // crop id
+        cid: selectedCrop.id.toString(),    // BIGINT as string
         status: "Pending",
-        lid: Number(loginid),           // buyer login id
+        lid: loginid.toString(),            // BIGINT as string
         quantity: qty,
         buyer_name: buyerName,
         price_per_kg: Number(selectedCrop.price),
@@ -387,11 +387,11 @@ async function confirmBuy() {
       return;
     }
 
-    // ✅ Insert notification for farmer
+    // ✅ Insert notification for farmer (bigint as string)
     if (buyData) {
       await db.from("notifications").insert({
-        user_id: Number(selectedCrop.lid),  // farmer id
-        buy_id: Number(buyData.id),         // buy id
+        user_id: selectedCrop.lid.toString(),  // BIGINT as string
+        buy_id: buyData.id.toString(),         // BIGINT as string
         title: "New Purchase Request",
         message: `${buyerName} ordered ${qty} kg of ${selectedCrop.crop_name} (₹${total})`,
         status: "Pending",
