@@ -370,25 +370,28 @@ console.log("Insert payload:", {
   status: "Pending",
   lid: loginid
 });
+
+    // Prepare payload
+const insertPayload = {
+  fname: selectedCrop.farmer_name,   // string
+  fid: selectedCrop.lid,             // number (int4)
+  cname: selectedCrop.crop_name,     // string
+  cid: selectedCrop.id,               // number (int8)
+  status: "Pending",
+  lid: loginid,                       // string
+  quantity: qty,                      // number
+  buyer_name: buyerName,              // string
+  price_per_kg: Number(selectedCrop.price),
+  total_price: Number(total),
+  is_confirmed: false
+};
+
     // ✅ Insert into buy_table (bigint as numbers, no strings)
     const { data: buyData, error: buyError } = await db
-      .from("buy_table")
-      .insert([{
-       fname: selectedCrop.farmer_name,
-        fid: selectedCrop.lid,   // BIGINT as number
-        cname: selectedCrop.crop_name,
-        cid: selectedCrop.id,    // BIGINT as number
-        status: "Pending",
-      lid: loginid,            // BIGINT as number
-        /*  quantity: qty,
-        buyer_name: buyerName,
-        price_per_kg: Number(selectedCrop.price),
-        total_price: Number(total),
-        is_confirmed: false*/
-      }])
-      .select("*")
-      .single();
-
+  .from("buy_table")
+  .insert([insertPayload])
+  .select("*")
+  .single();
     if (buyError) {
       console.error("Buy Table Insert Error:", buyError);
       showMessage(buyError.message || "Purchase failed");
