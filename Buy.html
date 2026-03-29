@@ -362,7 +362,14 @@ async function confirmBuy() {
     }
 
     const buyerName = userData.username;
-
+console.log({
+  fid: selectedCrop.lid,
+  cid: selectedCrop.id,
+  lid: loginid,
+  quantity: qty,
+  price_per_kg: selectedCrop.price,
+  total_price: total
+});
     // ✅ Insert into buy_table (bigint as numbers, no strings)
     const { data: buyData, error: buyError } = await db
       .from("buy_table")
