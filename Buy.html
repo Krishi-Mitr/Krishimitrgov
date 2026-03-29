@@ -353,7 +353,7 @@ async function confirmBuy() {
     const { data: userData, error: userError } = await db
       .from("logindata")
       .select("username")
-      .eq("loginid", Number(loginid))
+      .eq("loginid", Number(loginid)) // ensure number
       .single();
 
     if (userError || !userData) {
@@ -363,35 +363,36 @@ async function confirmBuy() {
 
     const buyerName = userData.username;
 
-    // ✅ Insert into buy_table with bigint columns as strings
+    // ✅ Insert into buy_table (bigint as numbers, no strings)
     const { data: buyData, error: buyError } = await db
       .from("buy_table")
       .insert([{
         fname: selectedCrop.farmer_name,
-        fid: selectedCrop.lid.toString(),   // BIGINT as string
+        fid: Number(selectedCrop.lid),   // BIGINT as number
         cname: selectedCrop.crop_name,
-        cid: selectedCrop.id.toString(),    // BIGINT as string
+        cid: Number(selectedCrop.id),    // BIGINT as number
         status: "Pending",
-        lid: loginid.toString(),            // BIGINT as string
+        lid: Number(loginid),            // BIGINT as number
         quantity: qty,
         buyer_name: buyerName,
         price_per_kg: Number(selectedCrop.price),
         total_price: Number(total),
         is_confirmed: false
       }])
-      .select()
+      .select("*")
       .single();
 
     if (buyError) {
-      showMessage(buyError.message);
+      console.error("Buy Table Insert Error:", buyError);
+      showMessage(buyError.message || "Purchase failed");
       return;
     }
 
-    // ✅ Insert notification for farmer (bigint as string)
+    // ✅ Insert notification for farmer
     if (buyData) {
       await db.from("notifications").insert({
-        user_id: selectedCrop.lid.toString(),  // BIGINT as string
-        buy_id: buyData.id.toString(),         // BIGINT as string
+        user_id: Number(selectedCrop.lid),  // farmer id as number
+        buy_id: Number(buyData.id),         // buy id as number
         title: "New Purchase Request",
         message: `${buyerName} ordered ${qty} kg of ${selectedCrop.crop_name} (₹${total})`,
         status: "Pending",
@@ -408,7 +409,6 @@ async function confirmBuy() {
     showMessage("Something went wrong, please try again.");
   }
 }
-
 const menuBtn = document.getElementById("menuBtn");
 const sideNav = document.getElementById("sideNav");
 const navOverlay = document.getElementById("navOverlay");
