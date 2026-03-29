@@ -373,7 +373,7 @@ async function confirmBuy() {
     // Prepare payload
 const insertPayload = {
   fname: selectedCrop.farmer_name,   // string
-  fid: selectedCrop.lid.toString(),             // number (int4)
+  fid: selectedCrop.lid,             // number (int4)
   cname: selectedCrop.crop_name,     // string
   cid: selectedCrop.id,               // number (int8)
   status: "Pending",
