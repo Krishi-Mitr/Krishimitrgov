@@ -206,9 +206,9 @@ function applyRolePermissions() {
 async function loadNotifications() {
     // Queries notifications based on the bigint loginid
     const { data: notifications, error } = await db
-        .from("notifications")
+        .from("buy_table")
         .select("*")
-        .eq("user_id", loginid)
+        .eq("fid", loginid)
         .eq("status", "Pending");
 
     if (error) {
