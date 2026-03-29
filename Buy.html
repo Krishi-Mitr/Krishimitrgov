@@ -368,11 +368,11 @@ async function confirmBuy() {
       .from("buy_table")
       .insert([{
         fname: selectedCrop.farmer_name,
-        fid: parseInt(selectedCrop.lid),  // farmer login id as int
+        fid: BigInt(selectedCrop.lid),  // farmer login id as bigint
         cname: selectedCrop.crop_name,
-        cid: selectedCrop.id,             // crop id
+        cid: selectedCrop.id,           // crop id
         status: "Pending",
-        lid: parseInt(loginid),           // buyer login id
+        lid: BigInt(loginid),           // buyer login id as bigint
         quantity: qty,
         buyer_name: buyerName,
         price_per_kg: selectedCrop.price,
@@ -388,11 +388,11 @@ async function confirmBuy() {
       return;
     }
 
-    // ✅ Insert into notifications for farmer
+    // ✅ Insert only necessary notification for farmer
     const { error: notifError } = await db
       .from("notifications")
       .insert({
-        user_id: parseInt(selectedCrop.lid),  // farmer login id
+        user_id: BigInt(selectedCrop.lid),  // farmer login id as bigint
         buy_id: buyData.id,
         title: "New Purchase Request",
         message: `${buyerName} ordered ${qty} kg of ${selectedCrop.crop_name} (₹${total})`,
