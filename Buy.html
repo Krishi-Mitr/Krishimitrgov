@@ -363,24 +363,25 @@ async function confirmBuy() {
 
     const buyerName = userData.username;
 
-    // ✅ Insert into buy_table
-    const { data: buyData, error: buyError } = await db
-      .from("buy_table")
-      .insert([{
-        fname: selectedCrop.farmer_name,
-        fid: BigInt(selectedCrop.lid),  // farmer login id as bigint
-        cname: selectedCrop.crop_name,
-        cid: selectedCrop.id,           // crop id
-        status: "Pending",
-        lid: BigInt(loginid),           // buyer login id as bigint
-        quantity: qty,
-        buyer_name: buyerName,
-        price_per_kg: selectedCrop.price,
-        total_price: total,
-        is_confirmed: false
-      }])
-      .select()
-      .single();
+   
+  // ✅ Insert into buy_table
+const { data: buyData, error: buyError } = await db
+  .from("buy_table")
+  .insert([{
+    fname: selectedCrop.farmer_name,
+    fid: Number(selectedCrop.lid),  // <-- convert to number
+    cname: selectedCrop.crop_name,
+    cid: selectedCrop.id,
+    status: "Pending",
+    lid: Number(loginid),           // <-- convert to number
+    quantity: qty,
+    buyer_name: buyerName,
+    price_per_kg: selectedCrop.price,
+    total_price: total,
+    is_confirmed: false
+  }])
+  .select()
+  .single();
 
     if (buyError) {
       console.error("Buy Table Insert Error:", buyError);
@@ -390,15 +391,15 @@ async function confirmBuy() {
 
     // ✅ Insert only necessary notification for farmer
     const { error: notifError } = await db
-      .from("notifications")
-      .insert({
-        user_id: BigInt(selectedCrop.lid),  // farmer login id as bigint
-        buy_id: buyData.id,
-        title: "New Purchase Request",
-        message: `${buyerName} ordered ${qty} kg of ${selectedCrop.crop_name} (₹${total})`,
-        status: "Pending",
-        is_read: false
-      });
+  .from("notifications")
+  .insert({
+    user_id: Number(selectedCrop.lid),  // <-- convert to number
+    buy_id: buyData.id,
+    title: "New Purchase Request",
+    message: `${buyerName} ordered ${qty} kg of ${selectedCrop.crop_name} (₹${total})`,
+    status: "Pending",
+    is_read: false
+  });
 
     if (notifError) {
       console.error("Notification Insert Error:", notifError);
