@@ -353,7 +353,7 @@ async function confirmBuy() {
     const { data: userData, error: userError } = await db
       .from("logindata")
       .select("username")
-      .eq("loginid", Number(loginid)) // ensure number
+      .eq("loginid", loginid) // ensure number
       .single();
 
     if (userError || !userData) {
