@@ -353,7 +353,7 @@ async function confirmBuy() {
     const { data: userData, error: userError } = await db
       .from("logindata")
       .select("username")
-      .eq("loginid", loginid)
+      .eq("loginid", Number(loginid))
       .single();
 
     if (userError || !userData) {
@@ -363,46 +363,40 @@ async function confirmBuy() {
 
     const buyerName = userData.username;
 
-   
-  // ✅ Insert into buy_table
-const { data: buyData, error: buyError } = await db
-  .from("buy_table")
-  .insert([{
-    fname: selectedCrop.farmer_name,
-    fid: Number(selectedCrop.lid),  // <-- convert to number
-    cname: selectedCrop.crop_name,
-    cid: selectedCrop.id,
-    status: "Pending",
-    lid: Number(loginid),           // <-- convert to number
-    quantity: qty,
-    buyer_name: buyerName,
-    price_per_kg: selectedCrop.price,
-    total_price: total,
-    is_confirmed: false
-  }])
-  .select()
-  .single();
+    // ✅ Insert into buy_table
+    const { data: buyData, error: buyError } = await db
+      .from("buy_table")
+      .insert([{
+        fname: selectedCrop.farmer_name,
+        fid: Number(selectedCrop.lid),  // farmer login id
+        cname: selectedCrop.crop_name,
+        cid: Number(selectedCrop.id),   // crop id
+        status: "Pending",
+        lid: Number(loginid),           // buyer login id
+        quantity: qty,
+        buyer_name: buyerName,
+        price_per_kg: Number(selectedCrop.price),
+        total_price: Number(total),
+        is_confirmed: false
+      }])
+      .select()
+      .single();
 
     if (buyError) {
-      console.error("Buy Table Insert Error:", buyError);
       showMessage(buyError.message);
       return;
     }
 
-    // ✅ Insert only necessary notification for farmer
-    const { error: notifError } = await db
-  .from("notifications")
-  .insert({
-    user_id: Number(selectedCrop.lid),  // <-- convert to number
-    buy_id: buyData.id,
-    title: "New Purchase Request",
-    message: `${buyerName} ordered ${qty} kg of ${selectedCrop.crop_name} (₹${total})`,
-    status: "Pending",
-    is_read: false
-  });
-
-    if (notifError) {
-      console.error("Notification Insert Error:", notifError);
+    // ✅ Insert notification for farmer
+    if (buyData) {
+      await db.from("notifications").insert({
+        user_id: Number(selectedCrop.lid),  // farmer id
+        buy_id: Number(buyData.id),         // buy id
+        title: "New Purchase Request",
+        message: `${buyerName} ordered ${qty} kg of ${selectedCrop.crop_name} (₹${total})`,
+        status: "Pending",
+        is_read: false
+      });
     }
 
     showMessage(`Purchase Request Sent!\nTotal Cost: ₹${total}`);
@@ -414,6 +408,7 @@ const { data: buyData, error: buyError } = await db
     showMessage("Something went wrong, please try again.");
   }
 }
+
 const menuBtn = document.getElementById("menuBtn");
 const sideNav = document.getElementById("sideNav");
 const navOverlay = document.getElementById("navOverlay");
