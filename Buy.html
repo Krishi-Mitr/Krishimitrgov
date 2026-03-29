@@ -357,7 +357,7 @@ async function confirmBuy() {
       .single();
 
     if (userError || !userData) {
-      showMessage("Unable to fetch buyer information");
+      showMessag  e("Unable to fetch buyer information");
       return;
     }
 
@@ -374,9 +374,9 @@ console.log({
     const { data: buyData, error: buyError } = await db
       .from("buy_table")
       .insert([{
-        fname: selectedCrop.farmer_name,
+       fname: selectedCrop.farmer_name,
         fid: selectedCrop.lid,   // BIGINT as number
-        cname: selectedCrop.crop_name,
+       /*  cname: selectedCrop.crop_name,
         cid: selectedCrop.id,    // BIGINT as number
         status: "Pending",
         lid: loginid,            // BIGINT as number
@@ -384,7 +384,7 @@ console.log({
         buyer_name: buyerName,
         price_per_kg: Number(selectedCrop.price),
         total_price: Number(total),
-        is_confirmed: false
+        is_confirmed: false*/
       }])
       .select("*")
       .single();
