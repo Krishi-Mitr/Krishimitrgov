@@ -408,7 +408,7 @@ const insertPayload = {
             buyer_name: buyerName,
             price_per_kg: Number(selectedCrop.price),
             total_price: Number(total),
-              is_confirmed: False}])
+            is_confirmed: false}])
   .select("*")
   .single();
     if (buyError) {
