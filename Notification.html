@@ -210,7 +210,7 @@ async function loadNotifications() {
         .select("*")
         .eq("fid", loginid)
         .eq("status", "Pending");
-
+console.log({loginid:loginid});
     if (error) {
         console.error("Error fetching notifications:", error.message);
         return;
