@@ -406,7 +406,8 @@ const insertPayload = {
              lid: loginid,
             quantity: qty,
             buyer_name: buyerName,
-            price_per_kg: Number(selectedCrop.price)}])
+            price_per_kg: Number(selectedCrop.price),
+            total_price: Number(total)}])
   .select("*")
   .single();
     if (buyError) {
