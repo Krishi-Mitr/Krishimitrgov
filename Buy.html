@@ -372,7 +372,7 @@ async function confirmBuy() {
         cname: selectedCrop.crop_name,
         cid: Number(selectedCrop.id),    // BIGINT as number
         status: "Pending",
-        lid: Number(loginid),            // BIGINT as number
+        lid: loginid,            // BIGINT as number
         quantity: qty,
         buyer_name: buyerName,
         price_per_kg: Number(selectedCrop.price),
