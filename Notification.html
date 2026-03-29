@@ -234,7 +234,7 @@ console.log({notifications});
             </div>`;
 
         if (item.cname) {
-            card.innerHTML = `<strong>${item.title}</strong><p>${item.message}</p>${actionHtml}`;
+            card.innerHTML = `<strong>${item.buyer_name}</strong><p>${item.Rice}</p>${actionHtml}`;
             cropList.appendChild(card);
         } else if (item.tool_id) {
             card.style.borderLeftColor = "#138808";
