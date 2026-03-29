@@ -405,7 +405,8 @@ const insertPayload = {
             status: "Pending",
              lid: loginid,
             quantity: qty,
-            buyer_name: buyerName}])
+            buyer_name: buyerName,
+            price_per_kg: Number(selectedCrop.price)}])
   .select("*")
   .single();
     if (buyError) {
