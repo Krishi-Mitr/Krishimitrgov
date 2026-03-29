@@ -330,24 +330,26 @@ function closeMessage() {
 async function confirmBuy() {
   const qty = parseInt(document.getElementById("buyQuantity").value);
 
+  // ✅ Validate quantity
   if (!qty || qty <= 0) {
-    showMessage("Please enter valid quantity");
+    showMessage("Please enter a valid quantity");
     return;
   }
 
   if (qty < selectedCrop.min_quantity) {
-    showMessage("Enter more than minimum quantity");
+    showMessage(`Minimum order is ${selectedCrop.min_quantity} kg`);
     return;
   }
 
   if (qty > selectedCrop.quantity) {
-    showMessage("Enter less than available quantity");
+    showMessage(`Maximum available quantity is ${selectedCrop.quantity} kg`);
     return;
   }
 
   const total = qty * selectedCrop.price;
 
   try {
+    // ✅ Fetch buyer name
     const { data: userData, error: userError } = await db
       .from("logindata")
       .select("username")
@@ -355,21 +357,22 @@ async function confirmBuy() {
       .single();
 
     if (userError || !userData) {
-      showMessage("Unable to fetch buyer name");
+      showMessage("Unable to fetch buyer information");
       return;
     }
 
     const buyerName = userData.username;
 
+    // ✅ Insert into buy_table
     const { data: buyData, error: buyError } = await db
       .from("buy_table")
       .insert([{
         fname: selectedCrop.farmer_name,
-        fid: String(selectedCrop.lid),
+        fid: parseInt(selectedCrop.lid),  // farmer login id as int
         cname: selectedCrop.crop_name,
-        cid: String(selectedCrop.id),
+        cid: selectedCrop.id,             // crop id
         status: "Pending",
-        lid: parseInt(loginid),
+        lid: parseInt(loginid),           // buyer login id
         quantity: qty,
         buyer_name: buyerName,
         price_per_kg: selectedCrop.price,
@@ -380,33 +383,34 @@ async function confirmBuy() {
       .single();
 
     if (buyError) {
-      console.error("BUY ERROR:", buyError);
+      console.error("Buy Table Insert Error:", buyError);
       showMessage(buyError.message);
       return;
     }
 
+    // ✅ Insert into notifications for farmer
     const { error: notifError } = await db
       .from("notifications")
       .insert({
-        user_id: parseInt(selectedCrop.lid),
+        user_id: parseInt(selectedCrop.lid),  // farmer login id
         buy_id: buyData.id,
         title: "New Purchase Request",
         message: `${buyerName} ordered ${qty} kg of ${selectedCrop.crop_name} (₹${total})`,
+        status: "Pending",
         is_read: false
       });
 
     if (notifError) {
-      console.error("Notification Error:", notifError);
+      console.error("Notification Insert Error:", notifError);
     }
 
     showMessage(`Purchase Request Sent!\nTotal Cost: ₹${total}`);
-
     closeBuyPopup();
     loadCrops();
 
   } catch (err) {
     console.error("Unexpected Error:", err);
-    showMessage("Something went wrong");
+    showMessage("Something went wrong, please try again.");
   }
 }
 const menuBtn = document.getElementById("menuBtn");
