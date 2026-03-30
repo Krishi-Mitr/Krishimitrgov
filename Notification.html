@@ -158,18 +158,21 @@ async function loadNotifications() {
   const { data, error } = await db
     .from("buy_table")
     .select("*")
-    .eq("fid", loginid)
+    .eq("fid", Number(loginid))   // ✅ FIXED
     .eq("status", "Pending");
 
-  if (error) {
-    console.error(error);
-    return;
-  }
+  console.log("DATA:", data);
+  console.log("ERROR:", error);
 
   const container = document.getElementById("cropNotifications");
   container.innerHTML = "";
 
-  if (!data.length) {
+  if (error) {
+    container.innerHTML = "<p style='padding:15px;'>Error loading</p>";
+    return;
+  }
+
+  if (!data || data.length === 0) {
     container.innerHTML = "<p style='padding:15px;'>No notifications</p>";
     return;
   }
@@ -187,10 +190,17 @@ async function loadNotifications() {
       </p>
 
       <div class="actions">
-        <button class="btn-accept" onclick="acceptOrder(${item.id}, ${item.cropid}, ${item.quantity}, this)">Accept</button>
-        <button class="btn-decline" onclick="declineOrder(${item.id}, this)">Decline</button>
+        <button class="btn-accept">Accept</button>
+        <button class="btn-decline">Decline</button>
       </div>
     `;
+
+    const acceptBtn = card.querySelector(".btn-accept");
+    const declineBtn = card.querySelector(".btn-decline");
+
+    // ✅ FIXED (use correct fields)
+    acceptBtn.onclick = () => acceptOrder(item.id, item.cid, item.quantity, acceptBtn);
+    declineBtn.onclick = () => declineOrder(item.id, declineBtn);
 
     container.appendChild(card);
   });
@@ -201,8 +211,7 @@ async function acceptOrder(buyId, cropId, qty, btn) {
 
   btn.disabled = true;
 
-  // update buy_table
-  await db
+  const { error: updateError } = await db
     .from("buy_table")
     .update({
       status: "Confirmed",
@@ -210,12 +219,22 @@ async function acceptOrder(buyId, cropId, qty, btn) {
     })
     .eq("id", buyId);
 
+  if (updateError) {
+    alert(updateError.message);
+    return;
+  }
+
   // get crop
-  const { data: crop } = await db
+  const { data: crop, error: cropError } = await db
     .from("crop_sales")
     .select("quantity")
     .eq("id", cropId)
     .single();
+
+  if (cropError) {
+    alert(cropError.message);
+    return;
+  }
 
   const newQty = Math.max(0, crop.quantity - qty);
 
@@ -232,13 +251,18 @@ async function declineOrder(buyId, btn) {
 
   btn.disabled = true;
 
-  await db
+  const { error } = await db
     .from("buy_table")
     .update({
       status: "Declined",
       is_confirmed: false
     })
     .eq("id", buyId);
+
+  if (error) {
+    alert(error.message);
+    return;
+  }
 
   loadNotifications();
 }
