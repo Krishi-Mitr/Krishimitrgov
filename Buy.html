@@ -296,7 +296,7 @@ async function loadCrops() {
   if (crop.quantity <= 0) {
       buttonText = "Out of Stock";
       disabled = true;
-      badge = `<span style="color:#dc2626;font-weight:700;">🔴 Out of Stock</span>`;
+      badge = `<span style="color:#dc2626;font-weight:700;">Out of Stock</span>`;
     }
 
     // ✅ CASE 2: USER ALREADY ORDERED
@@ -305,12 +305,12 @@ async function loadCrops() {
 
       if (order.status === "Pending") {
         buttonText = "Pending Approval";
-        badge = `<span style="color:#f59e0b;font-weight:700;">🟡 Pending</span>`;
+        badge = `<span style="color:#f59e0b;font-weight:700;"> Pending</span>`;
       }
 
-      if (order.is_confirmed) {
+      if (order.status=== "Confirmed") {
         buttonText = "Order Confirmed";
-        badge = `<span style="color:#16a34a;font-weight:700;">🟢 Confirmed</span>`;
+        badge = `<span style="color:#16a34a;font-weight:700;">Confirmed</span>`;
       }
     }
 
