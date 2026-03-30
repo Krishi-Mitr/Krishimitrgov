@@ -263,7 +263,9 @@ function applyRolePermissions() {
 
 // ✅ Load crops
 async function loadCrops() {
-  const { data, error } = await db
+
+  // ✅ Fetch crops
+  const { data: crops, error } = await db
     .from("crop_sales")
     .select("*")
     .neq("lid", loginid);
@@ -273,29 +275,79 @@ async function loadCrops() {
     return;
   }
 
+  // ✅ Fetch user's orders
+  const { data: myOrders } = await db
+    .from("buy_table")
+    .select("cid, status, is_confirmed")
+    .eq("lid", loginid);
+
   const grid = document.getElementById("cropGrid");
   grid.innerHTML = "";
 
-  data.forEach(crop => {
+  crops.forEach(crop => {
+
+    const order = myOrders?.find(o => o.cid === crop.id);
+
+    let buttonText = "Buy Now";
+    let disabled = false;
+    let badge = "";
+
+    // ✅ CASE 1: OUT OF STOCK
+  if (crop.quantity <= 0) {
+      buttonText = "Out of Stock";
+      disabled = true;
+      badge = `<span style="color:#dc2626;font-weight:700;">🔴 Out of Stock</span>`;
+    }
+
+    // ✅ CASE 2: USER ALREADY ORDERED
+    else if (order) {
+      disabled = true;
+
+      if (order.status === "Pending") {
+        buttonText = "Pending Approval";
+        badge = `<span style="color:#f59e0b;font-weight:700;">🟡 Pending</span>`;
+      }
+
+      if (order.is_confirmed) {
+        buttonText = "Order Confirmed";
+        badge = `<span style="color:#16a34a;font-weight:700;">🟢 Confirmed</span>`;
+      }
+    }
+
     const card = document.createElement("div");
     card.className = "crop-card";
 
     card.innerHTML = `
       <h3>${crop.crop_name}</h3>
       <p><b>Farmer:</b> ${crop.farmer_name}</p>
-      <p><b>Total Quantity:</b> ${crop.quantity} kg</p>
+      <p><b>Available:</b> ${crop.quantity} kg</p>
       <p><b>Quality:</b> ${crop.quality}</p>
+      ${badge}
       <div class="price">₹${crop.price}/kg</div>
-      <button style="width:100%; margin-top:15px; padding:12px; background:#0a3d62; color:white; border:none; border-radius:10px; cursor:pointer; font-weight:700;">
-        Buy Now
+
+      <button 
+        ${disabled ? "disabled" : ""}
+        style="
+          width:100%;
+          margin-top:15px;
+          padding:12px;
+          background:${disabled ? "#9ca3af" : "#0a3d62"};
+          color:white;
+          border:none;
+          border-radius:10px;
+          cursor:${disabled ? "not-allowed" : "pointer"};
+          font-weight:700;">
+        ${buttonText}
       </button>
     `;
 
-    card.querySelector("button").onclick = () => openBuyPopup(crop);
+    if (!disabled) {
+      card.querySelector("button").onclick = () => openBuyPopup(crop);
+    }
+
     grid.appendChild(card);
   });
 }
-
 // ✅ Open popup
 function openBuyPopup(crop) {
   selectedCrop = crop;
@@ -347,6 +399,19 @@ async function confirmBuy() {
   }
 
   const total = qty * selectedCrop.price;
+
+  // ✅ prevent duplicate order
+const { data: existing } = await db
+  .from("buy_table")
+  .select("*")
+  .eq("lid", loginid)
+  .eq("cid", selectedCrop.id)
+  .maybeSingle();
+
+if (existing) {
+  showMessage("You already placed an order for this crop");
+  return;
+}
 
   try {
     // ✅ Fetch buyer name
