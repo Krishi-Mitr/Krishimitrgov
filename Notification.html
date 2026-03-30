@@ -3,21 +3,20 @@
 <head>
 <meta charset="UTF-8">
 <title>Notifications - Krishi Mitr</title>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="supabase.js"></script>
+
 <style>
-/* Dashboard Match Core Styles */
 body {
   margin: 0;
   font-family: "Poppins", Arial, sans-serif;
   min-height: 100vh;
   background: linear-gradient(180deg, #f6e2cc 0%, #f7f9f8 45%, #dceee3 100%);
-  color: #1f2937;
   padding-top: 100px;
 }
-body.drawer-open { overflow: hidden; }
 
-/* Top Navigation Header */
+/* NAVBAR (UNCHANGED) */
 .top-nav {
   position: fixed;
   top: 0; left: 0; right: 0; height: 78px;
@@ -25,138 +24,117 @@ body.drawer-open { overflow: hidden; }
   padding: 0 32px;
   background: linear-gradient(90deg, #ff9933, #ffffff, #138808);
   border-bottom: 3px solid #0a3d62;
-  box-shadow: 0 6px 14px rgba(0,0,0,0.15);
   z-index: 9999;
 }
-.nav-left { display: flex; align-items: center; gap: 14px; }
 
-/* Dashboard-style Hamburger */
-.hamburger-btn {
-  width: 44px; height: 44px; border-radius: 12px;
-  border: 2px solid #0a3d62;
-  background: rgba(255,255,255,0.75);
-  display: grid; place-items: center;
-  cursor: pointer; transition: 0.3s;
-}
-.hamburger-btn:hover { transform: scale(1.05); }
-.hamburger-icon { width: 20px; height: 14px; position: relative; }
-.hamburger-icon span {
-  position: absolute; left: 0; right: 0; height: 2.5px;
-  background: #0a3d62; border-radius: 999px;
-}
-.hamburger-icon span:nth-child(1){ top:0; }
-.hamburger-icon span:nth-child(2){ top:5.5px; }
-.hamburger-icon span:nth-child(3){ top:11px; }
+.brand-title { font-weight: 800; color: #0a3d62; }
 
-.brand-title { margin: 0; font-size: 1.15rem; font-weight: 800; color: #0a3d62; }
-.logout-btn {
-  background: white; color: #0a3d62; border: 2px solid #0a3d62;
-  padding: 10px 18px; border-radius: 10px; font-weight: 700;
-  cursor: pointer; transition: 0.3s;
+/* CONTAINER */
+.container {
+  max-width: 800px;
+  margin: auto;
+  padding: 0 20px;
 }
-.logout-btn:hover { background: #0a3d62; color: white; transform: translateY(-2px); }
 
-/* Side Drawer - Exact Dashboard Style */
-.nav-overlay {
-  position: fixed; inset: 0; background: rgba(0,0,0,0.25);
-  opacity: 0; pointer-events: none; transition: opacity .2s ease; z-index: 9998;
+/* SECTION UI */
+.section-box {
+  background: white;
+  border-radius: 14px;
+  margin-bottom: 20px;
+  overflow: hidden;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.08);
 }
-.side-drawer {
-  position: fixed; top: 84px; left: 14px;
-  width: min(320px, calc(100vw - 28px));
-  max-height: calc(100vh - 98px);
-  overflow: auto;
-  background: linear-gradient(180deg,#0a3d62,#082032);
-  border: 3px solid #ffffff; border-radius: 18px;
-  box-shadow: 0 18px 40px rgba(0,0,0,0.35);
-  transform: translateX(-110%); transition: transform .25s ease; z-index: 9999;
-}
-.drawer-inner { padding: 14px; }
-body.drawer-open .nav-overlay { opacity: 1; pointer-events: auto; }
-body.drawer-open .side-drawer { transform: translateX(0); }
 
-.menu-section {
-  border-radius: 14px; overflow: hidden;
-  border: 1px solid rgba(255,255,255,0.15);
-  margin-bottom: 14px; background: rgba(255,255,255,0.05);
+.section-header {
+  padding: 15px 18px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  background: #f1f5f9;
 }
-.menu-section-title {
-  padding: 12px 14px; background: rgba(255,255,255,0.1);
-  color: white; font-weight: 800; font-size: 0.95rem;
-}
-.menu-list { list-style: none; padding: 0; margin: 0; }
-.menu-list a {
-  display: block; padding: 14px; text-decoration: none;
-  color: white; font-weight: 600; background: rgba(255,255,255,0.08);
-  transition: 0.2s ease;
-}
-.menu-list li + li a { border-top: 1px solid rgba(255,255,255,0.1); }
-.menu-list a:hover { background: #1e3a8a; padding-left: 20px; }
 
-/* Notification Layout */
-.container { max-width: 800px; margin: auto; padding: 0 20px; }
+.section-content {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.4s ease;
+}
+
+.section-box.active .section-content {
+  max-height: 600px;
+}
+
+.arrow {
+  transition: transform 0.3s;
+}
+
+.section-box.active .arrow {
+  transform: rotate(180deg);
+}
+
+/* CARD */
 .card {
-  background: white; padding: 20px; border-radius: 15px; margin-bottom: 20px;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.1); border-left: 6px solid #ff9933;
+  background: white;
+  padding: 15px;
+  border-bottom: 1px solid #eee;
 }
-.actions { margin-top: 10px; display: flex; gap: 10px; }
-.btn-accept { background: #138808; color: white; border: none; padding: 8px 15px; border-radius: 6px; cursor: pointer; }
-.btn-decline { background: #dc2626; color: white; border: none; padding: 8px 15px; border-radius: 6px; cursor: pointer; }
+
+.actions {
+  margin-top: 10px;
+  display: flex;
+  gap: 10px;
+}
+
+.btn-accept {
+  background: #138808;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.btn-decline {
+  background: #dc2626;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+}
 </style>
 </head>
+
 <body>
 
 <div class="top-nav">
-  <div class="nav-left">
-    <button class="hamburger-btn" id="menuBtn">
-      <div class="hamburger-icon"><span></span><span></span><span></span></div>
-    </button>
-    <p class="brand-title">Krishi Mitr</p>
-  </div>
-  <button class="logout-btn" id="logoutBtn">Logout</button>
+  <p class="brand-title">Krishi Mitr</p>
 </div>
 
-<div class="nav-overlay" id="navOverlay" hidden></div>
-<nav class="side-drawer" id="sideNav" hidden>
-  <div class="drawer-inner">
-    <div class="menu-section">
-      <div class="menu-section-title">Main</div>
-      <ul class="menu-list">
-        <li><a href="Dashboard">Dashboard</a></li>
-      </ul>
+<div class="container">
+  <h2>Notifications</h2>
+
+  <!-- Crop Sales -->
+  <div class="section-box" id="cropSection">
+    <div class="section-header" onclick="toggleSection('cropSection')">
+      Crop Sales
+      <span class="arrow">▼</span>
     </div>
-    <div class="menu-section" id="marketSection" style="display:none;">
-      <div class="menu-section-title">Market</div>
-      <ul class="menu-list">
-        <li><a href="Update_crops">Manage Your Crops</a></li>
-        <li><a href="Sell">Sell Your Crop</a></li>
-      </ul>
-    </div>
-    <div class="menu-section">
-      <div class="menu-section-title">Tools & Services</div>
-      <ul class="menu-list">
-        <li><a href="Buy">Buy Crops</a></li>
-        <li><a href="browse_tools.html">Rent Tools & Machinery</a></li>
-        <li class="farmer-only" style="display:none;"><a href="tools_rental.html">List Tool for Rent</a></li>
-        <li class="farmer-only" style="display:none;"><a href="my_listings.html">My Tool Inventory</a></li>
-        <li><a href="krishimitr">Crop Predictor</a></li>
-        <li><a href="advisor">Crop Advisor</a></li>
-      </ul>
-    </div>
-    <div class="menu-section" style="margin-bottom:0;">
-      <div class="menu-section-title">System</div>
-      <ul class="menu-list">
-        <li><a href="Notification">Notification</a></li>
-        <li><a href="Chat">Chat</a></li>
-      </ul>
+    <div class="section-content">
+      <div id="cropNotifications"></div>
     </div>
   </div>
-</nav>
 
-<div class="container">
-  <h2 style="color: #0a3d62; margin-bottom: 25px;">Notifications</h2>
-  <div id="cropNotifications"></div>
-  <div id="toolNotifications"></div>
+  <!-- Tool Rental -->
+  <div class="section-box" id="toolSection">
+    <div class="section-header" onclick="toggleSection('toolSection')">
+      Tool Rental
+      <span class="arrow">▼</span>
+    </div>
+    <div class="section-content">
+      <div style="padding:15px;">Coming Soon</div>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -164,106 +142,108 @@ const db = window.db;
 const loginid = sessionStorage.getItem("loginid");
 const usertype = sessionStorage.getItem("usertype");
 
-if (!loginid) { location.href = "login"; }
+if (!loginid) location.href = "login";
 
-// Navigation Drawer Logic
-const menuBtn = document.getElementById("menuBtn");
-const sideNav = document.getElementById("sideNav");
-const navOverlay = document.getElementById("navOverlay");
-
-function openDrawer() {
-    document.body.classList.add("drawer-open");
-    sideNav.hidden = false;
-    navOverlay.hidden = false;
+/* TOGGLE UI */
+function toggleSection(id) {
+  document.getElementById(id).classList.toggle("active");
 }
 
-function closeDrawer() {
-    document.body.classList.remove("drawer-open");
-    setTimeout(() => {
-        if (!document.body.classList.contains("drawer-open")) {
-            sideNav.hidden = true;
-            navOverlay.hidden = true;
-        }
-    }, 220);
-}
-
-menuBtn.onclick = () => document.body.classList.contains("drawer-open") ? closeDrawer() : openDrawer();
-navOverlay.onclick = closeDrawer;
-
-document.getElementById("logoutBtn").onclick = () => {
-    sessionStorage.clear();
-    location.href = "login";
-};
-
-function applyRolePermissions() {
-    if (usertype === "Farmer") {
-        const market = document.getElementById("marketSection");
-        if (market) market.style.display = "block";
-        document.querySelectorAll(".farmer-only").forEach(el => el.style.display = "block");
-    }
-}
-
+/* LOAD NOTIFICATIONS */
 async function loadNotifications() {
-    // Queries notifications based on the bigint loginid
-    const { data: notifications, error } = await db
-        .from("buy_table")
-        .select("*")
-        .eq("fid", loginid)
-        .eq("status", "Pending");
-console.log({notifications});
-    if (error) {
-        console.error("Error fetching notifications:", error.message);
-        return;
-    }
 
-    const cropList = document.getElementById("cropNotifications");
-    const toolList = document.getElementById("toolNotifications");
-    
-    cropList.innerHTML = "";
-    toolList.innerHTML = "";
+  if (usertype !== "Farmer") return;
 
-    notifications.forEach(item => {
-        const card = document.createElement("div");
-        card.className = "card";
-        
-        // Dynamic action buttons passing IDs correctly as integers
-        const actionHtml = `
-            <div class="actions">
-                <button class="btn-accept" onclick="handleAction(${item.id}, 'Accepted', '${item.cname ? 'crop' : 'tool'}', ${item.cname || item.tool_id})">Accept</button>
-                <button class="btn-decline" onclick="handleAction(${item.id}, 'Declined', '${item.buy_id ? 'crop' : 'tool'}', ${item.buy_id || item.tool_id})">Decline</button>
-            </div>`;
+  const { data, error } = await db
+    .from("buy_table")
+    .select("*")
+    .eq("fid", loginid)
+    .eq("status", "Pending");
 
-        if (item.cname) {
-            card.innerHTML = `<strong>${item.buyer_name}</strong><p>${item.Rice}</p>${actionHtml}`;
-            cropList.appendChild(card);
-        } else if (item.tool_id) {
-            card.style.borderLeftColor = "#138808";
-            card.innerHTML = `<strong>${item.title}</strong><p>${item.message}</p>${actionHtml}`;
-            toolList.appendChild(card);
-        }
-    });
+  if (error) {
+    console.error(error);
+    return;
+  }
+
+  const container = document.getElementById("cropNotifications");
+  container.innerHTML = "";
+
+  if (!data.length) {
+    container.innerHTML = "<p style='padding:15px;'>No notifications</p>";
+    return;
+  }
+
+  data.forEach(item => {
+
+    const card = document.createElement("div");
+    card.className = "card";
+
+    card.innerHTML = `
+      <strong>${item.buyer_name}</strong>
+      <p>
+        wants to buy <b>${item.quantity}</b> kg of 
+        <b>${item.cname}</b> for ₹${item.total_price}
+      </p>
+
+      <div class="actions">
+        <button class="btn-accept" onclick="acceptOrder(${item.id}, ${item.cropid}, ${item.quantity}, this)">Accept</button>
+        <button class="btn-decline" onclick="declineOrder(${item.id}, this)">Decline</button>
+      </div>
+    `;
+
+    container.appendChild(card);
+  });
 }
 
-async function handleAction(notifId, status, type, refId) {
-    try {
-        // 1. Update the notification status
-        await db.from("notifications").update({ status: status, is_read: true }).eq("id", notifId);
+/* ACCEPT */
+async function acceptOrder(buyId, cropId, qty, btn) {
 
-        // 2. Update the linked table (buy_table or tool_rentals)
-        if (type === 'crop') {
-            await db.from("buy_table").update({ status: status, is_confirmed: true }).eq("id", refId);
-        } else if (type === 'tool' && status === 'Accepted') {
-            await db.from("tool_rentals").update({ is_available: false }).eq("id", refId);
-        }
+  btn.disabled = true;
 
-        loadNotifications();
-    } catch (err) {
-        console.error("Failed to update status:", err);
-    }
+  // update buy_table
+  await db
+    .from("buy_table")
+    .update({
+      status: "Confirmed",
+      is_confirmed: true
+    })
+    .eq("id", buyId);
+
+  // get crop
+  const { data: crop } = await db
+    .from("crop_sales")
+    .select("quantity")
+    .eq("id", cropId)
+    .single();
+
+  const newQty = Math.max(0, crop.quantity - qty);
+
+  await db
+    .from("crop_sales")
+    .update({ quantity: newQty })
+    .eq("id", cropId);
+
+  loadNotifications();
 }
 
-applyRolePermissions();
+/* DECLINE */
+async function declineOrder(buyId, btn) {
+
+  btn.disabled = true;
+
+  await db
+    .from("buy_table")
+    .update({
+      status: "Declined",
+      is_confirmed: false
+    })
+    .eq("id", buyId);
+
+  loadNotifications();
+}
+
 loadNotifications();
 </script>
+
 </body>
 </html>
