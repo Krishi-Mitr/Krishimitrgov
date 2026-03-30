@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -8,153 +9,133 @@
 <script src="supabase.js"></script>
 
 <style>
-/* SAME UI */
 body {
   margin: 0;
   font-family: "Poppins", Arial, sans-serif;
-  background: linear-gradient(180deg,#f6e2cc 0%,#f7f9f8 45%,#dceee3 100%);
+  min-height: 100vh;
+  background: linear-gradient(180deg, #f6e2cc 0%, #f7f9f8 45%, #dceee3 100%);
+  padding-top: 100px;
 }
-body.drawer-open { overflow: hidden; }
 
-/* NAVBAR */
+/* NAVBAR (UNCHANGED) */
 .top-nav {
   position: fixed;
-  top: 0; left: 0; right: 0;
-  height: 78px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+  top: 0; left: 0; right: 0; height: 78px;
+  display: flex; justify-content: space-between; align-items: center;
   padding: 0 32px;
-  background: linear-gradient(90deg,#ff9933,#ffffff,#138808);
+  background: linear-gradient(90deg, #ff9933, #ffffff, #138808);
   border-bottom: 3px solid #0a3d62;
   z-index: 9999;
 }
 
-.nav-left { display: flex; align-items: center; gap: 14px; }
+.brand-title { font-weight: 800; color: #0a3d62; }
 
-.hamburger-btn {
-  width: 44px; height: 44px;
-  border-radius: 12px;
-  border: 2px solid #0a3d62;
-  background: white;
-  cursor: pointer;
-}
-
-.brand-title { font-weight: 800; }
-
-.logout-btn {
-  background: white;
-  border: 2px solid #0a3d62;
-  padding: 10px 18px;
-  border-radius: 10px;
-  cursor: pointer;
-}
-
-/* DRAWER */
-.nav-overlay {
-  position: fixed; inset: 0;
-  background: rgba(0,0,0,0.3);
-  opacity: 0;
-  pointer-events: none;
-  transition: .2s;
-}
-.side-drawer {
-  position: fixed;
-  top: 84px;
-  left: 14px;
-  width: 300px;
-  background: #0a3d62;
-  border-radius: 18px;
-  transform: translateX(-110%);
-  transition: .25s;
-  padding: 15px;
-}
-
-body.drawer-open .nav-overlay {
-  opacity: 1;
-  pointer-events: auto;
-}
-body.drawer-open .side-drawer {
-  transform: translateX(0);
-}
-
-.side-drawer a {
-  display: block;
-  padding: 12px;
-  color: white;
-  text-decoration: none;
-}
-.side-drawer a:hover {
-  background: #1e3a8a;
-}
-
-/* CONTENT */
+/* CONTAINER */
 .container {
-  max-width: 1200px;
-  margin: 140px auto;
+  max-width: 800px;
+  margin: auto;
   padding: 0 20px;
 }
 
-/* GRID */
-.crop-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit,minmax(320px,1fr));
-  gap: 25px;
+/* SECTION UI */
+.section-box {
+  background: white;
+  border-radius: 14px;
+  margin-bottom: 20px;
+  overflow: hidden;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.08);
 }
 
-.crop-card {
+.section-header {
+  padding: 15px 18px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  background: #f1f5f9;
+}
+
+.section-content {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.4s ease;
+}
+
+.section-box.active .section-content {
+  max-height: 600px;
+}
+
+.arrow {
+  transition: transform 0.3s;
+}
+
+.section-box.active .arrow {
+  transform: rotate(180deg);
+}
+
+/* CARD */
+.card {
   background: white;
-  border-radius: 20px;
-  padding: 20px;
-  box-shadow: 0 18px 40px rgba(0,0,0,0.15);
-  border-top: 6px solid #ff9933;
-  border-bottom: 6px solid #138808;
+  padding: 15px;
+  border-bottom: 1px solid #eee;
 }
 
 .actions {
-  margin-top: 15px;
+  margin-top: 10px;
   display: flex;
   gap: 10px;
 }
 
-.btn {
-  flex: 1;
-  padding: 10px;
-  border: none;
-  border-radius: 8px;
+.btn-accept {
+  background: #138808;
   color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
   cursor: pointer;
-  font-weight: 700;
 }
 
-.accept { background: #138808; }
-.decline { background: #dc2626; }
-
+.btn-decline {
+  background: #dc2626;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+}
 </style>
 </head>
 
 <body>
 
 <div class="top-nav">
-  <div class="nav-left">
-    <button class="hamburger-btn" id="menuBtn">☰</button>
-    <p class="brand-title">Krishi Mitr</p>
-  </div>
-  <button class="logout-btn" id="logoutBtn">Logout</button>
+  <p class="brand-title">Krishi Mitr</p>
 </div>
 
-<div class="nav-overlay" id="navOverlay"></div>
-
-<nav class="side-drawer" id="sideNav">
-  <a href="Dashboard">Dashboard</a>
-  <a href="Buy">Buy Crops</a>
-  <a href="Sell">Sell Crops</a>
-  <a href="Notification">Notifications</a>
-</nav>
-
 <div class="container">
-  <h2>Crop Notifications</h2>
-  <div class="crop-grid" id="cropGrid"></div>
+  <h2>Notifications</h2>
+
+  <!-- Crop Sales -->
+  <div class="section-box" id="cropSection">
+    <div class="section-header" onclick="toggleSection('cropSection')">
+      Crop Sales
+      <span class="arrow">▼</span>
+    </div>
+    <div class="section-content">
+      <div id="cropNotifications"></div>
+    </div>
+  </div>
+
+  <!-- Tool Rental -->
+  <div class="section-box" id="toolSection">
+    <div class="section-header" onclick="toggleSection('toolSection')">
+      Tool Rental
+      <span class="arrow">▼</span>
+    </div>
+    <div class="section-content">
+      <div style="padding:15px;">Coming Soon</div>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -164,119 +145,103 @@ const usertype = sessionStorage.getItem("usertype");
 
 if (!loginid) location.href = "login";
 
+/* TOGGLE UI */
+function toggleSection(id) {
+  document.getElementById(id).classList.toggle("active");
+}
+
 /* LOAD NOTIFICATIONS */
-async function loadNotifications(){
+async function loadNotifications() {
+
+  if (usertype !== "Farmer") return;
 
   const { data, error } = await db
     .from("buy_table")
     .select("*")
-    .eq("fid", Number(loginid)) // 🔥 FIX (IMPORTANT)
-    .eq("status","Pending");
+    .eq("fid", loginid)
+    .eq("status", "Pending");
 
-  console.log("DATA:", data);
-  console.log("ERROR:", error);
-
-  const grid = document.getElementById("cropGrid");
-  grid.innerHTML = "";
-
-  if(error){
-    grid.innerHTML = "Error loading data";
+  if (error) {
+    console.error(error);
     return;
   }
 
-  if(!data || data.length === 0){
-    grid.innerHTML = "<p>No notifications</p>";
+  const container = document.getElementById("cropNotifications");
+  container.innerHTML = "";
+
+  if (!data.length) {
+    container.innerHTML = "<p style='padding:15px;'>No notifications</p>";
     return;
   }
 
   data.forEach(item => {
 
     const card = document.createElement("div");
-    card.className = "crop-card";
+    card.className = "card";
 
     card.innerHTML = `
-      <h3>${item.cname}</h3>
-      <p><b>Buyer:</b> ${item.buyer_name}</p>
-      <p><b>Quantity:</b> ${item.quantity} kg</p>
-      <p><b>Total:</b> ₹${item.total_price}</p>
+      <strong>${item.buyer_name}</strong>
+      <p>
+        wants to buy <b>${item.quantity}</b> kg of 
+        <b>${item.cname}</b> for ₹${item.total_price}
+      </p>
 
       <div class="actions">
-        <button class="btn accept">Accept</button>
-        <button class="btn decline">Decline</button>
+        <button class="btn-accept" onclick="acceptOrder(${item.id}, ${item.cropid}, ${item.quantity}, this)">Accept</button>
+        <button class="btn-decline" onclick="declineOrder(${item.id}, this)">Decline</button>
       </div>
     `;
 
-    const acceptBtn = card.querySelector(".accept");
-    const declineBtn = card.querySelector(".decline");
-
-    acceptBtn.onclick = () => accept(item, acceptBtn);
-    declineBtn.onclick = () => decline(item.id, declineBtn);
-
-    grid.appendChild(card);
+    container.appendChild(card);
   });
 }
 
 /* ACCEPT */
-async function accept(item, btn){
+async function acceptOrder(buyId, cropId, qty, btn) {
+
   btn.disabled = true;
 
-  const { error } = await db.from("buy_table")
-    .update({ status:"Confirmed", is_confirmed:true })
-    .eq("id", item.id);
+  // update buy_table
+  await db
+    .from("buy_table")
+    .update({
+      status: "Confirmed",
+      is_confirmed: true
+    })
+    .eq("id", buyId);
 
-  if(error){
-    alert(error.message);
-    return;
-  }
-
-  // update crop quantity
+  // get crop
   const { data: crop } = await db
     .from("crop_sales")
     .select("quantity")
-    .eq("id", item.cid)
+    .eq("id", cropId)
     .single();
 
-  const newQty = Math.max(0, crop.quantity - item.quantity);
+  const newQty = Math.max(0, crop.quantity - qty);
 
-  await db.from("crop_sales")
+  await db
+    .from("crop_sales")
     .update({ quantity: newQty })
-    .eq("id", item.cid);
+    .eq("id", cropId);
 
   loadNotifications();
 }
 
 /* DECLINE */
-async function decline(id, btn){
+async function declineOrder(buyId, btn) {
+
   btn.disabled = true;
 
-  const { error } = await db.from("buy_table")
-    .update({ status:"Declined", is_confirmed:false })
-    .eq("id", id);
-
-  if(error){
-    alert(error.message);
-    return;
-  }
+  await db
+    .from("buy_table")
+    .update({
+      status: "Declined",
+      is_confirmed: false
+    })
+    .eq("id", buyId);
 
   loadNotifications();
 }
-
-/* DRAWER */
-const menuBtn = document.getElementById("menuBtn");
-const navOverlay = document.getElementById("navOverlay");
-
-menuBtn.onclick = () => {
-  document.body.classList.toggle("drawer-open");
-};
-
-navOverlay.onclick = () => {
-  document.body.classList.remove("drawer-open");
-};
-
-document.getElementById("logoutBtn").onclick = () => {
-  sessionStorage.clear();
-  location.href = "login";
-};
 
 loadNotifications();
 </script>
