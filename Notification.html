@@ -453,8 +453,68 @@ async function loadNotifications(){
     box.innerHTML = `<div class="no-data">No Notifications</div>`;
     return;
   }
+  <table border="1" style="width:100%; border-collapse:collapse; text-align:center;">
+  <thead>
+    <tr style="background:#0a3d62; color:white;">
+      <th>Crop</th>
+      <th>Buyer</th>
+      <th>Quantity (kg)</th>
+      <th>Status</th>
+      <th>Action</th>
+    </tr>
+  </thead>
+  <tbody id="ordersTable"></tbody>
+</table>
+  const box = document.getElementById("ordersTable");
+box.innerHTML = "";
 
-  data.forEach(o=>{
+data.forEach(o => {
+
+  let color = "#0a3d62";
+  if (o.status === "Confirmed") color = "#16a34a";
+  if (o.status === "Declined") color = "#dc2626";
+
+  const row = document.createElement("tr");
+
+  row.innerHTML = `
+    <td>${o.cname}</td>
+    <td>${o.buyer_name}</td>
+    <td>${o.quantity}</td>
+    <td>
+      <span style="
+        background:${color};
+        color:white;
+        padding:5px 10px;
+        border-radius:6px;
+        font-weight:bold;
+      ">
+        ${o.status}
+      </span>
+    </td>
+    <td class="action-cell"></td>
+  `;
+
+  // ✅ Add buttons if pending
+  if (o.status === "Pending") {
+    const actionCell = row.querySelector(".action-cell");
+
+    const acceptBtn = document.createElement("button");
+    acceptBtn.innerText = "Accept";
+    acceptBtn.style.marginRight = "5px";
+    acceptBtn.onclick = () => openPopup(o, "accept");
+
+    const declineBtn = document.createElement("button");
+    declineBtn.innerText = "Decline";
+    declineBtn.onclick = () => openPopup(o, "decline");
+
+    actionCell.appendChild(acceptBtn);
+    actionCell.appendChild(declineBtn);
+  }
+
+  box.appendChild(row);
+});
+
+  /*data.forEach(o=>{
 
     let color="#0a3d62";
     if(o.status==="Confirmed") color="#16a34a";
@@ -489,7 +549,7 @@ async function loadNotifications(){
 
     box.appendChild(card);
   });
-}
+}*/
 
 /* popup */
 function openPopup(order,type){
