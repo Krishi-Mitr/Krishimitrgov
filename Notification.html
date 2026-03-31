@@ -8,183 +8,159 @@
 <script src="supabase.js"></script>
 
 <style>
-body {
-  margin: 0;
-  font-family: "Poppins", Arial;
+body{
+  margin:0;
+  font-family:"Poppins",Arial;
   background: linear-gradient(180deg,#f6e2cc 0%,#f7f9f8 45%,#dceee3 100%);
 }
 
-/* ===== NAVBAR (EXACT COPY STYLE) ===== */
-body.drawer-open { overflow: hidden; }
+/* ===== NAVBAR (same as buy) ===== */
+body.drawer-open { overflow:hidden; }
 
-.top-nav {
-  position: fixed;
-  top: 0; left: 0; right: 0;
-  height: 78px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0 32px;
-  background: linear-gradient(90deg,#ff9933,#ffffff,#138808);
-  border-bottom: 3px solid #0a3d62;
-  box-shadow: 0 6px 14px rgba(0,0,0,0.15);
-  z-index: 9999;
+.top-nav{
+  position:fixed; top:0; left:0; right:0;
+  height:78px;
+  display:flex; justify-content:space-between; align-items:center;
+  padding:0 32px;
+  background:linear-gradient(90deg,#ff9933,#ffffff,#138808);
+  border-bottom:3px solid #0a3d62;
+  box-shadow:0 6px 14px rgba(0,0,0,0.15);
+  z-index:9999;
 }
 
-.nav-left { display: flex; align-items: center; gap: 14px; }
+.nav-left{display:flex;align-items:center;gap:14px;}
 
-.hamburger-btn {
-  width: 44px;
-  height: 44px;
-  border-radius: 12px;
-  border: 2px solid #0a3d62;
-  background: rgba(255,255,255,0.75);
-  display: grid;
-  place-items: center;
-  cursor: pointer;
-  transition: 0.3s;
+.hamburger-btn{
+  width:44px;height:44px;border-radius:12px;
+  border:2px solid #0a3d62;
+  background:rgba(255,255,255,0.75);
+  display:grid;place-items:center;
+  cursor:pointer;transition:.3s;
 }
-.hamburger-btn:hover { transform: scale(1.05); }
+.hamburger-btn:hover{transform:scale(1.05);}
 
-.hamburger-icon {
-  width: 20px;
-  height: 14px;
-  position: relative;
+.hamburger-icon{width:20px;height:14px;position:relative;}
+.hamburger-icon span{
+  position:absolute;left:0;right:0;height:2.5px;
+  background:#0a3d62;border-radius:999px;
 }
-.hamburger-icon span {
-  position: absolute;
-  left: 0;
-  right: 0;
-  height: 2.5px;
-  background: #0a3d62;
-  border-radius: 999px;
-}
-.hamburger-icon span:nth-child(1){ top:0; }
-.hamburger-icon span:nth-child(2){ top:5.5px; }
-.hamburger-icon span:nth-child(3){ top:11px; }
+.hamburger-icon span:nth-child(1){top:0;}
+.hamburger-icon span:nth-child(2){top:5.5px;}
+.hamburger-icon span:nth-child(3){top:11px;}
 
-.brand-title {
-  font-weight: 800;
-  color: #0a3d62;
+.brand-title{font-weight:800;color:#0a3d62;}
+
+.nav-right{display:flex;align-items:center;gap:15px;}
+
+.profile-btn img{
+  width:42px;height:42px;border-radius:50%;
+  border:2px solid #0a3d62;cursor:pointer;transition:.3s;
+}
+.profile-btn img:hover{
+  transform:scale(1.1);
+  box-shadow:0 0 15px rgba(10,61,98,0.4);
 }
 
-.nav-right { display: flex; align-items: center; gap: 15px; }
-
-.profile-btn img {
-  width: 42px;
-  height: 42px;
-  border-radius: 50%;
-  border: 2px solid #0a3d62;
-  cursor: pointer;
-  transition: 0.3s;
+.logout-btn{
+  background:white;color:#0a3d62;
+  border:2px solid #0a3d62;
+  padding:10px 18px;border-radius:10px;
+  font-weight:700;cursor:pointer;transition:.3s;
 }
-.profile-btn img:hover {
-  transform: scale(1.1);
-  box-shadow: 0 0 15px rgba(10,61,98,0.4);
+.logout-btn:hover{
+  background:#0a3d62;color:white;
+  transform:translateY(-2px);
 }
 
-.logout-btn {
-  background: white;
-  color: #0a3d62;
-  border: 2px solid #0a3d62;
-  padding: 10px 18px;
-  border-radius: 10px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: 0.3s;
-}
-.logout-btn:hover {
-  background: #0a3d62;
-  color: white;
-  transform: translateY(-2px);
+/* ===== DRAWER (same as buy) ===== */
+.nav-overlay{
+  position:fixed; inset:0;
+  background:rgba(0,0,0,0.25);
+  opacity:0; pointer-events:none;
+  transition:.2s; z-index:9998;
 }
 
-/* ===== DRAWER ===== */
-.nav-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.25);
-  opacity: 0;
-  pointer-events: none;
-  transition: .2s;
-  z-index: 9998;
+.side-drawer{
+  position:fixed;
+  top:84px; left:14px;
+  width:320px;
+  background:linear-gradient(180deg,#0a3d62,#082032);
+  border-radius:18px;
+  transform:translateX(-110%);
+  transition:.25s;
+  z-index:9999;
 }
 
-.side-drawer {
-  position: fixed;
-  top: 84px;
-  left: 14px;
-  width: 300px;
-  background: linear-gradient(180deg,#0a3d62,#082032);
-  border-radius: 18px;
-  transform: translateX(-110%);
-  transition: .25s;
-  z-index: 9999;
-}
+body.drawer-open .nav-overlay{opacity:1;pointer-events:auto;}
+body.drawer-open .side-drawer{transform:translateX(0);}
 
-body.drawer-open .nav-overlay { opacity:1; pointer-events:auto; }
-body.drawer-open .side-drawer { transform:translateX(0); }
-
-.menu-list a {
-  display:block;
-  padding:14px;
-  color:white;
-  text-decoration:none;
+.menu-list a{
+  display:block;padding:14px;color:white;text-decoration:none;
 }
-.menu-list a:hover { background:#1e3a8a; }
+.menu-list a:hover{background:#1e3a8a;}
 
 /* ===== CONTENT ===== */
-.container {
-  max-width: 1200px;
-  margin: 120px auto;
-  padding: 0 20px;
+.container{
+  max-width:1200px;
+  margin:120px auto 60px;
+  padding:0 20px;
 }
 
-.title {
-  font-size: 24px;
-  font-weight: 800;
-  color: #0a3d62;
-  margin-bottom: 20px;
+.title{
+  font-size:26px;
+  font-weight:800;
+  color:#0a3d62;
+  margin-bottom:20px;
 }
 
-/* dropdown */
-.dropdown {
-  margin-bottom: 15px;
-  border-radius: 12px;
-  overflow: hidden;
+/* ===== DROPDOWN BARS ===== */
+.dropdown{
+  margin-bottom:20px;
+  border-radius:16px;
+  overflow:hidden;
+  box-shadow:0 10px 25px rgba(0,0,0,0.1);
 }
 
-.dropdown-header {
-  background: #0a3d62;
-  color: white;
-  padding: 14px;
-  font-weight: 700;
-  cursor: pointer;
+.dropdown-header{
+  padding:16px;
+  font-weight:800;
+  font-size:18px;
+  cursor:pointer;
+  background:linear-gradient(90deg,#ff9933,#138808);
+  color:white;
+  display:flex;
+  justify-content:space-between;
 }
 
-.dropdown-content {
-  display: none;
-  padding-top: 15px;
+.dropdown-content{
+  max-height:0;
+  overflow:hidden;
+  transition:0.3s ease;
 }
 
-/* grid */
-.grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit,minmax(320px,1fr));
-  gap: 25px;
+.dropdown.active .dropdown-content{
+  max-height:1000px;
+  padding:15px;
 }
 
-/* card (same style as buy) */
-.card {
-  background: white;
-  border-radius: 25px;
-  padding: 20px;
-  box-shadow: 0 18px 40px rgba(0,0,0,0.15);
-  border-top: 6px solid #ff9933;
-  border-bottom: 6px solid #138808;
+/* ===== GRID ===== */
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
+  gap:20px;
 }
 
-.badge {
+/* ===== CARD ===== */
+.card{
+  background:white;
+  border-radius:20px;
+  padding:20px;
+  box-shadow:0 18px 40px rgba(0,0,0,0.15);
+  border-top:6px solid #ff9933;
+  border-bottom:6px solid #138808;
+}
+
+.badge{
   display:inline-block;
   padding:6px 12px;
   border-radius:8px;
@@ -193,13 +169,11 @@ body.drawer-open .side-drawer { transform:translateX(0); }
   margin-top:10px;
 }
 
-.btn-row {
-  display:flex;
-  gap:10px;
-  margin-top:15px;
+/* ===== BUTTONS ===== */
+.btn-row{
+  display:flex; gap:10px; margin-top:15px;
 }
-
-.btn {
+.btn{
   flex:1;
   padding:10px;
   border:none;
@@ -207,25 +181,38 @@ body.drawer-open .side-drawer { transform:translateX(0); }
   font-weight:700;
   cursor:pointer;
 }
+.accept{background:#16a34a;color:white;}
+.decline{background:#dc2626;color:white;}
 
-.accept { background:#16a34a; color:white; }
-.decline { background:#dc2626; color:white; }
-
-/* popup */
-.popup {
-  position:fixed;
-  inset:0;
+/* ===== POPUP ===== */
+.popup{
+  position:fixed; inset:0;
   background:rgba(0,0,0,0.6);
   display:none;
   justify-content:center;
   align-items:center;
+  z-index:10000;
 }
 
-.popup-box {
+.popup-box{
   background:white;
-  padding:25px;
-  border-radius:15px;
+  padding:30px;
+  border-radius:20px;
+  width:350px;
   text-align:center;
+}
+
+.popup-buttons{
+  margin-top:20px;
+  display:flex; gap:10px;
+}
+.popup-buttons button{
+  flex:1;
+  padding:10px;
+  border:none;
+  border-radius:8px;
+  font-weight:700;
+  cursor:pointer;
 }
 </style>
 </head>
@@ -265,32 +252,29 @@ body.drawer-open .side-drawer { transform:translateX(0); }
 <div class="container">
   <div class="title">Notifications</div>
 
-  <!-- Crop Sale -->
-  <div class="dropdown">
-    <div class="dropdown-header" onclick="toggle('cropContent')">
-      Crop Sale
-    </div>
-    <div id="cropContent" class="dropdown-content grid"></div>
-  </div>
-
-  <!-- Tool Rental -->
-  <div class="dropdown">
-    <div class="dropdown-header" onclick="toggle('toolContent')">
-      Tool Rental
-    </div>
-    <div id="toolContent" class="dropdown-content">
-      <p style="padding:10px;">No data</p>
+  <div class="dropdown" onclick="toggle(this)">
+    <div class="dropdown-header">Crop Sale</div>
+    <div class="dropdown-content">
+      <div id="cropContent" class="grid"></div>
     </div>
   </div>
 
+  <div class="dropdown" onclick="toggle(this)">
+    <div class="dropdown-header">Tool Rental</div>
+    <div class="dropdown-content">
+      <p>No data</p>
+    </div>
+  </div>
 </div>
 
 <!-- POPUP -->
 <div id="popup" class="popup">
   <div class="popup-box">
     <p id="popupText"></p>
-    <button onclick="confirmAction()">Yes</button>
-    <button onclick="closePopup()">Cancel</button>
+    <div class="popup-buttons">
+      <button onclick="confirmAction()" style="background:#16a34a;color:white;">Yes</button>
+      <button onclick="closePopup()" style="background:#dc2626;color:white;">Cancel</button>
+    </div>
   </div>
 </div>
 
@@ -311,14 +295,12 @@ logoutBtn.onclick=()=>{
 };
 
 /* dropdown */
-function toggle(id){
-  const el=document.getElementById(id);
-  el.style.display = el.style.display==="grid"?"none":"grid";
+function toggle(el){
+  el.classList.toggle("active");
 }
 
-/* load */
+/* load notifications */
 async function loadNotifications(){
-
   const {data}=await db
     .from("buy_table")
     .select("*")
@@ -329,7 +311,6 @@ async function loadNotifications(){
   box.innerHTML="";
 
   data.forEach(o=>{
-
     let color="#f59e0b";
     if(o.status==="Confirmed") color="#16a34a";
     if(o.status==="Declined") color="#dc2626";
@@ -339,7 +320,8 @@ async function loadNotifications(){
 
     card.innerHTML=`
       <h3>${o.cname}</h3>
-      <p>Buyer:  ${o.buyer_name}</p><p> Quantity: ${o.quantity} kg</p>
+      <p>Buyer: ${o.buyer_name}</p>
+      <p>Quantity: ${o.quantity} kg</p>
       <span class="badge" style="background:${color}">
         ${o.status}
       </span>
@@ -368,7 +350,7 @@ async function loadNotifications(){
 function openPopup(order,type){
   selectedOrder=order;
   actionType=type;
-  popupText.innerText = type==="accept" ? "Accept order?" : "Decline order?";
+  popupText.innerText = type==="accept" ? "Accept this order?" : "Decline this order?";
   popup.style.display="flex";
 }
 
