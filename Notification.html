@@ -328,6 +328,11 @@ async function loadNotifications(){
 
   const box=document.getElementById("cropContent");
   box.innerHTML="";
+  if(!data || data.length === 0){
+    box.style.display = "block";
+    box.innerHTML = `<div class="no-data">No Notifications</div>`;
+    return;
+  }
 
   data.forEach(o=>{
 
