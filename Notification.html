@@ -161,7 +161,7 @@ body.drawer-open .side-drawer { transform:translateX(0); }
 
 /* dropdown */
 .dropdown {
-  margin-bottom: 15px;
+  margin-bottom: 30px; /* increased spacing */
   border-radius: 12px;
   overflow: hidden;
 }
@@ -177,6 +177,15 @@ body.drawer-open .side-drawer { transform:translateX(0); }
 .dropdown-content {
   display: none;
   padding-top: 15px;
+}
+  .no-data {
+  text-align: center;
+  padding: 30px;
+  font-weight: 600;
+  color: #6b7280;
+  background: white;
+  border-radius: 15px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.08);
 }
 
 /* grid */
@@ -413,8 +422,17 @@ logoutBtn.onclick=()=>{
 
 /* dropdown */
 function toggle(id){
-  const el=document.getElementById(id);
-  el.style.display = el.style.display==="grid"?"none":"grid";
+  const el = document.getElementById(id);
+
+  if(el.style.display === "none" || el.style.display === ""){
+    if(id === "cropContent"){
+      el.style.display = "grid";
+    } else {
+      el.style.display = "block";
+    }
+  } else {
+    el.style.display = "none";
+  }
 }
 
 /* load */
@@ -429,18 +447,26 @@ async function loadNotifications(){
   const box=document.getElementById("cropContent");
   box.innerHTML="";
 
+  // ✅ SHOW EMPTY MESSAGE
+  if(!data || data.length === 0){
+    box.style.display = "block";
+    box.innerHTML = `<div class="no-data">No Notifications</div>`;
+    return;
+  }
+
   data.forEach(o=>{
-    
-let color="#0a3d62"; // neutral blue for pending
-if(o.status==="Confirmed") color="#16a34a";
-if(o.status==="Declined") color="#dc2626";
+
+    let color="#0a3d62";
+    if(o.status==="Confirmed") color="#16a34a";
+    if(o.status==="Declined") color="#dc2626";
 
     const card=document.createElement("div");
     card.className="card";
 
     card.innerHTML=`
       <h3>${o.cname}</h3>
-      <p>Buyer:  ${o.buyer_name}</p><p> Quantity: ${o.quantity} kg</p>
+      <p>Buyer: ${o.buyer_name}</p>
+      <p>Quantity: ${o.quantity} kg</p>
       <span class="badge" style="background:${color}">
         ${o.status}
       </span>
