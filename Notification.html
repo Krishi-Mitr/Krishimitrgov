@@ -137,10 +137,17 @@ body.drawer-open .side-drawer { transform:translateX(0); }
 /* ===== CONTENT ===== */
 .container {
   max-width: 1200px;
-  margin: 120px auto;
+  margin: 110px auto 40px; /* fixed top spacing */
   padding: 0 20px;
 }
 
+  body {
+  margin: 0;
+  font-family: "Poppins", Arial;
+  background: linear-gradient(180deg,#f6e2cc 0%,#f7f9f8 45%,#dceee3 100%);
+  min-height: 100vh;
+  overflow-x: hidden; /* prevents side overlap */
+}
 .title {
   font-size: 24px;
   font-weight: 800;
@@ -216,17 +223,61 @@ body.drawer-open .side-drawer { transform:translateX(0); }
 .popup {
   position:fixed;
   inset:0;
-  background:rgba(0,0,0,0.6);
+  background:rgba(0,0,0,0.5);
   display:none;
   justify-content:center;
   align-items:center;
+  z-index: 99999;
 }
 
 .popup-box {
-  background:white;
-  padding:25px;
-  border-radius:15px;
+  background: linear-gradient(180deg,#e8f5e9,#ffffff);
+  padding: 28px;
+  border-radius: 18px;
   text-align:center;
+  width: 320px;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.25);
+  border-top: 5px solid #16a34a;
+}
+
+.popup-box p {
+  font-weight: 600;
+  margin-bottom: 20px;
+  color: #0a3d62;
+}
+
+.popup-box button {
+  margin: 8px;
+  padding: 10px 18px;
+  border-radius: 8px;
+  border: none;
+  font-weight: 700;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.popup-box button:first-child {
+  background: #16a34a;
+  color: white;
+}
+
+.popup-box button:last-child {
+  background: #e5e7eb;
+}
+
+.popup-box button:hover {
+  transform: scale(1.05);
+}
+
+  .dropdown-content {
+  display: none;
+  padding-top: 15px;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity:0; transform:translateY(-5px); }
+  to { opacity:1; transform:translateY(0); }
 }
 </style>
 </head>
@@ -330,10 +381,10 @@ async function loadNotifications(){
   box.innerHTML="";
 
   data.forEach(o=>{
-
-    let color="#f59e0b";
-    if(o.status==="Confirmed") color="#16a34a";
-    if(o.status==="Declined") color="#dc2626";
+    
+let color="#0a3d62"; // neutral blue for pending
+if(o.status==="Confirmed") color="#16a34a";
+if(o.status==="Declined") color="#dc2626";
 
     const card=document.createElement("div");
     card.className="card";
