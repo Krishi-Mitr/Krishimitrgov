@@ -444,8 +444,10 @@ async function loadNotifications(){
     .eq("fid",loginid)
     .order("id",{ascending:false});
 
-  const box=document.getElementById("cropContent");
-  box.innerHTML="";
+ // const box=document.getElementById("cropContent");
+ // box.innerHTML="";
+  const box = document.getElementById("ordersTable");
+  box.innerHTML = "";
 
   // ✅ SHOW EMPTY MESSAGE
   if(!data || data.length === 0){
