@@ -358,6 +358,23 @@ body.drawer-open .side-drawer { transform:translateX(0); }
       Crop Sale
     </div>
     <div id="cropContent" class="dropdown-content grid"></div>
+    
+     <table border="1" style="width:100%; border-collapse:collapse; text-align:center;">
+    <thead>
+      <tr style="background:#0a3d62; color:white;">
+        <th>Crop</th>
+        <th>Buyer</th>
+        <th>Quantity (kg)</th>
+        <th>Status</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody id="ordersTable"></tbody>
+  </table>
+
+  <div id="noDataMsg" class="no-data" style="display:none;">
+    No Notifications
+  </div>
   </div>
 
   <!-- Tool Rental -->
@@ -436,22 +453,6 @@ function toggle(id){
 }
 
 /* load */
-   <table border="1" style="width:100%; border-collapse:collapse; text-align:center;">
-  <thead>
-    <tr style="background:#0a3d62; color:white;">
-      <th>Crop</th>
-      <th>Buyer</th>
-      <th>Quantity (kg)</th>
-      <th>Status</th>
-      <th>Action</th>
-    </tr>
-  </thead>
-  <tbody id="ordersTable"></tbody>
-</table>
-
-<div id="noDataMsg" class="no-data" style="display:none;">
-  No Notifications
-</div>
 async function loadNotifications(){
 
   const {data}=await db
@@ -470,7 +471,7 @@ async function loadNotifications(){
     return;
   }*/
 
-  const box = document.getElementById("cropContent");
+  const box = document.getElementById("ordersTable");
 const noData = document.getElementById("noDataMsg");
 
 box.innerHTML = "";
