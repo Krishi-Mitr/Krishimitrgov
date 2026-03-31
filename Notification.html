@@ -446,16 +446,14 @@ async function loadNotifications(){
 
  // const box=document.getElementById("cropContent");
  // box.innerHTML="";
-  const box = document.getElementById("ordersTable");
-  box.innerHTML = "";
 
   // ✅ SHOW EMPTY MESSAGE
-  if(!data || data.length === 0){
+ /* if(!data || data.length === 0){
     box.style.display = "block";
     box.innerHTML = `<div class="no-data">No Notifications</div>`;
     return;
-  }
-  <table border="1" style="width:100%; border-collapse:collapse; text-align:center;">
+  }*/
+ <table border="1" style="width:100%; border-collapse:collapse; text-align:center;">
   <thead>
     <tr style="background:#0a3d62; color:white;">
       <th>Crop</th>
@@ -467,8 +465,22 @@ async function loadNotifications(){
   </thead>
   <tbody id="ordersTable"></tbody>
 </table>
+
+<div id="noDataMsg" class="no-data" style="display:none;">
+  No Notifications
+</div>
   const box = document.getElementById("ordersTable");
+const noData = document.getElementById("noDataMsg");
+
 box.innerHTML = "";
+
+// ✅ SHOW EMPTY MESSAGE
+if (!data || data.length === 0) {
+  noData.style.display = "block";
+  return;
+} else {
+  noData.style.display = "none";
+}
 
 data.forEach(o => {
 
@@ -496,7 +508,7 @@ data.forEach(o => {
     <td class="action-cell"></td>
   `;
 
-  // ✅ Add buttons if pending
+  // ✅ Buttons for pending
   if (o.status === "Pending") {
     const actionCell = row.querySelector(".action-cell");
 
@@ -515,7 +527,6 @@ data.forEach(o => {
 
   box.appendChild(row);
 });
-
   /*data.forEach(o=>{
 
     let color="#0a3d62";
