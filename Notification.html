@@ -1,272 +1,246 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Notifications - Krishi Mitr</title>
+<title>Farmer Notifications</title>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="supabase.js"></script>
 
 <style>
 body {
-  margin: 0;
-  font-family: "Poppins", Arial, sans-serif;
-  min-height: 100vh;
-  background: linear-gradient(180deg, #f6e2cc 0%, #f7f9f8 45%, #dceee3 100%);
-  padding-top: 100px;
+  margin:0;
+  font-family:"Poppins", Arial;
+  background: linear-gradient(180deg,#f6e2cc 0%,#f7f9f8 45%,#dceee3 100%);
 }
 
-/* NAVBAR (UNCHANGED) */
-.top-nav {
-  position: fixed;
-  top: 0; left: 0; right: 0; height: 78px;
-  display: flex; justify-content: space-between; align-items: center;
-  padding: 0 32px;
-  background: linear-gradient(90deg, #ff9933, #ffffff, #138808);
-  border-bottom: 3px solid #0a3d62;
-  z-index: 9999;
-}
-
-.brand-title { font-weight: 800; color: #0a3d62; }
-
-/* CONTAINER */
+/* container */
 .container {
-  max-width: 800px;
-  margin: auto;
-  padding: 0 20px;
+  max-width:1200px;
+  margin:120px auto;
+  padding:0 20px;
 }
 
-/* SECTION UI */
-.section-box {
-  background: white;
-  border-radius: 14px;
-  margin-bottom: 20px;
-  overflow: hidden;
-  box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+/* grid (same BUY page) */
+.crop-grid {
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(320px,1fr));
+  gap:25px;
 }
 
-.section-header {
-  padding: 15px 18px;
-  font-weight: 700;
-  cursor: pointer;
-  display: flex;
-  justify-content: space-between;
-  background: #f1f5f9;
+/* card */
+.crop-card {
+  background:white;
+  border-radius:25px;
+  padding:20px;
+  box-shadow:0 18px 40px rgba(0,0,0,0.15);
+  border-top:6px solid #ff9933;
+  border-bottom:6px solid #138808;
+  transition:.3s;
 }
 
-.section-content {
-  max-height: 0;
-  overflow: hidden;
-  transition: max-height 0.4s ease;
+.crop-card:hover {
+  transform:translateY(-5px);
 }
 
-.section-box.active .section-content {
-  max-height: 600px;
+/* badge */
+.badge {
+  display:inline-block;
+  padding:6px 12px;
+  border-radius:8px;
+  color:white;
+  font-weight:700;
+  margin-top:10px;
 }
 
-.arrow {
-  transition: transform 0.3s;
+/* buttons */
+.btn-row {
+  display:flex;
+  justify-content:space-between;
+  margin-top:15px;
 }
 
-.section-box.active .arrow {
-  transform: rotate(180deg);
+.btn {
+  padding:10px;
+  border:none;
+  border-radius:8px;
+  font-weight:700;
+  cursor:pointer;
+  width:48%;
 }
 
-/* CARD */
-.card {
-  background: white;
-  padding: 15px;
-  border-bottom: 1px solid #eee;
+.accept { background:#16a34a; color:white; }
+.decline { background:#dc2626; color:white; }
+
+/* popup */
+.popup {
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.6);
+  display:none;
+  justify-content:center;
+  align-items:center;
 }
 
-.actions {
-  margin-top: 10px;
-  display: flex;
-  gap: 10px;
-}
-
-.btn-accept {
-  background: #138808;
-  color: white;
-  border: none;
-  padding: 6px 12px;
-  border-radius: 6px;
-  cursor: pointer;
-}
-
-.btn-decline {
-  background: #dc2626;
-  color: white;
-  border: none;
-  padding: 6px 12px;
-  border-radius: 6px;
-  cursor: pointer;
+.popup-box {
+  background:white;
+  padding:25px;
+  border-radius:15px;
+  text-align:center;
 }
 </style>
 </head>
 
 <body>
 
-<div class="top-nav">
-  <p class="brand-title">Krishi Mitr</p>
+<div class="container">
+  <h2 style="color:#0a3d62;">📢 Incoming Orders</h2>
+  <div id="notifBox" class="crop-grid"></div>
 </div>
 
-<div class="container">
-  <h2>Notifications</h2>
-
-  <!-- Crop Sales -->
-  <div class="section-box" id="cropSection">
-    <div class="section-header" onclick="toggleSection('cropSection')">
-      Crop Sales
-      <span class="arrow">▼</span>
-    </div>
-    <div class="section-content">
-      <div id="cropNotifications"></div>
-    </div>
-  </div>
-
-  <!-- Tool Rental -->
-  <div class="section-box" id="toolSection">
-    <div class="section-header" onclick="toggleSection('toolSection')">
-      Tool Rental
-      <span class="arrow">▼</span>
-    </div>
-    <div class="section-content">
-      <div style="padding:15px;">Coming Soon</div>
-    </div>
+<!-- CONFIRM POPUP -->
+<div id="popup" class="popup">
+  <div class="popup-box">
+    <p>Do you want to accept this order?</p>
+    <button onclick="confirmAccept()">Yes</button>
+    <button onclick="closePopup()">No</button>
   </div>
 </div>
 
 <script>
 const db = window.db;
-const loginid = sessionStorage.getItem("loginid");
-const usertype = sessionStorage.getItem("usertype");
+const loginid = Number(sessionStorage.getItem("loginid"));
 
-if (!loginid) location.href = "login";
-
-/* TOGGLE UI */
-function toggleSection(id) {
-  document.getElementById(id).classList.toggle("active");
+if (!loginid) {
+  location.href = "login";
 }
 
-/* LOAD NOTIFICATIONS */
-async function loadNotifications() {
+let selectedOrder = null;
 
-  if (usertype !== "Farmer") return;
+// 🔥 LOAD NOTIFICATIONS
+async function loadNotifications() {
 
   const { data, error } = await db
     .from("buy_table")
     .select("*")
-    .eq("fid", Number(loginid))   // ✅ FIXED
-    .eq("status", "Pending");
+    .eq("fid", loginid) // ONLY farmer orders
+    .order("id", { ascending:false });
 
   console.log("DATA:", data);
-  console.log("ERROR:", error);
 
-  const container = document.getElementById("cropNotifications");
-  container.innerHTML = "";
-
-  if (error) {
-    container.innerHTML = "<p style='padding:15px;'>Error loading</p>";
-    return;
-  }
+  const box = document.getElementById("notifBox");
+  box.innerHTML = "";
 
   if (!data || data.length === 0) {
-    container.innerHTML = "<p style='padding:15px;'>No notifications</p>";
+    box.innerHTML = "<p>No orders yet</p>";
     return;
   }
 
-  data.forEach(item => {
+  data.forEach(order => {
+
+    let badgeColor = "#f59e0b";
+
+    if (order.status === "Confirmed") badgeColor = "#16a34a";
+    if (order.status === "Declined") badgeColor = "#dc2626";
 
     const card = document.createElement("div");
-    card.className = "card";
+    card.className = "crop-card";
 
     card.innerHTML = `
-      <strong>${item.buyer_name}</strong>
-      <p>
-        wants to buy <b>${item.quantity}</b> kg of 
-        <b>${item.cname}</b> for ₹${item.total_price}
+      <h3>${order.cname}</h3>
+      <p><b>Buyer:</b> ${order.buyer_name}</p>
+      <p><b>Quantity:</b> ${order.quantity} kg</p>
+      <p><b>Total:</b> ₹${order.total_price}</p>
+
+      <p style="margin-top:10px;">
+        ${order.buyer_name} wants to buy ${order.quantity} kg of ${order.cname}
       </p>
 
-      <div class="actions">
-        <button class="btn-accept">Accept</button>
-        <button class="btn-decline">Decline</button>
-      </div>
+      <span class="badge" style="background:${badgeColor}">
+        ${order.status}
+      </span>
     `;
 
-    const acceptBtn = card.querySelector(".btn-accept");
-    const declineBtn = card.querySelector(".btn-decline");
+    // 🔥 SHOW BUTTONS ONLY IF PENDING
+    if (order.status === "Pending") {
 
-    // ✅ FIXED (use correct fields)
-    acceptBtn.onclick = () => acceptOrder(item.id, item.cid, item.quantity, acceptBtn);
-    declineBtn.onclick = () => declineOrder(item.id, declineBtn);
+      const btns = document.createElement("div");
+      btns.className = "btn-row";
 
-    container.appendChild(card);
+      btns.innerHTML = `
+        <button class="btn accept">Accept</button>
+        <button class="btn decline">Decline</button>
+      `;
+
+      btns.querySelector(".accept").onclick = () => openPopup(order);
+      btns.querySelector(".decline").onclick = () => declineOrder(order);
+
+      card.appendChild(btns);
+    }
+
+    box.appendChild(card);
   });
 }
 
-/* ACCEPT */
-async function acceptOrder(buyId, cropId, qty, btn) {
+// 🔥 OPEN POPUP
+function openPopup(order) {
+  selectedOrder = order;
+  document.getElementById("popup").style.display = "flex";
+}
 
-  btn.disabled = true;
+function closePopup() {
+  document.getElementById("popup").style.display = "none";
+}
 
-  const { error: updateError } = await db
-    .from("buy_table")
-    .update({
-      status: "Confirmed",
-      is_confirmed: true
-    })
-    .eq("id", buyId);
+// 🔥 ACCEPT ORDER
+async function confirmAccept() {
 
-  if (updateError) {
-    alert(updateError.message);
-    return;
+  const order = selectedOrder;
+
+  try {
+
+    // ✅ update order
+    await db.from("buy_table")
+      .update({ status:"Confirmed", is_confirmed:true })
+      .eq("id", order.id);
+
+    // ✅ get crop
+    const { data: crop } = await db
+      .from("crop_sales")
+      .select("quantity")
+      .eq("id", order.cid)
+      .single();
+
+    const newQty = crop.quantity - order.quantity;
+
+    // ✅ update crop quantity
+    await db.from("crop_sales")
+      .update({ quantity: newQty })
+      .eq("id", order.cid);
+
+    alert("Order Confirmed!");
+
+  } catch (err) {
+    console.error(err);
+    alert("Error occurred");
   }
 
-  // get crop
-  const { data: crop, error: cropError } = await db
-    .from("crop_sales")
-    .select("quantity")
-    .eq("id", cropId)
-    .single();
-
-  if (cropError) {
-    alert(cropError.message);
-    return;
-  }
-
-  const newQty = Math.max(0, crop.quantity - qty);
-
-  await db
-    .from("crop_sales")
-    .update({ quantity: newQty })
-    .eq("id", cropId);
-
+  closePopup();
   loadNotifications();
 }
 
-/* DECLINE */
-async function declineOrder(buyId, btn) {
+// 🔥 DECLINE ORDER
+async function declineOrder(order) {
 
-  btn.disabled = true;
+  await db.from("buy_table")
+    .update({ status:"Declined" })
+    .eq("id", order.id);
 
-  const { error } = await db
-    .from("buy_table")
-    .update({
-      status: "Declined",
-      is_confirmed: false
-    })
-    .eq("id", buyId);
-
-  if (error) {
-    alert(error.message);
-    return;
-  }
-
+  alert("Order Declined");
   loadNotifications();
 }
 
+// INIT
 loadNotifications();
 </script>
 
