@@ -2,530 +2,247 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Buy Crops</title>
+<title>Farmer Notifications</title>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="supabase.js"></script>
+
 <style>
 body {
-  margin: 0;
-  font-family: "Poppins", Arial, sans-serif;
-  min-height: 100vh;
+  margin:0;
+  font-family:"Poppins", Arial;
   background: linear-gradient(180deg,#f6e2cc 0%,#f7f9f8 45%,#dceee3 100%);
-  color: #1f2937;
 }
-body.drawer-open { overflow: hidden; }
-.top-nav {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 78px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0 32px;
-  background: linear-gradient(90deg,#ff9933,#ffffff,#138808);
-  border-bottom: 3px solid #0a3d62;
-  box-shadow: 0 6px 14px rgba(0,0,0,0.15);
-  z-index: 9999;
-}
-.nav-left { display: flex; align-items: center; gap: 14px; }
-.hamburger-btn {
-  width: 44px;
-  height: 44px;
-  border-radius: 12px;
-  border: 2px solid #0a3d62;
-  background: rgba(255,255,255,0.75);
-  display: grid;
-  place-items: center;
-  cursor: pointer;
-  transition: 0.3s;
-}
-.hamburger-btn:hover { transform: scale(1.05); }
-.hamburger-icon {
-  width: 20px;
-  height: 14px;
-  position: relative;
-}
-.hamburger-icon span {
-  position: absolute;
-  left: 0;
-  right: 0;
-  height: 2.5px;
-  background: #0a3d62;
-  border-radius: 999px;
-}
-.hamburger-icon span:nth-child(1){ top:0; }
-.hamburger-icon span:nth-child(2){ top:5.5px; }
-.hamburger-icon span:nth-child(3){ top:11px; }
-.brand-title {
-  margin: 0;
-  font-size: 1.15rem;
-  font-weight: 800;
-  color: #0a3d62;
-}
-.nav-right { display: flex; align-items: center; gap: 15px; }
-.profile-btn img {
-  width: 42px;
-  height: 42px;
-  border-radius: 50%;
-  border: 2px solid #0a3d62;
-  cursor: pointer;
-  transition: 0.3s;
-}
-.profile-btn img:hover {
-  transform: scale(1.1);
-  box-shadow: 0 0 15px rgba(10,61,98,0.4);
-}
-.logout-btn {
-  background: white;
-  color: #0a3d62;
-  border: 2px solid #0a3d62;
-  padding: 10px 18px;
-  border-radius: 10px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: 0.3s;
-}
-.logout-btn:hover {
-  background: #0a3d62;
-  color: white;
-  transform: translateY(-2px);
-}
-.nav-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.25);
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity .2s ease;
-  z-index: 9998;
-}
-.side-drawer {
-  position: fixed;
-  top: 84px;
-  left: 14px;
-  width: min(320px, calc(100vw - 28px));
-  max-height: calc(100vh - 98px);
-  overflow: auto;
-  background: linear-gradient(180deg,#0a3d62,#082032);
-  border: 3px solid #ffffff;
-  border-radius: 18px;
-  box-shadow: 0 18px 40px rgba(0,0,0,0.35);
-  transform: translateX(-110%);
-  transition: transform .25s ease;
-  z-index: 9999;
-}
-.drawer-inner { padding: 14px; }
-body.drawer-open .nav-overlay { opacity: 1; pointer-events: auto; }
-body.drawer-open .side-drawer { transform: translateX(0); }
-.menu-section {
-  border-radius: 14px;
-  overflow: hidden;
-  border: 1px solid rgba(255,255,255,0.15);
-  margin-bottom: 14px;
-  background: rgba(255,255,255,0.05);
-}
-.menu-section-title {
-  padding: 12px 14px;
-  background: rgba(255,255,255,0.1);
-  color: white;
-  font-weight: 800;
-  font-size: 0.95rem;
-}
-.menu-list { list-style: none; padding: 0; margin: 0; }
-.menu-list a {
-  display: block; 
-  padding: 14px;
-  text-decoration: none;
-  color: white;
-  font-weight: 600;
-  background: rgba(255,255,255,0.08);
-  transition: 0.2s ease;
-}
-.menu-list li + li a { border-top: 1px solid rgba(255,255,255,0.1); }
-.menu-list a:hover { background: #1e3a8a; padding-left: 20px; }
 
-.container{max-width:1200px;margin:150px auto 60px;padding:0 20px}
-.crop-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:30px}
-.crop-card{background:white;border-radius:25px;padding:25px;box-shadow:0 18px 40px rgba(0,0,0,0.15);border-top:6px solid #ff9933;border-bottom:6px solid #138808;transition:.3s}
-.crop-card:hover{transform:translateY(-6px);box-shadow:0 25px 55px rgba(0,0,0,.2)}
-.crop-card h3{margin:0;color:#0a3d62}
-.price{font-size:18px;font-weight:700;color:#ff6b00}
-.popup-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.6);display:none;justify-content:center;align-items:center;z-index:10000}
-.popup-box{background:white;width:650px;max-width:95%;max-height:90vh;overflow-y:auto;border-radius:25px;padding:35px;box-shadow:0 25px 60px rgba(0,0,0,0.35);position:relative}
-.popup-close{position:absolute;top:15px;right:20px;font-size:28px;font-weight:bold;color:#555;cursor:pointer;transition:0.2s}
-.popup-close:hover{color:#e53935}
-.detail{background:#f4f6f8;padding:12px;border-radius:10px;margin-bottom:10px}
-.popup-buttons{display:flex;justify-content:space-between;margin-top:20px}
-.popup-btn{padding:12px 22px;border:none;border-radius:10px;font-weight:bold;cursor:pointer}
-.cancel{background:#e53935;color:white}
-.cancel:hover{background:#d32f2f}
-.confirm{background:#138808;color:white}
-.message-box{background:white;padding:30px;width:400px;border-radius:20px;text-align:center}
+/* container */
+.container {
+  max-width:1200px;
+  margin:120px auto;
+  padding:0 20px;
+}
+
+/* grid (same BUY page) */
+.crop-grid {
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(320px,1fr));
+  gap:25px;
+}
+
+/* card */
+.crop-card {
+  background:white;
+  border-radius:25px;
+  padding:20px;
+  box-shadow:0 18px 40px rgba(0,0,0,0.15);
+  border-top:6px solid #ff9933;
+  border-bottom:6px solid #138808;
+  transition:.3s;
+}
+
+.crop-card:hover {
+  transform:translateY(-5px);
+}
+
+/* badge */
+.badge {
+  display:inline-block;
+  padding:6px 12px;
+  border-radius:8px;
+  color:white;
+  font-weight:700;
+  margin-top:10px;
+}
+
+/* buttons */
+.btn-row {
+  display:flex;
+  justify-content:space-between;
+  margin-top:15px;
+}
+
+.btn {
+  padding:10px;
+  border:none;
+  border-radius:8px;
+  font-weight:700;
+  cursor:pointer;
+  width:48%;
+}
+
+.accept { background:#16a34a; color:white; }
+.decline { background:#dc2626; color:white; }
+
+/* popup */
+.popup {
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.6);
+  display:none;
+  justify-content:center;
+  align-items:center;
+}
+
+.popup-box {
+  background:white;
+  padding:25px;
+  border-radius:15px;
+  text-align:center;
+}
 </style>
 </head>
+
 <body>
 
-<div class="top-nav">
-  <div class="nav-left">
-    <button class="hamburger-btn" id="menuBtn">
-      <div class="hamburger-icon"><span></span><span></span><span></span></div>
-    </button>
-    <p class="brand-title">Krishi Mitr</p>
-  </div>
-  <div class="nav-right">
-    <div class="profile-btn" onclick="location.href='Profile'">
-      <img src="profile_pic.png" alt="Profile">
-    </div>
-    <button class="logout-btn" id="logoutBtn">Logout</button>
-  </div>
-</div>
-
-<div class="nav-overlay" id="navOverlay" hidden></div>
-<nav class="side-drawer" id="sideNav" hidden>
-  <div class="drawer-inner">
-    <div class="menu-section">
-      <div class="menu-section-title">Main</div>
-      <ul class="menu-list">
-        <li><a href="Dashboard">Dashboard</a></li>
-      </ul>
-    </div>
-    <div class="menu-section" id="marketSection" style="display:none;">
-      <div class="menu-section-title">Market</div>
-      <ul class="menu-list">
-        <li><a href="Update_crops">Manage Your Crops</a></li>
-        <li><a href="Sell">Sell Your Crop</a></li>
-      </ul>
-    </div>
-    <div class="menu-section">
-      <div class="menu-section-title">Tools & Services</div>
-      <ul class="menu-list">
-        <li><a href="Buy">Buy Crops</a></li>
-        <li><a href="browse_tools.html">Rent Tools & Machinery</a></li>
-        <li class="farmer-only" style="display:none;"><a href="tools_rental.html">List Tool for Rent</a></li>
-        <li class="farmer-only" style="display:none;"><a href="my_listings.html">My Tool Inventory</a></li>
-        <li><a href="krishimitr">Crop Predictor</a></li>
-        <li><a href="advisor">Crop Advisor</a></li>
-      </ul>
-    </div>
-    <div class="menu-section" style="margin-bottom:0;">
-      <div class="menu-section-title">System</div>
-      <ul class="menu-list">
-        <li><a href="Notification">Notification</a></li>
-        <li><a href="Chat">Chat</a></li>
-      </ul>
-    </div>
-  </div>
-</nav>
-
 <div class="container">
-  <div class="crop-grid" id="cropGrid"></div>
+  <h2 style="color:#0a3d62;">📢 Incoming Orders</h2>
+  <div id="notifBox" class="crop-grid"></div>
 </div>
 
-<div id="buyPopup" class="popup-overlay">
+<!-- CONFIRM POPUP -->
+<div id="popup" class="popup">
   <div class="popup-box">
-    <span class="popup-close" onclick="closeBuyPopup()">&times;</span>
-    <h2>Crop Details</h2>
-    <div id="cropDetails"></div>
-    <input type="number" id="buyQuantity" placeholder="Enter quantity (kg)" style="width: 100%; padding: 10px; margin-top: 15px; border-radius: 8px; border: 1px solid #ccc;">
-    <div class="popup-buttons">
-      <button class="popup-btn cancel" onclick="closeBuyPopup()">Cancel</button>
-      <button class="popup-btn confirm" onclick="confirmBuy()">Confirm Purchase</button>
-    </div>
+    <p>Do you want to accept this order?</p>
+    <button onclick="confirmAccept()">Yes</button>
+    <button onclick="closePopup()">No</button>
   </div>
 </div>
 
-<div id="messagePopup" class="popup-overlay">
-  <div class="message-box">
-    <p id="messageText"></p>
-    <button onclick="closeMessage()">OK</button>
-  </div>
-</div>
 <script>
 const db = window.db;
-const loginid = sessionStorage.getItem("loginid");
-const usertype = sessionStorage.getItem("usertype");
+const loginid = Number(sessionStorage.getItem("loginid"));
 
 if (!loginid) {
   location.href = "login";
 }
 
-let selectedCrop = null;
+let selectedOrder = null;
 
-// ✅ Role UI
-function applyRolePermissions() {
-  if (usertype === "Farmer") {
-    document.getElementById("marketSection").style.display = "block";
-    document.querySelectorAll(".farmer-only").forEach(el => el.style.display = "block");
-  }
-}
+// 🔥 LOAD NOTIFICATIONS
+async function loadNotifications() {
 
-// ✅ Load crops
-async function loadCrops() {
-
-  // ✅ Fetch crops
-  const { data: crops, error } = await db
-    .from("crop_sales")
+  const { data, error } = await db
+    .from("buy_table")
     .select("*")
-    .neq("lid", loginid);
+    .eq("fid", loginid) // ONLY farmer orders
+    .order("id", { ascending:false });
 
-  if (error) {
-    console.error(error);
+  console.log("DATA:", data);
+
+  const box = document.getElementById("notifBox");
+  box.innerHTML = "";
+
+  if (!data || data.length === 0) {
+    box.innerHTML = "<p>No orders yet</p>";
     return;
   }
 
-  // ✅ Fetch user's orders
-  const { data: myOrders } = await db
-    .from("buy_table")
-    .select("cid, status, is_confirmed")
-    .eq("lid", loginid);
+  data.forEach(order => {
 
-  const grid = document.getElementById("cropGrid");
-  grid.innerHTML = "";
+    let badgeColor = "#f59e0b";
 
-  crops.forEach(crop => {
-
-    const order = myOrders?.find(o => o.cid === crop.id);
-
-    let buttonText = "Buy Now";
-    let disabled = false;
-    let badge = "";
-
-    // ✅ CASE 1: OUT OF STOCK
-  if (crop.quantity <= 0) {
-      buttonText = "Out of Stock";
-      disabled = true;
-      badge = `<span style="color:#dc2626;font-weight:700;">Out of Stock</span>`;
-    }
-
-    // ✅ CASE 2: USER ALREADY ORDERED
-    else if (order) {
-      disabled = true;
-
-      if (order.status === "Pending") {
-        buttonText = "Pending Approval";
-        badge = `<span style="color:#f59e0b;font-weight:700;"> Pending</span>`;
-      }
-
-      if (order.status=== "Confirmed") {
-        buttonText = "Order Confirmed";
-        badge = `<span style="color:#16a34a;font-weight:700;">Confirmed</span>`;
-      }
-    }
+    if (order.status === "Confirmed") badgeColor = "#16a34a";
+    if (order.status === "Declined") badgeColor = "#dc2626";
 
     const card = document.createElement("div");
     card.className = "crop-card";
 
     card.innerHTML = `
-      <h3>${crop.crop_name}</h3>
-      <p><b>Farmer:</b> ${crop.farmer_name}</p>
-      <p><b>Available:</b> ${crop.quantity} kg</p>
-      <p><b>Quality:</b> ${crop.quality}</p>
-      ${badge}
-      <div class="price">₹${crop.price}/kg</div>
+      <h3>${order.cname}</h3>
+      <p><b>Buyer:</b> ${order.buyer_name}</p>
+      <p><b>Quantity:</b> ${order.quantity} kg</p>
+      <p><b>Total:</b> ₹${order.total_price}</p>
 
-      <button 
-        ${disabled ? "disabled" : ""}
-        style="
-          width:100%;
-          margin-top:15px;
-          padding:12px;
-          background:${disabled ? "#9ca3af" : "#0a3d62"};
-          color:white;
-          border:none;
-          border-radius:10px;
-          cursor:${disabled ? "not-allowed" : "pointer"};
-          font-weight:700;">
-        ${buttonText}
-      </button>
+      <p style="margin-top:10px;">
+        ${order.buyer_name} wants to buy ${order.quantity} kg of ${order.cname}
+      </p>
+
+      <span class="badge" style="background:${badgeColor}">
+        ${order.status}
+      </span>
     `;
 
-    if (!disabled) {
-      card.querySelector("button").onclick = () => openBuyPopup(crop);
+    // 🔥 SHOW BUTTONS ONLY IF PENDING
+    if (order.status === "Pending") {
+
+      const btns = document.createElement("div");
+      btns.className = "btn-row";
+
+      btns.innerHTML = `
+        <button class="btn accept">Accept</button>
+        <button class="btn decline">Decline</button>
+      `;
+
+      btns.querySelector(".accept").onclick = () => openPopup(order);
+      btns.querySelector(".decline").onclick = () => declineOrder(order);
+
+      card.appendChild(btns);
     }
 
-    grid.appendChild(card);
+    box.appendChild(card);
   });
 }
-// ✅ Open popup
-function openBuyPopup(crop) {
-  selectedCrop = crop;
 
-  document.getElementById("cropDetails").innerHTML = `
-    <div class="detail"><b>Farmer:</b> ${crop.farmer_name}</div>
-    <div class="detail"><b>Crop:</b> ${crop.crop_name}</div>
-    <div class="detail"><b>Category:</b> ${crop.crop_category}</div>
-    <div class="detail"><b>Total Quantity:</b> ${crop.quantity} kg</div>
-    <div class="detail"><b>Minimum Order:</b> ${crop.min_quantity} kg</div>
-    <div class="detail"><b>Price:</b> ₹${crop.price}/kg</div>
-    <div class="detail"><b>Location:</b> ${crop.location}</div>
-    <div class="detail"><b>Contact:</b> ${crop.contact_info}</div>
-  `;
-
-  document.getElementById("buyPopup").style.display = "flex";
+// 🔥 OPEN POPUP
+function openPopup(order) {
+  selectedOrder = order;
+  document.getElementById("popup").style.display = "flex";
 }
 
-function closeBuyPopup() {
-  document.getElementById("buyPopup").style.display = "none";
+function closePopup() {
+  document.getElementById("popup").style.display = "none";
 }
 
-// ✅ Message popup
-function showMessage(msg) {
-  document.getElementById("messageText").innerText = msg;
-  document.getElementById("messagePopup").style.display = "flex";
-}
+// 🔥 ACCEPT ORDER
+async function confirmAccept() {
 
-function closeMessage() {
-  document.getElementById("messagePopup").style.display = "none";
-}
-async function confirmBuy() {
-  const qty = parseInt(document.getElementById("buyQuantity").value);
-
-  // ✅ Validate quantity
-  if (!qty || qty <= 0) {
-    showMessage("Please enter a valid quantity");
-    return;
-  }
-
-  if (qty < selectedCrop.min_quantity) {
-    showMessage(`Minimum order is ${selectedCrop.min_quantity} kg`);
-    return;
-  }
-
-  if (qty > selectedCrop.quantity) {
-    showMessage(`Maximum available quantity is ${selectedCrop.quantity} kg`);
-    return;
-  }
-
-  const total = qty * selectedCrop.price;
-
-  // ✅ prevent duplicate order
-const { data: existing } = await db
-  .from("buy_table")
-  .select("*")
-  .eq("lid", loginid)
-  .eq("cid", selectedCrop.id)
-  .maybeSingle();
-
-if (existing) {
-  showMessage("You already placed an order for this crop");
-  return;
-}
+  const order = selectedOrder;
 
   try {
-    // ✅ Fetch buyer name
-    const { data: userData, error: userError } = await db
-      .from("logindata")
-      .select("username")
-      .eq("loginid", loginid) // ensure number
+
+    // ✅ update order
+    await db.from("buy_table")
+      .update({ status:"Confirmed", is_confirmed:true })
+      .eq("id", order.id);
+
+    // ✅ get crop
+    const { data: crop } = await db
+      .from("crop_sales")
+      .select("quantity")
+      .eq("id", order.cid)
       .single();
 
-    if (userError || !userData) {
-      showMessage  ("Unable to fetch buyer information");
-      return;
-    }
+    const newQty = crop.quantity - order.quantity;
 
-    const buyerName = userData.username;
+    // ✅ update crop quantity
+    await db.from("crop_sales")
+      .update({ quantity: newQty })
+      .eq("id", order.cid);
 
-   
-    
-
-/*
-    // Prepare payload
-const insertPayload = {
-  fname: selectedCrop.farmer_name,   // string
-  fid: selectedCrop.lid,             // number (int4)
-  cname: selectedCrop.crop_name,     // string
-  cid: selectedCrop.id,               // number (int8)
-  status: "Pending",
-  lid: loginid,                       // string
-  quantity: qty,                      // number
-  buyer_name: buyerName,              // string
-  price_per_kg: Number(selectedCrop.price),
-  total_price: Number(total),
-  is_confirmed: false
-};
-
-    // ✅ Insert into buy_table (bigint as numbers, no strings)
-    const { data: buyData, error: buyError } = await db
-  .from("buy_table")
-  .insert([insertPayload])
-  .select("*")
-  .single();*/
-     const { data: buyData, error: buyError } = await db
-  .from("buy_table")
-  .insert([{fname:selectedCrop.farmer_name,   // string
-            fid: selectedCrop.lid,
-            cname: selectedCrop.crop_name,
-            cid: selectedCrop.id,
-            status: "Pending",
-             lid: loginid,
-            quantity: qty,
-            buyer_name: buyerName,
-            price_per_kg: Number(selectedCrop.price),
-            total_price: Number(total),
-            is_confirmed: false}])
-  .select("*")
-  .single();
-    if (buyError) {
-      console.error("Buy Table Insert Error:", buyError);
-      showMessage(buyError.message || "Purchase failed");
-      return;
-    }
-
-    // ✅ Insert notification for farmer
-    if (buyData) {
-      await db.from("notifications").insert({
-        user_id: Number(selectedCrop.lid),  // farmer id as number
-        buy_id: Number(buyData.id),         // buy id as number
-        title: "New Purchase Request",
-        message: `${buyerName} ordered ${qty} kg of ${selectedCrop.crop_name} (₹${total})`,
-        status: "Pending",
-        is_read: false
-      });
-    }
-
-    showMessage(`Purchase Request Sent!\nTotal Cost: ₹${total}`);
-    closeBuyPopup();
-    loadCrops();
+    alert("Order Confirmed!");
 
   } catch (err) {
-    console.error("Unexpected Error:", err);
-    showMessage("Something went wrong, please try again.");
+    console.error(err);
+    alert("Error occurred");
   }
-}
-const menuBtn = document.getElementById("menuBtn");
-const sideNav = document.getElementById("sideNav");
-const navOverlay = document.getElementById("navOverlay");
 
-function openDrawer() {
-  document.body.classList.add("drawer-open");
-  sideNav.hidden = false;
-  navOverlay.hidden = false;
+  closePopup();
+  loadNotifications();
 }
 
-function closeDrawer() {
-  document.body.classList.remove("drawer-open");
-  setTimeout(() => {
-    sideNav.hidden = true;
-    navOverlay.hidden = true;
-  }, 200);
+// 🔥 DECLINE ORDER
+async function declineOrder(order) {
+
+  await db.from("buy_table")
+    .update({ status:"Declined" })
+    .eq("id", order.id);
+
+  alert("Order Declined");
+  loadNotifications();
 }
 
-menuBtn.onclick = () => {
-  document.body.classList.contains("drawer-open") ? closeDrawer() : openDrawer();
-};
-
-navOverlay.onclick = closeDrawer;
-
-document.getElementById("logoutBtn").onclick = () => {
-  sessionStorage.clear();
-  location.href = "login";
-};
-
-applyRolePermissions();
-loadCrops();
+// INIT
+loadNotifications();
 </script>
+
 </body>
 </html>
