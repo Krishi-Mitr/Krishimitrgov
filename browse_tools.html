@@ -389,6 +389,7 @@ const payload = {
 
 // 🔍 Print everything
 console.log("Sending Notification Data:", payload);
+  console.log("ERROR:", error);
 await db
 .from("tool_rentals")
 .update({
