@@ -376,7 +376,19 @@ total_price: price,
 sender_name: user?.name || "Farmer",
 status: "pending"
 }]);
+const payload = {
+  sender_id: String(loginid),
+  receiver_id: String(ownerId),
+  tool_id: id,
+  tool_name: name,
+  requested_days: 1,
+  total_price: price,
+  sender_name: user?.name || "Farmer",
+  status: "pending"
+};
 
+// 🔍 Print everything
+console.log("Sending Notification Data:", payload);
 await db
 .from("tool_rentals")
 .update({
