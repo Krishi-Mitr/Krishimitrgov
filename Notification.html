@@ -150,9 +150,10 @@ body.drawer-open .side-drawer { transform:translateX(0); }
 
 /* dropdown */
 .dropdown {
-  margin-bottom: 25px; /* increased spacing */
+  margin-bottom: 30px;
   border-radius: 12px;
   overflow: hidden;
+  background: transparent;
 }
 
 .dropdown-header {
@@ -168,7 +169,11 @@ body.drawer-open .side-drawer { transform:translateX(0); }
 
 .dropdown-content {
   display: none;
-  padding-top: 15px;
+  padding: 20px;
+  background: white;              /* ✅ FIX: solid background */
+  border-radius: 0 0 12px 12px;   /* matches dropdown */
+  box-shadow: 0 10px 25px rgba(0,0,0,0.08); /* subtle separation */
+   margin-top: 5px; /* creates gap from header */
 }
 .no-data {
   text-align: center;
@@ -183,7 +188,7 @@ body.drawer-open .side-drawer { transform:translateX(0); }
 .grid {
   display: grid;
   grid-template-columns: repeat(auto-fit,minmax(320px,1fr));
-  gap: 25px;
+  gap: 20px;
 }
 
 /* card (same style as buy) */
