@@ -240,7 +240,7 @@ document.getElementById("logoutBtn").onclick = () => {
 };
 
 async function fetchMyTools() {
-  const { data, error } = await db.from("tool_rentals").select("*").eq("lid", loginid);
+  const { data, error } = await db.from("tool_rentals").select("*").eq("user_id", loginid);
   if (error) return;
   
   const grid = document.getElementById("toolGrid");
