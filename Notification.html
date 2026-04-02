@@ -415,7 +415,7 @@ async function loadNotifications(){
   const { data } = await db
     .from("notifications")   // 👉 your table name
     .select("*")
-    .eq("receiver_id", loginid)  // 👉 change if needed
+    .eq("receiver_id", loginid.toString())  // 👉 change if needed
     .order("id", { ascending: false });
 
   const box = document.getElementById("toolContent");
