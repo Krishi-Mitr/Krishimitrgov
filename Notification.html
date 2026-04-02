@@ -410,6 +410,50 @@ async function loadNotifications(){
   });
 }
 
+  async function loadToolNotifications(){
+
+  const { data } = await db
+    .from("Notifications")   // 👉 your table name
+    .select("*")
+    .eq("receiver_id", loginid)  // 👉 change if needed
+    .order("id", { ascending: false });
+
+  const box = document.getElementById("toolContent");
+  box.innerHTML = "";
+
+  if(!data || data.length === 0){
+    box.innerHTML = `<div class="no-data">No Notifications</div>`;
+    return;
+  }
+
+  data.forEach(o => {
+
+    const card = document.createElement("div");
+    card.className = "card";
+
+    card.innerHTML = `
+      <p>
+        <b>${o.sender_name}</b> has rented your 
+        <b>${o.tool_name}</b> for 
+        <b>${o.requested_days} days</b> 
+        at the rate of 
+        <b>₹${o.total_price}</b>.
+      </p>
+
+      <p style="margin-top:15px; color:#0a3d62; font-weight:600; cursor:pointer;">
+        👉 Go to Notifications
+      </p>
+    `;
+
+    // optional click redirect
+    card.onclick = () => {
+      window.location.href = "Notification"; // change if needed
+    };
+
+    box.appendChild(card);
+  });
+}
+
 /* popup */
 function openPopup(order,type){
   selectedOrder=order;
@@ -454,6 +498,7 @@ async function confirmAction(){
 }
 
 loadNotifications();
+loadToolNotifications(); // ✅ ADD THIS  
 </script>
 
 </body>
