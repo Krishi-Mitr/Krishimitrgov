@@ -382,7 +382,7 @@ const { data: user } = await db
 // 🔍 Print everything
 console.log("Sending Notification Data:", payload);
   
-const { data, error }= await db
+const { data1, error }= await db
 .from("tool_rentals")
 .update({
 requester_id: loginid,
