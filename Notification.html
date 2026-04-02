@@ -337,19 +337,23 @@ logoutBtn.onclick=()=>{
 
 /* dropdown */
 function toggle(id){
- const el = document.getElementById(id);
 
-  if(el.style.display === "none" || el.style.display === ""){
-    if(id === "cropContent"){
-      el.style.display = "grid";
+  const sections = ["cropContent", "toolContent"];
+
+  sections.forEach(sec => {
+    const el = document.getElementById(sec);
+
+    if(sec === id){
+      if(el.style.display === "none" || el.style.display === ""){
+        el.style.display = (sec === "cropContent") ? "grid" : "block";
+      } else {
+        el.style.display = "none";
+      }
     } else {
-      el.style.display = "block";
+      el.style.display = "none"; // ✅ close others
     }
-  } else {
-    el.style.display = "none";
-  }
+  });
 }
-
 /* load */
 async function loadNotifications(){
 
