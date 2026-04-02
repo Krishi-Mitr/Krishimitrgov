@@ -366,7 +366,10 @@ async function loadNotifications(){
   const box=document.getElementById("cropContent");
   box.innerHTML="";
   if(!data || data.length === 0){
-    box.style.display = "block";
+    if(!data || data.length === 0){
+  box.innerHTML = `<div class="no-data">No Notifications</div>`;
+  return; // ❌ do NOT change display
+}
     box.innerHTML = `<div class="no-data">No Notifications</div>`;
     return;
   }
