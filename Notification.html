@@ -413,7 +413,7 @@ async function loadNotifications(){
   async function loadToolNotifications(){
 
   const { data } = await db
-    .from("Notifications")   // 👉 your table name
+    .from("notifications")   // 👉 your table name
     .select("*")
     .eq("receiver_id", loginid)  // 👉 change if needed
     .order("id", { ascending: false });
