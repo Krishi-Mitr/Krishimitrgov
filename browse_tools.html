@@ -366,19 +366,21 @@ const { data: user } = await db
 .eq("loginid", loginid)
 .maybeSingle();
 
-const { data, error } = await db.from("notifications").insert([{
-sender_id: String(loginid),
-receiver_id: String(ownerId),
-tool_id: id,
-tool_name: name,
-requested_days: 1,
-total_price: price,
-sender_name: user?.name || "Farmer",
-status: "pending"
-}]);
+  const payload = {
+  sender_id: String(loginid),
+  receiver_id: String(ownerId),
+  tool_id: id,
+  tool_name: name,
+  requested_days: 1,
+  total_price: price,
+  sender_name: user?.name || "Farmer",
+  status: "Pending" // 🔥 FIXED (capital P)
+};
+  
+const { data, error } = await db.from("notifications").insert([payload]);
 
 // 🔍 Print everything
-console.log("Sending Notification Data:", data);
+console.log("Sending Notification Data:", payload);
   console.log("ERROR:", error);
 await db
 .from("tool_rentals")
