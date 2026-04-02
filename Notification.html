@@ -412,11 +412,13 @@ async function loadNotifications(){
 
   async function loadToolNotifications(){
 
-  const { data } = await db
-    .from("notifications")   // 👉 your table name
+  const { data, error } = await db
+    .from("notifications")
     .select("*")
-    .eq("receiver_id", loginid.toString())  // 👉 change if needed
+    .eq("receiver_id", loginid.toString())  // ✅ FIX
     .order("id", { ascending: false });
+
+  console.log("TOOL DATA:", data, error); // 👈 DEBUG
 
   const box = document.getElementById("toolContent");
   box.innerHTML = "";
@@ -441,14 +443,9 @@ async function loadNotifications(){
       </p>
 
       <p style="margin-top:15px; color:#0a3d62; font-weight:600; cursor:pointer;">
-        👉 Go to Notifications
+        Go to Notifications
       </p>
     `;
-
-    // optional click redirect
-    card.onclick = () => {
-      window.location.href = "Notification"; // change if needed
-    };
 
     box.appendChild(card);
   });
