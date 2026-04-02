@@ -381,15 +381,15 @@ const { data, error } = await db.from("notifications").insert([payload]);
 
 // 🔍 Print everything
 console.log("Sending Notification Data:", payload);
-  console.log("ERROR:", error);
-await db
+  
+const { data, error }= await db
 .from("tool_rentals")
 .update({
 requester_id: loginid,
 is_available: false
 })
 .eq("id", id);
-
+ console.log("ERROR:", error);
 alert("Request sent!");
 
 fetchTools();
