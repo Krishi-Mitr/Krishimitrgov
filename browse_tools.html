@@ -366,7 +366,7 @@ const { data: user } = await db
 .eq("loginid", loginid)
 .maybeSingle();
 
-await db.from("notifications").insert([{
+const { data, error } = await db.from("notifications").insert([{
 sender_id: String(loginid),
 receiver_id: String(ownerId),
 tool_id: id,
