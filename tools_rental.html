@@ -247,6 +247,7 @@ input:focus, textarea:focus, select:focus { outline: none; border-color: #138808
         <li><a href="Dashboard">Dashboard</a></li>
       </ul>
     </div>
+      <div class="menu-section">
       <div class="menu-section-title">Market</div>
       <ul class="menu-list">
         <li class="farmer-only" style="display:none;"><a href="Update_crops">Manage Your Crops</a></li>
@@ -254,7 +255,7 @@ input:focus, textarea:focus, select:focus { outline: none; border-color: #138808
         <li class="farmer-only" style="display:none;"><a href="my_listings.html">My Tool Inventory</a></li>
       </ul>
 
-      </ul>
+      
     </div>
     <div class="menu-section">
       <div class="menu-section-title">Tools & Services</div>
@@ -363,8 +364,14 @@ const db = window.db;
 const loginid = sessionStorage.getItem("loginid");
 const usertype = sessionStorage.getItem("usertype");
 
-if(!loginid || usertype !== "Farmer"){ location.href="login"; }
+if (!loginid) {
+  location.href = "login";
+}
 
+if (usertype !== "Farmer") {
+  alert("Only farmers can access this page");
+  location.href = "Dashboard"; // or home page
+}
 async function loadProfile(){
   const { data } = await db.from("logindata").select("name").eq("loginid", loginid).maybeSingle();
   ownerName.value = data?.name || "";
