@@ -247,21 +247,18 @@ input:focus, textarea:focus, select:focus { outline: none; border-color: #138808
         <li><a href="Dashboard">Dashboard</a></li>
       </ul>
     </div>
-      <div class="menu-section">
       <div class="menu-section-title">Market</div>
       <ul class="menu-list">
         <li><a href="Update_crops">Manage Your Crops</a></li>
         <li><a href="Sell">Sell Your Crop</a></li>
-        <li ><a href="my_listings.html">My Tool Inventory</a></li>
       </ul>
-
-      
     </div>
     <div class="menu-section">
       <div class="menu-section-title">Tools & Services</div>
       <ul class="menu-list">
         <li><a href="Buy">Buy Crops</a></li>
         <li><a href="browse_tools.html">Rent Tools & Machinery</a></li>
+        <li ><a href="my_listings.html">My Tool Inventory</a></li>
         <li><a href="krishimitr">Crop Predictor</a></li>
                 <li><a href="advisor">Crop Advisor</a></li>
 
@@ -270,7 +267,7 @@ input:focus, textarea:focus, select:focus { outline: none; border-color: #138808
     <div class="menu-section" style="margin-bottom:0;">
       <div class="menu-section-title">System</div>
       <ul class="menu-list">
-        <li ><a href="Notification">Notification</a></li>
+        <li><a href="Notification">Notification</a></li>
         <li><a href="Chat">Chat</a></li>
       </ul>
     </div>
@@ -364,14 +361,8 @@ const db = window.db;
 const loginid = sessionStorage.getItem("loginid");
 const usertype = sessionStorage.getItem("usertype");
 
-if (!loginid) {
-  location.href = "login";
-}
+if(!loginid || usertype !== "Farmer"){ location.href="login"; }
 
-if (usertype !== "Farmer") {
-  alert("Only farmers can access this page");
-  location.href = "Dashboard"; // or home page
-}
 async function loadProfile(){
   const { data } = await db.from("logindata").select("name").eq("loginid", loginid).maybeSingle();
   ownerName.value = data?.name || "";
