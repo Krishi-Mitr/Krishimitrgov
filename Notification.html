@@ -454,13 +454,12 @@ async function loadNotifications(){
 }
   async function loadToolNotifications(){
 
+  const usertype = sessionStorage.getItem("usertype");
+
   const { data, error } = await db
     .from("notifications")
     .select("*")
-    .eq("receiver_id", loginid.toString())  // ✅ FIX
     .order("id", { ascending: false });
-
-  console.log("TOOL DATA:", data, error); // 👈 DEBUG
 
   const box = document.getElementById("toolContent");
   box.innerHTML = "";
@@ -475,22 +474,41 @@ async function loadNotifications(){
     const card = document.createElement("div");
     card.className = "card";
 
-    card.innerHTML = `
-      <p>
-        <b>${o.sender_name}</b> has rented your 
-        <b>${o.tool_name}</b> for 
-        <b>${o.requested_days} days</b> 
-        at the rate of 
-        <b>₹${o.total_price}</b>.
-      </p>
+    // 🎯 CITIZEN VIEW
+    if(usertype === "Citizen" && o.sender_id == loginid){
 
+      card.innerHTML = `
+        <p>
+          You have rented <b>${o.tool_name}</b> 
+          for rupee <b>₹${o.total_price}</b>.
+        </p>
+      `;
 
-    `;
+      box.appendChild(card);
+    }
 
-    box.appendChild(card);
+    // 🔧 OWNER / FARMER VIEW (your existing one)
+    else if(usertype !== "Citizen" && o.receiver_id == loginid.toString()){
+
+      card.innerHTML = `
+        <p>
+          <b>${o.sender_name}</b> has rented your 
+          <b>${o.tool_name}</b> for 
+          <b>${o.requested_days} days</b> 
+          at the rate of 
+          <b>₹${o.total_price}</b>.
+        </p>
+      `;
+
+      box.appendChild(card);
+    }
+
   });
-}
 
+  if(box.innerHTML === ""){
+    box.innerHTML = `<div class="no-data">No Notifications</div>`;
+  }
+}
 /* popup */
 function openPopup(order,type){
   selectedOrder=order;
