@@ -11,86 +11,182 @@
 <script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@latest/dist/teachablemachine-image.min.js"></script>
 
 <style>
-/* KEEP YOUR ORIGINAL STYLES (unchanged) */
+/* 🌈 TRICOLOR BACKGROUND */
 body {
   margin: 0;
-  font-family: "Poppins", Arial, sans-serif;
-  min-height: 100vh;
-  background: linear-gradient(180deg,#f6e2cc 0%,#f7f9f8 45%,#dceee3 100%);
+  font-family: "Poppins", Arial;
+  background: linear-gradient(180deg,#ffedd5 0%,#ffffff 50%,#dcfce7 100%);
 }
 
-/* ADD THIS NEW ML BOX */
+/* NAVBAR */
+.top-nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: 78px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 32px;
+  background: linear-gradient(90deg,#ff9933,#ffffff,#138808);
+  border-bottom: 3px solid #0a3d62;
+  box-shadow: 0 6px 14px rgba(0,0,0,0.15);
+  z-index: 9999;
+}
+
+.nav-left { display: flex; align-items: center; gap: 14px; }
+.brand-title { font-weight: 800; color: #0a3d62; }
+
+/* 🍔 HAMBURGER */
+.hamburger-btn {
+  width: 44px; height: 44px;
+  border-radius: 12px;
+  border: 2px solid #0a3d62;
+  background: linear-gradient(135deg,#ff9933,#ffffff,#138808);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+}
+.hamburger-icon {
+  width: 22px; height: 16px; position: relative;
+}
+.hamburger-icon span {
+  position: absolute;
+  left: 0; right: 0;
+  height: 3px;
+  background: #0a3d62;
+  border-radius: 999px;
+  transition: 0.3s;
+}
+.hamburger-icon span:nth-child(1){ top:0; }
+.hamburger-icon span:nth-child(2){ top:6px; }
+.hamburger-icon span:nth-child(3){ top:12px; }
+
+/* ANIMATION */
+body.drawer-open .hamburger-icon span:nth-child(1){
+  transform: rotate(45deg); top:6px;
+}
+body.drawer-open .hamburger-icon span:nth-child(2){
+  opacity:0;
+}
+body.drawer-open .hamburger-icon span:nth-child(3){
+  transform: rotate(-45deg); top:6px;
+}
+
+/* RIGHT NAV */
+.nav-right { display:flex; align-items:center; gap:15px; }
+
+.logout-btn {
+  background: linear-gradient(90deg,#ff9933,#ffffff,#138808);
+  border:2px solid #0a3d62;
+  padding:10px 18px;
+  border-radius:10px;
+  font-weight:700;
+  cursor:pointer;
+}
+.logout-btn:hover {
+  background:#0a3d62;
+  color:white;
+}
+
+.profile-btn img {
+  width:42px;
+  height:42px;
+  border-radius:50%;
+  border:2px solid #0a3d62;
+}
+
+/* DRAWER */
+.nav-overlay {
+  position:fixed; inset:0;
+  background:rgba(0,0,0,0.3);
+  opacity:0; pointer-events:none;
+  transition:0.2s;
+}
+.side-drawer {
+  position:fixed;
+  top:84px; left:14px;
+  width:300px;
+  background:linear-gradient(180deg,#0a3d62,#082032);
+  border-radius:18px;
+  transform:translateX(-110%);
+  transition:0.3s;
+  padding:15px;
+  color:white;
+}
+body.drawer-open .nav-overlay { opacity:1; pointer-events:auto; }
+body.drawer-open .side-drawer { transform:translateX(0); }
+
+/* 🌿 ML CARD */
+.container {
+  margin-top:150px;
+  display:flex;
+  justify-content:center;
+}
+
 .ml-card {
-  background: rgba(255,255,255,0.9);
-  padding: 40px;
-  border-radius: 25px;
-  box-shadow: 0 20px 45px rgba(0,0,0,0.15);
-  text-align: center;
-  max-width: 420px;
-  width: 100%;
+  background: linear-gradient(135deg,#ffffff,#f0fff4);
+  padding:40px;
+  border-radius:25px;
+  text-align:center;
+  width:400px;
+  box-shadow:0 20px 45px rgba(0,0,0,0.2);
 }
 
-.ml-card h2 {
-  color: #0a3d62;
-}
+.ml-card h2 { color:#0a3d62; }
 
 .ml-card img {
-  max-width: 100%;
-  margin-top: 10px;
-  border-radius: 10px;
+  max-width:100%;
+  margin-top:10px;
+  border-radius:10px;
 }
 
 .ml-card button {
-  margin-top: 10px;
-  padding: 10px;
-  width: 100%;
-  border: none;
-  border-radius: 8px;
-  background: green;
-  color: white;
-  font-weight: bold;
-  cursor: pointer;
+  margin-top:10px;
+  padding:10px;
+  width:100%;
+  border:none;
+  border-radius:8px;
+  background:green;
+  color:white;
+  font-weight:bold;
+  cursor:pointer;
 }
 
 #result {
-  margin-top: 15px;
-  font-size: 18px;
+  margin-top:15px;
+  font-size:18px;
 }
 </style>
 </head>
 
 <body>
 
-<!-- NAVBAR (UNCHANGED) -->
+<!-- NAV -->
 <div class="top-nav">
   <div class="nav-left">
     <button class="hamburger-btn" id="menuBtn">
-      <div class="hamburger-icon"><span></span><span></span><span></span></div>
+      <div class="hamburger-icon">
+        <span></span><span></span><span></span>
+      </div>
     </button>
     <p class="brand-title">Krishi Mitr</p>
   </div>
+
   <div class="nav-right">
-    <div class="profile-btn" onclick="location.href='Profile'">
+    <div class="profile-btn">
       <img src="profile_pic.png">
     </div>
     <button class="logout-btn" id="logoutBtn">Logout</button>
   </div>
 </div>
 
-<!-- DRAWER (UNCHANGED) -->
-<div class="nav-overlay" id="navOverlay" hidden></div>
-<nav class="side-drawer" id="sideNav" hidden>
-  <div class="drawer-inner">
-    <div class="menu-section">
-      <div class="menu-section-title">Tools & Services</div>
-      <ul class="menu-list">
-        <li><a href="#">Plant Disease Detector</a></li>
-      </ul>
-    </div>
-  </div>
+<div class="nav-overlay" id="navOverlay"></div>
+
+<nav class="side-drawer" id="sideNav">
+  <p>🌿 Plant Detector</p>
 </nav>
 
-<!-- 🌿 ML SECTION (REPLACES WELCOME CARD) -->
+<!-- 🌿 ML UI -->
 <div class="container">
   <div class="ml-card">
     <h2>🌿 Plant Disease Detector</h2>
@@ -113,7 +209,7 @@ const input = document.getElementById("imageInput");
 const preview = document.getElementById("preview");
 const result = document.getElementById("result");
 
-/* preview */
+/* IMAGE PREVIEW */
 input.onchange = () => {
   const file = input.files[0];
   if (!file) return;
@@ -123,26 +219,25 @@ input.onchange = () => {
   reader.readAsDataURL(file);
 };
 
-/* load model */
+/* LOAD MODEL */
 async function loadModel() {
   model = await tmImage.load(URL + "model.json", URL + "metadata.json");
 }
 
-/* analyze */
+/* ANALYZE */
 async function analyze() {
   if (!input.files[0]) {
     alert("Upload image first");
     return;
   }
 
-  result.innerText = "Analyzing plant... 🌱";
+  result.innerText = "Analyzing... 🌱";
 
   if (!model) await loadModel();
 
   const prediction = await model.predict(preview);
 
   let best = prediction[0];
-
   prediction.forEach(p => {
     if (p.probability > best.probability) best = p;
   });
@@ -153,37 +248,23 @@ async function analyze() {
   `;
 }
 
-/* KEEP YOUR DASHBOARD LOGIC */
-const db = window.db;
+/* NAV LOGIC */
+const menuBtn = document.getElementById("menuBtn");
+const sideNav = document.getElementById("sideNav");
+const navOverlay = document.getElementById("navOverlay");
+
+menuBtn.onclick = () => {
+  document.body.classList.toggle("drawer-open");
+};
+
+navOverlay.onclick = () => {
+  document.body.classList.remove("drawer-open");
+};
 
 document.getElementById("logoutBtn").onclick = () => {
   sessionStorage.clear();
   location.href = "login";
 };
-
-const menuBtn = document.getElementById("menuBtn");
-const sideNav = document.getElementById("sideNav");
-const navOverlay = document.getElementById("navOverlay");
-
-function openDrawer(){
-  document.body.classList.add("drawer-open");
-  sideNav.hidden=false;
-  navOverlay.hidden=false;
-}
-
-function closeDrawer(){
-  document.body.classList.remove("drawer-open");
-  setTimeout(()=>{
-    sideNav.hidden=true;
-    navOverlay.hidden=true;
-  },220);
-}
-
-menuBtn.onclick=()=>{
-  document.body.classList.contains("drawer-open") ? closeDrawer() : openDrawer();
-};
-
-navOverlay.onclick=closeDrawer;
 </script>
 
 </body>
