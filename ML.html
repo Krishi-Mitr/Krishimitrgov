@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Plant Disease Detector - Krishi Mitr</title>
+<title>Plant Detector - Krishi Mitr</title>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="supabase.js"></script>
@@ -11,150 +11,121 @@
 <script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@latest/dist/teachablemachine-image.min.js"></script>
 
 <style>
-/* 🌈 TRICOLOR BACKGROUND */
 body {
-  margin: 0;
-  font-family: "Poppins", Arial;
+  margin:0;
+  font-family:"Poppins",Arial;
   background: linear-gradient(180deg,#ffedd5 0%,#ffffff 50%,#dcfce7 100%);
 }
+body.drawer-open{overflow:hidden;}
 
 /* NAVBAR */
-.top-nav {
-  position: fixed;
-  top: 0; left: 0; right: 0;
-  height: 78px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0 32px;
+.top-nav{
+  position:fixed; top:0; left:0; right:0;
+  height:78px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:0 32px;
   background: linear-gradient(90deg,#ff9933,#ffffff,#138808);
-  border-bottom: 3px solid #0a3d62;
-  box-shadow: 0 6px 14px rgba(0,0,0,0.15);
-  z-index: 9999;
+  border-bottom:3px solid #0a3d62;
 }
 
-.nav-left { display: flex; align-items: center; gap: 14px; }
-.brand-title { font-weight: 800; color: #0a3d62; }
+/* HAMBURGER */
+.hamburger-btn{
+  width:44px;height:44px;
+  border-radius:12px;
+  border:2px solid #0a3d62;
+  background: linear-gradient(135deg,#ff9933,#fff,#138808);
+  display:grid;place-items:center;
+  cursor:pointer;
+}
+.hamburger-icon{width:22px;height:16px;position:relative;}
+.hamburger-icon span{
+  position:absolute;
+  left:0;right:0;height:3px;
+  background:#0a3d62;
+  transition:.3s;
+}
+.hamburger-icon span:nth-child(1){top:0;}
+.hamburger-icon span:nth-child(2){top:6px;}
+.hamburger-icon span:nth-child(3){top:12px;}
 
-/* 🍔 HAMBURGER */
-.hamburger-btn {
-  width: 44px; height: 44px;
-  border-radius: 12px;
-  border: 2px solid #0a3d62;
-  background: linear-gradient(135deg,#ff9933,#ffffff,#138808);
-  display: grid;
-  place-items: center;
-  cursor: pointer;
-}
-.hamburger-icon {
-  width: 22px; height: 16px; position: relative;
-}
-.hamburger-icon span {
-  position: absolute;
-  left: 0; right: 0;
-  height: 3px;
-  background: #0a3d62;
-  border-radius: 999px;
-  transition: 0.3s;
-}
-.hamburger-icon span:nth-child(1){ top:0; }
-.hamburger-icon span:nth-child(2){ top:6px; }
-.hamburger-icon span:nth-child(3){ top:12px; }
+body.drawer-open .hamburger-icon span:nth-child(1){transform:rotate(45deg);top:6px;}
+body.drawer-open .hamburger-icon span:nth-child(2){opacity:0;}
+body.drawer-open .hamburger-icon span:nth-child(3){transform:rotate(-45deg);top:6px;}
 
-/* ANIMATION */
-body.drawer-open .hamburger-icon span:nth-child(1){
-  transform: rotate(45deg); top:6px;
-}
-body.drawer-open .hamburger-icon span:nth-child(2){
-  opacity:0;
-}
-body.drawer-open .hamburger-icon span:nth-child(3){
-  transform: rotate(-45deg); top:6px;
-}
+.nav-left{display:flex;align-items:center;gap:14px;}
+.brand-title{font-weight:800;color:#0a3d62;}
 
-/* RIGHT NAV */
-.nav-right { display:flex; align-items:center; gap:15px; }
+.nav-right{display:flex;align-items:center;gap:15px;}
 
-.logout-btn {
-  background: linear-gradient(90deg,#ff9933,#ffffff,#138808);
+.logout-btn{
+  background:linear-gradient(90deg,#ff9933,#fff,#138808);
   border:2px solid #0a3d62;
   padding:10px 18px;
   border-radius:10px;
   font-weight:700;
   cursor:pointer;
 }
-.logout-btn:hover {
-  background:#0a3d62;
-  color:white;
-}
+.logout-btn:hover{background:#0a3d62;color:white;}
 
-.profile-btn img {
-  width:42px;
-  height:42px;
+.profile-btn img{
+  width:42px;height:42px;
   border-radius:50%;
   border:2px solid #0a3d62;
 }
 
 /* DRAWER */
-.nav-overlay {
-  position:fixed; inset:0;
+.nav-overlay{
+  position:fixed;inset:0;
   background:rgba(0,0,0,0.3);
-  opacity:0; pointer-events:none;
-  transition:0.2s;
+  opacity:0;pointer-events:none;
 }
-.side-drawer {
+.side-drawer{
   position:fixed;
-  top:84px; left:14px;
+  top:84px;left:14px;
   width:300px;
   background:linear-gradient(180deg,#0a3d62,#082032);
   border-radius:18px;
   transform:translateX(-110%);
-  transition:0.3s;
+  transition:.3s;
   padding:15px;
-  color:white;
 }
-body.drawer-open .nav-overlay { opacity:1; pointer-events:auto; }
-body.drawer-open .side-drawer { transform:translateX(0); }
+body.drawer-open .nav-overlay{opacity:1;pointer-events:auto;}
+body.drawer-open .side-drawer{transform:translateX(0);}
+
+.menu-section{margin-bottom:12px;}
+.menu-section-title{color:white;font-weight:bold;margin-bottom:5px;}
+.menu-list a{
+  display:block;
+  padding:10px;
+  color:white;
+  text-decoration:none;
+}
+.menu-list a:hover{background:#1e3a8a;}
 
 /* 🌿 ML CARD */
-.container {
+.container{
   margin-top:150px;
   display:flex;
   justify-content:center;
 }
-
-.ml-card {
-  background: linear-gradient(135deg,#ffffff,#f0fff4);
+.ml-card{
+  background:white;
   padding:40px;
-  border-radius:25px;
-  text-align:center;
+  border-radius:20px;
   width:400px;
-  box-shadow:0 20px 45px rgba(0,0,0,0.2);
+  text-align:center;
+  box-shadow:0 15px 40px rgba(0,0,0,0.2);
 }
-
-.ml-card h2 { color:#0a3d62; }
-
-.ml-card img {
-  max-width:100%;
-  margin-top:10px;
-  border-radius:10px;
-}
-
-.ml-card button {
+.ml-card button{
   margin-top:10px;
   padding:10px;
   width:100%;
-  border:none;
-  border-radius:8px;
   background:green;
   color:white;
-  font-weight:bold;
-  cursor:pointer;
-}
-
-#result {
-  margin-top:15px;
-  font-size:18px;
+  border:none;
+  border-radius:8px;
 }
 </style>
 </head>
@@ -182,16 +153,41 @@ body.drawer-open .side-drawer { transform:translateX(0); }
 
 <div class="nav-overlay" id="navOverlay"></div>
 
+<!-- FULL DASHBOARD MENU -->
 <nav class="side-drawer" id="sideNav">
-  <p>🌿 Plant Detector</p>
+  <div class="menu-section">
+    <div class="menu-section-title">Market</div>
+    <div class="menu-list">
+      <a href="Update_crops">Manage Crops</a>
+      <a href="Sell">Sell Crop</a>
+    </div>
+  </div>
+
+  <div class="menu-section">
+    <div class="menu-section-title">Tools & Services</div>
+    <div class="menu-list">
+      <a href="Buy">Buy Crops</a>
+      <a href="browse_tools.html">Rent Tools</a>
+      <a href="krishimitr">Crop Predictor</a>
+      <a href="advisor">Crop Advisor</a>
+    </div>
+  </div>
+
+  <div class="menu-section">
+    <div class="menu-section-title">System</div>
+    <div class="menu-list">
+      <a href="Notification">Notification</a>
+      <a href="Chat">Chat</a>
+    </div>
+  </div>
 </nav>
 
-<!-- 🌿 ML UI -->
+<!-- 🌿 ML CONTENT -->
 <div class="container">
   <div class="ml-card">
     <h2>🌿 Plant Disease Detector</h2>
 
-    <input type="file" id="imageInput" accept="image/*">
+    <input type="file" id="imageInput">
     <img id="preview">
 
     <button onclick="analyze()">Analyze</button>
@@ -202,68 +198,44 @@ body.drawer-open .side-drawer { transform:translateX(0); }
 
 <script>
 const URL = "https://teachablemachine.withgoogle.com/models/DUCzqn8BH/";
-
 let model;
 
 const input = document.getElementById("imageInput");
 const preview = document.getElementById("preview");
 const result = document.getElementById("result");
 
-/* IMAGE PREVIEW */
-input.onchange = () => {
-  const file = input.files[0];
-  if (!file) return;
-
+input.onchange = ()=>{
   const reader = new FileReader();
   reader.onload = e => preview.src = e.target.result;
-  reader.readAsDataURL(file);
+  reader.readAsDataURL(input.files[0]);
 };
 
-/* LOAD MODEL */
-async function loadModel() {
-  model = await tmImage.load(URL + "model.json", URL + "metadata.json");
+async function loadModel(){
+  model = await tmImage.load(URL+"model.json",URL+"metadata.json");
 }
 
-/* ANALYZE */
-async function analyze() {
-  if (!input.files[0]) {
-    alert("Upload image first");
-    return;
-  }
+async function analyze(){
+  if(!model) await loadModel();
 
-  result.innerText = "Analyzing... 🌱";
-
-  if (!model) await loadModel();
+  result.innerText="Analyzing...";
 
   const prediction = await model.predict(preview);
 
   let best = prediction[0];
-  prediction.forEach(p => {
-    if (p.probability > best.probability) best = p;
+  prediction.forEach(p=>{
+    if(p.probability > best.probability) best = p;
   });
 
-  result.innerHTML = `
-    🌿 <b>${best.className}</b><br>
-    Confidence: ${(best.probability * 100).toFixed(2)}%
-  `;
+  result.innerHTML = `${best.className} (${(best.probability*100).toFixed(2)}%)`;
 }
 
-/* NAV LOGIC */
-const menuBtn = document.getElementById("menuBtn");
-const sideNav = document.getElementById("sideNav");
-const navOverlay = document.getElementById("navOverlay");
+/* NAV */
+menuBtn.onclick=()=>document.body.classList.toggle("drawer-open");
+navOverlay.onclick=()=>document.body.classList.remove("drawer-open");
 
-menuBtn.onclick = () => {
-  document.body.classList.toggle("drawer-open");
-};
-
-navOverlay.onclick = () => {
-  document.body.classList.remove("drawer-open");
-};
-
-document.getElementById("logoutBtn").onclick = () => {
+logoutBtn.onclick=()=>{
   sessionStorage.clear();
-  location.href = "login";
+  location.href="login";
 };
 </script>
 
