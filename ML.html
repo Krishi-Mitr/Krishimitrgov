@@ -2,194 +2,159 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Plant Detector - Krishi Mitr</title>
+<title>Disease Detector - Krishi Mitr</title>
 
 <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest/dist/tf.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@latest/dist/teachablemachine-image.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase.js"></script>
 
 <style>
-body{
-  margin:0;
-  font-family:"Poppins",Arial;
+/* SAME GLOBAL STYLE */
+body {
+  margin: 0;
+  font-family: "Poppins", Arial, sans-serif;
+  min-height: 100vh;
   background: linear-gradient(180deg,#f6e2cc 0%,#f7f9f8 45%,#dceee3 100%);
+  color: #1f2937;
 }
-body.drawer-open{overflow:hidden;}
+body.drawer-open { overflow: hidden; }
 
 /* NAVBAR */
-.top-nav{
-  position:fixed;
-  top:0;left:0;right:0;
-  height:78px;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  padding:0 32px;
+.top-nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: 78px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 32px;
   background: linear-gradient(90deg,#ff9933,#ffffff,#138808);
-  border-bottom:3px solid #0a3d62;
-  box-shadow:0 6px 14px rgba(0,0,0,0.15);
-  z-index:9999;
+  border-bottom: 3px solid #0a3d62;
+  box-shadow: 0 6px 14px rgba(0,0,0,0.15);
+  z-index: 9999;
 }
 
-.nav-left{display:flex;align-items:center;gap:14px;}
-.brand-title{font-weight:800;color:#0a3d62;}
+.nav-left { display: flex; align-items: center; gap: 14px; }
 
-/* 🍔 BOXED HAMBURGER */
-.hamburger-btn{
-  width:44px;height:44px;
-  border-radius:12px;
-  border:2px solid #0a3d62;
+.hamburger-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  border: 2px solid #0a3d62;
   background: rgba(255,255,255,0.75);
-  display:grid;
-  place-items:center;
-  cursor:pointer;
-  transition:0.3s;
-}
-.hamburger-btn:hover{
-  transform:scale(1.05);
-  box-shadow:0 0 12px rgba(10,61,98,0.4);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
 }
 
-.hamburger-icon{
-  width:20px;
-  height:14px;
-  position:relative;
+.hamburger-icon {
+  width: 20px;
+  height: 14px;
+  position: relative;
 }
-
-.hamburger-icon span{
-  position:absolute;
-  left:0;right:0;
-  height:2.5px;
-  background:#0a3d62;
-  border-radius:999px;
+.hamburger-icon span {
+  position: absolute;
+  left: 0; right: 0;
+  height: 2.5px;
+  background: #0a3d62;
+  border-radius: 999px;
 }
+.hamburger-icon span:nth-child(1){ top:0; }
+.hamburger-icon span:nth-child(2){ top:5.5px; }
+.hamburger-icon span:nth-child(3){ top:11px; }
 
-.hamburger-icon span:nth-child(1){top:0;}
-.hamburger-icon span:nth-child(2){top:5.5px;}
-.hamburger-icon span:nth-child(3){top:11px;}
-
-/* RIGHT NAV */
-.nav-right{display:flex;align-items:center;gap:15px;}
-
-.profile-btn img{
-  width:42px;height:42px;
-  border-radius:50%;
-  border:2px solid #0a3d62;
-}
-
-.logout-btn{
-  background:white;
-  color:#0a3d62;
-  border:2px solid #0a3d62;
-  padding:10px 18px;
-  border-radius:10px;
-  font-weight:700;
-  cursor:pointer;
-}
-.logout-btn:hover{
-  background:#0a3d62;
-  color:white;
+.brand-title {
+  font-weight: 800;
+  color: #0a3d62;
 }
 
 /* DRAWER */
-.nav-overlay{
-  position:fixed;inset:0;
-  background:rgba(0,0,0,0.25);
-  opacity:0;pointer-events:none;
-  transition:0.2s;
-  z-index:9998;
+.nav-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.25);
+  opacity: 0;
+  pointer-events: none;
+  transition: .2s;
 }
-
-.side-drawer{
-  position:fixed;
-  top:84px;left:14px;
-  width:min(320px,calc(100vw - 28px));
-  background:linear-gradient(180deg,#0a3d62,#082032);
-  border-radius:18px;
-  border:3px solid white;
-  transform:translateX(-110%);
-  transition:0.25s;
-  padding:14px;
-  z-index:9999;
+.side-drawer {
+  position: fixed;
+  top: 84px;
+  left: 14px;
+  width: 320px;
+  background: linear-gradient(180deg,#0a3d62,#082032);
+  border-radius: 18px;
+  transform: translateX(-110%);
+  transition: .25s;
+  color: white;
+  padding: 14px;
 }
+body.drawer-open .nav-overlay { opacity: 1; pointer-events: auto; }
+body.drawer-open .side-drawer { transform: translateX(0); }
 
-body.drawer-open .nav-overlay{opacity:1;pointer-events:auto;}
-body.drawer-open .side-drawer{transform:translateX(0);}
-
-/* MENU */
-.menu-section{
-  border-radius:14px;
-  overflow:hidden;
-  margin-bottom:14px;
-  background:rgba(255,255,255,0.05);
-}
-
-.menu-section-title{
-  padding:12px;
-  color:white;
-  font-weight:800;
-}
-
-.menu-list a{
+.menu-list a {
   display:block;
-  padding:12px;
+  padding:14px;
   color:white;
   text-decoration:none;
-  font-weight:600;
-}
-.menu-list a:hover{
-  background:#1e3a8a;
-  padding-left:18px;
 }
 
-/* 🌿 ML CARD (DASHBOARD STYLE) */
-.container{
-  margin-top:170px;
-  display:flex;
-  justify-content:center;
+/* MAIN */
+.container {
+  max-width: 900px;
+  margin: 150px auto;
+  padding: 20px;
 }
 
-.ml-card{
-  background: rgba(255,255,255,0.85);
-  backdrop-filter: blur(10px);
-  padding:50px 70px;
-  border-radius:25px;
-  border:2px solid rgba(10,61,98,0.15);
-  box-shadow:0 20px 45px rgba(0,0,0,0.15);
-  text-align:center;
-  transition:0.4s;
-}
-.ml-card:hover{
-  transform:translateY(-6px);
-  box-shadow:0 30px 60px rgba(0,0,0,0.2);
+/* CARD STYLE (LIKE BUY PAGE) */
+.ml-card {
+  background: white;
+  border-radius: 25px;
+  padding: 30px;
+  box-shadow: 0 18px 40px rgba(0,0,0,0.15);
+  border-top: 6px solid #ff9933;
+  border-bottom: 6px solid #138808;
+  text-align: center;
 }
 
-.ml-card img{
-  max-width:100%;
-  margin-top:15px;
-  border-radius:12px;
-  border:2px solid rgba(10,61,98,0.1);
+/* IMAGE */
+#preview {
+  max-width: 100%;
+  margin-top: 15px;
+  border-radius: 15px;
 }
 
-.ml-card button{
-  margin-top:15px;
-  padding:12px;
-  width:100%;
-  border:none;
-  border-radius:10px;
-  background: linear-gradient(90deg,#138808,#0a3d62);
-  color:white;
-  font-weight:700;
-  cursor:pointer;
-}
-.ml-card button:hover{
-  transform:translateY(-2px);
+/* BUTTON */
+button {
+  margin-top: 15px;
+  padding: 12px;
+  width: 100%;
+  border: none;
+  border-radius: 10px;
+  background: #0a3d62;
+  color: white;
+  font-weight: 700;
+  cursor: pointer;
 }
 
-#result{
-  margin-top:18px;
-  font-size:18px;
-  color:#0a3d62;
-  font-weight:600;
+/* RESULT BOX */
+.result-box {
+  margin-top: 20px;
+  text-align: left;
+}
+
+.top-result {
+  padding: 15px;
+  border-radius: 12px;
+  background: #e6f4ea;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.prediction {
+  padding: 10px;
+  border-bottom: 1px solid #eee;
 }
 </style>
 </head>
@@ -206,102 +171,96 @@ body.drawer-open .side-drawer{transform:translateX(0);}
     </button>
     <p class="brand-title">Krishi Mitr</p>
   </div>
-
-  <div class="nav-right">
-    <div class="profile-btn">
-      <img src="profile_pic.png">
-    </div>
-    <button class="logout-btn" id="logoutBtn">Logout</button>
-  </div>
 </div>
 
 <div class="nav-overlay" id="navOverlay"></div>
 
-<!-- FULL MENU -->
 <nav class="side-drawer" id="sideNav">
-  <div class="menu-section">
-    <div class="menu-section-title">Market</div>
-    <div class="menu-list">
-      <a href="#">Manage Crops</a>
-      <a href="#">Sell Crop</a>
-    </div>
-  </div>
-
-  <div class="menu-section">
-    <div class="menu-section-title">Tools & Services</div>
-    <div class="menu-list">
-      <a href="#">Buy Crops</a>
-      <a href="#">Rent Tools</a>
-      <a href="#">Crop Predictor</a>
-      <a href="#">Crop Advisor</a>
-    </div>
-  </div>
-
-  <div class="menu-section">
-    <div class="menu-section-title">System</div>
-    <div class="menu-list">
-      <a href="#">Notification</a>
-      <a href="#">Chat</a>
-    </div>
+  <div class="menu-list">
+    <a href="Dashboard">Dashboard</a>
+    <a href="Buy">Buy Crops</a>
+    <a href="Sell">Sell Crops</a>
+    <a href="#">Disease Detector</a>
   </div>
 </nav>
 
-<!-- 🌿 ML -->
+<!-- ML UI -->
 <div class="container">
   <div class="ml-card">
     <h2>🌿 Plant Disease Detector</h2>
 
-    <input type="file" id="imageInput">
+    <input type="file" id="imageInput" accept="image/*">
     <img id="preview">
 
     <button onclick="analyze()">Analyze</button>
 
-    <div id="result"></div>
+    <div id="result" class="result-box"></div>
   </div>
 </div>
 
 <script>
-const URL="https://teachablemachine.withgoogle.com/models/DUCzqn8BH/";
+const URL = "https://teachablemachine.withgoogle.com/models/DUCzqn8BH/";
+
 let model;
+const input = document.getElementById("imageInput");
+const preview = document.getElementById("preview");
+const result = document.getElementById("result");
 
-const input=document.getElementById("imageInput");
-const preview=document.getElementById("preview");
-const result=document.getElementById("result");
-
-input.onchange=()=>{
-  const reader=new FileReader();
-  reader.onload=e=>preview.src=e.target.result;
-  reader.readAsDataURL(input.files[0]);
+/* PREVIEW */
+input.onchange = () => {
+  const file = input.files[0];
+  const reader = new FileReader();
+  reader.onload = e => preview.src = e.target.result;
+  reader.readAsDataURL(file);
 };
 
-async function loadModel(){
-  model=await tmImage.load(URL+"model.json",URL+"metadata.json");
+/* LOAD MODEL */
+async function loadModel() {
+  model = await tmImage.load(URL + "model.json", URL + "metadata.json");
 }
 
-async function analyze(){
-  if(!input.files[0]){alert("Upload image first");return;}
+/* ANALYZE */
+async function analyze() {
+  if (!input.files[0]) return alert("Upload image first");
 
-  result.innerText="Analyzing... 🌱";
+  result.innerHTML = "Analyzing...";
 
-  if(!model) await loadModel();
+  if (!model) await loadModel();
 
-  const prediction=await model.predict(preview);
+  const predictions = await model.predict(preview);
 
-  let best=prediction[0];
-  prediction.forEach(p=>{
-    if(p.probability>best.probability) best=p;
+  // SORT BEST FIRST 🔥
+  predictions.sort((a,b) => b.probability - a.probability);
+
+  let html = `
+    <div class="top-result">
+      🌟 Detected: ${predictions[0].className} 
+      (${(predictions[0].probability*100).toFixed(2)}%)
+    </div>
+  `;
+
+  predictions.forEach(p => {
+    html += `
+      <div class="prediction">
+        ${p.className}: ${(p.probability*100).toFixed(2)}%
+      </div>
+    `;
   });
 
-  result.innerHTML=`🌿 ${best.className}<br>Confidence: ${(best.probability*100).toFixed(2)}%`;
+  result.innerHTML = html;
 }
 
-/* NAV */
-menuBtn.onclick=()=>document.body.classList.toggle("drawer-open");
-navOverlay.onclick=()=>document.body.classList.remove("drawer-open");
+/* DRAWER */
+const menuBtn = document.getElementById("menuBtn");
+const sideNav = document.getElementById("sideNav");
+const navOverlay = document.getElementById("navOverlay");
 
-logoutBtn.onclick=()=>{
-  sessionStorage.clear();
-  location.href="login";
+menuBtn.onclick = () => {
+  document.body.classList.toggle("drawer-open");
+};
+
+navOverlay.onclick = () => {
+  document.body.classList.remove("drawer-open");
 };
 </script>
 
