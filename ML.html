@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Plant Disease Detector - Krishi Mitr</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest/dist/tf.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@latest/dist/teachablemachine-image.min.js"></script>
+
+<style>
+/* KEEP YOUR ORIGINAL STYLES (unchanged) */
+body {
+  margin: 0;
+  font-family: "Poppins", Arial, sans-serif;
+  min-height: 100vh;
+  background: linear-gradient(180deg,#f6e2cc 0%,#f7f9f8 45%,#dceee3 100%);
+}
+
+/* ADD THIS NEW ML BOX */
+.ml-card {
+  background: rgba(255,255,255,0.9);
+  padding: 40px;
+  border-radius: 25px;
+  box-shadow: 0 20px 45px rgba(0,0,0,0.15);
+  text-align: center;
+  max-width: 420px;
+  width: 100%;
+}
+
+.ml-card h2 {
+  color: #0a3d62;
+}
+
+.ml-card img {
+  max-width: 100%;
+  margin-top: 10px;
+  border-radius: 10px;
+}
+
+.ml-card button {
+  margin-top: 10px;
+  padding: 10px;
+  width: 100%;
+  border: none;
+  border-radius: 8px;
+  background: green;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+#result {
+  margin-top: 15px;
+  font-size: 18px;
+}
+</style>
+</head>
+
+<body>
+
+<!-- NAVBAR (UNCHANGED) -->
+<div class="top-nav">
+  <div class="nav-left">
+    <button class="hamburger-btn" id="menuBtn">
+      <div class="hamburger-icon"><span></span><span></span><span></span></div>
+    </button>
+    <p class="brand-title">Krishi Mitr</p>
+  </div>
+  <div class="nav-right">
+    <div class="profile-btn" onclick="location.href='Profile'">
+      <img src="profile_pic.png">
+    </div>
+    <button class="logout-btn" id="logoutBtn">Logout</button>
+  </div>
+</div>
+
+<!-- DRAWER (UNCHANGED) -->
+<div class="nav-overlay" id="navOverlay" hidden></div>
+<nav class="side-drawer" id="sideNav" hidden>
+  <div class="drawer-inner">
+    <div class="menu-section">
+      <div class="menu-section-title">Tools & Services</div>
+      <ul class="menu-list">
+        <li><a href="#">Plant Disease Detector</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- 🌿 ML SECTION (REPLACES WELCOME CARD) -->
+<div class="container">
+  <div class="ml-card">
+    <h2>🌿 Plant Disease Detector</h2>
+
+    <input type="file" id="imageInput" accept="image/*">
+    <img id="preview">
+
+    <button onclick="analyze()">Analyze</button>
+
+    <div id="result"></div>
+  </div>
+</div>
+
+<script>
+const URL = "https://teachablemachine.withgoogle.com/models/DUCzqn8BH/";
+
+let model;
+
+const input = document.getElementById("imageInput");
+const preview = document.getElementById("preview");
+const result = document.getElementById("result");
+
+/* preview */
+input.onchange = () => {
+  const file = input.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = e => preview.src = e.target.result;
+  reader.readAsDataURL(file);
+};
+
+/* load model */
+async function loadModel() {
+  model = await tmImage.load(URL + "model.json", URL + "metadata.json");
+}
+
+/* analyze */
+async function analyze() {
+  if (!input.files[0]) {
+    alert("Upload image first");
+    return;
+  }
+
+  result.innerText = "Analyzing plant... 🌱";
+
+  if (!model) await loadModel();
+
+  const prediction = await model.predict(preview);
+
+  let best = prediction[0];
+
+  prediction.forEach(p => {
+    if (p.probability > best.probability) best = p;
+  });
+
+  result.innerHTML = `
+    🌿 <b>${best.className}</b><br>
+    Confidence: ${(best.probability * 100).toFixed(2)}%
+  `;
+}
+
+/* KEEP YOUR DASHBOARD LOGIC */
+const db = window.db;
+
+document.getElementById("logoutBtn").onclick = () => {
+  sessionStorage.clear();
+  location.href = "login";
+};
+
+const menuBtn = document.getElementById("menuBtn");
+const sideNav = document.getElementById("sideNav");
+const navOverlay = document.getElementById("navOverlay");
+
+function openDrawer(){
+  document.body.classList.add("drawer-open");
+  sideNav.hidden=false;
+  navOverlay.hidden=false;
+}
+
+function closeDrawer(){
+  document.body.classList.remove("drawer-open");
+  setTimeout(()=>{
+    sideNav.hidden=true;
+    navOverlay.hidden=true;
+  },220);
+}
+
+menuBtn.onclick=()=>{
+  document.body.classList.contains("drawer-open") ? closeDrawer() : openDrawer();
+};
+
+navOverlay.onclick=closeDrawer;
+</script>
+
+</body>
+</html>
