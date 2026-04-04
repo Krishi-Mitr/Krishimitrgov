@@ -344,72 +344,114 @@ function toggle(id){
     const el = document.getElementById(sec);
 
     if(sec === id){
+
       if(el.style.display === "none" || el.style.display === ""){
+
         el.style.display = (sec === "cropContent") ? "grid" : "block";
+
+        // 🔥 LOAD DATA WHEN OPENED
+        if(sec === "cropContent"){
+          loadNotifications();
+        }
+
+        if(sec === "toolContent"){
+          loadToolNotifications();
+        }
+
       } else {
         el.style.display = "none";
       }
+
     } else {
-      el.style.display = "none"; // ✅ close others
+      el.style.display = "none";
     }
   });
 }
 /* load */
 async function loadNotifications(){
 
-  const {data}=await db
+  const usertype = sessionStorage.getItem("usertype");
+
+  const { data, error } = await db
     .from("buy_table")
     .select("*")
-    .eq("fid",loginid)
-    .order("id",{ascending:false});
+    .order("id", { ascending: false });
 
-  const box=document.getElementById("cropContent");
-  box.innerHTML="";
+  const box = document.getElementById("cropContent");
+  box.innerHTML = "";
+
   if(!data || data.length === 0){
-    if(!data || data.length === 0){
-  box.innerHTML = `<div class="no-data">No Notifications</div>`;
-  return; // ❌ do NOT change display
-}
     box.innerHTML = `<div class="no-data">No Notifications</div>`;
     return;
   }
 
-  data.forEach(o=>{
+  data.forEach(o => {
 
-    let color="#f59e0b";
-    if(o.status==="Confirmed") color="#16a34a";
-    if(o.status==="Declined") color="#dc2626";
+    // 🎯 CASE 1: CITIZEN VIEW
+    if(usertype === "Citizen" && o.lid == loginid){
 
-    const card=document.createElement("div");
-    card.className="card";
+      const card = document.createElement("div");
+      card.className = "card";
 
-    card.innerHTML=`
-      <h3>${o.cname}</h3>
-      <p>Buyer:  ${o.buyer_name}</p><p> Quantity: ${o.quantity} kg</p>
-      <span class="badge" style="background:${color}">
-        ${o.status}
-      </span>
-    `;
+      card.innerHTML = `
+        <p>
+          You have bought <b>${o.cname}</b> from the farmer 
+          <b>${o.fname}</b> for the price of 
+          <b>₹${o.total_price}</b>.
+        </p>
 
-    if(o.status==="Pending"){
-      const btns=document.createElement("div");
-      btns.className="btn-row";
-
-      btns.innerHTML=`
-        <button class="btn accept">Accept</button>
-        <button class="btn decline">Decline</button>
+        <p style="margin-top:10px; font-weight:600;">
+          Order status: <span style="color:#0a3d62;">${o.status}</span>
+        </p>
       `;
 
-      btns.children[0].onclick=()=>openPopup(o,"accept");
-      btns.children[1].onclick=()=>openPopup(o,"decline");
-
-      card.appendChild(btns);
+      box.appendChild(card);
     }
 
-    box.appendChild(card);
-  });
-}
+    // 🌾 CASE 2: FARMER VIEW (your existing logic)
+    else if(usertype !== "Citizen" && o.fid == loginid){
 
+      let color="#f59e0b";
+      if(o.status==="Confirmed") color="#16a34a";
+      if(o.status==="Declined") color="#dc2626";
+
+      const card=document.createElement("div");
+      card.className="card";
+
+      card.innerHTML=`
+        <h3>${o.cname}</h3>
+        <p>Buyer: ${o.buyer_name}</p>
+        <p>Quantity: ${o.quantity} kg</p>
+
+        <span class="badge" style="background:${color}">
+          ${o.status}
+        </span>
+      `;
+
+      if(o.status==="Pending"){
+        const btns=document.createElement("div");
+        btns.className="btn-row";
+
+        btns.innerHTML=`
+          <button class="btn accept">Accept</button>
+          <button class="btn decline">Decline</button>
+        `;
+
+        btns.children[0].onclick=()=>openPopup(o,"accept");
+        btns.children[1].onclick=()=>openPopup(o,"decline");
+
+        card.appendChild(btns);
+      }
+
+      box.appendChild(card);
+    }
+
+  });
+
+  if(box.innerHTML === ""){
+    box.innerHTML = `<div class="no-data">No Notifications</div>`;
+  }
+}
   async function loadToolNotifications(){
 
   const { data, error } = await db
