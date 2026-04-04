@@ -253,13 +253,13 @@ Logout
 </ul>
 </div>
 
-<div class="menu-section">
+<div class="menu-section" id="marketSection" style="display:none;">
 <div class="menu-section-title">Market</div>
 <ul class="menu-list">
-<li><a href="Update_crops">Manage Your Crops</a></li>
-<li><a href="Sell">Sell Your Crop</a></li>
-  <li><a href="tools_rental.html">List Tool for Rent</a></li>
-<li><a href="my_listings.html">My Tool Inventory</a></li>
+<li class="farmer-only" style="display:none;"><a href="Update_crops">Manage Your Crops</a></li>
+<li class="farmer-only" style="display:none;"><a href="Sell">Sell Your Crop</a></li>
+<li class="farmer-only" style="display:none;"><a href="tools_rental.html">List Tool for Rent</a></li>
+<li class="farmer-only" style="display:none;"><a href="my_listings.html">My Tool Inventory</a></li>
 </ul>
 </div>
 
@@ -276,7 +276,7 @@ Logout
 <div class="menu-section" style="margin-bottom:0;">
 <div class="menu-section-title">System</div>
 <ul class="menu-list">
-<li><><a href="Notification">Notification</a></li>
+<li class="farmer-only" style="display:none;"><a href="Notification">Notification</a></li>
 <li><a href="Chat">Chat</a></li>
 </ul>
 </div>
@@ -427,9 +427,20 @@ sideNav.hidden = true;
 navOverlay.hidden = true;
 
 };
+  function applyRoleControl() {
+  const usertype = sessionStorage.getItem("usertype");
 
+  if (usertype === "Farmer") {
+    document.getElementById("marketSection").style.display = "block";
+
+    document.querySelectorAll(".farmer-only").forEach(el => {
+      el.style.display = "block";
+    });
+  }
+}
+
+applyRoleControl();
 fetchTools();
-
 </script>
 
 </body>
