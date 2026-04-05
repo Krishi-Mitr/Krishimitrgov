@@ -256,12 +256,13 @@ body.drawer-open .side-drawer{transform:translateX(0);}
 <!-- 🌿 ML -->
 <div class="container">
   <div class="ml-card">
-    <h2>🌿 Plant Disease Detector</h2>
+    <h2>Plant Disease Detector</h2>
 
     <input type="file" id="imageInput">
     <img id="preview">
 
-    <button onclick="analyze()">Analyze</button>
+     <!--This is for now, <button onclick="analyze()">Analyze</button>   a -->
+    <button>Coming soon </button>
 
     <div id="result"></div>
   </div>
@@ -288,7 +289,7 @@ async function loadModel(){
 async function analyze(){
   if(!input.files[0]){alert("Upload image first");return;}
 
-  result.innerText="Analyzing... 🌱";
+  result.innerText="Analyzing... ";
 
   if(!model) await loadModel();
 
@@ -299,7 +300,7 @@ async function analyze(){
     if(p.probability>best.probability) best=p;
   });
 
-  result.innerHTML=`🌿 ${best.className}<br>Confidence: ${(best.probability*100).toFixed(2)}%`;
+  result.innerHTML=` ${best.className}<br>Confidence: ${(best.probability*100).toFixed(2)}%`;
 }
 
 /* NAV */
