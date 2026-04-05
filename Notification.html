@@ -301,12 +301,11 @@ body.drawer-open .side-drawer {
     <span class="brand-title">Krishi Mitr</span>
   </div>
 
-  <div class="nav-right">
-    <div class="profile-btn">
-      <img src="profile_pic.png">
-    </div>
-    <button class="logout-btn" id="logoutBtn">Logout</button>
+ <div class="nav-right">
+  <div class="profile-btn" onclick="goToProfile()">
+    <img src="profile_pic.png">
   </div>
+  <button class="logout-btn" id="logoutBtn">Logout</button>
 </div>
 
 <div class="nav-overlay" id="navOverlay" hidden></div>
@@ -427,6 +426,9 @@ logoutBtn.onclick=()=>{
   location.href="login";
 };
 
+  function goToProfile(){
+  location.href = "Profile.html";
+}
   function setupMenu(){
 
   const usertype = sessionStorage.getItem("usertype");
