@@ -115,24 +115,59 @@ body.drawer-open { overflow: hidden; }
   position: fixed;
   top: 84px;
   left: 14px;
-  width: 300px;
+  width: min(320px, calc(100vw - 28px));
+  max-height: calc(100vh - 98px);
+  overflow: auto;
   background: linear-gradient(180deg,#0a3d62,#082032);
+  border: 3px solid #ffffff;
   border-radius: 18px;
+  box-shadow: 0 18px 40px rgba(0,0,0,0.35);
   transform: translateX(-110%);
-  transition: .25s;
+  transition: transform .25s ease;
   z-index: 9999;
 }
 
-body.drawer-open .nav-overlay { opacity:1; pointer-events:auto; }
-body.drawer-open .side-drawer { transform:translateX(0); }
+.drawer-inner { padding: 14px; }
+
+.menu-section {
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.15);
+  margin-bottom: 14px;
+  background: rgba(255,255,255,0.05);
+}
+
+.menu-section-title {
+  padding: 12px 14px;
+  background: rgba(255,255,255,0.1);
+  color: white;
+  font-weight: 800;
+}
+
+.menu-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
 
 .menu-list a {
-  display:block;
-  padding:14px;
-  color:white;
-  text-decoration:none;
+  display: block;
+  padding: 14px;
+  text-decoration: none;
+  color: white;
+  font-weight: 600;
+  background: rgba(255,255,255,0.08);
+  transition: 0.2s;
 }
-.menu-list a:hover { background:#1e3a8a; }
+
+.menu-list a:hover {
+  background: #1e3a8a;
+  padding-left: 20px;
+}
+
+body.drawer-open .side-drawer {
+  transform: translateX(0);
+}
 
 /* ===== CONTENT ===== */
 .container {
@@ -274,17 +309,45 @@ body.drawer-open .side-drawer { transform:translateX(0); }
   </div>
 </div>
 
-<div class="nav-overlay" id="overlay"></div>
+<div class="nav-overlay" id="navOverlay" hidden></div>
 
-<div class="side-drawer" id="drawer">
-  <div class="menu-list">
-    <a href="Dashboard">Dashboard</a>
-    <a href="Update_crops">Manage Crops</a>
-    <a href="Sell">Sell Crop</a>
-    <a href="Buy">Buy Crops</a>
-    <a href="Notification">Notification</a>
+<nav class="side-drawer" id="sideNav" hidden>
+  <div class="drawer-inner">
+
+    <!-- MARKET (Farmer only) -->
+    <div class="menu-section" id="marketSection" style="display:none;">
+      <div class="menu-section-title">Market</div>
+      <ul class="menu-list">
+        <li class="farmer-only" style="display:none;"><a href="Update_crops">Manage Your Crops</a></li>
+        <li class="farmer-only" style="display:none;"><a href="Sell">Sell Your Crop</a></li>
+        <li class="farmer-only" style="display:none;"><a href="tools_rental.html">List Tool for Rent</a></li>
+        <li class="farmer-only" style="display:none;"><a href="my_listings.html">My Tool Inventory</a></li>
+      </ul>
+    </div>
+
+    <!-- TOOLS -->
+    <div class="menu-section">
+      <div class="menu-section-title">Tools & Services</div>
+      <ul class="menu-list">
+        <li><a href="Buy">Buy Crops</a></li>
+        <li><a href="browse_tools.html">Rent Tools & Machinery</a></li>
+        <li><a href="krishimitr">Crop Predictor</a></li>
+        <li><a href="advisor">Crop Advisor</a></li>
+      </ul>
+    </div>
+
+    <!-- SYSTEM -->
+    <div class="menu-section">
+      <div class="menu-section-title">System</div>
+      <ul class="menu-list">
+        <li><a href="Notification">Notification</a></li>
+        <li><a href="Chat">Chat</a></li>
+        <li><a href="ML">Plant Disease Detector</a></li>
+      </ul>
+    </div>
+
   </div>
-</div>
+</nav>
 
 <!-- CONTENT -->
 <div class="container">
@@ -327,14 +390,51 @@ let selectedOrder=null;
 let actionType="";
 
 /* drawer */
-menuBtn.onclick=()=>document.body.classList.toggle("drawer-open");
-overlay.onclick=()=>document.body.classList.remove("drawer-open");
+const menuBtn = document.getElementById("menuBtn");
+const sideNav = document.getElementById("sideNav");
+const navOverlay = document.getElementById("navOverlay");
 
+function openDrawer(){
+  document.body.classList.add("drawer-open");
+  sideNav.hidden = false;
+  navOverlay.hidden = false;
+}
+
+function closeDrawer(){
+  document.body.classList.remove("drawer-open");
+  setTimeout(()=>{
+    if(!document.body.classList.contains("drawer-open")){
+      sideNav.hidden = true;
+      navOverlay.hidden = true;
+    }
+  },220);
+}
+
+menuBtn.onclick = () => {
+  document.body.classList.contains("drawer-open")
+    ? closeDrawer()
+    : openDrawer();
+};
+
+navOverlay.onclick = closeDrawer;
 logoutBtn.onclick=()=>{
   sessionStorage.clear();
   location.href="login";
 };
 
+  function setupMenu(){
+
+  const usertype = sessionStorage.getItem("usertype");
+
+  if (usertype === "Farmer") {
+    document.getElementById("marketSection").style.display = "block";
+
+    document.querySelectorAll(".farmer-only")
+      .forEach(el => el.style.display = "block");
+  }
+}
+
+setupMenu();
 /* dropdown */
 function toggle(id){
 
