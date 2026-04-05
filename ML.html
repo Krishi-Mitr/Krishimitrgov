@@ -103,14 +103,14 @@ body.drawer-open{overflow:hidden;}
   transition: 0.3s;
   z-index: 9998;
 }
-  .menu-list{
-  display: flex;
-  flex-direction: column;
+ .menu-list{
+  list-style: none;
+  padding: 0;
+  margin: 0;
 }
 
-.menu-list a{
+.menu-list li{
   width: 100%;
-  box-sizing: border-box;
 }
 .side-drawer{
   position: fixed;
@@ -239,39 +239,43 @@ body.drawer-open .side-drawer{transform:translateX(0);}
 <!-- FULL MENU -->
 <nav class="side-drawer" id="sideNav">
 
-   <div class="menu-section">
-      <div class="menu-section-title">Main</div>
-      <ul class="menu-list">
-       <a href="Dashboard">Dashboard</a>
-      </ul>
-    </div>
   <div class="menu-section">
-    <div class="menu-section-title">Market</div>
-    <div class="menu-list">
-      <a href="#">Manage Crops</a>
-      <a href="#">Sell Crop</a>
-    </div>
+    <div class="menu-section-title">Main</div>
+    <ul class="menu-list">
+      <li><a href="Dashboard">Dashboard</a></li>
+    </ul>
+  </div>
+
+<div class="menu-section" id="marketSection" style="display:none;">
+  <div class="menu-section-title">Market</div>
+    <ul class="menu-list">
+     <li class="farmer-only" style="display:none;"><a href="Update_crops">Manage Your Crops</a></li>
+<li class="farmer-only" style="display:none;"><a href="Sell">Sell Your Crop</a></li>
+<li class="farmer-only" style="display:none;"><a href="tools_rental.html">List Tool for Rent</a></li>
+<li class="farmer-only" style="display:none;"><a href="my_listings.html">My Tool Inventory</a></li>
+<li class="farmer-only" style="display:none;"><a href="Notification">Notification</a></li>
+    </ul>
   </div>
 
   <div class="menu-section">
     <div class="menu-section-title">Tools & Services</div>
-    <div class="menu-list">
-      <a href="#">Buy Crops</a>
-      <a href="#">Rent Tools</a>
-      <a href="#">Crop Predictor</a>
-      <a href="#">Crop Advisor</a>
-    </div>
+    <ul class="menu-list">
+      <li><a href="Buy">Buy Crops</a></li>
+      <li><a href="browse_tools.html">Rent Tools & Machinery</a></li>
+      <li><a href="krishimitr">Crop Predictor</a></li>
+      <li><a href="advisor">Crop Advisor</a></li>
+    </ul>
   </div>
 
-  <div class="menu-section">
+  <div class="menu-section" style="margin-bottom:0;">
     <div class="menu-section-title">System</div>
-    <div class="menu-list">
-      <a href="#">Notification</a>
-      <a href="#">Chat</a>
-    </div>
+    <ul class="menu-list">
+      <li class="farmer-only"><a href="Notification">Notification</a></li>
+      <li><a href="Chat">Chat</a></li>
+    </ul>
   </div>
-</nav>
 
+</nav>
 <!-- 🌿 ML -->
 <div class="container">
   <div class="ml-card">
@@ -330,6 +334,32 @@ logoutBtn.onclick=()=>{
   sessionStorage.clear();
   location.href="login";
 };
+  /* USER TYPE CHECK */
+function checkUserType() {
+  const usertype = sessionStorage.getItem("usertype");
+
+  // If not logged in → redirect
+  if (!usertype) {
+    location.href = "login";
+    return;
+  }
+
+  // If Farmer → show farmer menu
+  if (usertype === "Farmer") {
+    document.getElementById("marketSection").style.display = "block";
+
+    document.querySelectorAll(".farmer-only").forEach(el => {
+      el.style.display = "block";
+    });
+
+  } else {
+    // Hide farmer-only stuff
+    document.getElementById("marketSection").style.display = "none";
+  }
+}
+
+// Run on page load
+checkUserType();
 </script>
 
 </body>
