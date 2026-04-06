@@ -1,4 +1,5 @@
 
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -301,13 +302,13 @@ body.drawer-open .side-drawer {
     <span class="brand-title">Krishi Mitr</span>
   </div>
 
-<div class="nav-right">
-  <div class="profile-btn" onclick="goToProfile()">
-    <img src="profile_pic.png">
+  <div class="nav-right">
+    <div class="profile-btn">
+      <img src="profile_pic.png">
+    </div>
+    <button class="logout-btn" id="logoutBtn">Logout</button>
   </div>
-  <button class="logout-btn" id="logoutBtn">Logout</button>
 </div>
-  
 
 <div class="nav-overlay" id="navOverlay" hidden></div>
 
@@ -391,11 +392,6 @@ body.drawer-open .side-drawer {
 const db = window.db;
 const loginid = Number(sessionStorage.getItem("loginid"));
 
-  function goToProfile(){
-  window.location.href = "./Profile.html";
-}
-
-  
 let selectedOrder=null;
 let actionType="";
 
