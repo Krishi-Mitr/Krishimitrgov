@@ -17,6 +17,25 @@ body.drawer-open{overflow:hidden}
 .hamburger-icon span:nth-child(2){top:5.5px}
 .hamburger-icon span:nth-child(3){top:11px}
 .brand-title{margin:0;font-size:1.15rem;font-weight:800;color:#0a3d62}
+  .nav-right {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.profile-btn img {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    border: 2px solid #0a3d62;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.profile-btn img:hover {
+    transform: scale(1.1);
+    box-shadow: 0 0 15px rgba(10,61,98,0.4);
+}
 .logout-btn{background:white;color:#0a3d62;border:2px solid #0a3d62;padding:10px 22px;border-radius:10px;font-weight:700;cursor:pointer}
 .nav-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.25);opacity:0;pointer-events:none;transition:opacity .2s;z-index:9998}
 .side-drawer{position:fixed;top:84px;left:14px;width:min(320px,calc(100vw - 28px));background:linear-gradient(180deg,#0a3d62,#082032);border:3px solid #ffffff;border-radius:18px;transform:translateX(-110%);transition:transform .25s;z-index:9999;max-height:calc(100vh - 98px);overflow:auto}
@@ -36,13 +55,19 @@ body.dark .card{background:#2d2d2d;border-color:#4a9eff}
 </head>
 <body>
 <div class="top-nav">
-<div class="nav-left">
-<button class="hamburger-btn" id="menuBtn">
-<div class="hamburger-icon"><span></span><span></span><span></span></div>
-</button>
-<div class="brand-title"><b>Krishi Mitr</b><br>Crop Advisor</div>
-</div>
-<button class="logout-btn" id="logoutBtn">Logout</button>
+    <div class="nav-left">
+        <button class="hamburger-btn" id="menuBtn">
+            <div class="hamburger-icon"><span></span><span></span><span></span></div>
+        </button>
+        <p class="brand-title">Krishi Mitr</p>
+    </div>
+
+      <div class="nav-right">
+    <div class="profile-btn" onclick="location.href='Profile'">
+      <img src="profile_pic.png" alt="Profile">
+    </div>
+        <button class="logout-btn" id="logoutBtn">Logout</button>
+    </div>
 </div>
 <div class="nav-overlay" id="navOverlay" hidden></div>
 <nav class="side-drawer" id="sideNav" hidden>
