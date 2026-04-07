@@ -139,8 +139,8 @@ let isSending = false; // prevent double click
 async function loadUser(){
   const { data, error } = await window.db
     .from("logindata")
-    .select("id, username")
-    .eq("loginid", loginString)
+    .select("loginid, username")
+.eq("loginid", loginString)
     .single();
 
   if(error || !data){
@@ -148,7 +148,7 @@ async function loadUser(){
     return;
   }
 
-  myId = data.id;
+  myId = data.loginid;
   myUsername = data.username;
 }
 loadUser();
@@ -188,7 +188,7 @@ toInput.addEventListener("input", async()=>{
 
   const { data } = await window.db
     .from("logindata")
-    .select("id, username")
+.select("loginid, username")
     .ilike("username", val + "%")
     .limit(5);
 
@@ -213,7 +213,7 @@ toInput.addEventListener("input", async()=>{
 
     div.onclick = () => {
       toInput.value = u.username;
-      receiverId = u.id;
+receiverId = u.loginid;
       receiverName = u.username;
       suggestions.innerHTML = "";
     };
