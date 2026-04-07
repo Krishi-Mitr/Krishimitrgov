@@ -270,7 +270,6 @@ async function loadMyId(){
   }
 }
 
-await loadMyId();
 async function loadChats(){
 
   // ✅ Step 1: get ALL chats
@@ -344,9 +343,17 @@ async function loadChats(){
   }
 }
 
-setInterval(loadChats, 3000);
+async function init(){
+
+  await loadMyId();   // ✅ now it works properly
+
+  await loadChats();  // first load
+
+  setInterval(loadChats, 3000); // keep updating
+}
+
 applyRolePermissions();
-loadChats();
+init();
 </script>
 </body>
 </html>
