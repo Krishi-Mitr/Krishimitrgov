@@ -256,6 +256,21 @@ function applyRolePermissions() {
 
 let lastRendered = "";
 
+  let myId = null;
+
+async function loadMyId(){
+  const { data } = await db
+    .from("logindata")
+    .select("id")
+    .eq("loginid", myLoginId)
+    .single();
+
+  if(data){
+    myId = data.id;
+  }
+}
+
+await loadMyId();
 async function loadChats(){
 
   // ✅ Step 1: get ALL chats
@@ -301,8 +316,7 @@ async function loadChats(){
 
     const otherName = user1Login === myLoginId ? chat.user2name : chat.user1name;
     const otherId = user1Login === myLoginId ? user2Login : user1Login;
-const isNew = idToLogin[chat.unread_for] == myLoginId;
-
+    const isNew = chat.unread_for == myId;
     const card = document.createElement("div");
     card.className = "chat-card" + (isNew ? " unread" : "");
 
