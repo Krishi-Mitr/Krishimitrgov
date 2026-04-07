@@ -257,27 +257,57 @@ function applyRolePermissions() {
 let lastRendered = "";
 
 async function loadChats(){
+
+  // ✅ Step 1: get ALL chats
   const { data: chats } = await db
     .from("chat_conversations")
     .select("*")
-    .or(`user1id.eq.${myLoginId},user2id.eq.${myLoginId}`)
     .order("last_time", { ascending:false });
 
   if(!chats) return;
-  const snapshot = JSON.stringify(chats);
+
+  // ✅ Step 2: get all users (to map id → loginid)
+  const { data: users } = await db
+    .from("logindata")
+    .select("id, loginid");
+
+  if(!users) return;
+
+  // ✅ Create mapping: id → loginid
+  const idToLogin = {};
+  users.forEach(u => {
+    idToLogin[u.id] = u.loginid;
+  });
+
+  // ✅ Step 3: filter chats using loginid
+  const filteredChats = chats.filter(chat => {
+    return (
+      idToLogin[chat.user1id] == myLoginId ||
+      idToLogin[chat.user2id] == myLoginId
+    );
+  });
+
+  const snapshot = JSON.stringify(filteredChats);
   if(snapshot === lastRendered) return;
   lastRendered = snapshot;
 
   const chatList = document.getElementById("chatList");
   chatList.innerHTML = "";
 
-  for(const chat of chats){
-    const otherName = chat.user1id === myLoginId ? chat.user2name : chat.user1name;
-    const otherId = chat.user1id === myLoginId ? chat.user2id : chat.user1id;
-    const isNew = chat.unread_for === myLoginId;
+  for(const chat of filteredChats){
+
+    const user1Login = idToLogin[chat.user1id];
+    const user2Login = idToLogin[chat.user2id];
+
+    const otherName = user1Login === myLoginId ? chat.user2name : chat.user1name;
+    const otherId = user1Login === myLoginId ? user2Login : user1Login;
+    const isNew = chat.unread_for === chat.user1id
+      ? idToLogin[chat.unread_for] === myLoginId
+      : false;
 
     const card = document.createElement("div");
     card.className = "chat-card" + (isNew ? " unread" : "");
+
     card.onclick = () => {
       sessionStorage.setItem("chatid", chat.chatid);
       sessionStorage.setItem("otherid", otherId);
@@ -297,6 +327,7 @@ async function loadChats(){
         ${isNew ? `<div class="unread-count">New</div>` : ""}
       </div>
     `;
+
     chatList.appendChild(card);
   }
 }
