@@ -301,9 +301,7 @@ async function loadChats(){
 
     const otherName = user1Login === myLoginId ? chat.user2name : chat.user1name;
     const otherId = user1Login === myLoginId ? user2Login : user1Login;
-    const isNew = chat.unread_for === chat.user1id
-      ? idToLogin[chat.unread_for] === myLoginId
-      : false;
+const isNew = idToLogin[chat.unread_for] == myLoginId;
 
     const card = document.createElement("div");
     card.className = "chat-card" + (isNew ? " unread" : "");
