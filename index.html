@@ -159,7 +159,7 @@
   <header>
     <div class="logo">KrishiMitr</div>
     <div style="display: flex; gap: 15px; align-items: center;">
-      <button id="toggleDark" class="btn-dark-toggle">Dark Mode</button>
+   
       <a href="login.html" class="login-btn">Login</a>
     </div>
   </header>
@@ -187,12 +187,7 @@
         updateDarkModeButton();
     }
 
-    function updateDarkModeButton() {
-        const toggleBtn = document.getElementById('toggleDark');
-        if (toggleBtn) {
-            toggleBtn.innerText = document.body.classList.contains('dark') ? '☀️ Light Mode' : '🌙 Dark Mode';
-        }
-    }
+  
 
     const toggleBtn = document.getElementById('toggleDark');
     if (toggleBtn) {
