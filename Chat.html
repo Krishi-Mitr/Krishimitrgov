@@ -294,12 +294,12 @@ async function loadChats(){
   });
 
   // ✅ Step 3: filter chats using loginid
-  const filteredChats = chats.filter(chat => {
-    return (
-      idToLogin[chat.user1id] == myLoginId ||
-      idToLogin[chat.user2id] == myLoginId
-    );
-  });
+ const filteredChats = chats.filter(chat => {
+  return (
+    chat.user1id == myLoginId ||
+    chat.user2id == myLoginId
+  );
+});
 
   const snapshot = JSON.stringify(filteredChats);
   if(snapshot === lastRendered) return;
@@ -315,7 +315,7 @@ async function loadChats(){
 
     const otherName = user1Login === myLoginId ? chat.user2name : chat.user1name;
     const otherId = user1Login === myLoginId ? user2Login : user1Login;
-    const isNew = chat.unread_for == myId;
+    const isNew = Number(chat.unread_for) === Number(myLoginId);
     const card = document.createElement("div");
     card.className = "chat-card" + (isNew ? " unread" : "");
 
