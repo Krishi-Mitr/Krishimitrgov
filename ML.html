@@ -92,11 +92,21 @@ body.drawer-open {
 /* RIGHT NAV */
 .nav-right{display:flex;align-items:center;gap:15px;}
 
-.profile-btn img{
-  width:42px;height:42px;
-  border-radius:50%;
-  border:2px solid #0a3d62;
+
+.profile-btn img {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  border: 2px solid #0a3d62;
+  cursor: pointer;
+  transition: 0.3s;
 }
+
+.profile-btn img:hover {
+  transform: scale(1.1);
+  box-shadow: 0 0 15px rgba(10, 61, 98, 0.4);
+}
+
 
 .logout-btn{
   background:white;
@@ -249,9 +259,11 @@ body.drawer-open .side-drawer{transform:translateX(0);}
   </div>
 
   <div class="nav-right">
-    <div class="profile-btn">
-      <img src="profile_pic.png">
-    </div>
+    
+<div class="profile-btn" onclick="location.href='Profile'">
+  <img src="profile_pic.png" alt="Profile">
+</div>
+
     <button class="logout-btn" id="logoutBtn">Logout</button>
   </div>
 </div>
