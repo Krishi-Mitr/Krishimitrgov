@@ -10,14 +10,35 @@
 <script src="supabase.js"></script>
 
 <style>
-body {
-  margin: 0;
-  font-family: "Poppins", Arial;
-  background: linear-gradient(180deg,#f6e2cc 0%,#f7f9f8 45%,#dceee3 100%);
+
+html {
+  min-height: 100%;
+  background: #dceee3;
 }
 
-/* ===== NAVBAR (EXACT COPY STYLE) ===== */
-body.drawer-open { overflow: hidden; }
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: "Poppins", Arial, sans-serif;
+  color: #1f2937;
+
+  /* Same background as the original UI */
+  background: linear-gradient(
+    180deg,
+    #f6e2cc 0%,
+    #f7f9f8 45%,
+    #dceee3 100%
+  );
+  background-repeat: no-repeat;
+  background-size: 100% 100vh;
+  background-attachment: fixed;
+}
+
+body.drawer-open {
+  overflow: hidden;
+}
+
+
 
 .top-nav {
   position: fixed;
@@ -288,7 +309,7 @@ body.drawer-open .side-drawer {
   padding:6px 12px;
 }
 </style>
-</style>
+
 </head>
 
 <body>
