@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <title>Dashboard - Krishi Mitr</title>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://jsdelivr.net"></script>
 <script src="supabase.js"></script>
 <style>
 body {
@@ -208,8 +208,7 @@ body.drawer-open .side-drawer { transform: translateX(0); }
       <ul class="menu-list">
         <li ><a href="Notification">Notification</a></li>
         <li><a href="Chat">Chat</a></li>
-       <li ><a href="ML">Plant Disease Detector</a></li>
-
+        <li ><a href="ML">Plant Disease Detector</a></li>
       </ul>
     </div>
   </div>
@@ -286,8 +285,9 @@ menuBtn.onclick=()=>{
 navOverlay.onclick=closeDrawer;
 
 initDashboard();
+</script>
 
-  <!-- n8n Floating Chat Bubble Assets -->
+<!-- n8n Floating Chat Bubble Integration -->
 <link rel="stylesheet" href="https://jsdelivr.net" />
 <div id="n8n-chat"></div>
 
@@ -295,7 +295,7 @@ initDashboard();
   import { createChat } from 'https://jsdelivr.net';
 
   createChat({
-    webhookUrl: 'https://a206d0ad8f81c4.lhr.life/webhook/krishimtr-chat/chat',
+    webhookUrl: 'https://lhr.life',
     mode: 'window', 
     title: 'KrishiMtr AI',
     subtitle: 'Online',
