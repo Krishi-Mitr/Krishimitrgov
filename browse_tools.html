@@ -462,10 +462,10 @@ async function fetchTools(name = "", loc = "", cat = "") {
         <div class="tool-title">${tool.tool_name || "Unnamed Tool"}</div>
 
         <div class="tool-meta">
-          <div>📍 <strong>Pickup:</strong> ${tool.location || "N/A"}</div>
-          <div>👤 <strong>Owner:</strong> ${tool.owner_name || "Farmer"}</div>
-          <div>📞 <strong>Contact:</strong> ${tool.contact || "N/A"}</div>
-          <div>📅 <strong>Available:</strong> ${availFrom} to ${availTo}</div>
+          <div> <strong>Pickup:</strong> ${tool.location || "N/A"}</div>
+          <div> <strong>Owner:</strong> ${tool.owner_name || "Farmer"}</div>
+          <div> <strong>Contact:</strong> ${tool.contact || "N/A"}</div>
+          <div> <strong>Available:</strong> ${availFrom} to ${availTo}</div>
         </div>
 
         ${tool.description ? `<div class="tool-desc">${tool.description}</div>` : ""}
