@@ -5,6 +5,7 @@
 <title>My Tool Listings - Krishi Mitr</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="supabase.js"></script>
+<link href="https://cdn.jsdelivr.net/npm/@n8n/chat/dist/style.css" rel="stylesheet" />
 <style>
 body {
   margin: 0;
@@ -295,5 +296,20 @@ async function deleteTool(id) {
 applyRolePermissions();
 fetchMyTools();
 </script>
+  <div id="n8n-chat"></div>
+
+<script type="module">
+  import { createChat } from 'https://cdn.jsdelivr.net/npm/@n8n/chat/dist/chat.bundle.es.js';
+
+  createChat({
+  webhookUrl: 'https://krishi-mitr.app.n8n.cloud/webhook/krishimtr-chat/chat',
+  target: '#n8n-chat',
+  initialMessages: [
+    'Hi! I am Krishi Mitr.',
+    'How can I help you today?'
+  ]
+});
+</script>
+
 </body>
 </html>
