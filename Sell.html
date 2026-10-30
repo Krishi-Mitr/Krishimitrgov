@@ -155,7 +155,10 @@ body.drawer-open .side-drawer { transform: translateX(0); }
 .sell-card h2 { margin-top: 0; color: #0a3d62; text-align: center; margin-bottom: 30px; }
 label { display: block; margin-bottom: 8px; font-weight: 600; color: #374151; }
 input, select, textarea { width: 100%; padding: 12px; border: 2px solid #e5e7eb; border-radius: 12px; font-size: 15px; box-sizing: border-box; }
-input:focus { border-color: #0a3d62; outline: none; }
+input:focus, select:focus, textarea:focus { border-color: #0a3d62; outline: none; }
+input.input-error, select.input-error, textarea.input-error { border-color: #dc2626; }
+.error-msg { color: #dc2626; font-size: 13px; margin-top: 5px; display: none; }
+.error-msg.visible { display: block; }
 .submit-btn { width: 100%; padding: 16px; background: #138808; color: white; border: none; border-radius: 15px; font-size: 18px; font-weight: 700; cursor: pointer; transition: 0.3s; margin-top: 20px; }
 .submit-btn:hover { background: #0e6306; transform: translateY(-2px); box-shadow: 0 10px 20px rgba(19,136,8,0.2); }
 </style>
@@ -215,14 +218,16 @@ input:focus { border-color: #0a3d62; outline: none; }
 <div class="container">
   <div class="sell-card">
     <h2>List Your Crop</h2>
-    <form id="sellForm" class="form-grid">
+    <form id="sellForm" class="form-grid" novalidate>
       <div>
         <label>Farmer Name</label>
         <input type="text" id="farmerName" required readonly>
+        <div class="error-msg" id="farmerNameError"></div>
       </div>
       <div>
         <label>Crop Name</label>
         <input type="text" id="cropName" placeholder="e.g. Basmati Rice" required>
+        <div class="error-msg" id="cropNameError"></div>
       </div>
       <div>
         <label>Crop Category</label>
@@ -234,18 +239,22 @@ input:focus { border-color: #0a3d62; outline: none; }
           <option>Oilseeds</option>
           <option>Spices</option>
         </select>
+        <div class="error-msg" id="cropCategoryError"></div>
       </div>
       <div>
         <label>Total Quantity (kg)</label>
-        <input type="number" id="quantity" required>
+        <input type="number" id="quantity" min="1" step="1" required>
+        <div class="error-msg" id="quantityError"></div>
       </div>
       <div>
         <label>Min Order (kg)</label>
-        <input type="number" id="minQuantity" required>
+        <input type="number" id="minQuantity" min="1" step="1" required>
+        <div class="error-msg" id="minQuantityError"></div>
       </div>
       <div>
         <label>Price per kg (₹)</label>
-        <input type="number" id="price" required>
+        <input type="number" id="price" min="0.01" step="0.01" required>
+        <div class="error-msg" id="priceError"></div>
       </div>
       <div>
         <label>Quality Grade</label>
@@ -254,14 +263,17 @@ input:focus { border-color: #0a3d62; outline: none; }
           <option>High (A)</option>
           <option>Standard (B)</option>
         </select>
+        <div class="error-msg" id="qualityError"></div>
       </div>
       <div>
         <label>Harvest Date</label>
         <input type="date" id="harvestDate" required>
+        <div class="error-msg" id="harvestDateError"></div>
       </div>
       <div>
         <label>Available Until</label>
         <input type="date" id="availableUntil" required>
+        <div class="error-msg" id="availableUntilError"></div>
       </div>
       <div>
         <label>Delivery/Pickup</label>
@@ -270,18 +282,22 @@ input:focus { border-color: #0a3d62; outline: none; }
           <option>Farmer Delivery</option>
           <option>Negotiable</option>
         </select>
+        <div class="error-msg" id="deliveryTypeError"></div>
       </div>
       <div class="full-width">
         <label>Location (City/Village)</label>
         <input type="text" id="cropLocation" required>
+        <div class="error-msg" id="cropLocationError"></div>
       </div>
       <div class="full-width">
         <label>Contact Info</label>
         <input type="text" id="contactInfo" required>
+        <div class="error-msg" id="contactInfoError"></div>
       </div>
       <div class="full-width">
         <label>Additional Description</label>
         <textarea id="description" rows="3"></textarea>
+        <div class="error-msg" id="descriptionError"></div>
       </div>
       <div class="full-width">
         <button type="submit" class="submit-btn">List Crop for Sale</button>
@@ -334,15 +350,253 @@ navOverlay.onclick = closeDrawer;
 
 document.getElementById("logoutBtn").onclick = ()=>{ sessionStorage.clear(); location.href="login"; };
 
+function getTodayStr() {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, "0");
+  const day = String(now.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+const harvestDateInput = document.getElementById("harvestDate");
+const availableUntilInput = document.getElementById("availableUntil");
+const quantityInput = document.getElementById("quantity");
+const minQuantityInput = document.getElementById("minQuantity");
+const priceInput = document.getElementById("price");
+
+function syncDateLimits() {
+  const today = getTodayStr();
+  harvestDateInput.max = today;
+  availableUntilInput.min = harvestDateInput.value && harvestDateInput.value > today ? harvestDateInput.value : today;
+}
+syncDateLimits();
+
+[quantityInput, minQuantityInput].forEach(input => {
+  input.addEventListener("keydown", (e) => {
+    if ([".", ",", "-", "+", "e", "E"].includes(e.key)) {
+      e.preventDefault();
+    }
+  });
+});
+
+priceInput.addEventListener("keydown", (e) => {
+  if (["-", "+", "e", "E"].includes(e.key)) {
+    e.preventDefault();
+  }
+});
+
+function setFieldError(fieldId, message) {
+  const input = document.getElementById(fieldId);
+  const errorEl = document.getElementById(fieldId + "Error");
+  if (!input || !errorEl) return true;
+  if (message) {
+    input.classList.add("input-error");
+    errorEl.textContent = message;
+    errorEl.classList.add("visible");
+    return false;
+  } else {
+    input.classList.remove("input-error");
+    errorEl.textContent = "";
+    errorEl.classList.remove("visible");
+    return true;
+  }
+}
+
+function clearAllErrors() {
+  [
+    "farmerName", "cropName", "cropCategory", "quantity", "minQuantity",
+    "price", "quality", "harvestDate", "availableUntil", "deliveryType",
+    "cropLocation", "contactInfo", "description"
+  ].forEach(id => setFieldError(id, ""));
+}
+
+function validateField(fieldId) {
+  const today = getTodayStr();
+
+  if (fieldId === "farmerName") {
+    const val = document.getElementById("farmerName").value.trim();
+    if (!val) return setFieldError("farmerName", "Farmer name is required.");
+    return setFieldError("farmerName", "");
+  }
+
+  if (fieldId === "cropName") {
+    const val = document.getElementById("cropName").value.trim();
+    if (!val) return setFieldError("cropName", "Please enter the crop name.");
+    if (val.length < 2) return setFieldError("cropName", "Crop name must be at least 2 characters.");
+    return setFieldError("cropName", "");
+  }
+
+  if (fieldId === "cropCategory") {
+    const val = document.getElementById("cropCategory").value;
+    if (!val) return setFieldError("cropCategory", "Please select a crop category.");
+    return setFieldError("cropCategory", "");
+  }
+
+  if (fieldId === "quantity") {
+    const raw = quantityInput.value.trim();
+    if (!raw) return setFieldError("quantity", "Please enter the total quantity.");
+    const num = Number(raw);
+    if (!Number.isFinite(num) || num <= 0) {
+      return setFieldError("quantity", "Total quantity must be a positive integer (at least 1).");
+    }
+    if (!Number.isInteger(num) || raw.includes(".")) {
+      return setFieldError("quantity", "Total quantity must be a whole number (no decimals).");
+    }
+    return setFieldError("quantity", "");
+  }
+
+  if (fieldId === "minQuantity") {
+    const raw = minQuantityInput.value.trim();
+    if (!raw) return setFieldError("minQuantity", "Please enter the minimum order quantity.");
+    const num = Number(raw);
+    if (!Number.isFinite(num) || num <= 0) {
+      return setFieldError("minQuantity", "Minimum order quantity must be a positive integer (at least 1).");
+    }
+    if (!Number.isInteger(num) || raw.includes(".")) {
+      return setFieldError("minQuantity", "Minimum order quantity must be a whole number (no decimals).");
+    }
+    const totalRaw = quantityInput.value.trim();
+    const totalNum = Number(totalRaw);
+    if (totalRaw && Number.isFinite(totalNum) && totalNum > 0 && num > totalNum) {
+      return setFieldError("minQuantity", "Minimum order quantity cannot be more than the total quantity.");
+    }
+    return setFieldError("minQuantity", "");
+  }
+
+  if (fieldId === "price") {
+    const raw = priceInput.value.trim();
+    if (!raw) return setFieldError("price", "Please enter the price per kg.");
+    const num = Number(raw);
+    if (!Number.isFinite(num) || num <= 0) {
+      return setFieldError("price", "Price per kg must be greater than 0.");
+    }
+    return setFieldError("price", "");
+  }
+
+  if (fieldId === "quality") {
+    const val = document.getElementById("quality").value;
+    if (!val) return setFieldError("quality", "Please select a quality grade.");
+    return setFieldError("quality", "");
+  }
+
+  if (fieldId === "harvestDate") {
+    const val = harvestDateInput.value;
+    if (!val) return setFieldError("harvestDate", "Please select the harvest date.");
+    if (val > today) {
+      return setFieldError("harvestDate", "Harvest date cannot be in the future.");
+    }
+    return setFieldError("harvestDate", "");
+  }
+
+  if (fieldId === "availableUntil") {
+    const val = availableUntilInput.value;
+    if (!val) return setFieldError("availableUntil", "Please select the available until date.");
+    if (val < today) {
+      return setFieldError("availableUntil", "Available until date cannot be in the past.");
+    }
+    const harvestVal = harvestDateInput.value;
+    if (harvestVal && val < harvestVal) {
+      return setFieldError("availableUntil", "Available until date cannot be earlier than the harvest date.");
+    }
+    return setFieldError("availableUntil", "");
+  }
+
+  if (fieldId === "deliveryType") {
+    const val = document.getElementById("deliveryType").value;
+    if (!val) return setFieldError("deliveryType", "Please select a delivery or pickup option.");
+    return setFieldError("deliveryType", "");
+  }
+
+  if (fieldId === "cropLocation") {
+    const val = document.getElementById("cropLocation").value.trim();
+    if (!val) return setFieldError("cropLocation", "Please enter the location (city or village).");
+    return setFieldError("cropLocation", "");
+  }
+
+  if (fieldId === "contactInfo") {
+    const val = document.getElementById("contactInfo").value.trim();
+    if (!val) return setFieldError("contactInfo", "Please enter your contact info.");
+    const phoneRegex = /^\d{10}$/;
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!phoneRegex.test(val) && !emailRegex.test(val)) {
+      return setFieldError("contactInfo", "Enter a valid 10-digit phone number or email address.");
+    }
+    return setFieldError("contactInfo", "");
+  }
+
+  if (fieldId === "description") {
+    const val = document.getElementById("description").value.trim();
+    if (val.length > 500) {
+      return setFieldError("description", "Description cannot exceed 500 characters.");
+    }
+    return setFieldError("description", "");
+  }
+
+  return true;
+}
+
+const validatedFields = [
+  "farmerName", "cropName", "cropCategory", "quantity", "minQuantity",
+  "price", "quality", "harvestDate", "availableUntil", "deliveryType",
+  "cropLocation", "contactInfo", "description"
+];
+
+validatedFields.forEach(fieldId => {
+  const el = document.getElementById(fieldId);
+  if (!el) return;
+  el.addEventListener("input", () => {
+    validateField(fieldId);
+    if (fieldId === "quantity" && minQuantityInput.value.trim() !== "") {
+      validateField("minQuantity");
+    }
+    if (fieldId === "harvestDate") {
+      syncDateLimits();
+      if (availableUntilInput.value !== "") {
+        validateField("availableUntil");
+      }
+    }
+  });
+  el.addEventListener("blur", () => {
+    if (fieldId !== "farmerName") validateField(fieldId);
+  });
+  el.addEventListener("change", () => {
+    validateField(fieldId);
+    if (fieldId === "harvestDate") {
+      syncDateLimits();
+      if (availableUntilInput.value !== "") {
+        validateField("availableUntil");
+      }
+    }
+  });
+});
+
 document.getElementById("sellForm").addEventListener("submit", async (e)=>{
   e.preventDefault();
+  let isFormValid = true;
+  let firstInvalidEl = null;
+
+  validatedFields.forEach(fieldId => {
+    const valid = validateField(fieldId);
+    if (!valid) {
+      isFormValid = false;
+      if (!firstInvalidEl) {
+        firstInvalidEl = document.getElementById(fieldId);
+      }
+    }
+  });
+
+  if (!isFormValid) {
+    if (firstInvalidEl) firstInvalidEl.focus();
+    return;
+  }
+
   const { error } = await db.from("crop_sales").insert({
     farmer_name: farmerName.value,
     crop_name: cropName.value,
     crop_category: cropCategory.value,
-    quantity: quantity.value,
-    min_quantity: minQuantity.value,
-    price: price.value,
+    quantity: Number(quantity.value),
+    min_quantity: Number(minQuantity.value),
+    price: Number(price.value),
     quality: quality.value,
     harvest_date: harvestDate.value,
     available_until: availableUntil.value,
@@ -354,7 +608,7 @@ document.getElementById("sellForm").addEventListener("submit", async (e)=>{
     lid: loginid
   });
   if(error){ alert(error.message); } 
-  else { alert("Crop listed successfully"); e.target.reset(); loadFarmer(); }
+  else { alert("Crop listed successfully"); e.target.reset(); clearAllErrors(); syncDateLimits(); loadFarmer(); }
 });
 
 applyRolePermissions();
