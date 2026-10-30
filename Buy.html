@@ -531,13 +531,13 @@ document.getElementById("logoutBtn").onclick = () => {
 applyRolePermissions();
 loadCrops();
 </script>
-  <div id="n8n-chat"></div>
+ <div id="n8n-chat"></div>
 
 <script type="module">
   import { createChat } from 'https://cdn.jsdelivr.net/npm/@n8n/chat/dist/chat.bundle.es.js';
 
   createChat({
-  webhookUrl: 'YOUR_N8N_CHAT_URL',
+  webhookUrl: 'https://krishi-mitr.app.n8n.cloud/webhook/krishimtr-chat/chat',
   target: '#n8n-chat',
   initialMessages: [
     'Hi! I am Krishi Mitr.',
@@ -545,6 +545,8 @@ loadCrops();
   ]
 });
 </script>
+
+
 
 
 </body>
