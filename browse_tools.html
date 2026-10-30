@@ -429,13 +429,13 @@ async function fetchTools(name = "", loc = "", cat = "") {
     return;
   }
 
-  // Filter out tools marked as unavailable (supports rows where is_available is true or null from tools_rental form)
+  // Show tools where is_available is true or null (newly listed from tools_rental)
   const availableTools = (data || []).filter(tool => tool.is_available !== false);
 
   container.innerHTML = availableTools.length ? "" : "<h3>No tools available.</h3>";
 
   availableTools.forEach(tool => {
-    const toolUniqueId = tool.tool_id || tool.id;
+    const domId = tool.id ?? tool.tool_id;
     const card = document.createElement("div");
     card.className = "tool-card";
 
@@ -444,7 +444,6 @@ async function fetchTools(name = "", loc = "", cat = "") {
     const availFrom = tool.available_from || "N/A";
     const availTo = tool.available_to || "N/A";
 
-    // Calculate max allowed days from available_from and available_to if valid
     let maxDays = 30;
     if (tool.available_from && tool.available_to) {
       const diffTime = new Date(tool.available_to) - new Date(tool.available_from);
@@ -482,11 +481,11 @@ async function fetchTools(name = "", loc = "", cat = "") {
         </div>
 
         <div class="days-row">
-          <label for="days_${toolUniqueId}">Rental Days:</label>
-          <input type="number" id="days_${toolUniqueId}" value="1" min="1" max="${maxDays}">
+          <label for="days_${domId}">Rental Days:</label>
+          <input type="number" id="days_${domId}" value="1" min="1" max="${maxDays}">
         </div>
 
-        <button class="rent-btn" id="btn_${toolUniqueId}">
+        <button class="rent-btn" id="btn_${domId}">
           Request Rental
         </button>
       </div>
@@ -494,8 +493,8 @@ async function fetchTools(name = "", loc = "", cat = "") {
 
     container.appendChild(card);
 
-    const rentBtn = card.querySelector(`#btn_${toolUniqueId}`);
-    const daysInput = card.querySelector(`#days_${toolUniqueId}`);
+    const rentBtn = card.querySelector(`#btn_${domId}`);
+    const daysInput = card.querySelector(`#days_${domId}`);
 
     rentBtn.addEventListener("click", () => {
       const requestedDays = Math.max(1, parseInt(daysInput.value, 10) || 1);
@@ -505,8 +504,8 @@ async function fetchTools(name = "", loc = "", cat = "") {
 }
 
 async function sendRequest(tool, requestedDays, btnElement) {
-  const toolUniqueId = tool.tool_id || tool.id;
-  const idColumn = tool.tool_id ? "tool_id" : "id";
+  // notifications.tool_id expects the integer primary key (tool.id)
+  const numericToolId = Number(tool.id);
   const pricePerDay = Number(tool.price_per_day) || 0;
   const totalPrice = pricePerDay * requestedDays;
 
@@ -524,13 +523,15 @@ async function sendRequest(tool, requestedDays, btnElement) {
   const payload = {
     sender_id: String(loginid),
     receiver_id: String(tool.user_id),
-    tool_id: toolUniqueId,
+    tool_id: numericToolId,
     tool_name: tool.tool_name,
     requested_days: requestedDays,
     total_price: totalPrice,
     sender_name: user?.name || "Farmer",
     status: "Pending"
   };
+
+  console.log("Sending Notification Data:", payload);
 
   const { error: notifError } = await db.from("notifications").insert([payload]);
 
@@ -547,10 +548,10 @@ async function sendRequest(tool, requestedDays, btnElement) {
   const { error: updateError } = await db
     .from("tool_rentals")
     .update({ is_available: false })
-    .eq(idColumn, toolUniqueId);
+    .eq("id", numericToolId);
 
   if (updateError) {
-    console.warn("Could not update tool availability:", updateError);
+    console.log("ERROR:", updateError);
   }
 
   alert(`Request sent for ${tool.tool_name} (${requestedDays} day(s) - Total: ₹${totalPrice})!`);
